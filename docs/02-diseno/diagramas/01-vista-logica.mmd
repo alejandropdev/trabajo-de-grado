@@ -1,0 +1,62 @@
+flowchart TB
+    subgraph PRES["Capa 1 · Presentación (Nexus.UI · UI Toolkit)"]
+        R[ScreenRouter]
+        D[DashboardView]
+        K[KanbanBoardView]
+        B[BurndownChartView]
+        P[DecisionPanelView]
+        I[InboxView]
+        DB[DebriefView]
+    end
+
+    subgraph APP["Capa 2 · Aplicación (Nexus.App)"]
+        BS[GameBootstrapper]
+        SC[SessionController]
+        LC[LevelController]
+        PSM[PhaseStateMachine]
+        TC[TurnController]
+        DD[DecisionDispatcher]
+    end
+
+    subgraph DOM["Capa 3 · Dominio / Simulación (Nexus.Domain · C# puro)"]
+        PS[ProjectState]
+        SE[SimulationEngine]
+        VM[VelocityModel]
+        TD[TechnicalDebtModel]
+        MM[MoraleModel]
+        QM[QualityModel]
+        EE[EventEngine]
+        CA[ClientAgent]
+        TM[TeamModel]
+        MOD[MethodologyModifier]
+        IM[IntegrityModel]
+        SS[ScoringService]
+        RNG[SimulationRng]
+    end
+
+    subgraph DATA["Capa 4 · Datos e infraestructura (Nexus.Data)"]
+        CR[ContentRepository]
+        SR[SaveRepository]
+        PR[ProfileRepository]
+        TS[TelemetryService]
+        EB[EventBus]
+    end
+
+    subgraph EXT["Soporte"]
+        U[Unity 6 · URP · UI Toolkit]
+        NET[.NET Runtime]
+        FS[Sistema de archivos local]
+    end
+
+    PRES --> APP
+    APP --> DOM
+    APP --> DATA
+    DOM --> DATA
+    SE --> VM & TD & MM & QM & RNG
+    TC --> SE & EE & CA
+    PSM --> TC
+    DD --> DOM
+    SR --> FS
+    PR --> FS
+    PRES -.-> U
+    DOM -.-> NET

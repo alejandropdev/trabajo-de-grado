@@ -1,0 +1,24 @@
+flowchart TB
+    subgraph EST["Nodo · Estación de trabajo del estudiante (Windows 10/11 x64 · macOS)"]
+        EXE["Ejecutable del videojuego"]
+        UNITY["Runtime Unity 6 (URP)"]
+        DOTNET["Bibliotecas .NET"]
+        SA["StreamingAssets · contenido empaquetado"]
+        subgraph DISK["Almacenamiento local"]
+            PERF["Perfiles de usuario (JSON)<br/>hasta 20 por estación"]
+            SAVE["Partidas guardadas (JSON)"]
+            TEL["Trazas de telemetría"]
+        end
+    end
+
+    subgraph DOC["Nodo · Estación del docente / evaluador (opcional)"]
+        AN["Análisis de resultados de pruebas piloto"]
+    end
+
+    EXE --> UNITY
+    EXE --> DOTNET
+    EXE --> SA
+    EXE --> PERF
+    EXE --> SAVE
+    EXE --> TEL
+    TEL -. "exportación manual de archivos" .-> AN

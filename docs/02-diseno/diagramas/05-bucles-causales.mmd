@@ -1,0 +1,34 @@
+flowchart LR
+    PE[presionEntrega]
+    AT[decisiones de atajo]
+    DT[deudaTecnica]
+    VE[velocidadEfectiva]
+    TR[trabajoRestante]
+    HE[horasExtra]
+    FA[fatiga]
+    MO[moral]
+    RO[rotación]
+    CAP[capacidad del equipo]
+    QA[esfuerzo en QA]
+    DL[defectosLatentes]
+    DP[defectos en producción]
+    SAT[satisfaccionCliente]
+    SOL[solicitudes de cambio]
+    CU[acciones de cuidado]
+
+    %% B1 · Espiral de presión (refuerzo)
+    PE -->|+| AT --> |+| DT -->|-| VE -->|+| TR -->|+| PE
+
+    %% B2 · Espiral de agotamiento (refuerzo)
+    PE -->|+| HE -->|+| FA -->|-| VE
+    HE -->|-| MO -->|+| RO -->|-| CAP -->|+| PE
+
+    %% B3 · Espiral de confianza (refuerzo)
+    DT -->|+| DP -->|-| SAT -->|+| SOL -->|+| PE
+
+    %% B4 · Inversión en calidad (equilibrio)
+    QA -->|-| DT
+    QA -->|-| DL -->|+| DP
+
+    %% B5 · Cuidado del equipo (equilibrio)
+    CU -->|+| MO -->|+| VE

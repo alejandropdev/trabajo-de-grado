@@ -1,0 +1,14 @@
+{
+    "name": "Nexus.App",
+    "rootNamespace": "Nexus.App",
+    "references": ["Nexus.Domain", "Nexus.Core", "Nexus.Data"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

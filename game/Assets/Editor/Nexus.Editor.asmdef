@@ -1,0 +1,14 @@
+{
+    "name": "Nexus.Editor",
+    "rootNamespace": "Nexus.Editor",
+    "references": ["Nexus.Domain", "Nexus.Core", "Nexus.Data", "Nexus.App", "Nexus.UI"],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

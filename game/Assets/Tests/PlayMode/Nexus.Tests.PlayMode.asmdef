@@ -1,0 +1,21 @@
+{
+    "name": "Nexus.Tests.PlayMode",
+    "rootNamespace": "Nexus.Tests.PlayMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Nexus.Domain",
+        "Nexus.Core",
+        "Nexus.Data",
+        "Nexus.App"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

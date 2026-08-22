@@ -1,0 +1,22 @@
+flowchart TD
+    A([Inicio de semana]) --> B[Briefing: eventos y solicitudes en la bandeja]
+    B --> C[Deliberación: tablero, burndown, informes]
+    C --> D{¿Ejecutar una acción?}
+    D -- Sí --> E[Enviar Decision a DecisionDispatcher]
+    E --> F{¿Válida y hay puntos de acción?}
+    F -- No --> C
+    F -- Sí --> G[Encolar decisión]
+    G --> C
+    D -- No --> H[Cerrar la semana]
+    H --> I[SimulationEngine.AdvanceTick]
+    I --> J[Aplicar efectos de decisiones]
+    J --> K[Aplicar efectos de eventos]
+    K --> L[Calcular flujos del modelo dinámico]
+    L --> M[Saturar acumuladores 0-100]
+    M --> N[Reporte semanal con explicación causal]
+    N --> O{¿Condición de fin?}
+    O -- Sí --> P([Evaluación y reporte de lecciones aprendidas])
+    O -- No --> Q{¿Se cumplió el hito de fase?}
+    Q -- Sí --> R[Revisión de fase y transición]
+    R --> A
+    Q -- No --> A

@@ -1,0 +1,55 @@
+# ===== Unity =====
+game/[Ll]ibrary/
+game/[Tt]emp/
+game/[Oo]bj/
+game/[Bb]uild/
+game/[Bb]uilds/
+game/[Ll]ogs/
+game/[Uu]ser[Ss]ettings/
+game/[Mm]emoryCaptures/
+game/[Rr]ecordings/
+game/Assets/AssetStoreTools*
+game/Assets/Plugins/Editor/JetBrains*
+
+# Salidas de compilación del repositorio
+builds/
+!builds/.gitkeep
+
+# ===== IDE =====
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# ===== Sistema operativo =====
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ===== Artefactos de build =====
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+sysinfo.txt
+
+# ===== Documentación: temporales de Office =====
+~$*.docx
+~$*.xlsx
+~$*.pptx

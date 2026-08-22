@@ -1,0 +1,19 @@
+stateDiagram-v2
+    [*] --> Planificacion
+    Planificacion --> DesarrolloIterativo : plan aprobado
+    DesarrolloIterativo --> DesarrolloIterativo : cierre de iteración
+    DesarrolloIterativo --> Lanzamiento : alcance mínimo alcanzado o plazo vencido
+    Lanzamiento --> Retroalimentacion : producto desplegado
+    Retroalimentacion --> [*] : proyecto cerrado
+
+    DesarrolloIterativo --> Cancelado : presupuesto agotado
+    DesarrolloIterativo --> Cancelado : satisfacción del cliente < 20
+    Lanzamiento --> Cancelado : incidente crítico no resuelto
+    Cancelado --> [*]
+
+    Retroalimentacion --> Renuncia : el jugador renuncia (F9)
+    DesarrolloIterativo --> Despido : reputación < 15 (F10)
+    DesarrolloIterativo --> Burnout : fatiga > 90 durante 3 ticks (F11)
+    Renuncia --> [*]
+    Despido --> [*]
+    Burnout --> [*]

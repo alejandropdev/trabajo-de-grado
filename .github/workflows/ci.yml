@@ -1,0 +1,62 @@
+# Integración continua mínima.
+#
+# La compilación y las pruebas de Unity requieren una licencia registrada como
+# secreto del repositorio (UNITY_LICENSE / UNITY_EMAIL / UNITY_PASSWORD).
+# Mientras no esté configurada, este flujo solo valida la higiene del repositorio.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+jobs:
+  repo-hygiene:
+    name: Higiene del repositorio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Verificar que no se subieron carpetas generadas por Unity
+        run: |
+          if git ls-files | grep -E '^game/(Library|Temp|Logs|obj)/'; then
+            echo "Se detectaron carpetas generadas por Unity en el control de versiones."
+            exit 1
+          fi
+
+      - name: Verificar que todo asset tiene su archivo .meta
+        run: |
+          missing=0
+          while IFS= read -r f; do
+            case "$f" in
+              *.meta) continue ;;
+            esac
+            if [ ! -f "$f.meta" ]; then
+              echo "Falta el .meta de: $f"
+              missing=1
+            fi
+          done < <(git ls-files 'game/Assets/**')
+          exit $missing
+
+  # Descomentar cuando la licencia de Unity esté configurada como secreto.
+  #
+  # tests:
+  #   name: Pruebas de EditMode
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with: { lfs: true }
+  #     - uses: actions/cache@v4
+  #       with:
+  #         path: game/Library
+  #         key: Library-${{ hashFiles('game/Assets/**', 'game/Packages/**') }}
+  #     - uses: game-ci/unity-test-runner@v4
+  #       env:
+  #         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  #       with:
+  #         projectPath: game
+  #         testMode: editmode
