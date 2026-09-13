@@ -1,0 +1,490 @@
+{
+  "id": "MJ-F2-02",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "grafo_commits",
+  "temaPrincipal": "Git",
+  "objetivoAprendizaje": "OA-GIT-01",
+  "presentacion": {
+    "titulo": "La auditoría del grafo de commits",
+    "comoSeJuega": "Reescribir la historia de un repositorio compartido borra a personas.",
+    "quienEspera": "Javier",
+    "textoPresion": "Javier necesita esto antes de las 10:00",
+    "segundosReloj": 90
+  },
+  "artefacto": {
+    "ramas": [
+      {
+        "id": "main",
+        "color": "canal"
+      },
+      {
+        "id": "feature/reportes",
+        "color": "verde"
+      },
+      {
+        "id": "feature/reportes-v2",
+        "color": "mostaza"
+      },
+      {
+        "id": "spike/cache",
+        "color": "gris"
+      }
+    ],
+    "commits": [
+      {
+        "id": "m01",
+        "rama": "main",
+        "fecha": "2026-04-17T09:30",
+        "autor": "JM",
+        "mensaje": "Inicializa servicio de reportes",
+        "padres": [],
+        "diff": "d_m01"
+      },
+      {
+        "id": "r01",
+        "rama": "feature/reportes",
+        "fecha": "2026-04-17T10:01",
+        "autor": "JM",
+        "mensaje": "Crea modulo de reportes",
+        "padres": [
+          "m01"
+        ],
+        "diff": "d_r01"
+      },
+      {
+        "id": "r02",
+        "rama": "feature/reportes",
+        "fecha": "2026-04-17T11:52",
+        "autor": "AP",
+        "mensaje": "UI: tabla de reportes",
+        "padres": [
+          "r01"
+        ],
+        "diff": "d_r02"
+      },
+      {
+        "id": "r03",
+        "rama": "feature/reportes",
+        "fecha": "2026-04-17T14:05",
+        "autor": "AP",
+        "mensaje": "Agrega filtros por rango de fechas",
+        "padres": [
+          "r02"
+        ],
+        "diff": "d_r03"
+      },
+      {
+        "id": "r04",
+        "rama": "feature/reportes",
+        "fecha": "2026-04-17T15:21",
+        "autor": "LC",
+        "mensaje": "Implementa exportacion CSV",
+        "padres": [
+          "r03"
+        ],
+        "diff": "d_r04"
+      },
+      {
+        "id": "r05",
+        "rama": "feature/reportes",
+        "fecha": "2026-04-17T16:38",
+        "autor": "LC",
+        "mensaje": "Ajustes de rendimiento",
+        "padres": [
+          "r04"
+        ],
+        "diff": "d_r05"
+      },
+      {
+        "id": "x03",
+        "rama": "feature/reportes-v2",
+        "fecha": "2026-04-17T14:05",
+        "autor": "DH",
+        "mensaje": "Agrega filtros por rango de fechas",
+        "padres": [
+          "r02"
+        ],
+        "diff": "d_x03",
+        "huerfano": true
+      },
+      {
+        "id": "x04",
+        "rama": "feature/reportes-v2",
+        "fecha": "2026-04-17T15:21",
+        "autor": "DH",
+        "mensaje": "Implementa exportacion CSV",
+        "padres": [
+          "x03"
+        ],
+        "diff": "d_x04",
+        "huerfano": true
+      },
+      {
+        "id": "x05",
+        "rama": "feature/reportes-v2",
+        "fecha": "2026-04-17T16:38",
+        "autor": "DH",
+        "mensaje": "Ajustes de rendimiento",
+        "padres": [
+          "x04"
+        ],
+        "diff": "d_x05",
+        "huerfano": true
+      },
+      {
+        "id": "x06",
+        "rama": "feature/reportes-v2",
+        "fecha": "2026-04-18T08:45",
+        "autor": "DH",
+        "mensaje": "Refactor servicio de reportes",
+        "padres": [
+          "x05"
+        ],
+        "diff": "d_x06",
+        "huerfano": true
+      },
+      {
+        "id": "s01",
+        "rama": "spike/cache",
+        "fecha": "2026-04-17T13:10",
+        "autor": "JM",
+        "mensaje": "Prueba de cache en memoria (spike)",
+        "padres": [
+          "r01"
+        ],
+        "diff": "d_s01"
+      },
+      {
+        "id": "mrg",
+        "rama": "main",
+        "fecha": "2026-04-18T09:02",
+        "autor": "DH",
+        "mensaje": "Merge feature/reportes-v2 into main",
+        "padres": [
+          "m01",
+          "x06"
+        ],
+        "diff": "d_mrg"
+      },
+      {
+        "id": "m02",
+        "rama": "main",
+        "fecha": "2026-04-18T09:14",
+        "autor": "JM",
+        "mensaje": "Agrega reporte de uso",
+        "padres": [
+          "mrg"
+        ],
+        "diff": "d_m02"
+      }
+    ],
+    "diffs": {
+      "d_r04": {
+        "titulo": "17 ABR 15:21  ·  LC",
+        "lineas": [
+          {
+            "tipo": "ctx",
+            "texto": "export function exportReport(data) {"
+          },
+          {
+            "tipo": "ctx",
+            "texto": "  const rows = ..."
+          },
+          {
+            "tipo": "del",
+            "texto": "  logger.log('export');"
+          },
+          {
+            "tipo": "add",
+            "texto": "  audit.track('export', user.id);"
+          },
+          {
+            "tipo": "ctx",
+            "texto": "  return rows;"
+          },
+          {
+            "tipo": "ctx",
+            "texto": "}"
+          }
+        ]
+      },
+      "d_x04": {
+        "titulo": "17 ABR 15:21  ·  DH",
+        "lineas": [
+          {
+            "tipo": "ctx",
+            "texto": "export function exportReport(data) {"
+          },
+          {
+            "tipo": "ctx",
+            "texto": "  const rows = ..."
+          },
+          {
+            "tipo": "del",
+            "texto": "  logger.log('export');"
+          },
+          {
+            "tipo": "add",
+            "texto": "  audit.track('export', user.id);"
+          },
+          {
+            "tipo": "ctx",
+            "texto": "  return rows;"
+          },
+          {
+            "tipo": "ctx",
+            "texto": "}"
+          }
+        ]
+      },
+      "d_m01": {
+        "titulo": "17 ABR 09:30  ·  JM",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "export const REPORT_VERSION = 1;"
+          }
+        ]
+      },
+      "d_r01": {
+        "titulo": "17 ABR 10:01  ·  JM",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "export function buildReport(rows) {"
+          },
+          {
+            "tipo": "add",
+            "texto": "  return { rows, total: rows.length };"
+          },
+          {
+            "tipo": "add",
+            "texto": "}"
+          }
+        ]
+      },
+      "d_r02": {
+        "titulo": "17 ABR 11:52  ·  AP",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "<ReportTable rows={rows} />"
+          }
+        ]
+      },
+      "d_r03": {
+        "titulo": "17 ABR 14:05  ·  AP",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "const inRange = (r) => r.date >= from && r.date <= to;"
+          }
+        ]
+      },
+      "d_r05": {
+        "titulo": "17 ABR 16:38  ·  LC",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "const cache = new Map();"
+          }
+        ]
+      },
+      "d_x03": {
+        "titulo": "17 ABR 14:05  ·  DH",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "const inRange = (r) => r.date >= from && r.date <= to;"
+          }
+        ]
+      },
+      "d_x05": {
+        "titulo": "17 ABR 16:38  ·  DH",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "const cache = new Map();"
+          }
+        ]
+      },
+      "d_x06": {
+        "titulo": "18 ABR 08:45  ·  DH",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "export class ReportService {"
+          }
+        ]
+      },
+      "d_s01": {
+        "titulo": "17 ABR 13:10  ·  JM",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "// spike: no mergear"
+          }
+        ]
+      },
+      "d_mrg": {
+        "titulo": "18 ABR 09:02  ·  DH",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "Merge branch 'feature/reportes-v2'"
+          }
+        ]
+      },
+      "d_m02": {
+        "titulo": "18 ABR 09:14  ·  JM",
+        "lineas": [
+          {
+            "tipo": "add",
+            "texto": "export function usageReport() { ... }"
+          }
+        ]
+      }
+    }
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "tramo",
+      "commits": [
+        "x03",
+        "x04",
+        "x05",
+        "x06"
+      ],
+      "defecto": "historia_reescrita",
+      "explicacion": "Cuatro commits con fechas identicas a los originales y padres distintos. La rama fue reescrita y vuelta a publicar sobre una historia que ya era compartida."
+    },
+    {
+      "id": "Z2",
+      "tipo": "commit",
+      "commits": [
+        "x04"
+      ],
+      "defecto": "autoria_perdida",
+      "explicacion": "El contenido de x04 es identico al de r04, firmado por LC. Tras la reescritura, ese trabajo aparece firmado por DH."
+    }
+  ],
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "mrg"
+      ],
+      "razonNoEsDefecto": "Es una fusion sin revisar. Es mala practica, pero no reescribe la historia ni cambia la autoria de nadie."
+    },
+    {
+      "id": "S2",
+      "commits": [
+        "s01"
+      ],
+      "razonNoEsDefecto": "spike/cache es una rama de exploracion abandonada a proposito. Una rama sin fusionar no es una rama huerfana."
+    }
+  ],
+  "paletaEtiquetas": [
+    "historia_reescrita",
+    "autoria_perdida",
+    "rama_huerfana",
+    "fusion_sin_revisar"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "historia_reescrita",
+        "autoria_perdida"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "historia_reescrita",
+        "autoria_perdida",
+        "rama_huerfana"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "rama_huerfana",
+        "fusion_sin_revisar"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {
+        "Documentacion": 4
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [
+        "HAL-AUTORIA-N3"
+      ],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-GIT-01",
+        "razon": "Reescribir historia ya publicada rompe la trazabilidad: los mismos cambios quedan atribuidos a otra persona y el historico deja de servir como evidencia de quien hizo que."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {
+        "DeudaTecnica": 3
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [
+        "HAL-AUTORIA-N3"
+      ],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-GIT-01",
+        "razon": "Detectaste que el historico no cuadra, pero no todo lo que cambio. La reescritura y la perdida de autoria son dos hallazgos distintos y se registran por separado."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {
+        "MoralEquipo": -3
+      },
+      "efectosDiferidos": [
+        {
+          "enDias": 3,
+          "eventoForzado": "EV-EQ-07"
+        }
+      ],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-GIT-01",
+        "razon": "Marcaste como manipulacion algo que solo es mala practica de proceso. Acusar sin evidencia cuesta tanto como no mirar."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {
+        "DeudaTecnica": 6,
+        "Documentacion": -4
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-GIT-01",
+        "razon": "La auditoria se envio vacia. El historico quedo como esta y nadie mas va a volver a mirarlo."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "El registro dice que este trabajo lo hizo otra persona."
+  }
+}

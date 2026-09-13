@@ -1,0 +1,19 @@
+{
+    "name": "Nexus.Tests.EditMode",
+    "rootNamespace": "",
+    "references": [
+        "GUID:de1d952fae411c64183b26bbe32f171c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

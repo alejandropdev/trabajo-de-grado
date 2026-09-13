@@ -1,0 +1,2868 @@
+fileFormatVersion: 2
+guid: eac634cc2ecc45744ac6226d0bbb71e7
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: KitUIText 1_0
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9156be32e68db045a5f2a41243a6a39
+      internalID: 924008442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_1
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3e8e1750af8529f4caf63aa690ec3591
+      internalID: 1961601272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_2
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 240870f8173dc4d448133c55c1816a88
+      internalID: 70812851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_3
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14c524f6b3aa58142a60747f337dbdaf
+      internalID: 883391775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_4
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 1184
+        width: 43
+        height: 63
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fcfaf4bf7546f6e42b8410f307b886bd
+      internalID: -1737264114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_5
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 1184
+        width: 35
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 1, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7db5a635426ec04fa55258df5872fc3
+      internalID: -751769395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_6
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 1185
+        width: 44
+        height: 62
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 6, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 47d0964a435412742be97cecdef6a7d4
+      internalID: 993629783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_7
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 1184
+        width: 46
+        height: 62
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 6, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7308060b3f6a0c446959f863306c1ac1
+      internalID: 2018896501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_8
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 1186
+        width: 22
+        height: 55
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 21, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2948435ed654bbb4fa31506e94fb19ab
+      internalID: -1005952339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_9
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 1183
+        width: 45
+        height: 63
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 02b12630c7a86054185d0a8396010f75
+      internalID: 873088544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_10
+      rect:
+        serializedVersion: 2
+        x: 513
+        y: 1182
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a9838063ebda2342a65e498da88cc40
+      internalID: -2017332909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_11
+      rect:
+        serializedVersion: 2
+        x: 559
+        y: 1183
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e2c190c6ae3abb4993085e5c04dd9d6
+      internalID: -632537130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_12
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 1183
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b651c3898f9d6fb4db703282228d9058
+      internalID: -524503236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_13
+      rect:
+        serializedVersion: 2
+        x: 659
+        y: 1185
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b007ad0a5494f045959e6739ad44781
+      internalID: 354967553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_14
+      rect:
+        serializedVersion: 2
+        x: 709
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 577a5a8feedc03e4f9fbec00af219984
+      internalID: -1546858394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_15
+      rect:
+        serializedVersion: 2
+        x: 758
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c283fc60c8e7724da0e6fc099dab538
+      internalID: -982176916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_16
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 1185
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f8b1e6cb0d5aba4093678201e7fe192
+      internalID: -568709416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_17
+      rect:
+        serializedVersion: 2
+        x: 854
+        y: 1185
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 613e977aa4170ca4d85c6ab0c9e9bcd7
+      internalID: -418483159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_18
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 1185
+        width: 44
+        height: 63
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 7, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd76f695f9bcd444594b157cabf51fa3
+      internalID: 1307445509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_19
+      rect:
+        serializedVersion: 2
+        x: 940
+        y: 1185
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79eda9d9300e95b469266c92f1fa9e2b
+      internalID: -1985733095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_20
+      rect:
+        serializedVersion: 2
+        x: 988
+        y: 1183
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 499f79278cffb99488230e9f6a1ed05d
+      internalID: -253351966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_21
+      rect:
+        serializedVersion: 2
+        x: 1041
+        y: 1185
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a39adea014022a841a0543d3b5d9506b
+      internalID: 1277030373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_22
+      rect:
+        serializedVersion: 2
+        x: 1133
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 818a49ff99856ab4d9375af54c7c9d47
+      internalID: -1230944076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_23
+      rect:
+        serializedVersion: 2
+        x: 1183
+        y: 1184
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 41d1d67e21538a84c865443e5f482eae
+      internalID: -1467318369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_24
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 1139
+        width: 35
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 146d4c26d4e098e46bf733da00c13a1f
+      internalID: -80998210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_25
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 1139
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c7b786ebfcf9d341b2511c36de4a02d
+      internalID: -772188392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_26
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 1139
+        width: 42
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 092cfb3bacfe2364b8ac523b90fb8220
+      internalID: -808851700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_27
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 1139
+        width: 38
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91523111a49274040a262e5155207fe4
+      internalID: 259306706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_28
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 1141
+        width: 38
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa9cc35ef03612d449e5d8ff1564734e
+      internalID: 1274029544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_29
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 1142
+        width: 33
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66bc5b750481a7449adb0da33d30894b
+      internalID: -265434016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_30
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 1134
+        width: 43
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 353fc74cfbc655042a9fccc6102e8c9c
+      internalID: -442113725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_31
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 1140
+        width: 44
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8dc90aca5bb8739448e921eedf20f66a
+      internalID: -77147276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_32
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 1142
+        width: 28
+        height: 39
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76306e602d55c544990527056e2d8ac7
+      internalID: 1252030522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_33
+      rect:
+        serializedVersion: 2
+        x: 545
+        y: 1142
+        width: 43
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af302a754d8d7f04296abee285d39d3c
+      internalID: 609625300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_34
+      rect:
+        serializedVersion: 2
+        x: 604
+        y: 1143
+        width: 35
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 300ecb96ad28e904b91bc64e6769bff3
+      internalID: 310196780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_35
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 1145
+        width: 35
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7da348aa7244654a90fad9907943a6c
+      internalID: 1208454650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_36
+      rect:
+        serializedVersion: 2
+        x: 701
+        y: 1138
+        width: 36
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f3fe659f421cf34cbdd39191b73e60f
+      internalID: -236210490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_37
+      rect:
+        serializedVersion: 2
+        x: 756
+        y: 1138
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 893eb3b305f9e9d46b172391f2823638
+      internalID: 1046509641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_38
+      rect:
+        serializedVersion: 2
+        x: 805
+        y: 1146
+        width: 27
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff48c059a4a05604ba2e70f333674af9
+      internalID: 2025150533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_39
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 1145
+        width: 33
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 047cb8f83fcf6394eb344d4f9498b9f3
+      internalID: 1867461340
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_40
+      rect:
+        serializedVersion: 2
+        x: 898
+        y: 1144
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63f5c60e6df211448a0ce9fa25d53fe2
+      internalID: -1472371662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_42
+      rect:
+        serializedVersion: 2
+        x: 933
+        y: 1141
+        width: 50
+        height: 43
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 500742afe0f49e747a70b722ac4a7edd
+      internalID: 394584222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_43
+      rect:
+        serializedVersion: 2
+        x: 983
+        y: 1142
+        width: 49
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6dd16a19cc088e849a1d1fa444ac6a78
+      internalID: -1361090653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_44
+      rect:
+        serializedVersion: 2
+        x: 1036
+        y: 1140
+        width: 53
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89b5cd3e292345442a26a0e9f596d35a
+      internalID: 1313336543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_45
+      rect:
+        serializedVersion: 2
+        x: 1094
+        y: 1139
+        width: 39
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e4c88795f4d46841bfa0acb97d7f8ca
+      internalID: -1502307917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_46
+      rect:
+        serializedVersion: 2
+        x: 1134
+        y: 1132
+        width: 49
+        height: 52
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b6eacb408917054bb4cdce99958cd73
+      internalID: -371343363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_47
+      rect:
+        serializedVersion: 2
+        x: 1182
+        y: 1140
+        width: 51
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04f0e0627cccee94e81ffb654ca1cd1b
+      internalID: -432456043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_48
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 1093
+        width: 42
+        height: 39
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 217eca9598f2f0241a4ffb2b95df1e1c
+      internalID: 533365175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_49
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 1093
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d98445b6e3b3d214d91cad08fd2c78d4
+      internalID: -516845551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_50
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 1094
+        width: 41
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f69967055e7d9174792e27f2146a570c
+      internalID: -1276710396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_51
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 1096
+        width: 41
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca0e7ee3363a6b04189230aa297237ea
+      internalID: -911286856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_52
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 1096
+        width: 45
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6e3f894eda3e8c4992d2cee998b820f
+      internalID: -1200588706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_53
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 1095
+        width: 43
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ce5d623eea7a304d826901884cd382e
+      internalID: -1186327344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_54
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 1095
+        width: 45
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 48bc2f6be4993ec48888740349efb41f
+      internalID: 1692013670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_55
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 1095
+        width: 44
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e4d5f63d68e1d1478ba1f98fcb30d0f
+      internalID: -85269348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_56
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 1096
+        width: 43
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d033c121cfbfddd49a4163d43682f07f
+      internalID: -162210053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_57
+      rect:
+        serializedVersion: 2
+        x: 483
+        y: 1095
+        width: 51
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37702a7049568814884859a6cb7fa338
+      internalID: -1281570017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_58
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 1038
+        width: 18
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b0b8b65422a00146af41c1b5e793d22
+      internalID: -463664872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_59
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 1037
+        width: 22
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4afbcbee444d2b543b61d6812b776b01
+      internalID: -1397355723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_60
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 1037
+        width: 22
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a984eaf72063c14b850e1eab7bd3dc0
+      internalID: 1604944698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_61
+      rect:
+        serializedVersion: 2
+        x: 627
+        y: 1045
+        width: 22
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6be2db163d2ec8f4c84e6a4598bed9dd
+      internalID: -818066616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_62
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 1045
+        width: 22
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65b432b3890abb345b4a291f81091b8e
+      internalID: -400545561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_63
+      rect:
+        serializedVersion: 2
+        x: 715
+        y: 1045
+        width: 29
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a87bd5124299de944a6e09902f618d8d
+      internalID: 1224065072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_64
+      rect:
+        serializedVersion: 2
+        x: 759
+        y: 1044
+        width: 30
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52e203942c4a0f44daf1d194221b23c0
+      internalID: -1328776896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_65
+      rect:
+        serializedVersion: 2
+        x: 814
+        y: 1043
+        width: 41
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c5ce20d1e1552644ae661fb1592d01f
+      internalID: 346190629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_66
+      rect:
+        serializedVersion: 2
+        x: 879
+        y: 1044
+        width: 33
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f46910184c76954da501d118ab4412f
+      internalID: 312157301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_67
+      rect:
+        serializedVersion: 2
+        x: 935
+        y: 1043
+        width: 36
+        height: 39
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a9d039622ef007488eea6e75c23138a
+      internalID: -1588774518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_68
+      rect:
+        serializedVersion: 2
+        x: 991
+        y: 1044
+        width: 33
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b89d98ab661b99428aa60cca4d47627
+      internalID: -1609197458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_69
+      rect:
+        serializedVersion: 2
+        x: 1048
+        y: 1045
+        width: 35
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c1d713023b4dc84c880682c73609e2d
+      internalID: -1755654077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_70
+      rect:
+        serializedVersion: 2
+        x: 1105
+        y: 1059
+        width: 21
+        height: 22
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4238220b4b7a1f548a97089394320067
+      internalID: 1473776865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_71
+      rect:
+        serializedVersion: 2
+        x: 1147
+        y: 1050
+        width: 25
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0762712b6377b96469293fcd240d3b47
+      internalID: -652387014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_72
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 1048
+        width: 16
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eed89b0b4509e3f4b832bd76aab8e879
+      internalID: -2041505609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_73
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 1047
+        width: 31
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4d07994d57936e449a28225a620adb3
+      internalID: -1633507179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_74
+      rect:
+        serializedVersion: 2
+        x: 108
+        y: 1046
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f691d974575d3449a829b11e7672218
+      internalID: 63777484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_75
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1044
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a89eef881f389742a3451d92d8b29d1
+      internalID: -196747639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_76
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 1041
+        width: 14
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a899ccad3f66b754aadbe8dd627bd7b8
+      internalID: 2048085389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_77
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 1045
+        width: 32
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f033ab76666fb14fb5e052f8bcd7182
+      internalID: -697596538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_78
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 1040
+        width: 28
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d5516abe2b66c64582dc02085f78637
+      internalID: -526361690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_79
+      rect:
+        serializedVersion: 2
+        x: 345
+        y: 1039
+        width: 21
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a28cc7243c5e8f4080d96010f744fdc
+      internalID: -521099079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_80
+      rect:
+        serializedVersion: 2
+        x: 379
+        y: 1038
+        width: 17
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fd176ffe466107429fb60e18e2eb6ae
+      internalID: -1518362555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_81
+      rect:
+        serializedVersion: 2
+        x: 418
+        y: 1038
+        width: 22
+        height: 46
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ed3952e2e61b0d4cb57b6e4a8e706ea
+      internalID: -1336833515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_82
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 1003
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 279424db2b27fff4db2a22173fba212d
+      internalID: 691646738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_83
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 985
+        width: 11
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e8818f5bd829f4d428394cab12708373
+      internalID: -1093793032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_84
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 988
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aec3c919d1f7f264a90c310f4a00d465
+      internalID: -1134122511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_85
+      rect:
+        serializedVersion: 2
+        x: 697
+        y: 993
+        width: 40
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 40e8a4d6014e4964ca49f99fc107def0
+      internalID: -1225406204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_86
+      rect:
+        serializedVersion: 2
+        x: 757
+        y: 993
+        width: 37
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e4aeb3b71d6da24ba4770fcfa4d159e
+      internalID: -648187725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_87
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 990
+        width: 23
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c4ecdfa2c0a5464ca22cd753f6280e9
+      internalID: -698666854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_88
+      rect:
+        serializedVersion: 2
+        x: 863
+        y: 989
+        width: 22
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1329dfb36e40f234e9cdc2dd70c79c16
+      internalID: 90630858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_89
+      rect:
+        serializedVersion: 2
+        x: 913
+        y: 993
+        width: 43
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98c7463838b575b4c94b2a449e04dd8c
+      internalID: -2001664365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_90
+      rect:
+        serializedVersion: 2
+        x: 981
+        y: 992
+        width: 30
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9165929e08e17044a701f367c3a180c
+      internalID: 873084030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_91
+      rect:
+        serializedVersion: 2
+        x: 983
+        y: 992
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8628a960ca6cb2a4297750c1736d2174
+      internalID: -439868295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_92
+      rect:
+        serializedVersion: 2
+        x: 1033
+        y: 992
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a973a58f796a56c46a822ab5be3438a6
+      internalID: 711369488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_93
+      rect:
+        serializedVersion: 2
+        x: 1083
+        y: 992
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4428266e10c54084fb29936e37a006c3
+      internalID: -879158523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_94
+      rect:
+        serializedVersion: 2
+        x: 1133
+        y: 992
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e071e81048429d40bc122f8462f4fff
+      internalID: -285631423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_95
+      rect:
+        serializedVersion: 2
+        x: 1195
+        y: 1054
+        width: 24
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5b41636d244da34396541d399a879c8
+      internalID: 1281268409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_96
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 1140
+        width: 27
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43351165c72a424418297540934a11bd
+      internalID: 1034449052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_97
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 1141
+        width: 28
+        height: 41
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 130dcfa6d2b46b74bbfa39f281b71f3b
+      internalID: 41722039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_98
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 1142
+        width: 38
+        height: 40
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f39021b0ec01af4c9b7f7756f28fb66
+      internalID: 357702433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_99
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 1049
+        width: 14
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9edbf9aebf0b70c4da67adce3e7c498b
+      internalID: 1596419164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_100
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 1013
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4e8d85edda15844a9e814fa2d7ba91c
+      internalID: -814017164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_101
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 1015
+        width: 26
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b14f9254e234664582f4fc31515916a
+      internalID: -2058017626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_102
+      rect:
+        serializedVersion: 2
+        x: 140
+        y: 1016
+        width: 23
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36b65b3163c64d741839c89818b79f9e
+      internalID: 1206766669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_103
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 998
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76cf2d886a8cfe940993790570af74d1
+      internalID: -1412620590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_104
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 1183
+        width: 37
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 9, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa18a561124e91d498b25147faee30e6
+      internalID: 1558279033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_105
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 996
+        width: 26
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66450263809216545ac49927ba4e1ef6
+      internalID: 93032932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_106
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 1003
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5869e6af76c51e4da0913d17e20eedd
+      internalID: -2094910816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_107
+      rect:
+        serializedVersion: 2
+        x: 540
+        y: 988
+        width: 33
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db1c235c79264cf41af0c830f721713e
+      internalID: 657957716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_108
+      rect:
+        serializedVersion: 2
+        x: 633
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06ca3a20491451c42a092c3a75dd2444
+      internalID: -1595395623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_109
+      rect:
+        serializedVersion: 2
+        x: 1090
+        y: 1185
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5cc975464eaeee4f94d4d1af76656de
+      internalID: -1426419965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_110
+      rect:
+        serializedVersion: 2
+        x: 733
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 928fa310299471b4996d2d43b998e413
+      internalID: 1273626049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_111
+      rect:
+        serializedVersion: 2
+        x: 783
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4900b906d25245439f5a83028cb4062
+      internalID: 1506994594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_112
+      rect:
+        serializedVersion: 2
+        x: 833
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d267642f6520f74f92ddf84896bb343
+      internalID: 1812809954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_113
+      rect:
+        serializedVersion: 2
+        x: 883
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5f9ec1d78663064aa3a62801b5d5b4c
+      internalID: -1789169714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_114
+      rect:
+        serializedVersion: 2
+        x: 933
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d30275ad3de27ca42b00ea13cbc915d5
+      internalID: -1165075700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_115
+      rect:
+        serializedVersion: 2
+        x: 983
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06e033b25e0d3474e8c4530836b44992
+      internalID: -890191648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_116
+      rect:
+        serializedVersion: 2
+        x: 1033
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a4fb864f16b4abd4486538a58e74a697
+      internalID: -169960433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_117
+      rect:
+        serializedVersion: 2
+        x: 1083
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c8591d4b301c9f4db8800a993423581
+      internalID: 2097052197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_118
+      rect:
+        serializedVersion: 2
+        x: 1133
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6059cdb5dd8ce694eb1d3dc75b989bda
+      internalID: 2119341184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KitUIText 1_119
+      rect:
+        serializedVersion: 2
+        x: 1183
+        y: 928
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c44a3f296255a174ba93576975b66f97
+      internalID: 190508946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 76347fb637a08a949949cc0cb135fbd2
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      KitUIText 1_0: 924008442
+      KitUIText 1_1: 1961601272
+      KitUIText 1_10: -2017332909
+      KitUIText 1_100: -814017164
+      KitUIText 1_101: -2058017626
+      KitUIText 1_102: 1206766669
+      KitUIText 1_103: -1412620590
+      KitUIText 1_104: 1558279033
+      KitUIText 1_105: 93032932
+      KitUIText 1_106: -2094910816
+      KitUIText 1_107: 657957716
+      KitUIText 1_108: -1595395623
+      KitUIText 1_109: -1426419965
+      KitUIText 1_11: -632537130
+      KitUIText 1_110: 1273626049
+      KitUIText 1_111: 1506994594
+      KitUIText 1_112: 1812809954
+      KitUIText 1_113: -1789169714
+      KitUIText 1_114: -1165075700
+      KitUIText 1_115: -890191648
+      KitUIText 1_116: -169960433
+      KitUIText 1_117: 2097052197
+      KitUIText 1_118: 2119341184
+      KitUIText 1_119: 190508946
+      KitUIText 1_12: -524503236
+      KitUIText 1_13: 354967553
+      KitUIText 1_14: -1546858394
+      KitUIText 1_15: -982176916
+      KitUIText 1_16: -568709416
+      KitUIText 1_17: -418483159
+      KitUIText 1_18: 1307445509
+      KitUIText 1_19: -1985733095
+      KitUIText 1_2: 70812851
+      KitUIText 1_20: -253351966
+      KitUIText 1_21: 1277030373
+      KitUIText 1_22: -1230944076
+      KitUIText 1_23: -1467318369
+      KitUIText 1_24: -80998210
+      KitUIText 1_25: -772188392
+      KitUIText 1_26: -808851700
+      KitUIText 1_27: 259306706
+      KitUIText 1_28: 1274029544
+      KitUIText 1_29: -265434016
+      KitUIText 1_3: 883391775
+      KitUIText 1_30: -442113725
+      KitUIText 1_31: -77147276
+      KitUIText 1_32: 1252030522
+      KitUIText 1_33: 609625300
+      KitUIText 1_34: 310196780
+      KitUIText 1_35: 1208454650
+      KitUIText 1_36: -236210490
+      KitUIText 1_37: 1046509641
+      KitUIText 1_38: 2025150533
+      KitUIText 1_39: 1867461340
+      KitUIText 1_4: -1737264114
+      KitUIText 1_40: -1472371662
+      KitUIText 1_41: -1871924469
+      KitUIText 1_42: 394584222
+      KitUIText 1_43: -1361090653
+      KitUIText 1_44: 1313336543
+      KitUIText 1_45: -1502307917
+      KitUIText 1_46: -371343363
+      KitUIText 1_47: -432456043
+      KitUIText 1_48: 533365175
+      KitUIText 1_49: -516845551
+      KitUIText 1_5: -751769395
+      KitUIText 1_50: -1276710396
+      KitUIText 1_51: -911286856
+      KitUIText 1_52: -1200588706
+      KitUIText 1_53: -1186327344
+      KitUIText 1_54: 1692013670
+      KitUIText 1_55: -85269348
+      KitUIText 1_56: -162210053
+      KitUIText 1_57: -1281570017
+      KitUIText 1_58: -463664872
+      KitUIText 1_59: -1397355723
+      KitUIText 1_6: 993629783
+      KitUIText 1_60: 1604944698
+      KitUIText 1_61: -818066616
+      KitUIText 1_62: -400545561
+      KitUIText 1_63: 1224065072
+      KitUIText 1_64: -1328776896
+      KitUIText 1_65: 346190629
+      KitUIText 1_66: 312157301
+      KitUIText 1_67: -1588774518
+      KitUIText 1_68: -1609197458
+      KitUIText 1_69: -1755654077
+      KitUIText 1_7: 2018896501
+      KitUIText 1_70: 1473776865
+      KitUIText 1_71: -652387014
+      KitUIText 1_72: -2041505609
+      KitUIText 1_73: -1633507179
+      KitUIText 1_74: 63777484
+      KitUIText 1_75: -196747639
+      KitUIText 1_76: 2048085389
+      KitUIText 1_77: -697596538
+      KitUIText 1_78: -526361690
+      KitUIText 1_79: -521099079
+      KitUIText 1_8: -1005952339
+      KitUIText 1_80: -1518362555
+      KitUIText 1_81: -1336833515
+      KitUIText 1_82: 691646738
+      KitUIText 1_83: -1093793032
+      KitUIText 1_84: -1134122511
+      KitUIText 1_85: -1225406204
+      KitUIText 1_86: -648187725
+      KitUIText 1_87: -698666854
+      KitUIText 1_88: 90630858
+      KitUIText 1_89: -2001664365
+      KitUIText 1_9: 873088544
+      KitUIText 1_90: 873084030
+      KitUIText 1_91: -439868295
+      KitUIText 1_92: 711369488
+      KitUIText 1_93: -879158523
+      KitUIText 1_94: -285631423
+      KitUIText 1_95: 1281268409
+      KitUIText 1_96: 1034449052
+      KitUIText 1_97: 41722039
+      KitUIText 1_98: 357702433
+      KitUIText 1_99: 1596419164
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
