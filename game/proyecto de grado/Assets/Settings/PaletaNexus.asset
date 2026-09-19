@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: PaletaNexus
   m_EditorClassIdentifier: 
   coloresRama: []
+  coloresAutor:
+  - {r: 0.8509804, g: 0.54509807, b: 0.6392157, a: 1}
+  - {r: 0.54509807, g: 0.49803922, b: 0.8509804, a: 1}
+  - {r: 0.8509804, g: 0.627451, b: 0.35686275, a: 1}
+  - {r: 0.49803922, g: 0.76862746, b: 0.65882355, a: 1}
   filaNormal: {r: 0, g: 0, b: 0, a: 0}
   filaSeleccionada: {r: 0.31, g: 0.7, b: 0.79, a: 0.18}
   filaMarcada: {r: 0.66, g: 0.29, b: 0.26, a: 0.22}
