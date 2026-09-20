@@ -5,6 +5,7 @@ using Nexus.Core.Eventos;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Modelo;
+using Nexus.Core.Narrativa;
 using Nexus.Core.Servicios;
 using Nexus.Core.Simulacion;
 
@@ -467,6 +468,99 @@ namespace Nexus.Core.Datos {
                       $"'{escena.ObjetivoAprendizaje}'.");
         }
 
+        // ============================================================ narrativa y flags
+
+        /// <summary>
+        /// El catalogo narrativo. Lo mas util que valida son las expresiones de COLOREO: una condicion
+        /// mal escrita ahi no daria error, daria una escena que siempre suena igual — y eso no se nota
+        /// jugando, solo se nota leyendo el JSON con lupa.
+        /// </summary>
+        public static List<string> ValidarNarrativa(List<NarrativeBeat> beats) {
+            var e = new List<string>();
+            if (beats == null) return e;   // una partida puede correr sin trama
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var beat in beats) {
+                if (beat == null) { e.Add("Hay un beat narrativo vacio."); continue; }
+                if (string.IsNullOrEmpty(beat.Id)) { e.Add("Hay un beat sin 'id'."); continue; }
+                if (!ids.Add(beat.Id)) e.Add($"El id de beat '{beat.Id}' esta repetido.");
+
+                if (string.IsNullOrEmpty(beat.Nombre)) e.Add($"{beat.Id}: falta 'nombre'.");
+
+                if (!PrioridadDeBeat.EsValida(beat.Prioridad))
+                    e.Add($"{beat.Id}: 'prioridad' vale '{beat.Prioridad}'. Validas: obligatorio, opcional.");
+
+                var ventana = beat.Ventana;
+                if (ventana != null) {
+                    if (ventana.DiaMin < 1) e.Add($"{beat.Id}: 'ventana.diaMin' vale {ventana.DiaMin}; minimo 1.");
+                    if (ventana.DiaMax < ventana.DiaMin)
+                        e.Add($"{beat.Id}: la ventana va del dia {ventana.DiaMin} al {ventana.DiaMax}, " +
+                              "que es antes de empezar.");
+                }
+
+                ValidarExpresiones(beat.Precondiciones, $"{beat.Id}: precondicion", e);
+
+                if (beat.Coloreo == null) continue;
+                foreach (var kv in beat.Coloreo) {
+                    if (string.IsNullOrEmpty(kv.Value))
+                        e.Add($"{beat.Id}: la variante de coloreo de '{kv.Key}' esta vacia.");
+                    if (string.Equals(kv.Key, NarrativeBeat.VarianteDefecto, StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    ValidarExpresiones(new List<string> { kv.Key }, $"{beat.Id}: coloreo", e);
+                }
+            }
+
+            return e;
+        }
+
+        /// <summary>El censo de flags: la lista completa en una pagina, para que se pueda auditar de un vistazo.</summary>
+        public static List<string> ValidarFlags(List<DefinicionDeFlag> flags) {
+            var e = new List<string>();
+            if (flags == null) return e;
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            var hayDeudaMoral = false;
+
+            foreach (var def in flags) {
+                if (def == null) { e.Add("Hay una definicion de flag vacia."); continue; }
+                if (string.IsNullOrEmpty(def.Id)) { e.Add("Hay un flag sin 'id'."); continue; }
+
+                if (!def.Id.StartsWith(FlagStore.Prefijo, StringComparison.Ordinal))
+                    e.Add($"'{def.Id}' no empieza por {FlagStore.Prefijo}.");
+                if (!ids.Add(def.Id)) e.Add($"El flag '{def.Id}' esta repetido en el censo.");
+
+                if (!EjesDeFlag.EsValido(def.Eje))
+                    e.Add($"{def.Id}: el eje '{def.Eje}' no existe. Validos: " +
+                          string.Join(", ", new List<string>(EjesDeFlag.Todos).ToArray()) + ".");
+
+                if (string.IsNullOrEmpty(def.Descripcion))
+                    e.Add($"{def.Id}: falta 'descripcion'. El censo existe para documentar; sin texto no documenta nada.");
+
+                if (def.SinTecho && def.Max.HasValue)
+                    e.Add($"{def.Id}: dice 'sinTecho' y a la vez declara un maximo de {def.Max.Value}.");
+
+                if (def.Min.HasValue && def.Max.HasValue && def.Min.Value > def.Max.Value)
+                    e.Add($"{def.Id}: el minimo ({def.Min.Value}) es mayor que el maximo ({def.Max.Value}).");
+
+                if (def.Min.HasValue && def.Inicial < def.Min.Value)
+                    e.Add($"{def.Id}: el valor inicial ({def.Inicial}) esta por debajo de su minimo.");
+                if (def.Max.HasValue && def.Inicial > def.Max.Value)
+                    e.Add($"{def.Id}: el valor inicial ({def.Inicial}) esta por encima de su maximo.");
+
+                if (string.Equals(def.Id, FlagStore.DeudaMoral, StringComparison.Ordinal)) {
+                    hayDeudaMoral = true;
+                    if (!def.NoBaja)
+                        e.Add($"{FlagStore.DeudaMoral} tiene que declarar 'noBaja': la deuda moral no se paga. " +
+                              "Es la tesis del juego, no un parametro de balanceo.");
+                }
+            }
+
+            if (ids.Count > 0 && !hayDeudaMoral)
+                e.Add($"El censo no incluye {FlagStore.DeudaMoral}, que el motor necesita.");
+
+            return e;
+        }
+
         // ============================================================ el catalogo entero
 
         /// <summary>Las comprobaciones que solo se pueden hacer con todo cargado a la vez.</summary>
@@ -476,6 +570,8 @@ namespace Nexus.Core.Datos {
 
             e.AddRange(ValidarEventos(catalogo.Eventos));
             e.AddRange(ValidarMinijuegos(catalogo.Minijuegos, fuente));
+            e.AddRange(ValidarNarrativa(catalogo.Beats));
+            e.AddRange(ValidarFlags(catalogo.Flags));
 
             if (catalogo.Niveles == null || catalogo.Niveles.Count == 0) e.Add("No hay ningun perfil de nivel.");
             if (catalogo.Metodologias == null || catalogo.Metodologias.Count == 0) e.Add("No hay ninguna metodologia.");
