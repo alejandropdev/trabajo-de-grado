@@ -5,7 +5,9 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Nexus.Core;
 using Nexus.Core.Evaluacion;
+using Nexus.Core.Eventos;
 using Nexus.Core.Guardado;
+using Nexus.Core.Modelo;
 using Nexus.Core.Simulacion;
 using NUnit.Framework;
 
@@ -26,11 +28,17 @@ namespace Nexus.Tests {
             _carpetaTemporal = null;
         }
 
-        private sealed class Stocks {
-            public double Dias = 4;
-            public double Dinero = -1200.5;
-            public double DeudaTecnica = 47.25;
-            public double SaludJugador = 62;
+        /// <summary>
+        /// Antes de que existiera C1 esto era una clase falsa con cuatro campos. Ahora es el WorldState
+        /// de verdad, asi que el round-trip prueba el tipo que se va a guardar en produccion.
+        /// </summary>
+        private static WorldState EstadoDePrueba() {
+            var w = new WorldState();
+            w.Set("Dias", 4);
+            w.Set("Dinero", -1200.5);
+            w.Set("DeudaTecnica", 47.25);
+            w.Set("SaludJugador", 62);
+            return w;
         }
 
         private sealed class SesionFalsa : ISesionPersistible {
@@ -63,8 +71,8 @@ namespace Nexus.Tests {
 
             return new NivelEnCurso {
                 PerfilDeNivelId = "nivel-02",
-                W = JsonDeGuardado.ABloque(new Stocks()),
-                R = new JObject { ["diaActual"] = 4, ["diasSeguidosTrabajando"] = 2 },
+                W = EstadoDePrueba(),
+                R = new RuntimeState { DiaActual = 4, DiasSeguidosTrabajando = 2 },
                 Coef = coef,
                 Traza = traza,
                 Competencia = competencia,
@@ -78,8 +86,12 @@ namespace Nexus.Tests {
                 ThroughputAcumulado = 7.3,
                 AvanceAlEmpezarUnidad = 24.0,
                 UnidadAnterior = "it1",
-                ColaDeEfectos = new JArray(new JObject { ["diaObjetivo"] = 11, ["origen"] = "EV-TEC-02", ["eventoForzado"] = "EV-TEC-05" }),
-                Telegrafiados = new JArray(new JObject { ["eventoId"] = "EV-CLI-01", ["diaDelEvento"] = 9, ["diaDelAviso"] = 7, ["emitido"] = true }),
+                ColaDeEfectos = new List<EfectoEnCola> {
+                    new EfectoEnCola { DiaObjetivo = 11, Origen = "EV-TEC-02", EventoForzado = "EV-TEC-05" }
+                },
+                Telegrafiados = new List<TelegrafiadoPendiente> {
+                    new TelegrafiadoPendiente { EventoId = "EV-CLI-01", DiaDelEvento = 9, DiaDelAviso = 7, Emitido = true }
+                },
                 ConsumosDelRng = 37
             };
         }
@@ -98,12 +110,16 @@ namespace Nexus.Tests {
 
             Assert.AreEqual(JsonDeGuardado.Serializar(save), JsonDeGuardado.Serializar(cargada));
             Assert.AreEqual(37, cargada.Nivel.ConsumosDelRng);
-            Assert.AreEqual("EV-TEC-05", (string)cargada.Nivel.ColaDeEfectos[0]["eventoForzado"]);
-            Assert.AreEqual(true, (bool)cargada.Nivel.Telegrafiados[0]["emitido"]);
+            Assert.AreEqual("EV-TEC-05", cargada.Nivel.ColaDeEfectos[0].EventoForzado);
+            Assert.AreEqual(11, cargada.Nivel.ColaDeEfectos[0].DiaObjetivo);
+            Assert.AreEqual(true, cargada.Nivel.Telegrafiados[0].Emitido);
             Assert.AreEqual(0.34, cargada.Nivel.Coef.Kappa, 1e-9);
             Assert.AreEqual(4, cargada.Nivel.Coef.W.Length, "ObjectCreationHandling.Replace: no se duplican los pesos");
             Assert.AreEqual(1, cargada.Nivel.Competencia.PorObjetivo["OA-DIS-01"].Incorrectas);
-            Assert.AreEqual(-1200.5, JsonDeGuardado.DeBloque<Stocks>(cargada.Nivel.W).Dinero, 1e-9);
+            Assert.AreEqual(-1200.5, cargada.Nivel.W.Dinero, 1e-9);
+            Assert.AreEqual(47.25, cargada.Nivel.W.DeudaTecnica, 1e-9);
+            Assert.AreEqual(4, cargada.Nivel.R.DiaActual);
+            Assert.AreEqual(2, cargada.Nivel.R.DiasSeguidosTrabajando);
         }
 
         [Test]
@@ -127,7 +143,8 @@ namespace Nexus.Tests {
             StringAssert.Contains("\"OA-DIS-01\"", json);
             StringAssert.Contains("\"versionEsquema\"", json);
             StringAssert.Contains("\"consumosDelRng\": 37", json);
-            StringAssert.Contains("\"deudaTecnica\": 47.25", json, "los bloques opacos usan la misma convencion");
+            StringAssert.Contains("\"deudaTecnica\": 47.25", json,
+                                  "el esquema no cambio al tipar los bloques: el JSON es el mismo de antes");
         }
 
         [Test]
