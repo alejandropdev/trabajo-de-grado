@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Nexus.Core.Eventos;
 using Nexus.Core.Guardado;
 using Nexus.Core.Metodologia;
+using Nexus.Core.Minijuegos;
 using Nexus.Core.Modelo;
 
 namespace Nexus.Core.Datos {
@@ -14,8 +15,12 @@ namespace Nexus.Core.Datos {
         public Dictionary<string, MethodologyProfile> Metodologias =
             new Dictionary<string, MethodologyProfile>(StringComparer.Ordinal);
 
+        /// <summary>El INDICE de minijuegos: lo que el motor necesita para elegir. Las escenas se cargan aparte.</summary>
+        public List<MinigameDefinition> Minijuegos = new List<MinigameDefinition>();
+
         public override string ToString() {
-            return $"{Eventos.Count} eventos, {Niveles.Count} niveles, {Metodologias.Count} metodologias";
+            return $"{Eventos.Count} eventos, {Niveles.Count} niveles, {Metodologias.Count} metodologias, " +
+                   $"{Minijuegos.Count} minijuegos";
         }
     }
 
@@ -35,6 +40,12 @@ namespace Nexus.Core.Datos {
         public const string CarpetaMetodologias = "metodologias";
         public const string CarpetaMinijuegos = "minijuegos";
 
+        /// <summary>
+        /// El indice va en un archivo con nombre fijo porque la carpeta 'minijuegos/' contiene tambien
+        /// las escenas (MJ-*.json), que las carga la UI y no el motor.
+        /// </summary>
+        public const string ArchivoIndiceMinijuegos = "minijuegos/indice.json";
+
         public static JsonSerializerSettings Settings { get { return JsonDeGuardado.Settings; } }
 
         /// <summary>
@@ -45,6 +56,12 @@ namespace Nexus.Core.Datos {
         private sealed class ArchivoDeEventos {
             public int Version { get; set; }
             public List<EventDefinition> Eventos { get; set; }
+        }
+
+        /// <summary>El sobre de minijuegos/indice.json: { "version": 1, "minijuegos": [ … ] }.</summary>
+        private sealed class ArchivoDeMinijuegos {
+            public int Version { get; set; }
+            public List<MinigameDefinition> Minijuegos { get; set; }
         }
 
         // ------------------------------------------------------------------ uno a uno
@@ -65,6 +82,12 @@ namespace Nexus.Core.Datos {
             var perfil = Parsear<MethodologyProfile>(json, "la metodologia");
             Exigir("La metodologia", SchemaValidator.ValidarMetodologia(perfil));
             return perfil;
+        }
+
+        public static List<MinigameDefinition> CargarMinijuegos(string json, ICatalogSource fuente = null) {
+            var minijuegos = ParsearMinijuegos(json, ArchivoIndiceMinijuegos);
+            Exigir("El indice de minijuegos", SchemaValidator.ValidarMinijuegos(minijuegos, fuente));
+            return minijuegos;
         }
 
         public static string Serializar(object o) {
@@ -116,7 +139,17 @@ namespace Nexus.Core.Datos {
                 }
             }
 
-            errores.AddRange(SchemaValidator.ValidarCatalogo(catalogo));
+            // El indice de minijuegos es opcional: un nivel puede no tener ventana de verbos.
+            if (fuente.Existe(ArchivoIndiceMinijuegos)) {
+                try {
+                    catalogo.Minijuegos = ParsearMinijuegos(fuente.LeerCatalogo(ArchivoIndiceMinijuegos),
+                                                            ArchivoIndiceMinijuegos);
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            errores.AddRange(SchemaValidator.ValidarCatalogo(catalogo, fuente));
             Exigir("El catalogo", errores);
             return catalogo;
         }
@@ -132,6 +165,16 @@ namespace Nexus.Core.Datos {
             var archivo = Parsear<ArchivoDeEventos>(json, donde);
             if (archivo == null || archivo.Eventos == null) throw new SchemaException(FormaEsperada(donde));
             return archivo.Eventos;
+        }
+
+        private static List<MinigameDefinition> ParsearMinijuegos(string json, string donde) {
+            if (json != null && json.TrimStart().StartsWith("[", StringComparison.Ordinal))
+                throw new SchemaException($"{donde}: se esperaba {{ \"version\": 1, \"minijuegos\": [ … ] }}.");
+
+            var archivo = Parsear<ArchivoDeMinijuegos>(json, donde);
+            if (archivo == null || archivo.Minijuegos == null)
+                throw new SchemaException($"{donde}: se esperaba {{ \"version\": 1, \"minijuegos\": [ … ] }}.");
+            return archivo.Minijuegos;
         }
 
         private static string FormaEsperada(string donde) {
