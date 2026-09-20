@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Nexus.Core.Evaluacion;
 using Nexus.Core.Eventos;
 using Nexus.Core.Metodologia;
+using Nexus.Core.Minijuegos;
 using Nexus.Core.Modelo;
 using Nexus.Core.Servicios;
 using Nexus.Core.Simulacion;
@@ -386,14 +387,95 @@ namespace Nexus.Core.Datos {
             return e;
         }
 
+        // ============================================================ minijuegos
+
+        /// <summary>
+        /// El INDICE de minijuegos, que es la vista del motor. Si se le pasa la fuente, comprueba ademas
+        /// que cada 'archivo' exista, parsee como escena y **coincida** con lo que el indice dice de el:
+        /// dos vistas del mismo minijuego que se contradigan son un bug que no daria la cara hasta que
+        /// alguien abriera esa escena concreta.
+        /// </summary>
+        public static List<string> ValidarMinijuegos(List<MinigameDefinition> minijuegos, ICatalogSource fuente = null) {
+            var e = new List<string>();
+            if (minijuegos == null) return e;   // un nivel puede no tener ventana de verbos
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var def in minijuegos) {
+                if (def == null) { e.Add("Hay una entrada de minijuego vacia."); continue; }
+                if (string.IsNullOrEmpty(def.Id)) { e.Add("Hay un minijuego sin 'id'."); continue; }
+                if (!ids.Add(def.Id)) e.Add($"El id de minijuego '{def.Id}' esta repetido.");
+
+                if (!Verbos.EsValido(def.Verbo))
+                    e.Add($"{def.Id}: el verbo '{def.Verbo}' no existe. Validos: " +
+                          string.Join(", ", new List<string>(Verbos.Todos).ToArray()) + ".");
+
+                if (string.IsNullOrEmpty(def.ObjetivoAprendizaje))
+                    e.Add($"{def.Id}: falta 'objetivoAprendizaje'; sin el, el nivel no puede filtrarlo.");
+
+                if (string.IsNullOrEmpty(def.PresionDiegetica))
+                    e.Add($"{def.Id}: falta 'presionDiegetica'. El reloj existe porque alguien espera, " +
+                          "no porque si: sin ese texto solo queda un cronometro.");
+
+                if (def.Reloj < 10 || def.Reloj > 600)
+                    e.Add($"{def.Id}: 'reloj' vale {def.Reloj} segundos; el diseño pide entre 60 y 120.");
+
+                if (def.PesoBase <= 0) e.Add($"{def.Id}: 'pesoBase' vale {def.PesoBase}; no saldria nunca.");
+                if (def.Enfriamiento < 0) e.Add($"{def.Id}: 'enfriamiento' no puede ser negativo.");
+                if (def.MaxOcurrencias < 1) e.Add($"{def.Id}: 'maxOcurrencias' vale {def.MaxOcurrencias}; minimo 1.");
+
+                if (def.Fases != null)
+                    foreach (var fase in def.Fases)
+                        if (!EsUnaDe(fase, FasesDelNivel.Planificacion, FasesDelNivel.Desarrollo,
+                                     FasesDelNivel.Lanzamiento, FasesDelNivel.Evaluacion))
+                            e.Add($"{def.Id}: la fase '{fase}' no existe.");
+
+                ValidarExpresiones(def.Precondiciones, $"{def.Id}: precondicion", e);
+
+                if (string.IsNullOrEmpty(def.Archivo)) {
+                    e.Add($"{def.Id}: falta 'archivo'; el motor no sabria que escena abrir.");
+                    continue;
+                }
+                if (fuente != null) ValidarEscena(def, fuente, e);
+            }
+
+            return e;
+        }
+
+        private static void ValidarEscena(MinigameDefinition def, ICatalogSource fuente, List<string> e) {
+            if (!fuente.Existe(def.Archivo)) {
+                e.Add($"{def.Id}: apunta a '{def.Archivo}', que no existe.");
+                return;
+            }
+
+            MinijuegoDef escena;
+            try {
+                escena = CatalogoMinijuegos.Parsear(fuente.LeerCatalogo(def.Archivo));
+            } catch (Exception ex) {
+                e.Add($"{def.Id}: '{def.Archivo}' no se pudo leer. {ex.Message}");
+                return;
+            }
+
+            if (!string.Equals(escena.Id, def.Id, StringComparison.Ordinal))
+                e.Add($"{def.Id}: el archivo '{def.Archivo}' dice llamarse '{escena.Id}'.");
+
+            if (Verbos.Normalizar(escena.Verbo) != Verbos.Normalizar(def.Verbo))
+                e.Add($"{def.Id}: el indice dice verbo '{def.Verbo}' y la escena dice '{escena.Verbo}'.");
+
+            if (!string.IsNullOrEmpty(escena.ObjetivoAprendizaje) &&
+                !string.Equals(escena.ObjetivoAprendizaje, def.ObjetivoAprendizaje, StringComparison.Ordinal))
+                e.Add($"{def.Id}: el indice dice OA '{def.ObjetivoAprendizaje}' y la escena dice " +
+                      $"'{escena.ObjetivoAprendizaje}'.");
+        }
+
         // ============================================================ el catalogo entero
 
         /// <summary>Las comprobaciones que solo se pueden hacer con todo cargado a la vez.</summary>
-        public static List<string> ValidarCatalogo(Catalogo catalogo) {
+        public static List<string> ValidarCatalogo(Catalogo catalogo, ICatalogSource fuente = null) {
             var e = new List<string>();
             if (catalogo == null) { e.Add("No hay catalogo."); return e; }
 
             e.AddRange(ValidarEventos(catalogo.Eventos));
+            e.AddRange(ValidarMinijuegos(catalogo.Minijuegos, fuente));
 
             if (catalogo.Niveles == null || catalogo.Niveles.Count == 0) e.Add("No hay ningun perfil de nivel.");
             if (catalogo.Metodologias == null || catalogo.Metodologias.Count == 0) e.Add("No hay ninguna metodologia.");
