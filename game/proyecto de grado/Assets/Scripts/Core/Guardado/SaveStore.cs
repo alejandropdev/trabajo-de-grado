@@ -184,8 +184,8 @@ namespace Nexus.Core.Guardado {
 
         private static void ValidarNivel(NivelEnCurso n, List<string> e) {
             if (string.IsNullOrEmpty(n.PerfilDeNivelId)) e.Add("Falta 'nivel.perfilDeNivelId'.");
-            if (n.W == null || n.W.Type != JTokenType.Object) e.Add("Falta el bloque 'nivel.w' (los 13 stocks).");
-            if (n.R == null || n.R.Type != JTokenType.Object) e.Add("Falta el bloque 'nivel.r' (el estado de ejecución).");
+            if (n.W == null) e.Add("Falta el bloque 'nivel.w' (los 13 stocks).");
+            if (n.R == null) e.Add("Falta el bloque 'nivel.r' (el estado de ejecución).");
             if (n.Coef == null) e.Add("Faltan los coeficientes 'nivel.coef'.");
             else if (n.Coef.W == null || n.Coef.W.Length != 4) e.Add("'nivel.coef.w' debe tener exactamente 4 pesos.");
             if (n.Traza == null) e.Add("Falta la traza 'nivel.traza'.");
