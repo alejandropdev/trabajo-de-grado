@@ -6,6 +6,7 @@ using Nexus.Core.Guardado;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Modelo;
+using Nexus.Core.Narrativa;
 
 namespace Nexus.Core.Datos {
     /// <summary>Todo el contenido del juego, ya cargado y validado. Es lo que AppRoot tendra en memoria.</summary>
@@ -18,9 +19,14 @@ namespace Nexus.Core.Datos {
         /// <summary>El INDICE de minijuegos: lo que el motor necesita para elegir. Las escenas se cargan aparte.</summary>
         public List<MinigameDefinition> Minijuegos = new List<MinigameDefinition>();
 
+        public List<NarrativeBeat> Beats = new List<NarrativeBeat>();
+
+        /// <summary>El censo de flags. Existe aunque el codigo no lo necesitaria: el catalogo documenta.</summary>
+        public List<DefinicionDeFlag> Flags = new List<DefinicionDeFlag>();
+
         public override string ToString() {
             return $"{Eventos.Count} eventos, {Niveles.Count} niveles, {Metodologias.Count} metodologias, " +
-                   $"{Minijuegos.Count} minijuegos";
+                   $"{Minijuegos.Count} minijuegos, {Beats.Count} beats, {Flags.Count} flags";
         }
     }
 
@@ -45,6 +51,8 @@ namespace Nexus.Core.Datos {
         /// las escenas (MJ-*.json), que las carga la UI y no el motor.
         /// </summary>
         public const string ArchivoIndiceMinijuegos = "minijuegos/indice.json";
+        public const string ArchivoNarrativa = "narrativa/narrativa.json";
+        public const string ArchivoFlags = "flags.json";
 
         public static JsonSerializerSettings Settings { get { return JsonDeGuardado.Settings; } }
 
@@ -62,6 +70,16 @@ namespace Nexus.Core.Datos {
         private sealed class ArchivoDeMinijuegos {
             public int Version { get; set; }
             public List<MinigameDefinition> Minijuegos { get; set; }
+        }
+
+        private sealed class ArchivoDeNarrativa {
+            public int Version { get; set; }
+            public List<NarrativeBeat> Beats { get; set; }
+        }
+
+        private sealed class ArchivoDeFlags {
+            public int Version { get; set; }
+            public List<DefinicionDeFlag> Flags { get; set; }
         }
 
         // ------------------------------------------------------------------ uno a uno
@@ -88,6 +106,20 @@ namespace Nexus.Core.Datos {
             var minijuegos = ParsearMinijuegos(json, ArchivoIndiceMinijuegos);
             Exigir("El indice de minijuegos", SchemaValidator.ValidarMinijuegos(minijuegos, fuente));
             return minijuegos;
+        }
+
+        public static List<NarrativeBeat> CargarNarrativa(string json) {
+            var archivo = Parsear<ArchivoDeNarrativa>(json, ArchivoNarrativa);
+            var beats = archivo.Beats ?? new List<NarrativeBeat>();
+            Exigir("El catalogo narrativo", SchemaValidator.ValidarNarrativa(beats));
+            return beats;
+        }
+
+        public static List<DefinicionDeFlag> CargarFlags(string json) {
+            var archivo = Parsear<ArchivoDeFlags>(json, ArchivoFlags);
+            var flags = archivo.Flags ?? new List<DefinicionDeFlag>();
+            Exigir("El censo de flags", SchemaValidator.ValidarFlags(flags));
+            return flags;
         }
 
         public static string Serializar(object o) {
@@ -144,6 +176,25 @@ namespace Nexus.Core.Datos {
                 try {
                     catalogo.Minijuegos = ParsearMinijuegos(fuente.LeerCatalogo(ArchivoIndiceMinijuegos),
                                                             ArchivoIndiceMinijuegos);
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            // Narrativa y flags tambien son opcionales: un prototipo de motor puede correr sin trama.
+            if (fuente.Existe(ArchivoNarrativa)) {
+                try {
+                    var archivo = Parsear<ArchivoDeNarrativa>(fuente.LeerCatalogo(ArchivoNarrativa), ArchivoNarrativa);
+                    catalogo.Beats = archivo.Beats ?? new List<NarrativeBeat>();
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            if (fuente.Existe(ArchivoFlags)) {
+                try {
+                    var archivo = Parsear<ArchivoDeFlags>(fuente.LeerCatalogo(ArchivoFlags), ArchivoFlags);
+                    catalogo.Flags = archivo.Flags ?? new List<DefinicionDeFlag>();
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
                 }
