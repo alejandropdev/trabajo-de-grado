@@ -62,6 +62,7 @@
         "descripcion": "Un puesto en la planta de becarios de N1, junto a la ventana que da a los patios. Aquí llegan las alertas.",
         "esAncla": true,
         "minutosDeVisita": 0,
+        "coleccionables": ["COL-DEV-08", "COL-ADV-02", "COL-ADV-07"],
         "queDa": "Es el único sitio desde donde se atienden las alertas. Aquí están el tablero, el backlog y el dashboard."
       },
       {
@@ -70,7 +71,7 @@
         "descripcion": "La sala abierta donde trabaja tu equipo. Huele a café recalentado y a soldador.",
         "minutosDeVisita": 30,
         "quienEsta": ["Óscar", "el equipo del Edificio Patch"],
-        "coleccionables": ["COL-DEV-03"],
+        "coleccionables": ["COL-DEV-03", "COL-DEV-07", "COL-ADV-03", "COL-ADV-08", "COL-ADV-09"],
         "queDa": "Hablar con el equipo: es donde te enteras de quién está cansado, quién sabe qué y qué no se dice en el standup."
       },
       {
@@ -79,6 +80,7 @@
         "descripcion": "Mesas largas, una máquina de café que funciona solo si la golpeas y una pantalla con el menú del día que nadie lee.",
         "minutosDeVisita": 30,
         "quienEsta": ["Sarah", "gente de Facilities"],
+        "coleccionables": ["COL-DEV-04", "COL-DEV-09", "COL-ADV-04", "COL-ADV-05"],
         "queDa": "Los rumores de la empresa y lo que el cliente dice cuando no está en una reunión."
       },
       {
@@ -88,7 +90,7 @@
         "minutosDeVisita": 60,
         "puerta": { "precondiciones": ["diaActual >= 3"] },
         "quienEsta": ["Javier"],
-        "coleccionables": ["COL-COD-02"],
+        "coleccionables": ["COL-COD-02", "COL-DEV-05", "COL-ADV-06", "COL-ADV-10", "COL-STARTUP-01", "COL-STARTUP-02"],
         "queDa": "Javier y su terminal: los logs que nadie más mira. Es la única zona donde se gana su confianza."
       },
       {
@@ -97,7 +99,7 @@
         "descripcion": "Bajo los patios, entre la maquinaria de los ascensores de carga. Hay un rack apagado que nadie recuerda haber instalado.",
         "minutosDeVisita": 45,
         "puerta": { "trasBeat": "CIN-1.2" },
-        "coleccionables": ["COL-USB-01"],
+        "coleccionables": ["COL-USB-01", "COL-ADV-12"],
         "queDa": "La maquinaria real de lo que estás automatizando, y un rack apagado con algo dentro."
       },
       {
@@ -107,7 +109,7 @@
         "minutosDeVisita": 60,
         "puerta": { "precondiciones": ["diaActual >= 11"] },
         "quienEsta": ["Dra. Voss"],
-        "coleccionables": ["COL-DEV-02"],
+        "coleccionables": ["COL-DEV-02", "COL-DEV-06"],
         "queDa": "Voss y sus diagramas antiguos: la opinión de alguien que ha visto fracasar arquitecturas que tú todavía no conoces."
       }
     ],
@@ -154,7 +156,7 @@
           "nombre": "Fiabilidad",
           "tagAfectado": "devops",
           "coeficienteAfectado": "iota",
-          "textoSinInversion": "La barrera puede quedarse cerrada con cuarenta coches esperando."
+          "textoSinInversion": "La barrera puede quedarse cerrada con cuarenta carros esperando."
         },
         {
           "id": "seguridad",
@@ -201,7 +203,7 @@
         "nombre": "Monolito modular",
         "esLaAdecuada": true,
         "veredicto": "correcta",
-        "razon": "Tres personas, un edificio, cuarenta coches y nadie para operar servicios: un único despliegue, con módulos bien separados por dentro, es lo que este equipo puede construir y mantener. Voss gruñe en señal de aprobación.",
+        "razon": "Tres personas, un edificio, cuarenta carros y nadie para operar servicios: un único despliegue, con módulos bien separados por dentro, es lo que este equipo puede construir y mantener. Voss gruñe en señal de aprobación.",
         "efectos": { "Documentacion": 5 },
         "razonesValidas": ["equipo_pequeno", "despliegue_simple", "un_solo_edificio", "plazo_corto"],
         "razonesTrampa": ["lo_mas_rapido"]

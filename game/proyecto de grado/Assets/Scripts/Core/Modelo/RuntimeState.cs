@@ -63,6 +63,13 @@ namespace Nexus.Core.Modelo {
         public int VisitasZonaC;
         public int InteraccionesDerek;
 
+        /// <summary>
+        /// guion -> opcion elegida al final de una escena (Marta, la pared dorada, el log de build…).
+        /// No escribe ningun flag al momento: INV-6 solo deja hacerlo dentro de Cerrar(), que es quien
+        /// lee esto. Viaja en el guardado para que recargar no borre lo que el jugador ya decidio.
+        /// </summary>
+        public Dictionary<string, string> EleccionesNarrativas = new Dictionary<string, string>(StringComparer.Ordinal);
+
         // --- Registro pedagogico ---
         /// <summary>Estimado vs real: alimenta el cono de incertidumbre y el sesgo de optimismo del verbo V5.</summary>
         public List<Estimacion> HistorialEstimaciones = new List<Estimacion>();
@@ -167,6 +174,9 @@ namespace Nexus.Core.Modelo {
             ZonasVisitadas = Diccionarios.SinMayusculas(ZonasVisitadas);
             Artefactos = Diccionarios.SinMayusculas(Artefactos);
             PoblacionDefectos = Diccionarios.SinMayusculas(PoblacionDefectos);
+            // Un guardado anterior a las elecciones narrativas no trae el campo.
+            if (EleccionesNarrativas == null)
+                EleccionesNarrativas = new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,

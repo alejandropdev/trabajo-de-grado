@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Nexus.Core.Coleccion;
 using Nexus.Core.Evaluacion;
 using Nexus.Core.Eventos;
 using Nexus.Core.Jornada;
@@ -54,6 +56,8 @@ namespace Nexus.Core.Datos {
             public bool TryGetValue(string nombre, out double valor) {
                 valor = 0;
                 if (WorldState.EsStock(nombre)) return true;
+                // Que el flag exista de verdad se comprueba con todo cargado (FlagsLeidosEnCondiciones).
+                if (nombre != null && nombre.StartsWith(FlagStore.Prefijo, StringComparison.Ordinal)) return true;
                 if (VariablesDeSesion.EsVariable(nombre)) return true;
                 foreach (var consultable in RuntimeState.Consultables)
                     if (string.Equals(consultable, nombre, StringComparison.OrdinalIgnoreCase)) return true;
@@ -669,7 +673,313 @@ namespace Nexus.Core.Datos {
                 }
             }
 
+            ValidarAlcanceDeNiveles(catalogo, e);
+            ValidarFlagsLeidosEnCondiciones(catalogo, e);
+
+            e.AddRange(ValidarGuiones(catalogo.Guiones));
+            ValidarGuionesContraElCatalogo(catalogo, e);
+
+            if (catalogo.Admision != null) e.AddRange(ValidarAdmision(catalogo.Admision));
+
+            e.AddRange(ValidarColeccionables(catalogo.Coleccionables));
+            ValidarColeccionablesEnElMapa(catalogo, e);
+
             return e;
+        }
+
+        // ============================================================ flags leidos
+
+        private static readonly Regex _flagEnExpresion = new Regex(@"FLG_[A-Z0-9_]+", RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Una condicion puede leer un flag, pero tiene que ser uno del censo: si no, fallaria en mitad de la
+        /// partida. Solo se comprueba si el catalogo trae censo.
+        /// </summary>
+        private static void ValidarFlagsLeidosEnCondiciones(Catalogo c, List<string> e) {
+            if (c.Flags == null || c.Flags.Count == 0) return;
+
+            var censo = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var f in c.Flags) if (f != null && f.Id != null) censo.Add(f.Id);
+
+            Action<string, IEnumerable<string>> revisar = (donde, expresiones) => {
+                if (expresiones == null) return;
+                foreach (var expresion in expresiones) {
+                    if (string.IsNullOrEmpty(expresion)) continue;
+                    foreach (Match m in _flagEnExpresion.Matches(expresion))
+                        if (!censo.Contains(m.Value))
+                            e.Add($"{donde}: la condicion lee '{m.Value}', que no esta en el censo de flags.");
+                }
+            };
+
+            if (c.Eventos != null)
+                foreach (var ev in c.Eventos) if (ev != null) revisar(ev.Id, ev.Precondiciones);
+
+            if (c.Beats != null)
+                foreach (var beat in c.Beats) {
+                    if (beat == null) continue;
+                    revisar(beat.Id, beat.Precondiciones);
+                    if (beat.Coloreo != null) revisar(beat.Id, beat.Coloreo.Keys);
+                }
+
+            foreach (var kv in c.Niveles) {
+                var mapa = kv.Value == null ? null : kv.Value.Mapa;
+                if (mapa == null || mapa.Zonas == null) continue;
+                foreach (var zona in mapa.Zonas)
+                    if (zona != null && zona.Puerta != null)
+                        revisar($"{kv.Key}/{zona.Id}", zona.Puerta.Precondiciones);
+            }
+        }
+
+        // ============================================================ soloNiveles
+
+        /// <summary>Un evento o una cinematica atada a un nivel que no existe no saldria nunca, y en silencio.</summary>
+        private static void ValidarAlcanceDeNiveles(Catalogo c, List<string> e) {
+            if (c.Eventos != null)
+                foreach (var ev in c.Eventos) {
+                    if (ev == null || ev.SoloNiveles == null) continue;
+                    foreach (var nivel in ev.SoloNiveles)
+                        if (!c.Niveles.ContainsKey(nivel ?? ""))
+                            e.Add($"{ev.Id}: 'soloNiveles' menciona '{nivel}', que no es un nivel del catalogo.");
+                }
+
+            if (c.Beats != null)
+                foreach (var beat in c.Beats) {
+                    if (beat == null || beat.SoloNiveles == null) continue;
+                    foreach (var nivel in beat.SoloNiveles)
+                        if (!c.Niveles.ContainsKey(nivel ?? ""))
+                            e.Add($"{beat.Id}: 'soloNiveles' menciona '{nivel}', que no es un nivel del catalogo.");
+                }
+        }
+
+        // ============================================================ guiones
+
+        public static List<string> ValidarGuiones(List<Guion> guiones) {
+            var e = new List<string>();
+            if (guiones == null) return e;
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var g in guiones) {
+                if (g == null) { e.Add("Hay un guion vacio."); continue; }
+                if (string.IsNullOrEmpty(g.Id)) { e.Add("Hay un guion sin 'id'."); continue; }
+                if (!ids.Add(g.Id)) e.Add($"El guion '{g.Id}' esta repetido.");
+
+                if (string.IsNullOrEmpty(g.Titulo)) e.Add($"{g.Id}: falta 'titulo'.");
+                if (!MomentosDeGuion.EsValido(g.Momento))
+                    e.Add($"{g.Id}: el momento '{g.Momento}' no existe. Validos: " +
+                          string.Join(", ", new List<string>(MomentosDeGuion.Todos).ToArray()) + ".");
+
+                if (g.Variantes == null || g.Variantes.Count == 0) {
+                    e.Add($"{g.Id}: no tiene ninguna variante escrita. Una escena sin texto no es una escena.");
+                } else {
+                    foreach (var kv in g.Variantes) {
+                        if (kv.Value == null || kv.Value.Count == 0) {
+                            e.Add($"{g.Id}: la variante '{kv.Key}' no tiene lineas.");
+                            continue;
+                        }
+                        foreach (var linea in kv.Value)
+                            if (linea == null || string.IsNullOrEmpty(linea.Quien) || string.IsNullOrEmpty(linea.Texto))
+                                e.Add($"{g.Id}: en la variante '{kv.Key}' hay una linea sin 'quien' o sin 'texto'.");
+                    }
+                }
+
+                if (g.Opciones == null) continue;
+                var idsDeOpcion = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var o in g.Opciones) {
+                    if (o == null || string.IsNullOrEmpty(o.Id)) { e.Add($"{g.Id}: hay una opcion sin 'id'."); continue; }
+                    if (!idsDeOpcion.Add(o.Id)) e.Add($"{g.Id}: la opcion '{o.Id}' esta repetida.");
+                    if (string.IsNullOrEmpty(o.Texto)) e.Add($"{g.Id}: la opcion '{o.Id}' no tiene texto.");
+                    if (!string.IsNullOrEmpty(o.Flag) && !o.Flag.StartsWith(FlagStore.Prefijo, StringComparison.Ordinal))
+                        e.Add($"{g.Id}: la opcion '{o.Id}' escribe '{o.Flag}', que no empieza por {FlagStore.Prefijo}.");
+                }
+                if (g.Opciones.Count == 1)
+                    e.Add($"{g.Id}: tiene una sola opcion. Si no se puede elegir otra cosa, no es una eleccion.");
+            }
+            return e;
+        }
+
+        /// <summary>
+        /// Lo que solo se puede comprobar con todo cargado: que cada beat que el director puede emitir tenga
+        /// texto para CADA variante que el coloreo puede elegir. Si el catalogo no trae guiones (un prototipo
+        /// de motor) no se exige nada; si los trae, se exigen enteros.
+        /// </summary>
+        private static void ValidarGuionesContraElCatalogo(Catalogo c, List<string> e) {
+            if (c.Guiones == null || c.Guiones.Count == 0) return;
+
+            var porId = new Dictionary<string, Guion>(StringComparer.Ordinal);
+            foreach (var g in c.Guiones)
+                if (g != null && !string.IsNullOrEmpty(g.Id)) porId[g.Id] = g;
+
+            foreach (var g in c.Guiones) {
+                if (g == null) continue;
+                if (!string.IsNullOrEmpty(g.Nivel) && !c.Niveles.ContainsKey(g.Nivel))
+                    e.Add($"{g.Id}: pertenece al nivel '{g.Nivel}', que no esta en el catalogo.");
+
+                if (g.Opciones == null || c.Flags == null || c.Flags.Count == 0) continue;
+                foreach (var o in g.Opciones) {
+                    if (o == null || string.IsNullOrEmpty(o.Flag)) continue;
+                    if (!c.Flags.Exists(f => f != null && f.Id == o.Flag))
+                        e.Add($"{g.Id}: la opcion '{o.Id}' escribe '{o.Flag}', que no esta en el censo de flags.");
+                }
+            }
+
+            if (c.Beats == null) return;
+            foreach (var beat in c.Beats) {
+                if (beat == null || string.IsNullOrEmpty(beat.Id)) continue;
+
+                Guion guion;
+                if (!porId.TryGetValue(beat.Id, out guion)) {
+                    e.Add($"{beat.Id}: el director puede emitirlo pero no tiene guion. Saldria una escena en blanco.");
+                    continue;
+                }
+                if (!string.Equals(guion.Momento, MomentosDeGuion.Dia, StringComparison.Ordinal))
+                    e.Add($"{beat.Id}: es un beat del director, asi que su guion tiene que ser de momento 'dia'.");
+
+                foreach (var variante in VariantesPosibles(beat))
+                    if (guion.Variantes == null || !guion.Variantes.ContainsKey(variante))
+                        e.Add($"{beat.Id}: el coloreo puede elegir la variante '{variante}' y el guion no la tiene escrita.");
+            }
+        }
+
+        private static List<string> VariantesPosibles(NarrativeBeat beat) {
+            var variantes = new List<string>();
+            var tieneDefecto = false;
+            if (beat.Coloreo != null)
+                foreach (var kv in beat.Coloreo) {
+                    if (string.Equals(kv.Key, NarrativeBeat.VarianteDefecto, StringComparison.OrdinalIgnoreCase))
+                        tieneDefecto = true;
+                    if (!string.IsNullOrEmpty(kv.Value) && !variantes.Contains(kv.Value)) variantes.Add(kv.Value);
+                }
+            // Sin coloreo, o sin clave 'default', el director cae en la variante "default".
+            if (!tieneDefecto && !variantes.Contains(NarrativeBeat.VarianteDefecto))
+                variantes.Add(NarrativeBeat.VarianteDefecto);
+            return variantes;
+        }
+
+        // ============================================================ entrevista de admision
+
+        public static List<string> ValidarAdmision(PruebaDeAdmision prueba) {
+            var e = new List<string>();
+            if (prueba == null) { e.Add("La prueba de admision esta vacia."); return e; }
+
+            if (prueba.Entrevistadora == null || string.IsNullOrEmpty(prueba.Entrevistadora.Nombre))
+                e.Add("La prueba de admision no dice quien hace las preguntas ('entrevistadora.nombre').");
+
+            var total = prueba.Preguntas == null ? 0 : prueba.Preguntas.Count;
+            if (total != CorrectorDeAdmision.NumeroDePreguntas)
+                e.Add($"La prueba tiene {total} preguntas y el perfil guarda exactamente " +
+                      $"{CorrectorDeAdmision.NumeroDePreguntas} (resultadoPreTest). Si no coinciden, el pre-test " +
+                      "no se puede comparar con el post-test.");
+            if (prueba.Preguntas == null) return e;
+
+            var numeros = new HashSet<int>();
+            foreach (var p in prueba.Preguntas) {
+                if (p == null) { e.Add("Hay una pregunta vacia."); continue; }
+                var donde = $"Pregunta {p.Numero}";
+                if (p.Numero < 1 || p.Numero > CorrectorDeAdmision.NumeroDePreguntas)
+                    e.Add($"{donde}: el numero va de 1 a {CorrectorDeAdmision.NumeroDePreguntas}.");
+                if (!numeros.Add(p.Numero)) e.Add($"{donde}: el numero esta repetido.");
+
+                if (string.IsNullOrEmpty(p.Oa)) e.Add($"{donde}: falta 'oa'. Sin el no se puede medir la ganancia por tema.");
+                if (string.IsNullOrEmpty(p.Enunciado)) e.Add($"{donde}: falta 'enunciado'.");
+                if (string.IsNullOrEmpty(p.SusurroSiAcierta) || string.IsNullOrEmpty(p.SusurroSiFalla))
+                    e.Add($"{donde}: HH tiene que susurrar algo tanto si aciertas como si fallas.");
+
+                if (p.Opciones == null || p.Opciones.Count < 2) {
+                    e.Add($"{donde}: necesita al menos dos opciones.");
+                    continue;
+                }
+                var ids = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var o in p.Opciones) {
+                    if (o == null || string.IsNullOrEmpty(o.Id) || string.IsNullOrEmpty(o.Texto))
+                        e.Add($"{donde}: hay una opcion sin 'id' o sin 'texto'.");
+                    else if (!ids.Add(o.Id)) e.Add($"{donde}: la opcion '{o.Id}' esta repetida.");
+                }
+                if (string.IsNullOrEmpty(p.Correcta) || !ids.Contains(p.Correcta))
+                    e.Add($"{donde}: la respuesta correcta '{p.Correcta}' no es ninguna de sus opciones.");
+            }
+            return e;
+        }
+
+        // ============================================================ coleccionables
+
+        public static List<string> ValidarColeccionables(List<Coleccionable> coleccionables) {
+            var e = new List<string>();
+            if (coleccionables == null) return e;
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            var fragmentos = new HashSet<int>();
+            foreach (var c in coleccionables) {
+                if (c == null) { e.Add("Hay un coleccionable vacio."); continue; }
+                if (string.IsNullOrEmpty(c.Id)) { e.Add("Hay un coleccionable sin 'id'."); continue; }
+                if (!c.Id.StartsWith("COL-", StringComparison.Ordinal)) e.Add($"'{c.Id}' no empieza por COL-.");
+                if (!ids.Add(c.Id)) e.Add($"El coleccionable '{c.Id}' esta repetido.");
+
+                if (!SeriesDeColeccionables.EsValida(c.Serie)) {
+                    e.Add($"{c.Id}: la serie '{c.Serie}' no existe. Validas: " +
+                          string.Join(", ", new List<string>(SeriesDeColeccionables.Todas).ToArray()) + ".");
+                    continue;
+                }
+                if (string.IsNullOrEmpty(c.Titulo)) e.Add($"{c.Id}: falta 'titulo'.");
+                if (string.IsNullOrEmpty(c.Texto)) e.Add($"{c.Id}: falta 'texto'. Un coleccionable vacio no enseña nada.");
+
+                switch (c.Serie) {
+                    case SeriesDeColeccionables.Carta:
+                        if (!PalosDeCarta.EsValido(c.Palo))
+                            e.Add($"{c.Id}: el palo '{c.Palo}' no existe. Validos: leyes, desastres, practicas, oficio.");
+                        if (string.IsNullOrEmpty(c.PreguntaDeAplicacion))
+                            e.Add($"{c.Id}: el reverso de una carta lleva una pregunta de aplicacion.");
+                        if (string.IsNullOrEmpty(c.Fuente))
+                            e.Add($"{c.Id}: una carta cita siempre su fuente. Es la nota de produccion del canon.");
+                        break;
+                    case SeriesDeColeccionables.Startup:
+                        if (string.IsNullOrEmpty(c.Nicho)) e.Add($"{c.Id}: falta 'nicho'.");
+                        if (string.IsNullOrEmpty(c.Causa)) e.Add($"{c.Id}: falta 'causa'. La causa es la leccion.");
+                        if (string.IsNullOrEmpty(c.Fuente))
+                            e.Add($"{c.Id}: es un caso real y tiene que citar fuente verificable.");
+                        break;
+                    case SeriesDeColeccionables.Codigo:
+                        if (string.IsNullOrEmpty(c.Comando)) e.Add($"{c.Id}: falta 'comando'.");
+                        if (string.IsNullOrEmpty(c.Revela)) e.Add($"{c.Id}: falta 'revela'.");
+                        break;
+                    case SeriesDeColeccionables.Usb:
+                        if (c.Fragmento < 1 || c.Fragmento > 8)
+                            e.Add($"{c.Id}: el fragmento va de 1 a 8 (hay {c.Fragmento}).");
+                        else if (!fragmentos.Add(c.Fragmento))
+                            e.Add($"{c.Id}: el fragmento {c.Fragmento} esta repetido.");
+                        break;
+                }
+            }
+            return e;
+        }
+
+        /// <summary>
+        /// Cada coleccionable que una zona dice tener existe, y esta en UNA sola zona de todo el juego.
+        /// Si el catalogo no trae coleccionables, no se exige nada: el mapa puede ir por delante del contenido.
+        /// </summary>
+        private static void ValidarColeccionablesEnElMapa(Catalogo c, List<string> e) {
+            if (c.Coleccionables == null || c.Coleccionables.Count == 0) return;
+
+            var existen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var col in c.Coleccionables) if (col != null && col.Id != null) existen.Add(col.Id);
+
+            var dondeEsta = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var kv in c.Niveles) {
+                var mapa = kv.Value == null ? null : kv.Value.Mapa;
+                if (mapa == null || mapa.Zonas == null) continue;
+                foreach (var zona in mapa.Zonas) {
+                    if (zona == null || zona.Coleccionables == null) continue;
+                    foreach (var id in zona.Coleccionables) {
+                        var aqui = $"{kv.Key}/{zona.Id}";
+                        if (!existen.Contains(id ?? ""))
+                            e.Add($"{aqui}: tiene el coleccionable '{id}', que no esta en coleccionables.json.");
+                        string antes;
+                        if (dondeEsta.TryGetValue(id ?? "", out antes))
+                            e.Add($"'{id}' esta a la vez en {antes} y en {aqui}. Cada coleccionable se encuentra en un solo sitio.");
+                        else
+                            dondeEsta[id ?? ""] = aqui;
+                    }
+                }
+            }
         }
 
         // ============================================================ utilidades

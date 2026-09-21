@@ -128,9 +128,71 @@ namespace Nexus.Core.Sesion {
 
             _rng = new DeterministicRng(Perfil.Director.Semilla != 0 ? Perfil.Director.Semilla : semilla);
             _scheduler = new EffectScheduler();
-            _narrativa = new NarrativeDirector(catalogo.Beats);
+            _narrativa = new NarrativeDirector(BeatsDelNivel(catalogo, Perfil.Id));
             _reloj = new RelojDeJornada(Perfil.Jornada);
             _alertas = new ColaDeAlertas();
+        }
+
+        /// <summary>
+        /// Los catalogos de eventos y cinematicas son globales; cada nivel solo ve lo que es suyo
+        /// (soloNiveles vacio = de todos). Se filtra aqui, al construir los directores, para que ninguno
+        /// de los dos tenga que saber en que nivel esta.
+        /// </summary>
+        private static List<EventDefinition> EventosDelNivel(Catalogo catalogo, string nivelId) {
+            var lista = new List<EventDefinition>();
+            foreach (var ev in catalogo.Eventos)
+                if (ev != null && ev.AplicaAlNivel(nivelId)) lista.Add(ev);
+            return lista;
+        }
+
+        private static List<NarrativeBeat> BeatsDelNivel(Catalogo catalogo, string nivelId) {
+            var lista = new List<NarrativeBeat>();
+            foreach (var beat in catalogo.Beats)
+                if (beat != null && beat.AplicaAlNivel(nivelId)) lista.Add(beat);
+            return lista;
+        }
+
+        // ==================================================================== escenas
+
+        /// <summary>
+        /// Anota la eleccion con la que termina una escena (aceptar a Marta, fijarse en la pared dorada,
+        /// abrir el log de build). Una sola vez por guion: una decision narrativa no se deshace.
+        /// El flag se escribe en Cerrar(), no aqui — INV-6.
+        /// </summary>
+        public void RegistrarEleccion(string guionId, string opcionId) {
+            if (NivelTerminado) throw new InvalidOperationException("El nivel ya se cerro.");
+
+            Guion guion = null;
+            if (_catalogo.Guiones != null)
+                foreach (var g in _catalogo.Guiones)
+                    if (g != null && string.Equals(g.Id, guionId, StringComparison.Ordinal)) guion = g;
+            if (guion == null) throw new InvalidOperationException($"No existe el guion '{guionId}'.");
+
+            OpcionDeGuion opcion = null;
+            if (guion.Opciones != null)
+                foreach (var o in guion.Opciones)
+                    if (o != null && string.Equals(o.Id, opcionId, StringComparison.Ordinal)) opcion = o;
+            if (opcion == null) throw new InvalidOperationException($"'{opcionId}' no es una opcion de {guionId}.");
+
+            if (R.EleccionesNarrativas.ContainsKey(guionId))
+                throw new InvalidOperationException($"En {guionId} ya se eligio: una decision narrativa no se deshace.");
+
+            R.EleccionesNarrativas[guionId] = opcionId;
+        }
+
+        /// <summary>La otra mitad del puente de Cerrar(): las elecciones de escena que llevan flag.</summary>
+        private void VolcarEleccionesNarrativas() {
+            if (_catalogo.Guiones == null || R.EleccionesNarrativas == null) return;
+
+            foreach (var guion in _catalogo.Guiones) {
+                string opcionId;
+                if (guion == null || guion.Opciones == null ||
+                    !R.EleccionesNarrativas.TryGetValue(guion.Id ?? "", out opcionId)) continue;
+
+                foreach (var opcion in guion.Opciones)
+                    if (opcion != null && opcion.Id == opcionId && !string.IsNullOrEmpty(opcion.Flag))
+                        Flags.Set(opcion.Flag, opcion.Valor);
+            }
         }
 
         /// <summary>Las que este nivel permite, en el orden del perfil.</summary>
@@ -280,7 +342,7 @@ namespace Nexus.Core.Sesion {
             R.Fase = 2;
             R.CoberturaAlCerrarDiseno = W.Cobertura;
 
-            _eventos = new EventDirector(_catalogo.Eventos, Perfil, Reglas, _rng, _scheduler);
+            _eventos = new EventDirector(EventosDelNivel(_catalogo, Perfil.Id), Perfil, Reglas, _rng, _scheduler);
             _minijuegos = new MinigameDirector(_catalogo.Minijuegos, Perfil, _rng);
         }
 
@@ -813,6 +875,7 @@ namespace Nexus.Core.Sesion {
 
             // ★ EL PUENTE. Una vez, aqui.
             PuenteDeFlags.VolcarAlCerrar(W, R, Flags);
+            VolcarEleccionesNarrativas();
             reporte.Flags = Flags.Copia();
 
             NivelTerminado = true;
@@ -869,6 +932,13 @@ namespace Nexus.Core.Sesion {
         public bool TryGetValue(string nombre, out double valor) {
             if (W.TryGet(nombre, out valor)) return true;
             if (R.TryGet(nombre, out valor)) return true;
+
+            // Leer un flag no rompe nada: INV-1 prohibe ESCRIBIRLOS desde un evento, no consultarlos. Es lo
+            // que da lector a los flags de color de dialogo (FLG_ORIGEN, FLG_VIO_PANTALLA_DORADA...).
+            if (nombre != null && nombre.StartsWith(FlagStore.Prefijo, StringComparison.Ordinal) && Flags != null) {
+                valor = Flags.Get(nombre);
+                return true;
+            }
 
             switch (nombre == null ? "" : nombre.Trim().ToLowerInvariant()) {
                 case "diastotales": valor = Perfil.DiasTotales; return true;
@@ -990,7 +1060,7 @@ namespace Nexus.Core.Sesion {
             }
 
             if (s.Fase1Cerrada) {
-                s._eventos = new EventDirector(catalogo.Eventos, s.Perfil, s.Reglas, s._rng, s._scheduler);
+                s._eventos = new EventDirector(EventosDelNivel(catalogo, s.Perfil.Id), s.Perfil, s.Reglas, s._rng, s._scheduler);
                 s._minijuegos = new MinigameDirector(catalogo.Minijuegos, s.Perfil, s._rng);
             }
 

@@ -46,6 +46,16 @@ namespace Nexus.Core.Narrativa {
         /// </summary>
         public Dictionary<string, string> Coloreo = new Dictionary<string, string>(StringComparer.Ordinal);
 
+        /// <summary>Vacia = cualquier nivel. Una cinematica casi siempre pertenece a uno solo.</summary>
+        public List<string> SoloNiveles = new List<string>();
+
+        public bool AplicaAlNivel(string nivelId) {
+            if (SoloNiveles == null || SoloNiveles.Count == 0) return true;
+            foreach (var n in SoloNiveles)
+                if (string.Equals(n, nivelId, StringComparison.Ordinal)) return true;
+            return false;
+        }
+
         public const string VarianteDefecto = "default";
     }
 

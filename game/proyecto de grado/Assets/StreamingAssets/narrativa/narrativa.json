@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "beats": [
+    { "id": "TUT-0.1", "nombre": "Aquí el día corre", "soloNiveles": ["nivel-00"],
+      "ventana": { "diaMin": 1, "diaMax": 1 }, "prioridad": "obligatorio" },
+    { "id": "TUT-0.2", "nombre": "Marta", "soloNiveles": ["nivel-00"],
+      "ventana": { "diaMin": 2, "diaMax": 2 }, "prioridad": "obligatorio" },
+    { "id": "TUT-0.3", "nombre": "Más allá de tu puesto", "soloNiveles": ["nivel-00"],
+      "ventana": { "diaMin": 3, "diaMax": 3 }, "prioridad": "obligatorio" },
+    { "id": "TUT-0.4", "nombre": "Irse o quedarse", "soloNiveles": ["nivel-00"],
+      "ventana": { "diaMin": 4, "diaMax": 4 }, "prioridad": "obligatorio" },
+    { "id": "TUT-0.5", "nombre": "La entrega", "soloNiveles": ["nivel-00"],
+      "ventana": { "diaMin": 5, "diaMax": 5 }, "prioridad": "obligatorio" },
+
+    { "id": "CIN-1.2", "nombre": "El Standup de los Fantasmas", "soloNiveles": ["nivel-01"],
+      "ventana": { "diaMin": 6, "diaMax": 6 }, "prioridad": "obligatorio" },
+    { "id": "INT-1", "nombre": "El Cuarto", "soloNiveles": ["nivel-01"],
+      "ventana": { "diaMin": 4, "diaMax": 20 }, "prioridad": "opcional",
+      "precondiciones": ["vecesQueSeFueACasa >= 3"],
+      "coloreo": { "FLG_ORIGEN == 1": "universitario", "default": "pueblo" } }
+  ]
+}

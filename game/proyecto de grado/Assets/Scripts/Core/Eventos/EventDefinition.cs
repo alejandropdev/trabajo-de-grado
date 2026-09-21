@@ -59,6 +59,19 @@ namespace Nexus.Core.Eventos {
         /// <summary>Vacia = vale para todas las metodologias.</summary>
         public List<string> SoloMetodologias = new List<string>();
 
+        /// <summary>
+        /// Vacia = vale para todos los niveles. El catalogo de eventos es uno solo para todo el juego;
+        /// esto es lo que impide que un evento escrito para la barrera de N1 salga en el concurso del N0.
+        /// </summary>
+        public List<string> SoloNiveles = new List<string>();
+
+        public bool AplicaAlNivel(string nivelId) {
+            if (SoloNiveles == null || SoloNiveles.Count == 0) return true;
+            foreach (var n in SoloNiveles)
+                if (string.Equals(n, nivelId, StringComparison.Ordinal)) return true;
+            return false;
+        }
+
         /// <summary>Si es true, pasa por MethodologyRules.EvaluarCambioDeAlcance antes de presentarse.</summary>
         public bool EsCambioDeAlcance;
 
