@@ -1,0 +1,428 @@
+{
+  "version": 1,
+  "eventos": [
+
+    {
+      "id": "EV-TEC-02",
+      "nombre": "Lecturas duplicadas",
+      "tags": ["tecnico"],
+      "fases": ["desarrollo"],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-CAL-01",
+      "precondiciones": ["diaActual >= 3", "diaActual <= 10"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 3,
+        "canal": "ticket",
+        "texto": "Ticket de soporte de Javier: el panel de la garita muestra el mismo vehículo dos veces cuando hay reintentos de red. No es grave, pero ya van tres reportes esta semana."
+      },
+      "opciones": [
+        {
+          "id": "parchear",
+          "texto": "Parchear el síntoma: filtrar los duplicados en la pantalla de la garita. Funciona hoy.",
+          "efectosInmediatos": { "Avance": 1, "DeudaTecnica": 8 },
+          "efectosDiferidos": [ { "enDias": 5, "eventoForzado": "EV-TEC-05" } ],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-CAL-01",
+            "razon": "Bajo presión de tiempo es defendible, pero el parche está en la capa equivocada: oculta la causa en vez de resolverla, y un parche sin plan de retirada tiene fecha de vencimiento."
+          }
+        },
+        {
+          "id": "investigar",
+          "texto": "Buscar la causa: el lector de matrículas reintenta sin idempotencia en el servidor. Arreglarlo bien cuesta dos días.",
+          "efectosInmediatos": { "Dias": 2, "Documentacion": 3 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-CAL-01",
+            "razon": "Se corrige donde nace el defecto. Cuesta más hoy y no genera deuda: el bug no puede volver por el mismo camino."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-TEC-05",
+      "nombre": "La deuda que vuelve",
+      "tags": ["tecnico"],
+      "fases": ["desarrollo", "lanzamiento"],
+      "severidad": 3,
+      "objetivoAprendizaje": "OA-CAL-01",
+      "precondiciones": ["ocurrencias('SOLO-POR-CADENA') > 0"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "chat",
+        "texto": "Javier, de pasada: «Oye. Ese filtro de duplicados de la garita. Está pasando algo raro en producción y creo que es por ahí.»"
+      },
+      "opciones": [
+        {
+          "id": "apagar-y-arreglar",
+          "texto": "Sacar el panel de la garita de producción seis horas y arreglar la causa de verdad.",
+          "efectosInmediatos": { "Dias": 1, "DeudaTecnica": -10, "SatisfaccionCliente": -4 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-CAL-01",
+            "razon": "Se paga la deuda en el momento en que se hace visible, y se paga entera. Un cliente molesto seis horas es más barato que un incidente de datos."
+          }
+        },
+        {
+          "id": "monitorizar",
+          "texto": "Dejarlo correr y vigilar los logs, cruzando los dedos.",
+          "efectosInmediatos": { "DeudaTecnica": 6, "Cansancio": 4 },
+          "efectosDiferidos": [ { "enDias": 3, "efectos": { "DeudaTecnica": 6, "SatisfaccionCliente": -6 } } ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-CAL-01",
+            "razon": "El filtro ya mostró vehículos de otros patios: dejó de ser un bug y pasó a ser un incidente. Vigilar un incidente sin corregirlo es esperar a que ocurra la segunda vez."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-ALC-01",
+      "nombre": "Ah, y también…",
+      "tags": ["alcance"],
+      "fases": ["desarrollo"],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-DOC-01",
+      "esCambioDeAlcance": true,
+      "precondiciones": ["ocurrencias('SOLO-POR-CADENA') > 0"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 3,
+        "canal": "correo",
+        "texto": "Correo de Facilities: «Excelente avance. Una cosa chiquita: cuando dijimos “reservar los ascensores” asumimos que incluía el desglose por turno de mantenimiento. ¿Eso ya está, verdad?»"
+      },
+      "opciones": [
+        {
+          "id": "absorber",
+          "texto": "Absorberlo sin decir nada. Se mete y el equipo se las arregla.",
+          "ampliaAlcance": true,
+          "efectosInmediatos": { "Alcance": 4, "MoralEquipo": -2 },
+          "efectosDiferidos": [ { "enDias": 4, "efectos": { "Cansancio": 6, "MoralEquipo": -4 } } ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-DOC-01",
+            "razon": "Un cambio que no se nombra como cambio no se puede negociar: el alcance crece y el plazo no. El requisito era ambiguo, y la ambigüedad la está pagando el equipo."
+          }
+        },
+        {
+          "id": "nombrar-y-negociar",
+          "texto": "Nombrarlo como lo que es: un cambio de alcance. Documentarlo y negociar fecha o qué se recorta.",
+          "ampliaAlcance": true,
+          "efectosInmediatos": { "Alcance": 4, "SatisfaccionCliente": -2, "Documentacion": 3 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-DOC-01",
+            "razon": "Si no está bien escrito, alguien lo interpreta mal. Escribirlo ahora convierte una suposición en un requisito, y el coste del cambio lo decide la metodología, no el silencio."
+          }
+        },
+        {
+          "id": "rechazar",
+          "texto": "Rechazarlo: no estaba en lo acordado.",
+          "efectosInmediatos": { "SatisfaccionCliente": -8 },
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-DOC-01",
+            "razon": "Defendible, porque no estaba escrito. Pero tampoco estaba escrito lo contrario: la ambigüedad era de los dos lados, y el cliente se va con la sensación de que no se le escuchó."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-EQ-03",
+      "nombre": "El héroe",
+      "tags": ["equipo"],
+      "fases": ["desarrollo"],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "precondiciones": ["diaActual >= 6", "diaActual <= 9"],
+      "pesoBase": 12,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 3,
+        "canal": "standup",
+        "texto": "En el standup, Óscar se ofrece a llevarse él solo el módulo de la barrera: «Así no hay que coordinarse con nadie». Desde entonces nadie más lo toca."
+      },
+      "opciones": [
+        {
+          "id": "dejarlo",
+          "texto": "Dejarlo: está rindiendo, y nadie más sabe tocar ese módulo.",
+          "efectosInmediatos": { "Avance": 2 },
+          "efectosDiferidos": [ { "enDias": 6, "eventoForzado": "EV-EQ-02" } ],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Rinde a corto plazo, pero deja el bus factor del módulo en uno: todo el conocimiento en una persona. Es una apuesta, y se paga el día que esa persona no está."
+          }
+        },
+        {
+          "id": "emparejar",
+          "texto": "Meter a alguien más a la par. Se pierde un día en traspasar lo que sabe.",
+          "efectosInmediatos": { "Dias": 1, "Competencia": 5, "MoralEquipo": -1 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "El equipo es el que se compromete, no una persona. Dos personas que entienden el módulo valen más que una que lo entiende rápido."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-EQ-02",
+      "nombre": "El que se va",
+      "tags": ["equipo"],
+      "fases": ["desarrollo", "lanzamiento"],
+      "severidad": 3,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "precondiciones": ["ocurrencias('SOLO-POR-CADENA') > 0"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "chat",
+        "texto": "Óscar te escribe, sin darle importancia: está cansado. Lleva semanas siendo «el que sabe» de todo lo que importa."
+      },
+      "opciones": [
+        {
+          "id": "negarle",
+          "texto": "Pedirle que se quede: hay un incidente abierto en la barrera y solo él sabe arreglarlo.",
+          "efectosInmediatos": { "Avance": 1, "MoralEquipo": -3, "Cansancio": 3 },
+          "efectosDiferidos": [ { "enDias": 5, "efectos": { "MoralEquipo": -6, "Cansancio": 6 } } ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "El incidente se cierra rápido y el problema sigue intacto: sigue habiendo una sola persona que sabe. Y ahora está más cansada. El ritmo sostenible no es un lujo, es lo que evita que el equipo se rompa."
+          }
+        },
+        {
+          "id": "darle-la-semana",
+          "texto": "Darle la semana. El equipo tendrá que arreglárselas con el módulo sin él.",
+          "efectosInmediatos": { "Dias": 2, "MoralEquipo": 4, "Competencia": 6 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Cuesta el doble resolver el incidente, y ese es exactamente el coste del bus factor que se aceptó antes, ahora visible. A cambio, el equipo aprende el módulo por necesidad."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-INT-01",
+      "nombre": "El merge del viernes",
+      "tags": ["integracion"],
+      "fases": ["desarrollo"],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-GIT-01",
+      "precondiciones": ["diaActual >= 4"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "chat",
+        "texto": "En el canal del equipo: dos ramas llevan una semana sin integrarse. Alguien escribe «lo hacemos el viernes, con calma»."
+      },
+      "opciones": [
+        {
+          "id": "integrar-ya",
+          "texto": "Integrar hoy, aunque haya que quedarse hasta resolver los conflictos uno por uno.",
+          "efectosInmediatos": { "Cansancio": 6, "DeudaTecnica": -3, "Documentacion": 2 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-GIT-01",
+            "razon": "El coste de integrar crece de forma no lineal con el tiempo que dos ramas pasan separadas. Pagarlo hoy es pagarlo al precio más bajo que va a tener."
+          }
+        },
+        {
+          "id": "el-lunes",
+          "texto": "Dejarlo para el lunes temprano. Todo el mundo se va a casa.",
+          "efectosInmediatos": { "MoralEquipo": 2, "DeudaTecnica": 2 },
+          "efectosDiferidos": [ { "enDias": 3, "efectos": { "DeudaTecnica": 5, "Cansancio": 5 } } ],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-GIT-01",
+            "razon": "Nadie se queda hoy, pero el coste no desaparece: se mueve al lunes, con más conflictos y menos margen antes de la entrega."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-DVO-02",
+      "nombre": "El servidor de integración se cae",
+      "tags": ["devops"],
+      "fases": ["desarrollo", "lanzamiento"],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-DEVOPS-01",
+      "precondiciones": ["diaActual >= 6"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "log",
+        "texto": "[CI] Aviso: el disco del servidor de integración está al 94 %. Nadie ha borrado los artefactos de compilación antiguos desde que se instaló."
+      },
+      "opciones": [
+        {
+          "id": "esperar",
+          "texto": "Esperar a que infraestructura lo arregle. Suele volver en un par de horas.",
+          "efectosInmediatos": { "Dias": 0.5 },
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-DEVOPS-01",
+            "razon": "No añade nada roto, pero se pierde medio día sin integrar ni probar. Y el aviso llevaba dos días en el log: no puedes arreglar lo que no puedes ver, pero esto sí se veía."
+          }
+        },
+        {
+          "id": "pipeline-local",
+          "texto": "Montar un pipeline de respaldo en una máquina del equipo, para no parar.",
+          "efectosInmediatos": { "Cansancio": 3 },
+          "efectosDiferidos": [ { "enDias": 5, "efectos": { "DeudaTecnica": 5, "Documentacion": -4 } } ],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-DEVOPS-01",
+            "razon": "Se mantiene la integración continua, pero nace un pipeline sin documentar que alguien tendrá que recordar que existe. Ninguna de las dos opciones era gratis: la correcta era haber leído el aviso."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-CAL-02",
+      "nombre": "La cobertura que miente",
+      "tags": ["calidad"],
+      "fases": ["desarrollo"],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-TEST-02",
+      "precondiciones": ["diaActual >= 5"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 3,
+        "canal": "standup",
+        "texto": "En el standup alguien enseña el informe de pruebas: el módulo de acceso marca 100 % de cobertura. «Vamos muy bien en pruebas», dice."
+      },
+      "opciones": [
+        {
+          "id": "confiar-en-el-numero",
+          "texto": "El número dice que está bien. Seguir con la siguiente tarea.",
+          "efectosInmediatos": { "Avance": 1 },
+          "efectosDiferidos": [ { "enDias": 4, "efectos": { "DeudaTecnica": 5, "SatisfaccionCliente": -4 } } ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-TEST-02",
+            "razon": "Las pruebas ejecutaban el código pero no comprobaban el resultado. Cuando una métrica se convierte en objetivo deja de medir lo que medía: eso es la ley de Goodhart, y el defecto de hoy es su ejemplo."
+          }
+        },
+        {
+          "id": "auditar-las-pruebas",
+          "texto": "Revisar qué comprueban de verdad las pruebas del módulo. Se pierde medio día.",
+          "efectosInmediatos": { "Dias": 0.5, "Cobertura": 8 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-TEST-02",
+            "razon": "La cobertura mide qué líneas se ejecutaron, no si el resultado era correcto. Quitar las pruebas vacías puede bajar el número y subir la protección real, que es lo único que importa."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-BUE-04",
+      "nombre": "La semana tranquila",
+      "tags": ["buenas"],
+      "fases": ["desarrollo"],
+      "severidad": 0,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "precondiciones": ["diaActual >= 8"],
+      "pesoBase": 8,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "correo",
+        "texto": "Facilities avisa de que la semana que viene tienen auditoría interna y no van a poder reunirse con nadie."
+      },
+      "opciones": [
+        {
+          "id": "almuerzo",
+          "texto": "Óscar propone pedir almuerzo para todos. Una hora de equipo, sin agenda.",
+          "efectosInmediatos": { "MoralEquipo": 8, "Cansancio": -6 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "No todo lo que pasa en un proyecto es una crisis. Un equipo que descansa cuando puede es un equipo que aguanta cuando no puede."
+          }
+        },
+        {
+          "id": "adelantar",
+          "texto": "Aprovechar la calma para adelantar trabajo del siguiente tramo.",
+          "efectosInmediatos": { "Avance": 2, "MoralEquipo": 2 },
+          "efectosDiferidos": [ { "enDias": 3, "efectos": { "Cansancio": 3 } } ],
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "También es razonable: usar el margen cuando existe. Pero la semana de descanso gastada en trabajar también se cobra, en cansancio, unos días después. Este evento existe para que no todo lo que llega sea malo."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-BUE-02",
+      "nombre": "El cliente que entiende",
+      "tags": ["buenas", "cliente"],
+      "fases": ["desarrollo", "lanzamiento"],
+      "severidad": 0,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "precondiciones": ["ocurrencias('SOLO-POR-CADENA') > 0"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "correo",
+        "texto": "Facilities pide una reunión corta «para hablar de fechas». Esta vez el asunto no viene en mayúsculas."
+      },
+      "opciones": [
+        {
+          "id": "pedir-margen",
+          "texto": "Pedir el margen que de verdad hace falta, ni más ni menos.",
+          "efectosInmediatos": { "Dias": -1, "SatisfaccionCliente": 6, "MoralEquipo": 4 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "El cliente confía porque la vez anterior se le explicó por qué una fecha no era realista. Negociar no es lo mismo que obedecer ni que rechazar, y esta es su recompensa."
+          }
+        },
+        {
+          "id": "no-abusar",
+          "texto": "No pedir nada, «para no abusar».",
+          "efectosInmediatos": { "SatisfaccionCliente": 2 },
+          "efectosDiferidos": [ { "enDias": 4, "efectos": { "Cansancio": 4 } } ],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "No hace daño, pero desperdicia la confianza que se ganó negociando antes. Un margen ofrecido y no usado no se guarda para después."
+          }
+        }
+      ]
+    }
+  ]
+}

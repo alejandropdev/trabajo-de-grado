@@ -30,7 +30,7 @@
       "nombre": "Planificación de sprint",
       "cuando": "inicioIteracion",
       "costeDias": 0.5,
-      "verbo": "V5_PREDECIR",
+      "verbo": "V5",
       "texto": "El equipo se compromete con lo que cree que cabe. Nadie sabe todavía si cabe.",
       "abreVentanaDeCambio": true
     },
@@ -55,7 +55,7 @@
       "nombre": "Retrospectiva",
       "cuando": "finIteracion",
       "costeDias": 0.5,
-      "verbo": "V4_ELEGIR",
+      "verbo": "V4",
       "texto": "Qué salió bien, qué no, y qué vamos a cambiar. Solo se elige una cosa: las listas de diez propósitos no cambian nada.",
       "ajustaCoeficiente": true,
       "acciones": [

@@ -62,7 +62,7 @@
       "nombre": "La firma del documento",
       "cuando": "finEtapa",
       "costeDias": 0.5,
-      "verbo": "V4_ELEGIR",
+      "verbo": "V4",
       "texto": "La etapa se cierra con una firma. Se puede firmar con secciones a medias: el sello cae desalineado, y el documento sigue adelante igual.",
       "abreVentanaDeCambio": true,
       "efectos": { "Documentacion": 4 }

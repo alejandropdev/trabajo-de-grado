@@ -29,7 +29,7 @@
       "nombre": "Reposición del tablero",
       "cuando": "cuandoSeLiberaWip",
       "costeDias": 0.1,
-      "verbo": "V3_ORDENAR",
+      "verbo": "V3",
       "texto": "Se ha liberado un hueco en «En curso». El límite no es un número en una hoja: es un hueco dibujado, y solo cabe una tarjeta.",
       "muestraLeadTime": true
     },
@@ -39,7 +39,7 @@
       "cuando": "cada",
       "cadaNDias": 5,
       "costeDias": 0.3,
-      "verbo": "V4_ELEGIR",
+      "verbo": "V4",
       "texto": "Se mira el diagrama de flujo acumulado: dónde se ensancha la banda, ahí está el atasco. Nadie lo explica con una fórmula.",
       "muestraLeadTime": true,
       "ajustaCoeficiente": true,
