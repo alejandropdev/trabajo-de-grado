@@ -158,6 +158,16 @@ namespace Nexus.Core.Eventos {
             var diasAntes = DiasDeAntelacion(evento);
             var diaDelEvento = r.DiaActual + diasAntes;
 
+            // ★ Una cadena no puede caer encima de otro evento: solo se presenta uno por dia, y el otro
+            // se perderia en silencio — la consecuencia se esquivaria sin que el jugador hiciera nada.
+            // Se corre al primer dia libre, y el aviso sigue saliendo hoy: llega con MAS antelacion,
+            // nunca con menos. No gasta ninguna tirada, asi que INV-7 no cambia.
+            var tope = Math.Max(1, _perfil.Director.MaxEventosPorDia);
+            while (_scheduler.EventosAgendadosEn(diaDelEvento) >= tope) {
+                diaDelEvento++;
+                diasAntes++;
+            }
+
             Agendar(evento, diaDelEvento, diasAntes);
             Log.Add(new DecisionDelDirector {
                 Dia = r.DiaActual, Resultado = DecisionDelDirector.Forzado,

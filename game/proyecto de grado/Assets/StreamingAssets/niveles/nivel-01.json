@@ -1,0 +1,231 @@
+{
+  "id": "nivel-01",
+  "nombre": "Cradle Lifts",
+  "briefing": [
+    "HH: «Ah, y arréglame lo de los patios. Alguien hackeó la barrera y me dejó el carro adentro tres horas. Veinte días. No es un proyecto importante. Es una prueba.»",
+    "Cliente: Facilities, el departamento interno de instalaciones. Necesita controlar quién entra a los patios de los edificios N1 y N2 y reservar los ascensores de carga.",
+    "El equipo asignado son tres técnicos del Edificio Patch. Ninguno ha operado nunca un sistema repartido en varios servicios.",
+    "Facilities no tiene personal de sistemas. Lo que se entregue lo va a mantener el propio equipo de mantenimiento, sin ayuda.",
+    "Todo ocurre en un único edificio. En la hora punta hay, como mucho, cuarenta vehículos esperando.",
+    "La barrera actual la abrieron con el mando genérico del fabricante. Nadie en Nexus tiene su código fuente.",
+    "Facilities todavía no sabe bien qué quiere: la primera reunión terminó con tres ideas distintas sobre quién tiene prioridad en los ascensores."
+  ],
+
+  "diasTotales": 20,
+  "presupuestoInicial": 18000,
+  "alcanceInicial": 34,
+  "equipoInicial": 3,
+  "deudaHeredada": 0,
+  "coberturaHeredada": 10,
+  "documentacionHeredada": 25,
+
+  "velocidadBase": 3.0,
+
+  "director": {
+    "presupuestoDrama": [1, 3, 2, 1],
+    "pesosPorTag": {
+      "equipo": 2.0,
+      "buenas": 1.5,
+      "tecnico": 1.0,
+      "alcance": 1.0,
+      "calidad": 1.0,
+      "integracion": 0.8,
+      "devops": 0.8,
+      "cliente": 0.6,
+      "gestion": 0.4,
+      "seguridad": 0.3,
+      "infra": 0.3,
+      "legacy": 0.2
+    },
+    "enfriamientoGlobal": 2,
+    "maxEventosPorDia": 1,
+    "ventanaTelegrafiado": 3,
+    "multiplicadorSeveridad": 0.8
+  },
+
+  "jornada": {
+    "horaInicio": 8,
+    "horaCierre": 18,
+    "horaLimite": 20,
+    "segundosRealesPorHora": 20,
+    "ventanaDeAtencionMinutos": 180,
+    "minutosPorAtender": 60,
+    "granularidadDeAlertas": 15
+  },
+
+  "mapa": {
+    "costeBaseDeViaje": 20,
+    "zonas": [
+      {
+        "id": "escritorio",
+        "nombre": "Tu escritorio",
+        "descripcion": "Un puesto en la planta de becarios de N1, junto a la ventana que da a los patios. Aquí llegan las alertas.",
+        "esAncla": true,
+        "minutosDeVisita": 0,
+        "queDa": "Es el único sitio desde donde se atienden las alertas. Aquí están el tablero, el backlog y el dashboard."
+      },
+      {
+        "id": "bullpen",
+        "nombre": "El bullpen",
+        "descripcion": "La sala abierta donde trabaja tu equipo. Huele a café recalentado y a soldador.",
+        "minutosDeVisita": 30,
+        "quienEsta": ["Óscar", "el equipo del Edificio Patch"],
+        "coleccionables": ["COL-DEV-03"],
+        "queDa": "Hablar con el equipo: es donde te enteras de quién está cansado, quién sabe qué y qué no se dice en el standup."
+      },
+      {
+        "id": "cafeteria",
+        "nombre": "La cafetería de N1",
+        "descripcion": "Mesas largas, una máquina de café que funciona solo si la golpeas y una pantalla con el menú del día que nadie lee.",
+        "minutosDeVisita": 30,
+        "quienEsta": ["Sarah", "gente de Facilities"],
+        "queDa": "Los rumores de la empresa y lo que el cliente dice cuando no está en una reunión."
+      },
+      {
+        "id": "data-hub",
+        "nombre": "Data Hub, sótano −2",
+        "descripcion": "Racks, aire acondicionado demasiado fuerte y una terminal antigua con una silla gastada delante.",
+        "minutosDeVisita": 60,
+        "puerta": { "precondiciones": ["diaActual >= 3"] },
+        "quienEsta": ["Javier"],
+        "coleccionables": ["COL-COD-02"],
+        "queDa": "Javier y su terminal: los logs que nadie más mira. Es la única zona donde se gana su confianza."
+      },
+      {
+        "id": "sotano-de-patios",
+        "nombre": "Sótano de mantenimiento de los patios",
+        "descripcion": "Bajo los patios, entre la maquinaria de los ascensores de carga. Hay un rack apagado que nadie recuerda haber instalado.",
+        "minutosDeVisita": 45,
+        "puerta": { "trasBeat": "CIN-1.2" },
+        "coleccionables": ["COL-USB-01"],
+        "queDa": "La maquinaria real de lo que estás automatizando, y un rack apagado con algo dentro."
+      },
+      {
+        "id": "archivo-de-voss",
+        "nombre": "El archivo de la Dra. Voss",
+        "descripcion": "Una sala de planos con cajoneras de metal. Voss la usa como despacho porque nadie más la usa.",
+        "minutosDeVisita": 60,
+        "puerta": { "precondiciones": ["diaActual >= 11"] },
+        "quienEsta": ["Dra. Voss"],
+        "coleccionables": ["COL-DEV-02"],
+        "queDa": "Voss y sus diagramas antiguos: la opinión de alguien que ha visto fracasar arquitecturas que tú todavía no conoces."
+      }
+    ],
+    "costes": {
+      "escritorio>bullpen": 5,
+      "escritorio>cafeteria": 10,
+      "bullpen>cafeteria": 10,
+      "escritorio>data-hub": 30,
+      "escritorio>sotano-de-patios": 35,
+      "escritorio>archivo-de-voss": 25,
+      "data-hub>sotano-de-patios": 20,
+      "cafeteria>archivo-de-voss": 20
+    }
+  },
+
+  "objetivosActivos": [
+    "OA-INTRO-01", "OA-CICLO-01", "OA-SCRUM-01", "OA-KANBAN-01", "OA-EST-01",
+    "OA-DOC-01", "OA-DIS-01", "OA-CAL-01", "OA-GIT-01", "OA-TEST-01"
+  ],
+
+  "umbrales": {
+    "exito": { "avanceMinimo": 28, "coberturaMinima": 40, "deudaMaxima": 60 },
+    "fallo": { "deuda": 90, "moral": 15, "dinero": 0 }
+  },
+
+  "metodologiasPermitidas": ["scrum", "kanban", "cascada"],
+  "nivelAndamiaje": 3,
+  "volatilidadReal": 60,
+
+  "fase1": {
+    "calidad": {
+      "fichas": 8,
+      "textoPresion": "Seis atributos y ocho fichas. Lo que no reciba ninguna, se va a romper — y vas a saber cuál, porque lo elegiste tú.",
+      "atributos": [
+        {
+          "id": "adecuacion-funcional",
+          "nombre": "Adecuación funcional",
+          "tagAfectado": "alcance",
+          "coeficienteAfectado": "kappa",
+          "textoSinInversion": "Nadie comprobó que lo que se construye es lo que Facilities pidió."
+        },
+        {
+          "id": "fiabilidad",
+          "nombre": "Fiabilidad",
+          "tagAfectado": "devops",
+          "coeficienteAfectado": "iota",
+          "textoSinInversion": "La barrera puede quedarse cerrada con cuarenta coches esperando."
+        },
+        {
+          "id": "seguridad",
+          "nombre": "Seguridad",
+          "tagAfectado": "seguridad",
+          "textoSinInversion": "Ya la hackearon una vez con un mando genérico."
+        },
+        {
+          "id": "mantenibilidad",
+          "nombre": "Mantenibilidad",
+          "tagAfectado": "tecnico",
+          "coeficienteAfectado": "alpha",
+          "textoSinInversion": "Lo va a mantener un equipo sin personal de sistemas."
+        },
+        {
+          "id": "usabilidad",
+          "nombre": "Usabilidad",
+          "tagAfectado": "cliente",
+          "textoSinInversion": "El guardia de la garita va a tener que entenderlo a las seis de la mañana."
+        },
+        {
+          "id": "rendimiento",
+          "nombre": "Eficiencia de desempeño",
+          "tagAfectado": "infra",
+          "textoSinInversion": "Cuarenta vehículos en hora punta."
+        }
+      ]
+    },
+
+    "razonesDisponibles": [
+      { "id": "equipo_pequeno", "texto": "El equipo es de tres personas." },
+      { "id": "despliegue_simple", "texto": "Facilities no tiene a nadie para operar varios servicios." },
+      { "id": "un_solo_edificio", "texto": "Todo ocurre en un solo edificio, con poca carga." },
+      { "id": "plazo_corto", "texto": "Hay veinte días." },
+      { "id": "ya_existe", "texto": "Ya hay una barrera funcionando." },
+      { "id": "esta_de_moda", "texto": "Es lo que usan las empresas grandes." },
+      { "id": "escala_mejor", "texto": "Así escala cuando crezca." },
+      { "id": "lo_mas_rapido", "texto": "Es lo más rápido para empezar mañana." }
+    ],
+
+    "arquitecturas": [
+      {
+        "id": "monolito-modular",
+        "nombre": "Monolito modular",
+        "esLaAdecuada": true,
+        "veredicto": "correcta",
+        "razon": "Tres personas, un edificio, cuarenta coches y nadie para operar servicios: un único despliegue, con módulos bien separados por dentro, es lo que este equipo puede construir y mantener. Voss gruñe en señal de aprobación.",
+        "efectos": { "Documentacion": 5 },
+        "razonesValidas": ["equipo_pequeno", "despliegue_simple", "un_solo_edificio", "plazo_corto"],
+        "razonesTrampa": ["lo_mas_rapido"]
+      },
+      {
+        "id": "microservicios",
+        "nombre": "Microservicios",
+        "veredicto": "incorrecta",
+        "razon": "Cinco servicios que desplegar, monitorizar y versionar, para un equipo que nunca ha operado uno. El briefing lo decía dos veces. Voss: «Otro más que confunde moda con criterio.»",
+        "efectos": { "DeudaTecnica": 10, "Cansancio": 8 },
+        "modificadoresModelo": { "gamma": 1.15 },
+        "razonesValidas": [],
+        "razonesTrampa": ["esta_de_moda", "escala_mejor"]
+      },
+      {
+        "id": "parche-sobre-la-barrera",
+        "nombre": "Parche sobre la barrera actual",
+        "veredicto": "aceptable",
+        "razon": "Arranca con ventaja porque algo ya funciona, pero hereda un sistema del que nadie tiene el código y que ya abrieron una vez con un mando genérico. Resuelve los veinte días y deja el problema para después.",
+        "efectos": { "DeudaTecnica": 20, "Avance": 4 },
+        "modificadoresModelo": { "alpha": 1.1 },
+        "razonesValidas": ["plazo_corto", "ya_existe"],
+        "razonesTrampa": ["lo_mas_rapido"]
+      }
+    ]
+  }
+}

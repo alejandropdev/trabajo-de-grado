@@ -1,0 +1,147 @@
+{
+  "id": "cascada",
+  "nombre": "Cascada",
+  "familia": "tradicional",
+  "resumen": "Una etapa detrás de otra, cada una cerrada con una firma. Lo que se decide en análisis se paga en pruebas. El alcance solo se toca en los hitos, y fuera de ellos no se toca.",
+
+  "razonesValidas": [
+    "el_dominio_es_conocido_y_estable",
+    "hay_que_certificar_o_auditar_el_resultado",
+    "el_cliente_necesita_un_precio_cerrado",
+    "el_coste_de_equivocarse_en_produccion_es_altisimo"
+  ],
+  "razonesTrampa": [
+    "asi_no_hay_que_hablar_con_el_cliente",
+    "es_mas_serio_y_profesional",
+    "asi_queda_todo_documentado",
+    "es_lo_que_siempre_hemos_hecho"
+  ],
+
+  "calendario": {
+    "tipo": "secuencial",
+    "etiquetaUnidad": "Etapa",
+    "etapas": [
+      {
+        "id": "analisis",
+        "nombre": "Análisis",
+        "dias": 5,
+        "texto": "Etapa de análisis. Todo lo que no se pregunte ahora, se va a suponer después.",
+        "multiplicadorPesosPorTag": { "alcance": 2.0, "cliente": 1.5, "tecnico": 0.5, "calidad": 0.3 },
+        "efectosPorDia": { "Documentacion": 1.8 }
+      },
+      {
+        "id": "diseno",
+        "nombre": "Diseño",
+        "dias": 5,
+        "texto": "Etapa de diseño. La arquitectura que salga de aquí es la que habrá que defender en el juicio.",
+        "multiplicadorPesosPorTag": { "tecnico": 1.6, "alcance": 1.2, "calidad": 0.5 },
+        "efectosPorDia": { "Documentacion": 1.2 }
+      },
+      {
+        "id": "codificacion",
+        "nombre": "Codificación",
+        "dias": 6,
+        "texto": "Etapa de codificación. Aquí se descubre lo que el diseño no había pensado.",
+        "multiplicadorPesosPorTag": { "tecnico": 1.4, "equipo": 1.3, "devops": 1.2, "alcance": 0.6 },
+        "efectosPorDia": { "Documentacion": -0.4 }
+      },
+      {
+        "id": "pruebas",
+        "nombre": "Pruebas",
+        "dias": 4,
+        "texto": "Etapa de pruebas. Todos los errores de las tres etapas anteriores aparecen en esta.",
+        "multiplicadorPesosPorTag": { "calidad": 2.2, "tecnico": 1.2, "alcance": 0.4 },
+        "efectosPorDia": { "Cobertura": 2.0 }
+      }
+    ]
+  },
+
+  "ceremonias": [
+    {
+      "id": "firma-de-etapa",
+      "nombre": "La firma del documento",
+      "cuando": "finEtapa",
+      "costeDias": 0.5,
+      "verbo": "V4",
+      "texto": "La etapa se cierra con una firma. Se puede firmar con secciones a medias: el sello cae desalineado, y el documento sigue adelante igual.",
+      "abreVentanaDeCambio": true,
+      "efectos": { "Documentacion": 4 }
+    },
+    {
+      "id": "revision-de-hito",
+      "nombre": "Revisión de hito",
+      "cuando": "finEtapa",
+      "costeDias": 0.25,
+      "texto": "Se repasa el plan contra lo que se lleva hecho. Nadie enseña el producto todavía: no hay producto que enseñar.",
+      "revelaProductoAlCliente": false
+    }
+  ],
+
+  "reglasDeCambio": {
+    "costeMultiplicador": 2.0,
+    "ventanas": ["hito"],
+    "consumeWip": false,
+    "textoEnVentana": "Estamos cerrando etapa. Si el cambio entra, entra ahora y con su firma; mañana ya no.",
+    "penalizacionFueraDeVentana": {
+      "permitido": false,
+      "costeMultiplicador": 3.0,
+      "efectosExtra": { "SatisfaccionCliente": -6, "MoralEquipo": -3 },
+      "texto": "El documento de la etapa anterior ya está firmado. Para meter esto habría que reabrirla, y reabrirla significa volver a firmarlo todo."
+    }
+  },
+
+  "modificadoresModelo": {
+    "kappa": 0.7,
+    "lambda": 1.3,
+    "beta": 0.85
+  },
+
+  "modificadoresDirector": {
+    "multiplicadorPesosPorTag": { "alcance": 1.4, "cliente": 0.8 },
+    "multiplicadorDrama": 1.0,
+    "eventosBloqueados": []
+  },
+
+  "tableroPrincipal": "curvaS",
+
+  "lanzamiento": {
+    "factorRiesgo": 1.4,
+    "entregaIncremental": false,
+    "clienteYaVioElProducto": false,
+    "texto": "El cliente ve el producto entero hoy, por primera vez. Todo lo que se supuso en análisis se resuelve en los próximos diez minutos.",
+    "textoSiSale": "Sale. Es exactamente lo que estaba escrito, y resultó que lo escrito era lo que hacía falta.",
+    "textoSiFalla": "Falla delante del cliente, que nunca tuvo ocasión de corregir el rumbo antes."
+  },
+
+  "rubricaCierre": {
+    "practicas": [
+      {
+        "id": "diseno-verificable",
+        "descripcion": "En cascada, salir de diseño sin plan de pruebas deja las cuatro etapas apoyadas en nada.",
+        "metrica": "coberturaAlCerrarDiseno",
+        "comparador": ">=",
+        "objetivo": 30,
+        "razonSiCumple": "Al cerrar el diseño ya había con qué verificarlo. En un modelo secuencial esa es la última oportunidad barata de detectar un error.",
+        "razonSiFalla": "Se cerró el diseño sin nada que lo verificara. El error de análisis siguió vivo tres etapas más, y corregirlo en pruebas cuesta un orden de magnitud más."
+      },
+      {
+        "id": "alcance-controlado",
+        "descripcion": "Cascada no absorbe cambios: los cobra. Aceptar muchos es usar el modelo en contra de su propio diseño.",
+        "metrica": "cambiosAceptados",
+        "comparador": "<=",
+        "objetivo": 2,
+        "razonSiCumple": "El alcance se mantuvo estable, que es la única condición bajo la que un modelo secuencial tiene sentido.",
+        "razonSiFalla": "Entraron demasiados cambios para un modelo que los cobra al doble. O el alcance no era estable, o no era la metodología adecuada."
+      },
+      {
+        "id": "documentacion-viva",
+        "descripcion": "La documentación es el entregable de la mitad de las etapas, no un trámite del final.",
+        "metrica": "diasConHorasExtra",
+        "comparador": "<=",
+        "objetivo": 5,
+        "razonSiCumple": "Las etapas se cerraron dentro de su plazo sin comprimir las últimas a base de horas extra.",
+        "razonSiFalla": "El retraso de las primeras etapas se pagó con horas extra en las últimas. En un modelo secuencial el retraso no se reparte: se acumula al final."
+      }
+    ]
+  }
+}

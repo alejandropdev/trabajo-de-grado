@@ -1,0 +1,145 @@
+{
+  "id": "kanban",
+  "nombre": "Kanban",
+  "familia": "agil",
+  "resumen": "No hay sprints ni fechas de corte: hay un flujo y un límite de trabajo en curso. Se empieza algo nuevo solo cuando se termina algo viejo, y el tablero enseña dónde se atasca.",
+
+  "razonesValidas": [
+    "el_trabajo_llega_de_forma_impredecible",
+    "hay_mucho_soporte_y_mantenimiento_mezclado",
+    "el_equipo_ya_esta_saturado_y_hay_que_ver_donde",
+    "las_prioridades_cambian_mas_rapido_que_un_sprint"
+  ],
+  "razonesTrampa": [
+    "asi_no_hay_que_estimar_nada",
+    "es_scrum_pero_sin_reuniones",
+    "asi_el_equipo_va_mas_suelto",
+    "no_hace_falta_planificar"
+  ],
+
+  "calendario": {
+    "tipo": "continuo",
+    "etiquetaUnidad": "Flujo continuo",
+    "limiteWipInicial": 3
+  },
+
+  "ceremonias": [
+    {
+      "id": "reposicion",
+      "nombre": "Reposición del tablero",
+      "cuando": "cuandoSeLiberaWip",
+      "costeDias": 0.1,
+      "verbo": "V3",
+      "texto": "Se ha liberado un hueco en «En curso». El límite no es un número en una hoja: es un hueco dibujado, y solo cabe una tarjeta.",
+      "muestraLeadTime": true
+    },
+    {
+      "id": "revision-del-flujo",
+      "nombre": "Revisión del flujo",
+      "cuando": "cada",
+      "cadaNDias": 5,
+      "costeDias": 0.3,
+      "verbo": "V4",
+      "texto": "Se mira el diagrama de flujo acumulado: dónde se ensancha la banda, ahí está el atasco. Nadie lo explica con una fórmula.",
+      "muestraLeadTime": true,
+      "ajustaCoeficiente": true,
+      "acciones": [
+        {
+          "id": "bajar-wip",
+          "texto": "Bajar el límite de WIP una unidad",
+          "coeficiente": "gamma",
+          "multiplicador": 0.8,
+          "explicacion": "Con menos cosas a medias el equipo se cansa más despacio: cada cambio de contexto tiene un coste que no aparece en ninguna tarea."
+        },
+        {
+          "id": "clase-de-servicio",
+          "texto": "Separar las urgencias en su propio carril",
+          "coeficiente": "alpha",
+          "multiplicador": 0.85,
+          "explicacion": "Las urgencias dejan de atropellar al trabajo planificado, así que se generan menos atajos bajo presión."
+        },
+        {
+          "id": "definicion-de-terminado",
+          "texto": "Escribir qué significa «terminado» en cada columna",
+          "coeficiente": "iota",
+          "multiplicador": 0.85,
+          "explicacion": "La cobertura se diluye más despacio, porque una tarjeta deja de poder cruzar el tablero sin sus pruebas."
+        }
+      ]
+    }
+  ],
+
+  "reglasDeCambio": {
+    "costeMultiplicador": 0.8,
+    "ventanas": ["siempre"],
+    "consumeWip": true,
+    "textoEnVentana": "Entra cuando haya hueco. Kanban no discute si el cambio es legítimo: discute a costa de qué entra.",
+    "penalizacionFueraDeVentana": {
+      "permitido": true,
+      "costeMultiplicador": 1.0,
+      "texto": "Siempre hay ventana. Lo que no siempre hay es sitio."
+    }
+  },
+
+  "modificadoresModelo": {
+    "gamma": 0.9
+  },
+
+  "modificadoresDirector": {
+    "multiplicadorPesosPorTag": { "equipo": 1.2, "tecnico": 1.1, "cliente": 0.9 },
+    "multiplicadorDrama": 0.9,
+    "eventosBloqueados": []
+  },
+
+  "tableroPrincipal": "cfd",
+
+  "lanzamiento": {
+    "factorRiesgo": 0.85,
+    "entregaIncremental": true,
+    "clienteYaVioElProducto": true,
+    "texto": "No hay un día de lanzamiento: lleva semanas saliendo por partes. Hoy solo sale la última.",
+    "textoSiSale": "Sale como han salido las anteriores, sin que nadie se quede hasta tarde.",
+    "textoSiFalla": "Falla en la integración de lo último con lo que ya llevaba semanas en producción."
+  },
+
+  "rubricaCierre": {
+    "practicas": [
+      {
+        "id": "respetar-el-limite",
+        "descripcion": "El límite de WIP es la única regla de Kanban. Subirlo cuando aprieta es quitarle el mecanismo que lo hace funcionar.",
+        "metrica": "vecesExcedioWip",
+        "comparador": "<=",
+        "objetivo": 3,
+        "razonSiCumple": "El límite se respetó. Por eso el tablero pudo enseñar dónde estaba el atasco en vez de esconderlo bajo trabajo a medias.",
+        "razonSiFalla": "Se excedió el límite demasiadas veces. Cada vez que se sube el WIP la banda del flujo acumulado se ensancha y el lead time sube, aunque ese día parezca que se avanza más."
+      },
+      {
+        "id": "flujo-estrecho",
+        "descripcion": "Poco trabajo a medias a la vez es lo que hace que algo llegue a terminarse.",
+        "metrica": "wipMedio",
+        "comparador": "<=",
+        "objetivo": 4,
+        "razonSiCumple": "El trabajo en curso se mantuvo bajo. Por la ley de Little, eso es exactamente lo que mantiene corto el tiempo de entrega.",
+        "razonSiFalla": "Se sostuvo demasiado trabajo a la vez. Empezar no es avanzar: lo que cuenta es lo que cruza el tablero."
+      },
+      {
+        "id": "tiempo-de-entrega",
+        "descripcion": "En un flujo continuo la métrica que importa no es cuánto se empieza, sino cuánto tarda una tarjeta en cruzar.",
+        "metrica": "leadTimeMedio",
+        "comparador": "<=",
+        "objetivo": 6,
+        "razonSiCumple": "Las tarjetas cruzaron el tablero rápido. Con un lead time corto se puede prometer una fecha sin estimar cada tarea.",
+        "razonSiFalla": "Las tarjetas tardaron demasiado en cruzar. Un lead time largo hace imposible prometer nada, por muy lleno que esté el tablero."
+      },
+      {
+        "id": "mejora-del-flujo",
+        "descripcion": "La revisión del flujo existe para cambiar el sistema, no para mirarlo.",
+        "metrica": "accionesRetroElegidas",
+        "comparador": ">=",
+        "objetivo": 1,
+        "razonSiCumple": "Se cambió algo del sistema al menos una vez, a partir de lo que enseñaba el tablero.",
+        "razonSiFalla": "El tablero enseñó los atascos y no se cambió nada. Medir sin actuar es decorar."
+      }
+    ]
+  }
+}

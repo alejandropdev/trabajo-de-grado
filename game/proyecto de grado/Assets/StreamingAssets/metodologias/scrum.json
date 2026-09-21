@@ -1,0 +1,168 @@
+{
+  "id": "scrum",
+  "nombre": "Scrum",
+  "familia": "agil",
+  "resumen": "Se trabaja en sprints cerrados. Al final de cada uno hay algo que se puede enseñar, y una conversación sobre cómo mejorar el proceso. El alcance solo se renegocia entre sprints.",
+
+  "razonesValidas": [
+    "el_cliente_cambiara_de_opinion",
+    "el_problema_no_esta_del_todo_definido",
+    "hace_falta_enseñar_avance_pronto",
+    "el_equipo_puede_entregar_algo_usable_cada_pocas_semanas"
+  ],
+  "razonesTrampa": [
+    "es_lo_que_usa_todo_el_mundo",
+    "asi_se_trabaja_mas_rapido",
+    "no_hay_que_documentar_nada",
+    "lo_pidio_la_gerencia"
+  ],
+
+  "calendario": {
+    "tipo": "iterativo",
+    "etiquetaUnidad": "Sprint",
+    "longitudIteracion": 10,
+    "iteraciones": 2
+  },
+
+  "ceremonias": [
+    {
+      "id": "planning",
+      "nombre": "Planificación de sprint",
+      "cuando": "inicioIteracion",
+      "costeDias": 0.5,
+      "verbo": "V5",
+      "texto": "El equipo se compromete con lo que cree que cabe. Nadie sabe todavía si cabe.",
+      "abreVentanaDeCambio": true
+    },
+    {
+      "id": "daily",
+      "nombre": "Reunión diaria",
+      "cuando": "diario",
+      "costeDias": 0.05,
+      "texto": "Quince minutos de pie. Sirve para detectar bloqueos, no para rendir cuentas.",
+      "efectos": { "MoralEquipo": 0.2 }
+    },
+    {
+      "id": "review",
+      "nombre": "Revisión de sprint",
+      "cuando": "finIteracion",
+      "costeDias": 0.5,
+      "texto": "Se enseña lo que hay. Lo que no está terminado, no se enseña.",
+      "revelaProductoAlCliente": true
+    },
+    {
+      "id": "retro",
+      "nombre": "Retrospectiva",
+      "cuando": "finIteracion",
+      "costeDias": 0.5,
+      "verbo": "V4",
+      "texto": "Qué salió bien, qué no, y qué vamos a cambiar. Solo se elige una cosa: las listas de diez propósitos no cambian nada.",
+      "ajustaCoeficiente": true,
+      "acciones": [
+        {
+          "id": "documentar",
+          "texto": "Documentar antes de cerrar cada tarea",
+          "coeficiente": "kappa",
+          "multiplicador": 0.85,
+          "explicacion": "La documentación deja de diluirse tan rápido: lo que se escribe mientras se hace envejece más lento que lo que se escribe después."
+        },
+        {
+          "id": "refactor20",
+          "texto": "Reservar el 20 % del sprint a refactorizar",
+          "coeficiente": "beta",
+          "multiplicador": 1.25,
+          "explicacion": "Cada hora dedicada a refactorizar baja más deuda técnica que antes, porque se ataca el código mientras todavía se entiende."
+        },
+        {
+          "id": "pareja",
+          "texto": "Programación en pareja obligatoria en los módulos críticos",
+          "coeficiente": "alpha",
+          "multiplicador": 0.8,
+          "explicacion": "Trabajar bajo presión genera menos deuda: hay un segundo par de ojos que frena el atajo antes de que se escriba."
+        },
+        {
+          "id": "ritmo",
+          "texto": "Prohibido comprometerse por encima de la velocidad empírica",
+          "coeficiente": "gamma",
+          "multiplicador": 0.75,
+          "explicacion": "El equipo se cansa más despacio, porque deja de perseguir un número que nunca fue realista."
+        }
+      ]
+    }
+  ],
+
+  "reglasDeCambio": {
+    "costeMultiplicador": 1.0,
+    "ventanas": ["entreIteraciones"],
+    "consumeWip": false,
+    "textoEnVentana": "Estamos entre sprints. Es el momento de meterlo en el backlog sin romper nada.",
+    "penalizacionFueraDeVentana": {
+      "permitido": true,
+      "costeMultiplicador": 1.5,
+      "efectosExtra": { "MoralEquipo": -4 },
+      "texto": "El sprint ya está comprometido. Se puede meter, pero algo se cae, y el equipo lo sabe."
+    }
+  },
+
+  "modificadoresModelo": {
+    "iota": 0.9
+  },
+
+  "modificadoresDirector": {
+    "multiplicadorPesosPorTag": { "cliente": 1.2, "equipo": 1.1 },
+    "multiplicadorDrama": 1.0,
+    "eventosBloqueados": []
+  },
+
+  "tableroPrincipal": "burndown",
+
+  "lanzamiento": {
+    "factorRiesgo": 0.9,
+    "entregaIncremental": true,
+    "clienteYaVioElProducto": true,
+    "texto": "El cliente ya vio esto dos veces. No hay sorpresas de última hora, solo las que no supiste ver tú.",
+    "textoSiSale": "Sale sin ruido. Es lo que ya habían visto, terminado.",
+    "textoSiFalla": "Falla en lo que nunca se enseñó en ninguna revisión."
+  },
+
+  "rubricaCierre": {
+    "practicas": [
+      {
+        "id": "ritmo-sostenible",
+        "descripcion": "Ritmo sostenible: Scrum asume que el equipo puede mantener el paso indefinidamente.",
+        "metrica": "diasConHorasExtra",
+        "comparador": "<=",
+        "objetivo": 4,
+        "razonSiCumple": "El equipo llegó al final del nivel entero. Un sprint sostenido no es el que más entrega, es el que se puede repetir.",
+        "razonSiFalla": "Se sostuvo a base de horas extra. Eso no es velocidad, es deuda de salud, y se cobra en el nivel siguiente."
+      },
+      {
+        "id": "mejora-continua",
+        "descripcion": "La retrospectiva sirve para cambiar algo, no para desahogarse.",
+        "metrica": "accionesRetroElegidas",
+        "comparador": ">=",
+        "objetivo": 2,
+        "razonSiCumple": "Cada retro cambió una constante real del proceso. La mejora de proceso es acumulativa, y aquí se nota.",
+        "razonSiFalla": "Se hicieron las retros y no salió ninguna acción. Una retro sin acción es una reunión."
+      },
+      {
+        "id": "compromiso-realista",
+        "descripcion": "Lo comprometido y lo entregado deberían parecerse cada vez más.",
+        "metrica": "desviacionCompromisoPct",
+        "comparador": "<=",
+        "objetivo": 25,
+        "razonSiCumple": "Las estimaciones se fueron acercando a la realidad. Eso es exactamente para lo que sirve medir la velocidad.",
+        "razonSiFalla": "Se comprometió mucho más de lo que se entregó. El sprint dejó de ser un compromiso y pasó a ser un deseo."
+      },
+      {
+        "id": "el-cambio-no-es-el-enemigo",
+        "descripcion": "Scrum existe para absorber cambios, no para blindarse contra ellos.",
+        "metrica": "cambiosAceptados",
+        "comparador": ">=",
+        "objetivo": 1,
+        "razonSiCumple": "Entró al menos un cambio por la puerta de delante. Eso es lo que distingue iterar de entregar tarde.",
+        "razonSiFalla": "No entró ni un cambio en todo el nivel. Si el alcance era tan estable, quizá la metodología ágil no era la que hacía falta."
+      }
+    ]
+  }
+}
