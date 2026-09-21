@@ -225,8 +225,64 @@ namespace Nexus.Core.Datos {
 
             ValidarDirector(id, p.Director, e);
             ValidarJornada(id, p.Jornada, e);
+            ValidarMapa(id, p.Mapa, e);
             ValidarFase1(id, p.Fase1, e);
             return e;
+        }
+
+        /// <summary>
+        /// El mapa recorrible (§3.6). Un nivel puede no tener mapa — entonces no hay exploracion y
+        /// todo ocurre en el escritorio — pero si lo tiene, tiene que sostenerse.
+        /// </summary>
+        private static void ValidarMapa(string id, MapaDeZonas mapa, List<string> e) {
+            if (mapa == null || mapa.Vacio) return;
+
+            if (mapa.CosteBaseDeViaje < 0)
+                e.Add($"{id}: 'mapa.costeBaseDeViaje' no puede ser negativo.");
+            if (mapa.Zonas.Count > 6)
+                e.Add($"{id}: el mapa tiene {mapa.Zonas.Count} zonas; el diseño pide de 3 a 6. " +
+                      "Recorrerlas todas en un dia tiene que ser imposible, pero el mapa tambien tiene que leerse.");
+
+            var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var anclas = 0;
+
+            foreach (var zona in mapa.Zonas) {
+                if (zona == null) { e.Add($"{id}: hay una zona vacia en el mapa."); continue; }
+                if (string.IsNullOrEmpty(zona.Id)) { e.Add($"{id}: hay una zona sin 'id'."); continue; }
+                if (!ids.Add(zona.Id)) e.Add($"{id}: la zona '{zona.Id}' esta repetida.");
+
+                if (zona.EsAncla) anclas++;
+                if (string.IsNullOrEmpty(zona.Nombre)) e.Add($"{id}: la zona '{zona.Id}' no tiene nombre.");
+                if (string.IsNullOrEmpty(zona.QueDa))
+                    e.Add($"{id}: la zona '{zona.Id}' no dice que da. Cada zona tiene que dar algo que " +
+                          "no este en ninguna otra; si no, sobra.");
+                if (zona.MinutosDeVisita < 0)
+                    e.Add($"{id}: la zona '{zona.Id}' tiene minutos de visita negativos.");
+
+                if (zona.Puerta != null)
+                    ValidarExpresiones(zona.Puerta.Precondiciones, $"{id}: puerta de la zona '{zona.Id}'", e);
+            }
+
+            // ★ El escritorio es siempre el ancla: es donde llegan las alertas y donde hay que volver
+            // a atenderlas. Sin ancla, una alerta no se podria atender en ninguna parte.
+            if (anclas == 0)
+                e.Add($"{id}: ninguna zona es el ancla. Tu escritorio tiene que serlo: es donde llegan las alertas.");
+            else if (anclas > 1)
+                e.Add($"{id}: hay {anclas} zonas marcadas como ancla; solo puede haber una.");
+
+            if (mapa.Costes == null) return;
+            foreach (var kv in mapa.Costes) {
+                if (kv.Value < 0) e.Add($"{id}: el coste de viaje '{kv.Key}' es negativo.");
+
+                var partes = (kv.Key ?? "").Split(MapaDeZonas.Separador);
+                if (partes.Length != 2) {
+                    e.Add($"{id}: la clave de coste '{kv.Key}' deberia tener la forma 'zonaA{MapaDeZonas.Separador}zonaB'.");
+                    continue;
+                }
+                foreach (var zona in partes)
+                    if (!ids.Contains(zona.Trim()))
+                        e.Add($"{id}: el coste '{kv.Key}' menciona la zona '{zona.Trim()}', que no esta en el mapa.");
+            }
         }
 
         /// <summary>

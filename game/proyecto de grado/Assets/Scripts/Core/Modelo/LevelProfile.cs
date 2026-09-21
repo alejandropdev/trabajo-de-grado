@@ -50,6 +50,15 @@ namespace Nexus.Core.Modelo {
         /// </summary>
         public JornadaConfig Jornada = new JornadaConfig();
 
+        /// <summary>
+        /// El mapa recorrible de este nivel (§3.6): de 3 a 6 zonas, con tu escritorio siempre de ancla.
+        /// Vacio = el nivel no tiene exploracion y todo ocurre en el escritorio.
+        ///
+        /// No confundir con las zonas A-F de la Fase 1, que son la recoleccion con reloj de 2 h
+        /// y no cambian nunca.
+        /// </summary>
+        public MapaDeZonas Mapa = new MapaDeZonas();
+
         // --- Grupo 4 · pedagogia ---
         /// <summary>OA-* que este nivel evalua. Filtra tanto eventos como minijuegos.</summary>
         public string[] ObjetivosActivos = new string[0];
@@ -78,6 +87,7 @@ namespace Nexus.Core.Modelo {
             c.Coef = Coef == null ? null : Coef.Clone();
             c.Director = Director == null ? null : Director.Clone();
             c.Jornada = Jornada == null ? null : Jornada.Clone();
+            c.Mapa = Mapa == null ? null : Mapa.Clone();
             c.Umbrales = Umbrales == null ? null : Umbrales.Clone();
             c.Fase1 = Fase1 == null ? null : Fase1.Clone();
             return c;
