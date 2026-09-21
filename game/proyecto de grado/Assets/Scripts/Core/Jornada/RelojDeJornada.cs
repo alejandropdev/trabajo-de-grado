@@ -34,6 +34,18 @@ namespace Nexus.Core.Jornada {
         /// </summary>
         public int VentanaDeAtencionMinutos = 180;
 
+        /// <summary>
+        /// Lo que cuesta atender una alerta: ir a la escena, resolverla y volver a lo tuyo.
+        /// El reloj se pausa DENTRO de la escena, pero el hueco en el dia se cobra igual.
+        /// </summary>
+        public int MinutosPorAtender = 60;
+
+        /// <summary>
+        /// A que multiplos cae una alerta. 15 hace que suenen a las 09:00, 09:15, 09:30…, que se lee
+        /// mucho mejor en pantalla que un 09:37 y no le quita nada al azar.
+        /// </summary>
+        public int GranularidadDeAlertas = 15;
+
         public JornadaConfig Clone() { return (JornadaConfig)MemberwiseClone(); }
     }
 
@@ -160,6 +172,11 @@ namespace Nexus.Core.Jornada {
             if (Config.SegundosRealesPorHora <= 0)
                 throw new InvalidOperationException(
                     $"'segundosRealesPorHora' vale {Config.SegundosRealesPorHora}; el reloj no correria.");
+            if (Config.MinutosPorAtender < 0)
+                throw new InvalidOperationException("'minutosPorAtender' no puede ser negativo.");
+            if (Config.GranularidadDeAlertas < 1)
+                throw new InvalidOperationException(
+                    $"'granularidadDeAlertas' vale {Config.GranularidadDeAlertas}; minimo 1 minuto.");
         }
     }
 }

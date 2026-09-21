@@ -33,16 +33,6 @@ namespace Nexus.Core.Modelo {
         /// <summary>True si eligio quedarse en el cierre y el dia sigue hasta la hora limite.</summary>
         public bool JornadaProrrogada;
 
-        /// <summary>
-        /// 0 = 09:00 monitoreo · 1 = 12:00 decision · 2 = 15:00 verbo · 3 = 18:00 fin de jornada.
-        ///
-        /// ⚠ EN RETIRADA. Las cuatro ventanas fijas las sustituye el dia continuo (§3.3), y el propio
-        /// Documento Maestro las marca como documentacion obsoleta en su §13.2. Sigue aqui solo
-        /// mientras GameSession termina de migrar; no esta en Consultables, asi que ningun JSON de
-        /// contenido depende de ella.
-        /// </summary>
-        public int Ventana;
-
         /// <summary>1 = planificacion · 2 = desarrollo · 3 = lanzamiento · 4 = evaluacion.</summary>
         public int Fase = 1;
 

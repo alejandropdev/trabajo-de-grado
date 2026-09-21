@@ -5,6 +5,7 @@ using Nexus.Core.Datos;
 using Nexus.Core.Evaluacion;
 using Nexus.Core.Eventos;
 using Nexus.Core.Guardado;
+using Nexus.Core.Jornada;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Modelo;
@@ -216,14 +217,40 @@ namespace Nexus.Tests {
         }
 
         /// <summary>
-        /// Juega N dias siempre igual. Es el "jugador robot" con el que se comparan dos partidas:
-        /// sin un jugador determinista, INV-7 no se puede comprobar.
+        /// Juega N dias siempre igual, respetando el dia continuo: avanza el reloj de 30 en 30,
+        /// atiende cada alerta en cuanto suena (los fixtures de este archivo no declaran mapa, asi que
+        /// el jugador esta siempre en su escritorio) y cierra la jornada en cuanto no queda nada.
+        ///
+        /// Es el "jugador robot" con el que se comparan dos partidas: sin un jugador determinista,
+        /// INV-7 no se puede comprobar.
         /// </summary>
         private static void Jugar(GameSession s, int dias) {
             for (var i = 0; i < dias; i++) {
                 s.ComenzarDia();
 
                 if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida + 4);
+                if (s.PendingRetro != null && s.PendingRetro.Acciones.Count > 0)
+                    s.ElegirAccionRetro(s.PendingRetro.Acciones[0].Id);
+
+                RecorrerElDia(s);
+
+                s.CerrarJornada();
+                s.TerminarDia(s.R.DiaActual % 3 == 0);
+            }
+        }
+
+        /// <summary>
+        /// Avanza el reloj hasta que no quede nada pendiente hoy, atendiendo cada alerta apenas suena
+        /// y resolviendo lo que se abra. El tope de 40 iteraciones (20h/30min) es una red de seguridad
+        /// de test, no algo que el motor necesite: SePuedeCerrarLaJornada siempre se vuelve cierto
+        /// porque toda alerta expira, como muy tarde, en el cierre.
+        /// </summary>
+        private static void RecorrerElDia(GameSession s) {
+            for (var vueltas = 0; vueltas < 40 && !s.SePuedeCerrarLaJornada; vueltas++) {
+                var avance = s.AvanzarReloj(30);
+
+                foreach (var alerta in avance.AlertasQueSuenan)
+                    s.AtenderAlerta(alerta.Id);
 
                 if (s.Decision != null) {
                     var elegible = s.Decision.Opciones.FirstOrDefault(o => !o.Bloqueada);
@@ -237,11 +264,6 @@ namespace Nexus.Tests {
                         Rubrica = new Rubrica { Veredicto = "aceptable", Oa = "OA-GIT-01", Razon = "Casi." },
                         EfectosInmediatos = { { "DeudaTecnica", 3f } }
                     });
-
-                if (s.PendingRetro != null && s.PendingRetro.Acciones.Count > 0)
-                    s.ElegirAccionRetro(s.PendingRetro.Acciones[0].Id);
-
-                s.TerminarDia(s.R.DiaActual % 3 == 0);
             }
         }
 
@@ -354,12 +376,16 @@ namespace Nexus.Tests {
             conservador.ComenzarDia();
             conservador.Comprometer(conservador.PendingPlanning.CapacidadSugerida);
             Assert.AreEqual(0.0, conservador.R.SobreCompromiso, Tol);
+            RecorrerElDia(conservador);
+            conservador.CerrarJornada();
             conservador.TerminarDia(false);
 
             var optimista = Empezada();
             optimista.ComenzarDia();
             optimista.Comprometer(optimista.PendingPlanning.CapacidadSugerida + 10);
             Assert.AreEqual(10.0, optimista.R.SobreCompromiso, Tol);
+            RecorrerElDia(optimista);
+            optimista.CerrarJornada();
             optimista.TerminarDia(false);
 
             Assert.Greater(optimista.W.DeudaTecnica, conservador.W.DeudaTecnica,
@@ -390,18 +416,34 @@ namespace Nexus.Tests {
 
             Assert.AreEqual(0.0, avanceTrasComenzar, Tol, "empezar el dia no produce nada");
 
+            RecorrerElDia(s);
+            Assert.AreEqual(0.0, s.W.Avance, Tol, "recorrer el dia y resolver alertas tampoco: solo el cierre mueve el proyecto");
+
+            s.CerrarJornada();
             s.TerminarDia(false);
             Assert.Greater(s.W.Avance, 0, "solo las 18:00 mueven el proyecto");
+        }
+
+        [Test]
+        public void No_se_puede_terminar_el_dia_antes_de_llegar_al_cierre() {
+            var s = Empezada();
+            s.ComenzarDia();
+            var ex = Assert.Throws<InvalidOperationException>(() => s.TerminarDia(false));
+            StringAssert.Contains("18:00", ex.Message);
         }
 
         [Test]
         public void Quedarse_avanza_mas_hoy_y_lo_cobra_durante_el_resto_de_la_partida() {
             var aCasa = Empezada();
             aCasa.ComenzarDia();
+            RecorrerElDia(aCasa);
+            aCasa.CerrarJornada();
             aCasa.TerminarDia(false);
 
             var seQueda = Empezada();
             seQueda.ComenzarDia();
+            RecorrerElDia(seQueda);
+            seQueda.CerrarJornada();
             seQueda.TerminarDia(true);
 
             Assert.Greater(seQueda.W.Avance, aCasa.W.Avance, "el +25 % es el señuelo");
@@ -416,16 +458,66 @@ namespace Nexus.Tests {
 
         // ================================================================ decisiones
 
-        private static GameSession HastaLaPrimeraDecision(out int dia, string metodologia = "scrum") {
-            var s = Empezada(metodologia);
-            for (dia = 1; dia <= 20; dia++) {
+        /// <summary>
+        /// Avanza dias hasta que se abra una decision. El dia queda A MEDIAS, con la decision viva, tal
+        /// como hacia el helper original — solo que ahora "abrirse" significa que sono la alerta Y el
+        /// jugador la atendio, no que ComenzarDia la presentara de golpe. Cualquier minijuego que
+        /// aparezca por el camino se resuelve, para que no bloquee el cierre de un dia sin decision.
+        /// </summary>
+        private static void JugarHastaQueHayaUnaDecision(GameSession s, out int dia, int maxDias = 20) {
+            for (dia = 1; dia <= maxDias; dia++) {
                 s.ComenzarDia();
                 if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
-                if (s.Decision != null) return s;
+                if (s.PendingRetro != null && s.PendingRetro.Acciones.Count > 0)
+                    s.ElegirAccionRetro(s.PendingRetro.Acciones[0].Id);
+
+                for (var vueltas = 0; vueltas < 40 && !s.SePuedeCerrarLaJornada; vueltas++) {
+                    var avance = s.AvanzarReloj(30);
+                    foreach (var alerta in avance.AlertasQueSuenan) s.AtenderAlerta(alerta.Id);
+
+                    if (s.Decision != null) return;
+                    if (s.Minijuego != null)
+                        s.ResolverMinijuego(new ResultadoMinijuego {
+                            MinijuegoId = s.Minijuego.MinijuegoId, Resultado = ResultadosDeMinijuego.Parcial,
+                            Rubrica = new Rubrica { Veredicto = "aceptable", Oa = "OA-GIT-01", Razon = "Casi." },
+                            EfectosInmediatos = { { "DeudaTecnica", 3f } }
+                        });
+                }
+
+                s.CerrarJornada();
                 s.TerminarDia(false);
             }
-            Assert.Fail("no salio ninguna decision en 20 dias");
-            return null;
+        }
+
+        /// <summary>El espejo: avanza hasta que se abra un minijuego, resolviendo cualquier decision que salga antes.</summary>
+        private static void JugarHastaQueHayaUnMinijuego(GameSession s, out int dia, int maxDias = 20) {
+            for (dia = 1; dia <= maxDias; dia++) {
+                s.ComenzarDia();
+                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
+                if (s.PendingRetro != null && s.PendingRetro.Acciones.Count > 0)
+                    s.ElegirAccionRetro(s.PendingRetro.Acciones[0].Id);
+
+                for (var vueltas = 0; vueltas < 40 && !s.SePuedeCerrarLaJornada; vueltas++) {
+                    var avance = s.AvanzarReloj(30);
+                    foreach (var alerta in avance.AlertasQueSuenan) s.AtenderAlerta(alerta.Id);
+
+                    if (s.Minijuego != null) return;
+                    if (s.Decision != null) {
+                        var elegible = s.Decision.Opciones.FirstOrDefault(o => !o.Bloqueada);
+                        if (elegible != null) s.ResolverDecision(elegible.Id);
+                    }
+                }
+
+                s.CerrarJornada();
+                s.TerminarDia(false);
+            }
+        }
+
+        private static GameSession HastaLaPrimeraDecision(out int dia, string metodologia = "scrum") {
+            var s = Empezada(metodologia);
+            JugarHastaQueHayaUnaDecision(s, out dia);
+            if (s.Decision == null) Assert.Fail("no salio ninguna decision en 20 dias");
+            return s;
         }
 
         [Test]
@@ -469,12 +561,8 @@ namespace Nexus.Tests {
             catalogo.Eventos = new List<EventDefinition> { EventoDeAlcance() };
             var s = Empezada("scrum", 4417, catalogo);
 
-            for (var dia = 1; dia <= 20 && s.Decision == null; dia++) {
-                s.ComenzarDia();
-                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
-                if (s.Decision != null) break;
-                s.TerminarDia(false);
-            }
+            int dia;
+            JugarHastaQueHayaUnaDecision(s, out dia);
 
             Assert.IsNotNull(s.Decision, "el evento de alcance tenia que salir");
             Assert.IsTrue(s.Decision.EsCambioDeAlcance);
@@ -496,12 +584,8 @@ namespace Nexus.Tests {
             catalogo.Eventos = new List<EventDefinition> { evento };
 
             var s = Empezada("scrum", 4417, catalogo);
-            for (var dia = 1; dia <= 20 && s.Decision == null; dia++) {
-                s.ComenzarDia();
-                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
-                if (s.Decision != null) break;
-                s.TerminarDia(false);
-            }
+            int dia;
+            JugarHastaQueHayaUnaDecision(s, out dia);
 
             var bloqueada = s.Decision.Opciones.First(o => o.Id == "A");
             Assert.IsTrue(bloqueada.Bloqueada);
@@ -512,13 +596,8 @@ namespace Nexus.Tests {
         [Test]
         public void Resolver_un_minijuego_llega_al_estado_y_a_la_traza() {
             var s = Empezada();
-            for (var dia = 1; dia <= 20 && s.Minijuego == null; dia++) {
-                s.ComenzarDia();
-                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
-                if (s.Minijuego != null) break;
-                if (s.Decision != null) s.ResolverDecision("A");
-                s.TerminarDia(false);
-            }
+            int dia;
+            JugarHastaQueHayaUnMinijuego(s, out dia);
 
             Assert.IsNotNull(s.Minijuego, "la ventana de las 15:00 tenia que abrirse alguna vez");
             Assert.AreEqual(3, s.Minijuego.NivelAndamiaje, "el andamiaje sale del nivel");
@@ -806,6 +885,237 @@ namespace Nexus.Tests {
 
             Assert.Greater(reporte.Competencia.PorObjetivo.Count, 0, "algo se evaluo");
             CollectionAssert.IsEmpty(reporte.BeatsPerdidos, "el unico beat obligatorio no tenia precondiciones");
+        }
+
+        // ================================================================ ★ A'4: el dia continuo
+
+        /// <summary>
+        /// Avanza dias, jugando con normalidad, hasta que un dia empiece con al menos una alerta que
+        /// cumpla 'filtro' — y deja la sesion justo tras ComenzarDia() de ese dia, sin tocar el reloj.
+        ///
+        /// Hace falta porque el DIA 1 nunca trae una decision: EventoDeHoy solo devuelve algo si un
+        /// dia ANTERIOR ya lo agendo (§7.5), y el dia 1 no tiene anterior. Probar solo "el dia 1" con
+        /// Assert.Ignore como salida no verificaria nada la mayoria de las veces; esto lo hace real.
+        /// </summary>
+        private static void HastaUnDiaConAlerta(GameSession s, out int dia, Func<Alerta, bool> filtro = null) {
+            var pasa = filtro ?? (a => true);
+            for (dia = 1; dia <= 20; dia++) {
+                s.ComenzarDia();
+                if (s.AlertasDeHoy.Any(pasa)) return;
+
+                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
+                if (s.PendingRetro != null && s.PendingRetro.Acciones.Count > 0)
+                    s.ElegirAccionRetro(s.PendingRetro.Acciones[0].Id);
+                RecorrerElDia(s);
+                s.CerrarJornada();
+                s.TerminarDia(false);
+            }
+            Assert.Fail("no salio ninguna alerta que cumpliera el filtro en 20 dias");
+        }
+
+        /// <summary>Un mapa de dos zonas, con una puerta que solo se abre desde el dia 3.</summary>
+        private static Catalogo CatalogoConMapa() {
+            var c = Catalogo();
+            c.Niveles["nivel-01"].Mapa = new MapaDeZonas {
+                CosteBaseDeViaje = 20,
+                Zonas = {
+                    new ZonaDeNivel { Id = "escritorio", Nombre = "Tu escritorio", EsAncla = true,
+                                      MinutosDeVisita = 10, QueDa = "Aqui llegan las alertas." },
+                    new ZonaDeNivel { Id = "bullpen", Nombre = "Bullpen", MinutosDeVisita = 20,
+                                      QueDa = "El equipo." },
+                    new ZonaDeNivel { Id = "sala-comite", Nombre = "Sala del Comite", MinutosDeVisita = 20,
+                                      QueDa = "Un miembro del Comite.",
+                                      Puerta = new PuertaDeZona { Precondiciones = { "diaActual >= 3" } } }
+                }
+            };
+            return c;
+        }
+
+        [Test]
+        public void Sin_mapa_las_alertas_se_atienden_desde_cualquier_sitio() {
+            var s = Empezada();   // Catalogo() no declara Mapa
+            int dia;
+            JugarHastaQueHayaUnaDecision(s, out dia);
+
+            Assert.IsNull(s.ZonaActual, "sin mapa no hay 'donde estas': todo ocurre en el escritorio");
+            Assert.IsNotNull(s.Decision, "AtenderAlerta no exigio ir a ningun sitio para llegar hasta aqui");
+        }
+
+        [Test]
+        public void Con_mapa_las_alertas_solo_se_atienden_desde_el_escritorio() {
+            var s = Empezada("scrum", 4417, CatalogoConMapa());
+            int dia;
+            HastaUnDiaConAlerta(s, out dia);
+            s.IrAZona("bullpen");
+
+            // Se avanza en pasos pequeños y se para en cuanto algo suena — saltar de golpe haria que
+            // la alerta sonara Y expirara en la misma llamada, y entonces el mensaje que se comprueba
+            // seria "ya expiro", no "solo se atienden desde tu escritorio".
+            Alerta sonando = null;
+            for (var i = 0; i < 40 && !s.SePuedeCerrarLaJornada && sonando == null; i++)
+                sonando = s.AvanzarReloj(15).AlertasQueSuenan.FirstOrDefault();
+
+            Assert.IsNotNull(sonando, "HastaUnDiaConAlerta garantiza que hoy suena algo");
+            var ex = Assert.Throws<InvalidOperationException>(() => s.AtenderAlerta(sonando.Id));
+            StringAssert.Contains("escritorio", ex.Message);
+        }
+
+        [Test]
+        public void Ir_a_una_zona_cuesta_el_reloj_y_queda_registrado() {
+            var s = Empezada("scrum", 4417, CatalogoConMapa());
+            s.ComenzarDia();
+            var minutoAntes = s.MinutoDelDia;
+
+            s.IrAZona("bullpen");
+
+            Assert.AreEqual(minutoAntes + 20 + 20, s.MinutoDelDia, "20 de viaje + 20 de la micro-escena");
+            Assert.AreEqual("bullpen", s.ZonaActual);
+            Assert.AreEqual(1, s.R.ZonasVisitadas["bullpen"]);
+        }
+
+        [Test]
+        public void Una_zona_con_puerta_cerrada_no_se_puede_visitar() {
+            var s = Empezada("scrum", 4417, CatalogoConMapa());
+            s.ComenzarDia();   // dia 1: la puerta pide diaActual >= 3
+
+            var ex = Assert.Throws<InvalidOperationException>(() => s.IrAZona("sala-comite"));
+            StringAssert.Contains("sala-comite", ex.Message);
+        }
+
+        [Test]
+        public void Una_zona_con_puerta_se_abre_cuando_se_cumple_la_condicion() {
+            var s = Empezada("scrum", 4417, CatalogoConMapa());
+
+            for (var dia = 1; dia < 3; dia++) {
+                s.ComenzarDia();
+                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
+                RecorrerElDia(s);
+                s.CerrarJornada();
+                s.TerminarDia(false);
+            }
+            s.ComenzarDia();   // dia 3: ahora "diaActual >= 3" se cumple
+
+            Assert.DoesNotThrow(() => s.IrAZona("sala-comite"), "desde el dia 3 la puerta esta abierta");
+        }
+
+        [Test]
+        public void No_se_puede_ir_a_una_zona_si_el_nivel_no_tiene_mapa() {
+            var s = Empezada();   // Catalogo() sin Mapa
+            s.ComenzarDia();
+            var ex = Assert.Throws<InvalidOperationException>(() => s.IrAZona("lo-que-sea"));
+            StringAssert.Contains("mapa", ex.Message);
+        }
+
+        [Test]
+        public void Una_decision_que_expira_se_evalua_como_incorrecta_y_no_como_si_no_hubiera_pasado_nada() {
+            var s = Empezada();
+            int dia;
+            HastaUnDiaConAlerta(s, out dia, a => a.Tipo == TiposDeAlerta.Decision);
+
+            var expiro = false;
+            for (var i = 0; i < 40 && !s.SePuedeCerrarLaJornada && !expiro; i++) {
+                var avance = s.AvanzarReloj(30);   // nunca se atiende nada: se deja expirar todo
+                if (avance.AlertasQueExpiraron.Any(a => a.Tipo == TiposDeAlerta.Decision)) expiro = true;
+            }
+
+            Assert.IsTrue(expiro, "HastaUnDiaConAlerta garantiza una decision hoy, y nunca se atendio");
+
+            var entrada = s.Traza.Entradas.Last();
+            Assert.AreEqual(Veredictos.Incorrecta, entrada.Veredicto);
+            Assert.AreEqual("omitido", entrada.OpcionId);
+            StringAssert.Contains("Alguien decidio por ti", entrada.Razon);
+            Assert.IsNull(s.Decision, "la decision expirada no puede quedar abierta");
+        }
+
+        [Test]
+        public void Un_minijuego_que_expira_tambien_produce_una_escena_no_una_puntuacion() {
+            var s = Empezada();
+            int dia;
+            HastaUnDiaConAlerta(s, out dia, a => a.Tipo == TiposDeAlerta.Minijuego);
+
+            Alerta expirada = null;
+            for (var i = 0; i < 40 && !s.SePuedeCerrarLaJornada && expirada == null; i++) {
+                var avance = s.AvanzarReloj(30);
+                expirada = avance.AlertasQueExpiraron.FirstOrDefault(a => a.Tipo == TiposDeAlerta.Minijuego);
+            }
+
+            Assert.IsNotNull(expirada, "HastaUnDiaConAlerta garantiza un minijuego hoy, y nunca se atendio");
+
+            var entrada = s.Traza.Entradas.Last();
+            Assert.AreEqual(expirada.Id, entrada.Origen);
+            Assert.AreEqual(Veredictos.Incorrecta, entrada.Veredicto);
+            StringAssert.Contains("tambien es decidir", entrada.Razon);
+            Assert.IsNull(s.Minijuego);
+        }
+
+        [Test]
+        public void CerrarJornada_lanza_si_queda_algo_pendiente() {
+            var s = Empezada();
+            int dia;
+            HastaUnDiaConAlerta(s, out dia);
+
+            Assert.IsFalse(s.SePuedeCerrarLaJornada, "hay una alerta agendada para hoy que aun no sono ni se atendio");
+            var ex = Assert.Throws<InvalidOperationException>(() => s.CerrarJornada());
+            StringAssert.Contains("pendiente", ex.Message);
+        }
+
+        [Test]
+        public void Guardar_y_recargar_a_mitad_del_dia_con_una_alerta_viva_da_lo_mismo() {
+            // La version mas dura de INV-7: no entre dos dias, sino a MITAD de uno, con una alerta
+            // sonada y sin atender todavia. Es exactamente lo que A4 añade sobre lo que M9 ya probaba.
+            var deUnTiron = Empezada();
+            deUnTiron.ComenzarDia();
+            var avance = deUnTiron.AvanzarReloj(600);   // agota el dia entero de un tiron
+
+            var respaldo = new Dictionary<string, double>(StringComparer.Ordinal);
+            var conParada = Empezada("scrum", 4417, null, Flags(respaldo));
+            conParada.ComenzarDia();
+            conParada.AvanzarReloj(150);   // solo una parte del dia: dos horas y media
+
+            var partida = new SaveGame {
+                Id = "p", PerfilId = "perfil",
+                Partida = new DatosDePartida { Nombre = "x", Semilla = 4417, NivelActualId = "nivel-01" },
+                Flags = respaldo, Nivel = conParada.Capturar()
+            };
+            var recargada = JsonDeGuardado.Deserializar<SaveGame>(JsonDeGuardado.Serializar(partida));
+            var restaurada = new FabricaDeSesion(Catalogo()).Restaurar(recargada, recargada.Nivel);
+
+            Assert.AreEqual(conParada.MinutoDelDia, restaurada.MinutoDelDia,
+                            "recargar no puede adelantar ni atrasar el reloj del dia");
+
+            restaurada.AvanzarReloj(600 - 150);   // el resto del mismo dia
+
+            Assert.AreEqual(deUnTiron.MinutoDelDia, restaurada.MinutoDelDia);
+            Assert.AreEqual(deUnTiron.W.ToString(), restaurada.W.ToString());
+            Assert.AreEqual(deUnTiron.Traza.Entradas.Count, restaurada.Traza.Entradas.Count,
+                            "recargar a mitad de una alerta no puede borrarla ni servir para esquivarla");
+        }
+
+        [Test]
+        public void Restaurar_recupera_el_evento_de_una_alerta_todavia_pendiente() {
+            var s = Empezada();
+            int dia;
+            HastaUnDiaConAlerta(s, out dia);
+
+            // Pasos pequeños: saltar de golpe arriesga sonar-y-expirar en la misma llamada, y entonces
+            // no quedaria ninguna alerta VIVA que restaurar. Y "pendiente" no basta: una alerta agendada
+            // para dentro de dos horas ya es Pendiente aunque todavia no haya SONADO.
+            for (var i = 0; i < 40 && !s.SePuedeCerrarLaJornada &&
+                            !s.AlertasDeHoy.Any(a => a.EstaPendiente && a.YaSono(s.MinutoDelDia)); i++)
+                s.AvanzarReloj(15);
+
+            var sonando = s.AlertasDeHoy.FirstOrDefault(a => a.EstaPendiente && a.YaSono(s.MinutoDelDia));
+            Assert.IsNotNull(sonando, "HastaUnDiaConAlerta garantiza una alerta hoy, y suena antes del cierre");
+
+            var partida = new SaveGame {
+                Id = "p", PerfilId = "perfil",
+                Partida = new DatosDePartida { Nombre = "x", Semilla = 4417, NivelActualId = "nivel-01" },
+                Flags = new Dictionary<string, double>(StringComparer.Ordinal), Nivel = s.Capturar()
+            };
+            var restaurada = new FabricaDeSesion(Catalogo()).Restaurar(partida, partida.Nivel);
+
+            // tras restaurar, atender la misma alerta tiene que seguir funcionando
+            Assert.DoesNotThrow(() => restaurada.AtenderAlerta(sonando.Id));
         }
     }
 }

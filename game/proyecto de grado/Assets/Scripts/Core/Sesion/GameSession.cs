@@ -4,6 +4,7 @@ using Nexus.Core.Datos;
 using Nexus.Core.Evaluacion;
 using Nexus.Core.Eventos;
 using Nexus.Core.Guardado;
+using Nexus.Core.Jornada;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Modelo;
@@ -47,6 +48,8 @@ namespace Nexus.Core.Sesion {
         private EventDirector _eventos;
         private MinigameDirector _minijuegos;
         private NarrativeDirector _narrativa;
+        private readonly RelojDeJornada _reloj;
+        private readonly ColaDeAlertas _alertas;
 
         // --- salidas para la UI ---
         public DayBrief BriefDeHoy { get; private set; }
@@ -72,9 +75,32 @@ namespace Nexus.Core.Sesion {
 
         private DayPlan _planDeHoy;
         private EventDefinition _eventoDeHoy;
+        private PendingMinigame _minijuegoDeHoy;
 
         public string NivelId { get { return Perfil.Id; } }
         public IReadOnlyList<DecisionDelDirector> LogDeEventos { get { return _eventos.Log; } }
+
+        // --- el dia continuo (§3.3): lo que la UI consulta en vivo mientras el jugador se mueve ---
+
+        /// <summary>Minutos desde medianoche. 480 = 08:00.</summary>
+        public int MinutoDelDia { get { return _reloj.Minuto; } }
+
+        /// <summary>"08:00", siempre con dos digitos.</summary>
+        public string HoraActual { get { return _reloj.ToString(); } }
+
+        public bool JornadaLlegoAlCierre { get { return _reloj.LlegoElCierre; } }
+        public bool JornadaTerminada { get { return _reloj.Terminada; } }
+        public bool JornadaProrrogada { get { return R.JornadaProrrogada; } }
+        public int MinutosRestantesDeJornada { get { return _reloj.MinutosRestantes; } }
+
+        /// <summary>Donde esta el jugador. Null si el nivel no tiene mapa: todo ocurre en el escritorio.</summary>
+        public string ZonaActual { get { return R.ZonaActual; } }
+
+        /// <summary>Las alertas de hoy, sonaran o no, con su estado. Para pintar el reloj y la bandeja.</summary>
+        public IReadOnlyList<Alerta> AlertasDeHoy { get { return _alertas.Alertas; } }
+
+        /// <summary>Si el boton «cerrar jornada» se puede ofrecer ahora mismo.</summary>
+        public bool SePuedeCerrarLaJornada { get { return _alertas.SePuedeCerrarLaJornada(_reloj.Minuto); } }
 
         // ==================================================================== construccion
 
@@ -103,6 +129,8 @@ namespace Nexus.Core.Sesion {
             _rng = new DeterministicRng(Perfil.Director.Semilla != 0 ? Perfil.Director.Semilla : semilla);
             _scheduler = new EffectScheduler();
             _narrativa = new NarrativeDirector(catalogo.Beats);
+            _reloj = new RelojDeJornada(Perfil.Jornada);
+            _alertas = new ColaDeAlertas();
         }
 
         /// <summary>Las que este nivel permite, en el orden del perfil.</summary>
@@ -256,23 +284,31 @@ namespace Nexus.Core.Sesion {
             _minijuegos = new MinigameDirector(_catalogo.Minijuegos, Perfil, _rng);
         }
 
-        // ==================================================================== FASE 2
+        // ==================================================================== FASE 2 · el dia continuo (§3.3)
 
         /// <summary>
-        /// La ventana de las 09:00, en el orden exacto del §5.3. El orden no es negociable: los efectos
-        /// diferidos vencen ANTES de que el director elija, porque lo que se cobra hoy cambia lo que
-        /// hoy es probable.
+        /// Las 08:00: arranca el dia. El orden de los pasos no es negociable: los efectos diferidos
+        /// vencen ANTES de que el director elija, porque lo que se cobra hoy cambia lo que hoy es
+        /// probable. Lo que cambio al pasar al dia continuo es que el evento y el minijuego de hoy
+        /// YA NO se presentan aqui: se agendan como alertas, y suenan a la hora que el azar decidio.
         /// </summary>
         public DayBrief ComenzarDia() {
             ExigirFase2();
 
             R.DiaActual++;
-            R.Ventana = 0;
+            _reloj.Reiniciar();
+            _alertas.VaciarDelDia();
+            R.MinutoDelDia = _reloj.Minuto;
+            R.JornadaProrrogada = false;
+            R.ZonaActual = Perfil.Mapa != null && !Perfil.Mapa.Vacio ? Perfil.Mapa.Ancla?.Id : null;
+
             Decision = null;
             Minijuego = null;
             Beat = null;
             PendingPlanning = null;
             PendingRetro = null;
+            _eventoDeHoy = null;
+            _minijuegoDeHoy = null;
 
             _planDeHoy = Reglas.PlanFor(R.DiaActual);
             R.SprintActual = _planDeHoy.IndiceDeUnidad;
@@ -310,16 +346,18 @@ namespace Nexus.Core.Sesion {
                     AbrirPlanning();
             }
 
-            // 4 · el evento de hoy, o el tick que agenda uno para dentro de unos dias
+            // 4 · el evento de hoy se convierte en una ALERTA a la hora que el director sorteo;
+            //     si no hay ninguno, el tick agenda uno para dentro de unos dias
             _eventoDeHoy = _eventos.EventoDeHoy(R);
-            if (_eventoDeHoy == null) _eventos.TickSeleccion(R, this, _planDeHoy);
-            else Decision = Presentar(_eventoDeHoy);
+            if (_eventoDeHoy != null) AgendarAlertaDeDecision(_eventoDeHoy);
+            else _eventos.TickSeleccion(R, this, _planDeHoy);
 
-            // 5 · la ventana de los verbos
-            Minijuego = _minijuegos.MinijuegoDeHoy(R, this);
+            // 5 · la ventana de los verbos: si toca, tambien es una alerta con su propia hora
+            var minijuegoElegido = _minijuegos.MinijuegoDeHoy(R, this);
+            if (minijuegoElegido != null) AgendarAlertaDeMinijuego(minijuegoElegido);
 
-            // 6 · los avisos, que salen DESPUES de que el evento de hoy se haya presentado:
-            //     el telegrafiado es de un evento futuro, no del de hoy
+            // 6 · los avisos de eventos FUTUROS, que salen despues de que el de hoy ya este agendado:
+            //     el telegrafiado es de un evento de dentro de unos dias, no del de hoy
             foreach (var aviso in _scheduler.AvisosDeHoy(R.DiaActual))
                 brief.Avisos.Add($"[{aviso.Canal}] {aviso.Texto}");
 
@@ -334,6 +372,163 @@ namespace Nexus.Core.Sesion {
             RegistrarSeries(brief.Derivadas);
             BriefDeHoy = brief;
             return brief;
+        }
+
+        /// <summary>
+        /// ★ Paso 7 del §7.5, hecho alerta. El minuto lo eligio el director (SorteoDeMinuto, del mismo
+        /// DeterministicRng), y aqui solo se convierte en la citacion del dia. Si por lo que sea el
+        /// telegrafiado no trae minuto (no deberia pasar: EventDirector siempre lo pone), se sortea
+        /// aqui mismo con el mismo generador para no perder la reproducibilidad.
+        /// </summary>
+        private void AgendarAlertaDeDecision(EventDefinition evento) {
+            TelegrafiadoPendiente telegrafiado = null;
+            foreach (var t in _scheduler.EventosQueDisparanHoy(R.DiaActual))
+                if (string.Equals(t.EventoId, evento.Id, StringComparison.Ordinal)) telegrafiado = t;
+
+            var minuto = telegrafiado != null && telegrafiado.MinutoDelEvento >= 0
+                ? telegrafiado.MinutoDelEvento
+                : SorteoDeMinuto.Elegir(Perfil.Jornada, _rng);
+
+            _alertas.Encolar(new Alerta {
+                Id = evento.Id, Tipo = TiposDeAlerta.Decision,
+                MinutoDeLaAlerta = minuto, MinutoDeExpiracion = SorteoDeMinuto.Expiracion(Perfil.Jornada, minuto),
+                Canal = telegrafiado != null ? telegrafiado.Canal : "chat",
+                Texto = telegrafiado != null ? telegrafiado.Texto : evento.Nombre
+            });
+        }
+
+        /// <summary>
+        /// La ventana de verbos no se telegrafia con dias de antelacion (C6 decide el mismo dia), asi
+        /// que su minuto se sortea aqui, con el mismo azar que ya eligio SI tocaba minijuego hoy.
+        /// </summary>
+        private void AgendarAlertaDeMinijuego(PendingMinigame minijuego) {
+            _minijuegoDeHoy = minijuego;
+            var minuto = SorteoDeMinuto.Elegir(Perfil.Jornada, _rng);
+
+            _alertas.Encolar(new Alerta {
+                Id = minijuego.MinijuegoId, Tipo = TiposDeAlerta.Minijuego,
+                MinutoDeLaAlerta = minuto, MinutoDeExpiracion = SorteoDeMinuto.Expiracion(Perfil.Jornada, minuto),
+                Canal = "ticket", Texto = minijuego.PresionDiegetica
+            });
+        }
+
+        /// <summary>
+        /// Hace correr el reloj. Es el unico sitio, junto con IrAZona y CerrarJornada, donde el tiempo
+        /// del dia se mueve — y los tres pasan por aqui.
+        ///
+        /// ★ El reloj NO se pausa mientras el jugador decide si atender una alerta: si el mundo se
+        /// congelara, la decision no costaria nada (§M8). Solo se pausa DENTRO de la escena, una vez
+        /// que AtenderAlerta ya cobro el desplazamiento y el tiempo de resolverla.
+        /// </summary>
+        public ResultadoDeAvance AvanzarReloj(int minutos) {
+            ExigirFase2();
+
+            var desde = _reloj.Minuto;
+            var avanzados = _reloj.Avanzar(minutos);
+            R.MinutoDelDia = _reloj.Minuto;
+
+            var resultado = new ResultadoDeAvance { MinutosAvanzados = avanzados };
+            resultado.AlertasQueSuenan.AddRange(_alertas.SuenanEntre(desde, _reloj.Minuto));
+
+            foreach (var expirada in _alertas.Expirar(_reloj.Minuto, R.ZonaActual)) {
+                AplicarOmision(expirada);
+                resultado.AlertasQueExpiraron.Add(expirada);
+            }
+
+            return resultado;
+        }
+
+        /// <summary>
+        /// Ir a una zona del mapa. Cuesta el viaje mas la micro-escena de estar ahi (§3.6), y ese
+        /// tiempo puede hacer sonar o perder una alerta por el camino: estar lejos es un riesgo real.
+        /// </summary>
+        public ResultadoDeAvance IrAZona(string zonaId) {
+            ExigirFase2();
+            if (Perfil.Mapa == null || Perfil.Mapa.Vacio)
+                throw new InvalidOperationException("Este nivel no tiene mapa que recorrer.");
+
+            var zona = Perfil.Mapa.PorId(zonaId);
+            if (zona == null) throw new InvalidOperationException($"'{zonaId}' no es una zona de {Perfil.Id}.");
+            if (!PuertaAbierta(zona.Puerta))
+                throw new InvalidOperationException($"La zona '{zonaId}' todavia no esta abierta.");
+
+            var coste = Perfil.Mapa.CosteDeVisitar(R.ZonaActual, zonaId);
+            var resultado = AvanzarReloj(coste);
+
+            R.ZonaActual = zonaId;
+            int visitas;
+            R.ZonasVisitadas.TryGetValue(zonaId, out visitas);
+            R.ZonasVisitadas[zonaId] = visitas + 1;
+
+            return resultado;
+        }
+
+        private bool PuertaAbierta(PuertaDeZona puerta) {
+            if (puerta == null || puerta.SiempreAbierta) return true;
+            if (!ConditionEvaluator.EvaluarTodas(puerta.Precondiciones, this)) return false;
+
+            if (!string.IsNullOrEmpty(puerta.TrasBeat)) {
+                var beat = _narrativa.PorId(puerta.TrasBeat);
+                if (beat == null || !_narrativa.YaSalio(beat, R)) return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Atiende la alerta de hoy. ★ Solo desde tu escritorio: es el ancla, y es donde llegan y se
+        /// atienden. Cuesta MinutosPorAtender de reloj, ademas del viaje que ya costo llegar.
+        /// </summary>
+        public ResultadoDeAvance AtenderAlerta(string alertaId) {
+            ExigirFase2();
+
+            var ancla = Perfil.Mapa != null && !Perfil.Mapa.Vacio ? Perfil.Mapa.Ancla : null;
+            if (ancla != null && !string.Equals(R.ZonaActual, ancla.Id, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Las alertas solo se atienden desde tu escritorio.");
+
+            var alerta = _alertas.Atender(alertaId, _reloj.Minuto, R.ZonaActual);
+            var resultado = AvanzarReloj(Perfil.Jornada.MinutosPorAtender);
+
+            if (string.Equals(alerta.Tipo, TiposDeAlerta.Decision, StringComparison.Ordinal)) {
+                if (_eventoDeHoy != null && string.Equals(_eventoDeHoy.Id, alerta.Id, StringComparison.Ordinal))
+                    Decision = Presentar(_eventoDeHoy);
+            } else if (_minijuegoDeHoy != null &&
+                       string.Equals(_minijuegoDeHoy.MinijuegoId, alerta.Id, StringComparison.Ordinal)) {
+                Minijuego = _minijuegoDeHoy;
+            }
+
+            return resultado;
+        }
+
+        /// <summary>
+        /// ★ Lo que se cobra cuando la ventana de atencion se acaba sin que nadie haya ido: el mundo
+        /// queda igual que haberla resuelto mal, nunca igual que si no hubiera pasado nada (§M8).
+        /// </summary>
+        private void AplicarOmision(Alerta alerta) {
+            if (string.Equals(alerta.Tipo, TiposDeAlerta.Decision, StringComparison.Ordinal)) {
+                OmitirDecision(alerta);
+            } else {
+                var oa = _minijuegoDeHoy != null && string.Equals(_minijuegoDeHoy.MinijuegoId, alerta.Id, StringComparison.Ordinal)
+                    ? _minijuegoDeHoy.ObjetivoAprendizaje
+                    : null;
+                AplicarResultadoDeMinijuego(PuenteDelMotor.Omitido(alerta.Id, oa, null));
+            }
+        }
+
+        /// <summary>
+        /// No hay un "consecuencias.omitido" por evento, a diferencia de los minijuegos: aqui nadie
+        /// eligio, asi que no se aplica ningun efecto de ninguna opcion — solo queda constancia, con
+        /// veredicto incorrecta, de que la decision la tomo el reloj.
+        /// </summary>
+        private void OmitirDecision(Alerta alerta) {
+            if (_eventoDeHoy == null || !string.Equals(_eventoDeHoy.Id, alerta.Id, StringComparison.Ordinal)) return;
+
+            Registrar(_eventoDeHoy.Id, _eventoDeHoy.Nombre, "omitido", "Se acabo el tiempo sin decidir.",
+                      Veredictos.Incorrecta, _eventoDeHoy.ObjetivoAprendizaje,
+                      "No llegaste a tiempo. Alguien decidio por ti.", null);
+
+            _eventos.RegistrarDisparo(_eventoDeHoy, R);
+            _eventoDeHoy = null;
+            if (Decision != null) Decision = null;
         }
 
         private void AbrirPlanning() {
@@ -402,7 +597,6 @@ namespace Nexus.Core.Sesion {
             _eventos.RegistrarDisparo(_eventoDeHoy, R);
             _eventoDeHoy = null;
             Decision = null;
-            R.Ventana = 1;
         }
 
         /// <summary>La vuelta de la escena. La UI no aplica nada: devuelve el resultado y el motor lo aplica.</summary>
@@ -410,6 +604,16 @@ namespace Nexus.Core.Sesion {
             if (Minijuego == null) throw new InvalidOperationException("Hoy no hay minijuego.");
             if (resultado == null) throw new ArgumentNullException(nameof(resultado));
 
+            AplicarResultadoDeMinijuego(resultado);
+            Minijuego = null;
+        }
+
+        /// <summary>
+        /// Lo que Aplicar-un-minijuego tiene en comun entre resolverlo de verdad y omitirlo por
+        /// expiracion: el estado, la traza, la competencia y el enfriamiento se tratan exactamente
+        /// igual — un minijuego omitido ES una decision, y se evalua como tal.
+        /// </summary>
+        private void AplicarResultadoDeMinijuego(ResultadoMinijuego resultado) {
             var antes = W.ToString();
             PuenteDelMotor.Aplicar(resultado, W, _scheduler, R.DiaActual);
 
@@ -417,9 +621,9 @@ namespace Nexus.Core.Sesion {
             Traza.Registrar(entrada);
             if (!string.IsNullOrEmpty(entrada.Oa)) Competencia.Acumular(entrada.Oa, entrada.Veredicto);
 
-            _minijuegos.RegistrarJugado(Minijuego.MinijuegoId, R);
-            Minijuego = null;
-            R.Ventana = 2;
+            _minijuegos.RegistrarJugado(resultado.MinijuegoId, R);
+            if (_minijuegoDeHoy != null && string.Equals(_minijuegoDeHoy.MinijuegoId, resultado.MinijuegoId, StringComparison.Ordinal))
+                _minijuegoDeHoy = null;
         }
 
         /// <summary>
@@ -445,14 +649,35 @@ namespace Nexus.Core.Sesion {
         }
 
         /// <summary>
-        /// ★ Las 18:00: el unico punto del motor donde el tiempo avanza, y la mecanica mas importante
-        /// del juego. Quedarse da un 25 % mas de avance hoy y lo cobra durante el resto de la partida;
-        /// irse a casa desbloquea el interludio de esa noche.
+        /// Salta directo a las 18:00, sin pasar por el tiempo intermedio. ★ Solo se ofrece cuando no
+        /// queda NADA: ni una alerta pendiente ni una por sonar. Asi cerrar el dia nunca se come una
+        /// consecuencia — lo unico que cuesta es perderse la exploracion y las conversaciones de la tarde.
+        /// </summary>
+        public ResultadoDeAvance CerrarJornada() {
+            ExigirFase2();
+            if (!SePuedeCerrarLaJornada)
+                throw new InvalidOperationException(
+                    "Todavia queda algo pendiente hoy: hay una alerta viva o por sonar.");
+
+            var avanzados = _reloj.SaltarHasta(_reloj.MinutoDeCierre);
+            R.MinutoDelDia = _reloj.Minuto;
+            return new ResultadoDeAvance { MinutosAvanzados = avanzados };
+        }
+
+        /// <summary>
+        /// ★ Las 18:00: el unico punto del motor donde el tiempo avanza de verdad, y la mecanica mas
+        /// importante del juego. Quedarse da un 25 % mas de avance hoy y lo cobra durante el resto de
+        /// la partida; irse a casa desbloquea el interludio de esa noche.
         /// </summary>
         public void TerminarDia(bool horasExtra) {
             ExigirFase2();
+            if (!_reloj.LlegoElCierre)
+                throw new InvalidOperationException(
+                    $"Todavia no son las {RelojDeJornada.Formatear(_reloj.MinutoDeCierre)}.");
 
             if (horasExtra) {
+                _reloj.Prorrogar();
+                R.JornadaProrrogada = true;
                 R.DiasConHorasExtra++;
                 R.DiasSeguidosTrabajando++;
             } else {
@@ -465,7 +690,6 @@ namespace Nexus.Core.Sesion {
             if (Metodologia.Calendario.Tipo == TiposDeCalendario.Continuo) AvanzarFlujoContinuo();
             if (_planDeHoy != null && _planDeHoy.EsUltimoDiaDeUnidad) CerrarUnidad();
 
-            R.Ventana = 3;
             if (R.DiaActual >= Perfil.DiasTotales) R.Fase = 3;
         }
 
@@ -701,6 +925,7 @@ namespace Nexus.Core.Sesion {
                 UnidadAnterior = _unidadAnterior,
                 ColaDeEfectos = _scheduler.CopiaDeCola(),
                 Telegrafiados = _scheduler.CopiaDeTelegrafiados(),
+                Alertas = _alertas.Copia(),
                 ConsumosDelRng = _rng.Consumos
             };
         }
@@ -742,6 +967,11 @@ namespace Nexus.Core.Sesion {
             s._fichasDeCalidad = nivel.FichasDeCalidad ?? new Dictionary<string, int>(StringComparer.Ordinal);
             s.ReaplicarPesosDeCalidad();   // ← lo unico de la Fase 1 que SI hay que reaplicar
 
+            // el reloj y las alertas del dia a medias. Guardar a las 14:00 con una alerta viva hasta
+            // las 16:00 y recargar tiene que devolver EXACTAMENTE esa situacion (INV-7).
+            s._reloj.Restaurar(s.R.MinutoDelDia, s.R.JornadaProrrogada);
+            s._alertas.Restaurar(nivel.Alertas);
+
             // 4 · metodologia, reglas y directores, que dependen del azar y de la agenda ya restaurados
             if (!string.IsNullOrEmpty(nivel.MetodologiaId)) {
                 MethodologyProfile metodologia;
@@ -759,6 +989,27 @@ namespace Nexus.Core.Sesion {
 
             // 5 · el plan de hoy
             if (s.Reglas != null && s.R.DiaActual > 0) s._planDeHoy = s.Reglas.PlanFor(s.R.DiaActual);
+
+            // El evento o el minijuego de una alerta AUN PENDIENTE se recupera para que AtenderAlerta
+            // siga funcionando tras recargar. Lo que NO se restaura es el panel ya abierto (Decision /
+            // Minijuego): esa limitacion ya existia antes del dia continuo — ninguno de los dos viajaba
+            // en el guardado — y aqui se mantiene igual, no se introduce de nuevo.
+            foreach (var alerta in s._alertas.Alertas) {
+                if (!alerta.EstaPendiente) continue;
+
+                if (string.Equals(alerta.Tipo, TiposDeAlerta.Decision, StringComparison.Ordinal)) {
+                    foreach (var ev in catalogo.Eventos)
+                        if (string.Equals(ev.Id, alerta.Id, StringComparison.Ordinal)) s._eventoDeHoy = ev;
+                } else if (s._minijuegos != null) {
+                    var def = s._minijuegos.PorId(alerta.Id);
+                    if (def != null)
+                        s._minijuegoDeHoy = new PendingMinigame {
+                            MinijuegoId = def.Id, Verbo = def.Verbo, Archivo = def.Archivo,
+                            PresionDiegetica = def.PresionDiegetica, Segundos = def.Reloj,
+                            NivelAndamiaje = s.Perfil.NivelAndamiaje, ObjetivoAprendizaje = def.ObjetivoAprendizaje
+                        };
+                }
+            }
 
             return s;
         }
