@@ -168,7 +168,8 @@ namespace Nexus.Tests {
                 D("FLG_CALIDAD_ACUM", EjesDeFlag.Competencia, 0, 0, 100),
                 D("FLG_REPUTACION", EjesDeFlag.Estado, 50, 0, 100),
                 new DefinicionDeFlag { Id = "FLG_HORAS_EXTRA", Eje = EjesDeFlag.Estado, SinTecho = true,
-                                       Descripcion = "Contador acumulado." }
+                                       Descripcion = "Contador acumulado." },
+                D("FLG_MARTA_ALIADA", EjesDeFlag.Estado, 0, 0, 1)
             };
         }
 
@@ -968,6 +969,132 @@ namespace Nexus.Tests {
 
             CollectionAssert.DoesNotContain(resultado.AlertasQueSuenan, alerta,
                                             "ya estaba atendida: anunciarla ahora seria mentirle a la pantalla");
+        }
+
+        // ================================================================ contenido por nivel
+
+        /// <summary>Juega los dias apuntando que cinematica sale cada uno.</summary>
+        private static List<string> BeatsEmitidos(GameSession s, int dias) {
+            var beats = new List<string>();
+            for (var i = 0; i < dias; i++) {
+                s.ComenzarDia();
+                if (s.Beat != null) beats.Add(s.Beat.BeatId + "@" + s.R.DiaActual);
+                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida);
+                if (s.PendingRetro != null && s.PendingRetro.Acciones.Count > 0)
+                    s.ElegirAccionRetro(s.PendingRetro.Acciones[0].Id);
+                RecorrerElDia(s);
+                s.CerrarJornada();
+                s.TerminarDia(false);
+            }
+            return beats;
+        }
+
+        [Test]
+        public void Un_evento_atado_a_otro_nivel_no_sale_nunca() {
+            var ajeno = Catalogo();
+            foreach (var ev in ajeno.Eventos) ev.SoloNiveles = new List<string> { "nivel-00" };
+            var s = Empezada(catalogo: ajeno);
+            Jugar(s, 20);
+            Assert.IsFalse(s.LogDeEventos.Any(d => d.Resultado == DecisionDelDirector.Agendado),
+                           "el catalogo de eventos es global, pero N1 no puede ver los del concurso");
+
+            var propio = Catalogo();
+            foreach (var ev in propio.Eventos) ev.SoloNiveles = new List<string> { "nivel-01" };
+            var t = Empezada(catalogo: propio);
+            Jugar(t, 20);
+            Assert.IsTrue(t.LogDeEventos.Any(d => d.Resultado == DecisionDelDirector.Agendado),
+                          "y los suyos si: si no, la prueba de arriba pasaria por no hacer nada");
+        }
+
+        [Test]
+        public void Una_cinematica_de_otro_nivel_no_sale_y_la_suya_si() {
+            var c = Catalogo();
+            c.Beats.Add(new NarrativeBeat { Id = "TUT-0.2", Nombre = "Del concurso", Prioridad = PrioridadDeBeat.Obligatorio,
+                                            Ventana = new VentanaDeBeat { DiaMin = 2, DiaMax = 2 },
+                                            SoloNiveles = new List<string> { "nivel-00" } });
+            c.Beats.Add(new NarrativeBeat { Id = "CIN-1.2", Nombre = "De N1", Prioridad = PrioridadDeBeat.Obligatorio,
+                                            Ventana = new VentanaDeBeat { DiaMin = 3, DiaMax = 3 },
+                                            SoloNiveles = new List<string> { "nivel-01" } });
+
+            var beats = BeatsEmitidos(Empezada(catalogo: c), 5);
+
+            CollectionAssert.Contains(beats, "CIN-1.2@3");
+            Assert.IsFalse(beats.Any(b => b.StartsWith("TUT-0.2")), "una cinematica del N0 no puede salir en N1");
+        }
+
+        // ================================================================ elecciones de escena
+
+        private static Catalogo CatalogoConEscena() {
+            var c = Catalogo();
+            c.Guiones.Add(new Guion {
+                Id = "TUT-0.2", Titulo = "Marta", Nivel = "nivel-01", Momento = MomentosDeGuion.Dia,
+                Variantes = { { "default", new List<LineaDeGuion> { new LineaDeGuion { Quien = "Marta", Texto = "¿Aliados?" } } } },
+                Opciones = {
+                    new OpcionDeGuion { Id = "aceptar", Texto = "Sí", Flag = "FLG_MARTA_ALIADA", Valor = 1 },
+                    new OpcionDeGuion { Id = "rechazar", Texto = "No", Flag = "FLG_MARTA_ALIADA", Valor = 0 }
+                }
+            });
+            return c;
+        }
+
+        [Test]
+        public void Una_eleccion_de_escena_se_escribe_al_cerrar_y_no_antes() {
+            var s = Empezada(catalogo: CatalogoConEscena());
+            s.RegistrarEleccion("TUT-0.2", "aceptar");
+
+            Jugar(s, 20);
+            Assert.AreEqual(0, s.Flags.Get("FLG_MARTA_ALIADA"), "INV-6: ningun flag se escribe antes de Cerrar()");
+
+            s.Cerrar();
+            Assert.AreEqual(1, s.Flags.Get("FLG_MARTA_ALIADA"));
+        }
+
+        [Test]
+        public void Una_eleccion_de_escena_no_se_deshace() {
+            var s = Empezada(catalogo: CatalogoConEscena());
+            s.RegistrarEleccion("TUT-0.2", "aceptar");
+            Assert.Throws<InvalidOperationException>(() => s.RegistrarEleccion("TUT-0.2", "rechazar"));
+        }
+
+        [Test]
+        public void Una_opcion_o_un_guion_que_no_existen_se_rechazan() {
+            var s = Empezada(catalogo: CatalogoConEscena());
+            Assert.Throws<InvalidOperationException>(() => s.RegistrarEleccion("TUT-0.2", "quizas"));
+            Assert.Throws<InvalidOperationException>(() => s.RegistrarEleccion("CIN-9.9", "aceptar"));
+        }
+
+        [Test]
+        public void La_eleccion_de_escena_sobrevive_a_guardar_y_recargar() {
+            var respaldo = new Dictionary<string, double>(StringComparer.Ordinal);
+            var s = Empezada("scrum", 4417, CatalogoConEscena(), Flags(respaldo));
+            s.RegistrarEleccion("TUT-0.2", "aceptar");
+            Jugar(s, 5);
+
+            var partida = new SaveGame {
+                Id = "p", PerfilId = "perfil",
+                Partida = new DatosDePartida { Nombre = "x", Semilla = 4417, NivelActualId = "nivel-01" },
+                Flags = respaldo,
+                Nivel = s.Capturar()
+            };
+            var recargada = JsonDeGuardado.Deserializar<SaveGame>(JsonDeGuardado.Serializar(partida));
+            var despues = new FabricaDeSesion(CatalogoConEscena()).Restaurar(recargada, recargada.Nivel);
+
+            Assert.Throws<InvalidOperationException>(() => despues.RegistrarEleccion("TUT-0.2", "rechazar"),
+                                                     "recargar no puede servir para cambiar lo que ya decidiste");
+            Jugar(despues, 15);
+            despues.Cerrar();
+            Assert.AreEqual(1, despues.Flags.Get("FLG_MARTA_ALIADA"));
+        }
+
+        [Test]
+        public void Una_condicion_puede_leer_un_flag_pero_nunca_escribirlo() {
+            var s = Empezada(flags: Flags(new Dictionary<string, double>(StringComparer.Ordinal) { { "FLG_MARTA_ALIADA", 1 } }));
+
+            double valor;
+            Assert.IsTrue(s.TryGetValue("FLG_MARTA_ALIADA", out valor));
+            Assert.AreEqual(1, valor);
+            Assert.IsTrue(Nexus.Core.Servicios.ConditionEvaluator.Evaluar("FLG_MARTA_ALIADA == 1", s),
+                          "es lo que da lector a los flags de color de dialogo");
         }
 
         /// <summary>Un mapa de dos zonas, con una puerta que solo se abre desde el dia 3.</summary>

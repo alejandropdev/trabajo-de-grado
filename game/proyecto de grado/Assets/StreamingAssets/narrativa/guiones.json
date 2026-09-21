@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "guiones": [
+
+    {
+      "id": "CIN-0.0", "titulo": "El Ascensor", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 1,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "Un ascensor de vidrio sube por la fachada del edificio N1. Dentro, una sola persona. No dice nada." },
+          { "quien": "narrador", "texto": "Por el cristal se ve el campus por niveles: gris al norte, azul al este, blanco al sur. Al fondo, un cubo de titanio sin ventanas." },
+          { "quien": "Megafonía", "texto": "Bienvenidos al Concurso de Admisión de Nexus. Les rogamos mantengan sus credenciales visibles durante toda la estancia." },
+          { "quien": "Megafonía", "texto": "Los concursantes dispondrán de un puesto, un equipo y acceso a las zonas comunes de N1. El uso de recursos externos queda registrado." },
+          { "quien": "Megafonía", "texto": "Antes de comenzar, cada concursante será entrevistado. La entrevista no puntúa. Se ruega responder con sinceridad." },
+          { "quien": "Megafonía", "texto": "Cinco días. Un problema real. Un ganador." }
+        ]
+      }
+    },
+
+    {
+      "id": "ENT-0", "titulo": "La entrevista de admisión", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 2,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "Una sala pequeña, una mesa, dos sillas al otro lado. En una, una mujer con una planilla. En la otra, un hombre canoso de traje verde que no se presenta." },
+          { "quien": "Marisol Andrade", "texto": "Buenos días. Soy Marisol Andrade. Le haré quince preguntas; conteste la que le parezca correcta. Si no sabe una, dígalo: no se descuenta nada." },
+          { "quien": "Marisol Andrade", "texto": "El señor que me acompaña solo va a escuchar." },
+          { "quien": "narrador", "texto": "El hombre no levanta la vista. Cada vez que respondas, se inclinará hacia ella y le dirá algo en voz baja. Ella no lo repetirá. Tú sí lo oirás." },
+          { "quien": "Marisol Andrade", "texto": "Antes de empezar, para la ficha: ¿de dónde viene usted?" }
+        ]
+      },
+      "opciones": [
+        { "id": "pueblo", "texto": "De un pueblo. Nadie de allí había llegado hasta aquí.", "flag": "FLG_ORIGEN", "valor": 0 },
+        { "id": "universitario", "texto": "De la universidad. Terminé la carrera hace poco.", "flag": "FLG_ORIGEN", "valor": 1 }
+      ]
+    },
+
+    {
+      "id": "ENT-0.FIN", "titulo": "Fin de la entrevista", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 3,
+      "variantes": {
+        "default": [
+          { "quien": "Marisol Andrade", "texto": "Eso es todo. Gracias." },
+          { "quien": "narrador", "texto": "El hombre se levanta primero y sale sin despedirse. Marisol termina de escribir, cierra la planilla y te acompaña a la puerta." },
+          { "quien": "Marisol Andrade", "texto": "Su puesto es el siete. El problema del concurso le estará esperando en la pantalla." }
+        ]
+      }
+    },
+
+    {
+      "id": "CIN-0.1", "titulo": "El Problema", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 4,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "En la pantalla del puesto siete se abre un ticket: NEX-4417. Prioridad: P1." },
+          { "quien": "narrador", "texto": "Un ticket no es un encargo: es una conversación. Arriba, el resumen. Debajo, la descripción. Y abajo del todo, lo que casi nadie lee: las restricciones y los comentarios." },
+          { "quien": "narrador", "texto": "La restricción dice que la recepción tiene un solo equipo y que ningún visitante va a instalar nada. Un comentario pregunta algo que nadie ha contestado." },
+          { "quien": "narrador", "texto": "Todo lo que necesitas para decidir está en este ticket. No todo está en la primera línea." }
+        ]
+      }
+    },
+
+    {
+      "id": "GUIA-0.F1", "titulo": "Antes de empezar", "nivel": "nivel-00", "momento": "fase1", "orden": 1,
+      "variantes": {
+        "default": [
+          { "quien": "Marisol Andrade", "texto": "Antes de la primera línea de código hay tres decisiones, y las tres se registran." },
+          { "quien": "Marisol Andrade", "texto": "Primero, cómo va a trabajar: con sprints cerrados o con un flujo continuo. Le pedirán que diga por qué. El porqué cuenta tanto como la elección." },
+          { "quien": "Marisol Andrade", "texto": "Segundo, a qué dedica su cuidado. Tiene cuatro fichas y tres cosas que proteger. Lo que deje sin fichas es lo que el jurado va a probar." },
+          { "quien": "Marisol Andrade", "texto": "Tercero, la forma de lo que va a construir. Vuelva a leer la restricción del ticket antes de elegir." }
+        ]
+      }
+    },
+
+    {
+      "id": "TUT-0.1", "titulo": "Aquí el día corre", "nivel": "nivel-00", "momento": "dia",
+      "variantes": {
+        "default": [
+          { "quien": "Marisol Andrade", "texto": "Una cosa antes de que empiece. Aquí el día no salta de hora en hora: corre. Mire el reloj de la pared." },
+          { "quien": "Marisol Andrade", "texto": "Cuando algo le necesite, le llegará un aviso a su puesto. Tendrá unas horas para atenderlo, y solo puede hacerlo desde aquí, desde su puesto." },
+          { "quien": "Marisol Andrade", "texto": "Si no llega a tiempo, alguien decidirá por usted. Y casi nunca decide bien." },
+          { "quien": "Marisol Andrade", "texto": "A las cinco se cierra la sala. Puede irse, o quedarse hasta las siete. Las dos cosas tienen un precio." }
+        ]
+      }
+    },
+
+    {
+      "id": "TUT-0.2", "titulo": "Marta", "nivel": "nivel-00", "momento": "dia",
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "La concursante del puesto de al lado se acerca con dos cafés. Uno es para ti." },
+          { "quien": "Marta Oyola", "texto": "Marta. Puesto ocho. Te he visto leer los comentarios del ticket; casi nadie lo hace." },
+          { "quien": "Marta Oyola", "texto": "Los avisos llegan antes que los problemas, ¿te has dado cuenta? Lo que ayer era un comentario suelto, hoy es una alerta. Hay que leerlos." },
+          { "quien": "Marta Oyola", "texto": "Te propongo algo: compartimos lo que vayamos encontrando. Solo gana uno, lo sé. Pero cinco días es poco para hacerlo todo solo." }
+        ]
+      },
+      "opciones": [
+        { "id": "aceptar", "texto": "Aceptar. Compartir no te quita el concurso.", "flag": "FLG_MARTA_ALIADA", "valor": 1 },
+        { "id": "rechazar", "texto": "Rechazarla con educación. Esto es un concurso.", "flag": "FLG_MARTA_ALIADA", "valor": 0 }
+      ]
+    },
+
+    {
+      "id": "TUT-0.3", "titulo": "Más allá de tu puesto", "nivel": "nivel-00", "momento": "dia",
+      "variantes": {
+        "default": [
+          { "quien": "Marisol Andrade", "texto": "Desde hoy el auditorio está abierto: allí está la clasificación provisional." },
+          { "quien": "Marisol Andrade", "texto": "Puede moverse por la planta cuando quiera. Tenga en cuenta que ir y volver cuesta tiempo, y que los avisos solo se atienden desde su puesto." },
+          { "quien": "Marisol Andrade", "texto": "Y fíjese en las paredes. En este edificio la gente deja cosas pegadas. Algunas valen la pena." }
+        ]
+      }
+    },
+
+    {
+      "id": "TUT-0.4", "titulo": "Irse o quedarse", "nivel": "nivel-00", "momento": "dia",
+      "variantes": {
+        "default": [
+          { "quien": "Marta Oyola", "texto": "¿Te quedas esta noche? Yo ayer me quedé hasta las siete." },
+          { "quien": "Marta Oyola", "texto": "Avancé más, eso sí. Pero hoy me cuesta el doble concentrarme, y lo que escribí anoche lo he tenido que rehacer." },
+          { "quien": "Marta Oyola", "texto": "Quedarse es un préstamo. Te lo cobran mañana, con intereses." }
+        ]
+      }
+    },
+
+    {
+      "id": "TUT-0.5", "titulo": "La entrega", "nivel": "nivel-00", "momento": "dia",
+      "variantes": {
+        "default": [
+          { "quien": "Megafonía", "texto": "Último día del concurso. Las entregas se cierran a las cinco en punto. No se admitirán prórrogas." },
+          { "quien": "Marisol Andrade", "texto": "Lo que tenga a las cinco es lo que se evalúa. No lo que iba a tener." },
+          { "quien": "narrador", "texto": "A las cinco menos cuarto, la barra de subida de tu entrega se detiene seis segundos. Después sigue." }
+        ]
+      }
+    },
+
+    {
+      "id": "CIN-0.2", "titulo": "El Aplauso", "nivel": "nivel-00", "momento": "despuesDelNivel", "orden": 1,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
+          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es el concursante del puesto siete." },
+          { "quien": "narrador", "texto": "Alguien te pone un badge gris en la mano. En el escenario, un holograma: el hombre del traje verde de la entrevista. Aplaude." },
+          { "quien": "narrador", "texto": "Aplaude con la muñeca, porque en los dedos está girando algo pequeño y antiguo. Dos segundos. Nadie lo señala." },
+          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+        ]
+      }
+    },
+
+    {
+      "id": "CIN-1.0", "titulo": "El Té", "nivel": "nivel-01", "momento": "apertura", "orden": 1,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "El Núcleo. Un despacho con luz roja tenue. HH, en persona por primera vez, te sirve té de una plantación privada." },
+          { "quien": "narrador", "texto": "Detrás de él, una pared de pantallas enseña métricas de empleados. Una de ellas brilla en dorado." },
+          { "quien": "HH", "texto": "Tú tienes algo que yo perdí. Esa chispa de creer que el código puede cambiar el mundo. No la pierdas." },
+          { "quien": "HH", "texto": "Ah, y arréglame lo de los patios. Alguien hackeó la barrera y me dejó el carro adentro tres horas. Veinte días. No es un proyecto importante. Es una prueba." }
+        ]
+      },
+      "opciones": [
+        { "id": "mirar-la-pared", "texto": "Mirar la pared de pantallas mientras habla.", "flag": "FLG_VIO_PANTALLA_DORADA", "valor": 1 },
+        { "id": "mirar-a-hh", "texto": "Mirarle a él." }
+      ]
+    },
+
+    {
+      "id": "CIN-1.1", "titulo": "La Arquitectura", "nivel": "nivel-01", "momento": "fase1", "orden": 1,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "Una mujer mayor entra sin llamar, deja una carpeta de planos sobre la mesa y se sienta a mirar." },
+          { "quien": "Dra. Voss", "texto": "Helena Voss. No vengo a ayudarte. Vengo a ver qué eliges, y por qué." }
+        ],
+        "tras-monolito-modular": [
+          { "quien": "narrador", "texto": "Voss suelta un gruñido corto, de aprobación. Recoge la carpeta." }
+        ],
+        "tras-microservicios": [
+          { "quien": "Dra. Voss", "texto": "Otro más que confunde moda con criterio." }
+        ],
+        "tras-parche-sobre-la-barrera": [
+          { "quien": "Dra. Voss", "texto": "Veinte días resueltos. El problema, para quien venga después." }
+        ]
+      }
+    },
+
+    {
+      "id": "CIN-1.2", "titulo": "El Standup de los Fantasmas", "nivel": "nivel-01", "momento": "dia",
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "Tu equipo: tres técnicos del Edificio Patch. Los que en el campus llaman «los fantasmas»." },
+          { "quien": "narrador", "texto": "El mayor lleva diecinueve años en Nexus y nunca lo han ascendido. Se presenta sin levantarse." },
+          { "quien": "Óscar Rendón", "texto": "Yo mantengo el sistema que mantiene el sistema. Nadie sabe mi nombre. Está bien. Los ascensores funcionan." },
+          { "quien": "Óscar Rendón", "texto": "Si necesitas ver la maquinaria de los patios, está en el sótano. Te bajo cuando quieras." }
+        ]
+      }
+    },
+
+    {
+      "id": "INT-1", "titulo": "El Cuarto", "nivel": "nivel-01", "momento": "dia",
+      "variantes": {
+        "pueblo": [
+          { "quien": "narrador", "texto": "Tu cuarto fuera del campus. Una habitación compartida y subsidiada. Por la ventana se ve el cubo de titanio, encendido." },
+          { "quien": "narrador", "texto": "Llamas a casa. Contesta tu madre. Le cuentas que ganaste. No le cuentas que llevas tres noches saliendo tarde." },
+          { "quien": "narrador", "texto": "Sobre la mesa, tu vieja laptop, montada con piezas rescatadas de la basura. Al abrirla, siguen ahí tus contribuciones anónimas a proyectos libres." }
+        ],
+        "universitario": [
+          { "quien": "narrador", "texto": "Tu cuarto fuera del campus. Una habitación compartida y subsidiada. Por la ventana se ve el cubo de titanio, encendido." },
+          { "quien": "narrador", "texto": "Llamas a un compañero de carrera. Sigue buscando trabajo. Te felicita dos veces, y la segunda suena distinta." },
+          { "quien": "narrador", "texto": "Sobre la mesa, tu vieja laptop, montada con piezas rescatadas de la basura. Al abrirla, siguen ahí tus contribuciones anónimas a proyectos libres." }
+        ]
+      }
+    },
+
+    {
+      "id": "CIN-1.3", "titulo": "El Deploy Tonto", "nivel": "nivel-01", "momento": "lanzamiento", "orden": 1,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "La barrera de los patios se levanta. Un carro entra. La barrera baja. Otro carro." },
+          { "quien": "narrador", "texto": "Nadie aplaude, porque no pasa nada. Todo sale bien. Es la única vez." }
+        ]
+      }
+    },
+
+    {
+      "id": "CIN-1.4", "titulo": "El Primer Glitch", "nivel": "nivel-01", "momento": "cierre", "orden": 1,
+      "variantes": {
+        "default": [
+          { "quien": "narrador", "texto": "La compilación final. El log corre como siempre." },
+          { "quien": "log", "texto": "[BUILD] Compiling module facilities.access ... OK" },
+          { "quien": "log", "texto": "        elena te observa. no confíes en el hombre de la corbata roja." },
+          { "quien": "log", "texto": "[BUILD] Compiling module facilities.telemetry ... OK" },
+          { "quien": "narrador", "texto": "Nadie reacciona. No hay música. El log sigue." }
+        ]
+      },
+      "opciones": [
+        { "id": "abrir-el-log", "texto": "Abrir el archivo de log y buscar esa línea.", "flag": "FLG_ZERO_NOTADO_N1", "valor": 1 },
+        { "id": "cerrar", "texto": "Cerrar la ventana de compilación." }
+      ]
+    }
+  ]
+}

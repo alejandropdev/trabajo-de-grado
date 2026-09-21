@@ -1,0 +1,157 @@
+{
+  "id": "nivel-00",
+  "nombre": "El Concurso del Ascensor",
+  "briefing": [
+    "Ticket NEX-4417 · Prioridad: P1 · Reportado por: Recepción de N1.",
+    "Resumen: los visitantes esperan hasta cuarenta minutos en el vestíbulo, porque su registro se hace a mano en un cuaderno.",
+    "Descripción: queremos registrar a cada visitante, avisar a la persona a la que viene a ver y saber quién sigue dentro del edificio al final del día.",
+    "Restricción: la recepción tiene un solo equipo con un navegador y nadie de sistemas. Ningún visitante va a instalar nada en su móvil para una visita de una hora.",
+    "Comentario de Marisol Andrade: «El jurado valorará que funcione el viernes. No que sea bonito el lunes.»"
+  ],
+
+  "diasTotales": 5,
+  "presupuestoInicial": 3000,
+  "alcanceInicial": 12,
+  "equipoInicial": 1,
+  "deudaHeredada": 0,
+  "coberturaHeredada": 20,
+  "documentacionHeredada": 20,
+
+  "velocidadBase": 3.0,
+
+  "director": {
+    "presupuestoDrama": [0, 3, 0, 0],
+    "pesosPorTag": { "tutorial": 1.0 },
+    "enfriamientoGlobal": 1,
+    "maxEventosPorDia": 1,
+    "ventanaTelegrafiado": 1,
+    "multiplicadorSeveridad": 0.6
+  },
+
+  "jornada": {
+    "horaInicio": 9,
+    "horaCierre": 17,
+    "horaLimite": 19,
+    "segundosRealesPorHora": 12,
+    "ventanaDeAtencionMinutos": 120,
+    "minutosPorAtender": 30,
+    "granularidadDeAlertas": 15
+  },
+
+  "mapa": {
+    "costeBaseDeViaje": 10,
+    "zonas": [
+      {
+        "id": "sala-de-concurso",
+        "nombre": "La sala del concurso",
+        "descripcion": "Doce puestos en fila bajo un reloj enorme. En el tuyo hay un portátil de préstamo y un cajón que nadie ha abierto.",
+        "esAncla": true,
+        "minutosDeVisita": 0,
+        "coleccionables": ["COL-ADV-11"],
+        "queDa": "Tu puesto: aquí llegan los avisos y aquí se atienden."
+      },
+      {
+        "id": "pasillo",
+        "nombre": "El pasillo de los concursantes",
+        "descripcion": "Una máquina de café, un tablón de corcho y los demás concursantes fingiendo que no se miran.",
+        "minutosDeVisita": 20,
+        "quienEsta": ["Marta Oyola", "otros concursantes"],
+        "coleccionables": ["COL-ADV-01"],
+        "queDa": "Cómo van los demás. Y Marta, que tiene algo que proponerte."
+      },
+      {
+        "id": "terminal",
+        "nombre": "La terminal pública",
+        "descripcion": "Un equipo viejo junto a la escalera, con un cartel de «solo consultas». Nadie lo ha apagado en años.",
+        "minutosDeVisita": 20,
+        "coleccionables": ["COL-COD-01"],
+        "queDa": "Una línea de comandos con acceso al sistema del concurso. Nadie te ha dicho qué se puede escribir en ella."
+      },
+      {
+        "id": "auditorio",
+        "nombre": "El auditorio de N1",
+        "descripcion": "Butacas vacías y un escenario donde el viernes se anunciará al ganador. Hoy solo hay técnicos probando el holograma.",
+        "minutosDeVisita": 30,
+        "puerta": { "precondiciones": ["diaActual >= 3"] },
+        "queDa": "El tablón con la clasificación provisional: dónde estás respecto a los demás."
+      }
+    ],
+    "costes": {
+      "sala-de-concurso>pasillo": 5,
+      "sala-de-concurso>terminal": 10,
+      "sala-de-concurso>auditorio": 15,
+      "pasillo>terminal": 5,
+      "pasillo>auditorio": 10
+    }
+  },
+
+  "objetivosActivos": ["OA-INTRO-01", "OA-DOC-01", "OA-SCRUM-01", "OA-KANBAN-01", "OA-GIT-01"],
+
+  "umbrales": {
+    "exito": { "avanceMinimo": 9, "coberturaMinima": 15, "deudaMaxima": 70 },
+    "fallo": {}
+  },
+
+  "metodologiasPermitidas": ["scrum", "kanban"],
+  "nivelAndamiaje": 3,
+  "volatilidadReal": 55,
+
+  "fase1": {
+    "calidad": {
+      "fichas": 4,
+      "textoPresion": "Tres atributos y cuatro fichas. Lo que dejes a cero es lo que el jurado va a probar.",
+      "atributos": [
+        {
+          "id": "adecuacion-funcional",
+          "nombre": "Adecuación funcional",
+          "tagAfectado": "alcance",
+          "coeficienteAfectado": "kappa",
+          "textoSinInversion": "Nadie comprobó que registrar a un visitante hace lo que la recepción pidió."
+        },
+        {
+          "id": "usabilidad",
+          "nombre": "Usabilidad",
+          "tagAfectado": "cliente",
+          "textoSinInversion": "La recepcionista lo va a usar con una cola de cuarenta personas delante."
+        },
+        {
+          "id": "fiabilidad",
+          "nombre": "Fiabilidad",
+          "tagAfectado": "tutorial",
+          "coeficienteAfectado": "iota",
+          "textoSinInversion": "Si se cae a las nueve de la mañana, vuelve el cuaderno."
+        }
+      ]
+    },
+
+    "razonesDisponibles": [
+      { "id": "un_solo_equipo", "texto": "La recepción tiene un solo equipo con navegador." },
+      { "id": "nadie_instala_nada", "texto": "Ningún visitante va a instalar nada para una visita de una hora." },
+      { "id": "cinco_dias", "texto": "Hay cinco días." },
+      { "id": "queda_mas_moderno", "texto": "Queda más moderno." },
+      { "id": "todo_el_mundo_tiene_movil", "texto": "Todo el mundo tiene móvil." }
+    ],
+
+    "arquitecturas": [
+      {
+        "id": "web-sencilla",
+        "nombre": "Aplicación web sencilla",
+        "esLaAdecuada": true,
+        "veredicto": "correcta",
+        "razon": "Un único equipo, un navegador y ninguna instalación: el ticket lo decía en su restricción. Leer bien el enunciado ya era la mitad de la arquitectura.",
+        "efectos": { "Documentacion": 3 },
+        "razonesValidas": ["un_solo_equipo", "nadie_instala_nada", "cinco_dias"],
+        "razonesTrampa": ["queda_mas_moderno"]
+      },
+      {
+        "id": "app-movil",
+        "nombre": "App móvil para los visitantes",
+        "veredicto": "incorrecta",
+        "razon": "Pide que cada visitante instale algo para una visita de una hora, y la restricción del ticket decía justo lo contrario.",
+        "efectos": { "DeudaTecnica": 8, "Cansancio": 5 },
+        "razonesValidas": [],
+        "razonesTrampa": ["todo_el_mundo_tiene_movil", "queda_mas_moderno"]
+      }
+    ]
+  }
+}

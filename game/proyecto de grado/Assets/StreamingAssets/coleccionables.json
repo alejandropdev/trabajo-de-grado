@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "coleccionables": [
+
+    {
+      "id": "COL-DEV-02", "serie": "carta", "palo": "leyes",
+      "titulo": "Ley de Conway",
+      "texto": "Las organizaciones que diseñan sistemas acaban produciendo diseños que copian su propia estructura de comunicación. Si dos equipos no se hablan, entre sus dos módulos habrá una frontera rígida, se necesite o no.",
+      "preguntaDeAplicacion": "Si dos equipos que no se hablan diseñan el mismo sistema, ¿qué forma tendrá la arquitectura resultante?",
+      "fuente": "Conway, M. E. (1968). How Do Committees Invent? Datamation, 14(4), 28–31.",
+      "ubicacion": "Entre los planos del archivo de Voss, sujeta con un clip."
+    },
+    {
+      "id": "COL-DEV-03", "serie": "carta", "palo": "desastres",
+      "titulo": "Therac-25",
+      "texto": "Entre 1985 y 1987, la máquina de radioterapia Therac-25 administró sobredosis masivas de radiación en seis accidentes; varios pacientes murieron. La causa fue una condición de carrera en su software, en un modelo al que se le habían quitado los enclavamientos de seguridad físicos que tenían las versiones anteriores y que confiaba solo en el código.",
+      "preguntaDeAplicacion": "¿Por qué quitar una protección física y confiar solo en un software sin pruebas exhaustivas de concurrencia es una decisión de arquitectura, y no solo de código?",
+      "fuente": "Leveson, N. G. y Turner, C. S. (1993). An Investigation of the Therac-25 Accidents. IEEE Computer, 26(7), 18–41.",
+      "ubicacion": "Clavada en el corcho del bullpen, bajo una lista de turnos antigua."
+    },
+    {
+      "id": "COL-DEV-04", "serie": "carta", "palo": "leyes",
+      "titulo": "Ley de Parkinson",
+      "texto": "El trabajo se expande hasta llenar el tiempo disponible para completarlo. Una tarea con el doble de plazo del que necesita tiende a consumir ese doble, no a terminarse antes.",
+      "preguntaDeAplicacion": "Si a una tarea le das el doble de tiempo del que necesita, ¿por qué tiende a tardar exactamente ese doble?",
+      "fuente": "Parkinson, C. N. (1955, 19 de noviembre). Parkinson's Law. The Economist.",
+      "ubicacion": "Olvidada en una mesa de la cafetería, debajo de un vaso."
+    },
+    {
+      "id": "COL-DEV-05", "serie": "carta", "palo": "desastres",
+      "titulo": "Knight Capital",
+      "texto": "El 1 de agosto de 2012, Knight Capital desplegó código nuevo en siete de sus ocho servidores de negociación. El octavo conservaba código antiguo que se reactivó con la nueva configuración. En unos 45 minutos la empresa perdió unos 440 millones de dólares.",
+      "preguntaDeAplicacion": "¿Qué práctica de despliegue habría evitado esto?",
+      "fuente": "U.S. Securities and Exchange Commission (2013). Release No. 70694: In the Matter of Knight Capital Americas LLC.",
+      "ubicacion": "Pegada con cinta al lateral de un rack del Data Hub."
+    },
+    {
+      "id": "COL-DEV-06", "serie": "carta", "palo": "practicas",
+      "titulo": "ADR · Registro de decisión de arquitectura",
+      "texto": "Un documento corto que registra una decisión de arquitectura importante: el contexto que la motivó, la decisión y las consecuencias que se aceptan. No recoge todas las opciones posibles; solo la que se tomó y por qué.",
+      "preguntaDeAplicacion": "La próxima vez que alguien pregunte «¿por qué elegimos esto?», ¿qué deberías poder enseñar, en vez de tener que recordarlo?",
+      "fuente": "Nygard, M. (2011, 15 de noviembre). Documenting Architecture Decisions. Cognitect.",
+      "ubicacion": "Dentro de una cajonera del archivo de Voss, en una carpeta con la etiqueta «Por qué»."
+    },
+    {
+      "id": "COL-DEV-07", "serie": "carta", "palo": "practicas",
+      "titulo": "Bus factor",
+      "texto": "El número mínimo de personas que, si desaparecieran de golpe, dejarían el proyecto parado por falta de conocimiento que nadie más tiene. Un bus factor de uno es una alarma silenciosa: todo funciona hasta el día en que esa persona no viene.",
+      "preguntaDeAplicacion": "Si solo una persona del equipo puede tocar un módulo crítico, ¿qué pasa el día que esa persona no está?",
+      "fuente": "Cosentino, V., Cánovas Izquierdo, J. L. y Cabot, J. (2015). Assessing the bus factor of Git repositories. IEEE SANER 2015.",
+      "ubicacion": "En el bullpen, dentro del manual de un módulo que solo usa una persona."
+    },
+    {
+      "id": "COL-DEV-08", "serie": "carta", "palo": "oficio",
+      "titulo": "Deuda técnica",
+      "texto": "Tomar un atajo en el diseño o en el código es como pedir un préstamo: se avanza antes, pero cada cambio posterior cuesta un poco más, como si se pagaran intereses, hasta que la deuda se salda reescribiendo lo que se hizo con prisa.",
+      "preguntaDeAplicacion": "Si un parche rápido hace que el siguiente cambio tarde el doble, ¿en qué se parece eso a pagar intereses?",
+      "fuente": "Cunningham, W. (1992). The WyCash Portfolio Management System. OOPSLA '92, Experience Report.",
+      "ubicacion": "En el cajón de tu propio escritorio. Alguien la dejó ahí antes que tú."
+    },
+    {
+      "id": "COL-DEV-09", "serie": "carta", "palo": "oficio",
+      "titulo": "Burnout",
+      "texto": "La Organización Mundial de la Salud lo describe en la CIE-11 como un fenómeno ocupacional, no como una enfermedad: un síndrome causado por estrés laboral crónico que no se ha gestionado bien. Tiene tres dimensiones: agotamiento, distancia mental o cinismo hacia el trabajo, y menor eficacia profesional.",
+      "preguntaDeAplicacion": "¿Por qué «el que más entrega» durante meses seguidos es una señal de riesgo para el proyecto, y no solo un elogio?",
+      "fuente": "Organización Mundial de la Salud (2019). CIE-11, código QD85: Síndrome de desgaste ocupacional.",
+      "ubicacion": "En el tablón de la cafetería, medio tapada por un anuncio de yoga."
+    },
+
+    {
+      "id": "COL-USB-01", "serie": "usb", "fragmento": 1,
+      "titulo": "Fragmento 1/8 del USB de 256 MB",
+      "texto": "Un trozo de memoria USB antigua, sin carcasa, encajado detrás de un rack que nadie recuerda haber instalado. Solo no se puede leer.",
+      "ubicacion": "Detrás del rack apagado del sótano de los patios."
+    },
+
+    {
+      "id": "COL-COD-01", "serie": "codigo",
+      "titulo": "Código de terminal #1",
+      "comando": "whoami",
+      "revela": "nobody",
+      "texto": "La terminal responde que no eres nadie. El diario lo anota. Este mismo comando no siempre va a responder lo mismo.",
+      "ubicacion": "La terminal pública del concurso."
+    },
+    {
+      "id": "COL-COD-02", "serie": "codigo",
+      "titulo": "Código de terminal #2",
+      "comando": "ls -la /var/log/legacy",
+      "revela": "Una carpeta de registros con fechas de 1998.",
+      "texto": "Nexus dice que se fundó mucho después de 1998. Estos registros dicen otra cosa.",
+      "ubicacion": "La terminal de Javier, en el Data Hub."
+    },
+
+    {
+      "id": "COL-STARTUP-01", "serie": "startup",
+      "titulo": "Webvan",
+      "nicho": "Supermercado en línea con reparto a domicilio",
+      "texto": "Webvan salió a bolsa en noviembre de 1999 y comprometió cerca de mil millones de dólares en construir centros de distribución automatizados antes de tener la demanda que los justificara. Cerró en julio de 2001, menos de dos años después.",
+      "causa": "Construyó la infraestructura para el éxito antes de comprobar que el éxito iba a llegar: escaló primero y validó después.",
+      "fuente": "Quiebra de Webvan Group Inc. (julio de 2001), recogida por la prensa económica de la época.",
+      "ubicacion": "Recorte de prensa pegado en la pared del Data Hub, con un post-it de Javier: «por si se te olvida»."
+    },
+    {
+      "id": "COL-STARTUP-02", "serie": "startup",
+      "titulo": "Pets.com",
+      "nicho": "Venta en línea de productos para mascotas",
+      "texto": "Pets.com vendía comida y arena para mascotas: productos pesados, de poco margen y caros de enviar. Gastó enormes sumas en publicidad, con una famosa mascota-calcetín, y anunció su liquidación en noviembre de 2000, unos nueve meses después de salir a bolsa.",
+      "causa": "Cada pedido costaba más en envío de lo que dejaba de margen: cuantos más clientes conseguía, más dinero perdía.",
+      "fuente": "Anuncio de liquidación de Pets.com (noviembre de 2000), recogido por la prensa económica de la época.",
+      "ubicacion": "Recorte de prensa pegado junto al de Webvan, en la pared del Data Hub."
+    },
+
+    { "id": "COL-ADV-01", "serie": "advertencia", "titulo": "UN COMMIT, UNA IDEA.",
+      "texto": "Un commit que hace tres cosas a la vez no se puede revertir sin llevarse las otras dos.",
+      "ubicacion": "Cartel junto a la máquina de café del pasillo del concurso." },
+    { "id": "COL-ADV-02", "serie": "advertencia", "titulo": "SI NO ESTÁ EN EL ADR, NO PASÓ.",
+      "texto": "La memoria del equipo se va con la gente. El documento se queda.",
+      "ubicacion": "Cartel sobre tu escritorio." },
+    { "id": "COL-ADV-03", "serie": "advertencia", "titulo": "COBERTURA ALTA NO ES LO MISMO QUE PRUEBAS BUENAS.",
+      "texto": "Ejecutar una línea no es lo mismo que comprobar que hizo lo correcto.",
+      "ubicacion": "Cartel en la pared del bullpen." },
+    { "id": "COL-ADV-04", "serie": "advertencia", "titulo": "EL LÍMITE DE WIP NO ES UNA SUGERENCIA.",
+      "texto": "Cada tarea a medias que añades hace más lentas a todas las demás.",
+      "ubicacion": "Cartel junto a la entrada de la cafetería." },
+    { "id": "COL-ADV-05", "serie": "advertencia", "titulo": "UNA PERSONA, UN MÓDULO, UN RIESGO.",
+      "texto": "Si solo una persona lo entiende, el proyecto depende de que esa persona no se enferme, no renuncie y no se canse.",
+      "ubicacion": "Cartel en la cafetería, sobre el microondas." },
+    { "id": "COL-ADV-06", "serie": "advertencia", "titulo": "EL ATAJO DE HOY LO PAGA OTRO, O TÚ, EN TRES SEMANAS.",
+      "texto": "La deuda técnica cobra intereses. No se olvida sola.",
+      "ubicacion": "Cartel en la puerta del Data Hub." },
+    { "id": "COL-ADV-07", "serie": "advertencia", "titulo": "«AH, Y TAMBIÉN» ES UN CAMBIO DE ALCANCE.",
+      "texto": "Si no se nombra como cambio, no se puede negociar ni la fecha ni los recursos.",
+      "ubicacion": "Post-it en el borde de tu monitor." },
+    { "id": "COL-ADV-08", "serie": "advertencia", "titulo": "NEGOCIAR NO ES OBEDECER NI RECHAZAR.",
+      "texto": "Hay una tercera opción, y casi nadie la prueba primero.",
+      "ubicacion": "Cartel en el bullpen, junto al tablero." },
+    { "id": "COL-ADV-09", "serie": "advertencia", "titulo": "UN MERGE TARDE NO CUESTA MENOS. SOLO CUESTA DESPUÉS.",
+      "texto": "El viernes «con calma» casi nunca llega con calma.",
+      "ubicacion": "Cartel en el bullpen, encima de la impresora." },
+    { "id": "COL-ADV-10", "serie": "advertencia", "titulo": "LO QUE NO SE MIDE DE VERDAD, SE INVENTA.",
+      "texto": "Una métrica que se puede maquillar, tarde o temprano se maquilla.",
+      "ubicacion": "Cartel sobre la terminal de Javier." },
+    { "id": "COL-ADV-11", "serie": "advertencia", "titulo": "UNA ESTIMACIÓN SIN INCERTIDUMBRE ES UNA PROMESA DISFRAZADA.",
+      "texto": "Un rango dice más verdad que un número solo.",
+      "ubicacion": "Cartel en la sala del concurso, debajo del reloj." },
+    { "id": "COL-ADV-12", "serie": "advertencia", "titulo": "EL SERVIDOR QUE NADIE MONITOREA FALLA SOLO.",
+      "texto": "No puedes arreglar lo que no puedes ver.",
+      "ubicacion": "Cartel en el sótano, junto al rack apagado." }
+  ]
+}

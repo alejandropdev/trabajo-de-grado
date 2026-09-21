@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Nexus.Core.Coleccion;
+using Nexus.Core.Evaluacion;
 using Nexus.Core.Eventos;
 using Nexus.Core.Guardado;
 using Nexus.Core.Metodologia;
@@ -24,9 +26,19 @@ namespace Nexus.Core.Datos {
         /// <summary>El censo de flags. Existe aunque el codigo no lo necesitaria: el catalogo documenta.</summary>
         public List<DefinicionDeFlag> Flags = new List<DefinicionDeFlag>();
 
+        /// <summary>Lo que se dice en cada escena. Los beats dicen cuando; esto dice que.</summary>
+        public List<Guion> Guiones = new List<Guion>();
+
+        /// <summary>La entrevista del N0. Null si el catalogo no la trae (un prototipo puede no tenerla).</summary>
+        public PruebaDeAdmision Admision;
+
+        public List<Coleccionable> Coleccionables = new List<Coleccionable>();
+
         public override string ToString() {
             return $"{Eventos.Count} eventos, {Niveles.Count} niveles, {Metodologias.Count} metodologias, " +
-                   $"{Minijuegos.Count} minijuegos, {Beats.Count} beats, {Flags.Count} flags";
+                   $"{Minijuegos.Count} minijuegos, {Beats.Count} beats, {Flags.Count} flags, " +
+                   $"{Guiones.Count} guiones, {(Admision == null ? 0 : Admision.Preguntas.Count)} preguntas, " +
+                   $"{Coleccionables.Count} coleccionables";
         }
     }
 
@@ -53,6 +65,9 @@ namespace Nexus.Core.Datos {
         public const string ArchivoIndiceMinijuegos = "minijuegos/indice.json";
         public const string ArchivoNarrativa = "narrativa/narrativa.json";
         public const string ArchivoFlags = "flags.json";
+        public const string ArchivoGuiones = "narrativa/guiones.json";
+        public const string ArchivoAdmision = "prueba-de-admision.json";
+        public const string ArchivoColeccionables = "coleccionables.json";
 
         public static JsonSerializerSettings Settings { get { return JsonDeGuardado.Settings; } }
 
@@ -80,6 +95,16 @@ namespace Nexus.Core.Datos {
         private sealed class ArchivoDeFlags {
             public int Version { get; set; }
             public List<DefinicionDeFlag> Flags { get; set; }
+        }
+
+        private sealed class ArchivoDeGuiones {
+            public int Version { get; set; }
+            public List<Guion> Guiones { get; set; }
+        }
+
+        private sealed class ArchivoDeColeccionables {
+            public int Version { get; set; }
+            public List<Coleccionable> Coleccionables { get; set; }
         }
 
         // ------------------------------------------------------------------ uno a uno
@@ -120,6 +145,26 @@ namespace Nexus.Core.Datos {
             var flags = archivo.Flags ?? new List<DefinicionDeFlag>();
             Exigir("El censo de flags", SchemaValidator.ValidarFlags(flags));
             return flags;
+        }
+
+        public static List<Guion> CargarGuiones(string json) {
+            var archivo = Parsear<ArchivoDeGuiones>(json, ArchivoGuiones);
+            var guiones = archivo.Guiones ?? new List<Guion>();
+            Exigir("Los guiones", SchemaValidator.ValidarGuiones(guiones));
+            return guiones;
+        }
+
+        public static PruebaDeAdmision CargarAdmision(string json) {
+            var prueba = Parsear<PruebaDeAdmision>(json, ArchivoAdmision);
+            Exigir("La prueba de admision", SchemaValidator.ValidarAdmision(prueba));
+            return prueba;
+        }
+
+        public static List<Coleccionable> CargarColeccionables(string json) {
+            var archivo = Parsear<ArchivoDeColeccionables>(json, ArchivoColeccionables);
+            var coleccionables = archivo.Coleccionables ?? new List<Coleccionable>();
+            Exigir("Los coleccionables", SchemaValidator.ValidarColeccionables(coleccionables));
+            return coleccionables;
         }
 
         public static string Serializar(object o) {
@@ -195,6 +240,34 @@ namespace Nexus.Core.Datos {
                 try {
                     var archivo = Parsear<ArchivoDeFlags>(fuente.LeerCatalogo(ArchivoFlags), ArchivoFlags);
                     catalogo.Flags = archivo.Flags ?? new List<DefinicionDeFlag>();
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            // Guiones, entrevista y coleccionables: opcionales como la narrativa. Si estan, se validan enteros.
+            if (fuente.Existe(ArchivoGuiones)) {
+                try {
+                    var archivo = Parsear<ArchivoDeGuiones>(fuente.LeerCatalogo(ArchivoGuiones), ArchivoGuiones);
+                    catalogo.Guiones = archivo.Guiones ?? new List<Guion>();
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            if (fuente.Existe(ArchivoAdmision)) {
+                try {
+                    catalogo.Admision = Parsear<PruebaDeAdmision>(fuente.LeerCatalogo(ArchivoAdmision), ArchivoAdmision);
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            if (fuente.Existe(ArchivoColeccionables)) {
+                try {
+                    var archivo = Parsear<ArchivoDeColeccionables>(fuente.LeerCatalogo(ArchivoColeccionables),
+                                                                   ArchivoColeccionables);
+                    catalogo.Coleccionables = archivo.Coleccionables ?? new List<Coleccionable>();
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
                 }

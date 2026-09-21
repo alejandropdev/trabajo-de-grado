@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "entrevistadora": {
+    "id": "marisol-andrade",
+    "nombre": "Marisol Andrade",
+    "edad": 47,
+    "rol": "Secretaria ejecutiva de HH desde hace once años. Conduce la entrevista de admisión.",
+    "descripcion": "Cortesía de procedimiento: ha hecho esta entrevista cientos de veces. No reacciona a las respuestas, solo las anota. HH, sentado a su lado, le susurra algo después de cada una; ella no lo repite en voz alta."
+  },
+  "preguntas": [
+    {
+      "numero": 1, "oa": "OA-INTRO-01",
+      "enunciado": "¿Qué distingue a la ingeniería de software de simplemente escribir código?",
+      "opciones": [
+        { "id": "A", "texto": "Usar un lenguaje más difícil." },
+        { "id": "B", "texto": "Trabajar en equipo." },
+        { "id": "C", "texto": "Aplicar un proceso disciplinado, con calidad y mantenibilidad medibles." }
+      ],
+      "correcta": "C",
+      "susurroSiAcierta": "Anótalo con una marca.",
+      "susurroSiFalla": "Ese no distingue programar de construir. Como casi todos."
+    },
+    {
+      "numero": 2, "oa": "OA-CICLO-01",
+      "enunciado": "En el modelo en cascada, ¿qué pasa si un error de requisitos se descubre en la fase de pruebas?",
+      "opciones": [
+        { "id": "A", "texto": "El coste de corregirlo crece, porque hay que rehacer fases anteriores." },
+        { "id": "B", "texto": "Se corrige ahí mismo; es barato." },
+        { "id": "C", "texto": "No afecta: las fases son independientes." }
+      ],
+      "correcta": "A",
+      "susurroSiAcierta": "Sabe lo que cuesta un error tarde. Bien.",
+      "susurroSiFalla": "No sabe lo que cuesta un error tarde. Se lo enseñará el sprint 2."
+    },
+    {
+      "numero": 3, "oa": "OA-SCRUM-01",
+      "enunciado": "¿Quién es responsable de maximizar el valor del producto en Scrum?",
+      "opciones": [
+        { "id": "A", "texto": "El Scrum Master." },
+        { "id": "B", "texto": "El Product Owner." },
+        { "id": "C", "texto": "Todo el equipo por igual." }
+      ],
+      "correcta": "B",
+      "susurroSiAcierta": "Correcta. Siguiente.",
+      "susurroSiFalla": "Confunde quién prioriza con quién ejecuta. Común."
+    },
+    {
+      "numero": 4, "oa": "OA-KANBAN-01",
+      "enunciado": "¿Para qué sirve un límite de trabajo en curso (WIP) en un tablero Kanban?",
+      "opciones": [
+        { "id": "A", "texto": "Para que el tablero se vea ordenado." },
+        { "id": "B", "texto": "Para limitar cuántas personas hay en el equipo." },
+        { "id": "C", "texto": "Para obligar a terminar antes de empezar algo nuevo, y dejar a la vista los cuellos de botella." }
+      ],
+      "correcta": "C",
+      "susurroSiAcierta": "Entiende el límite. Pocos lo entienden hasta que lo rompen.",
+      "susurroSiFalla": "No entiende el límite. Lo va a romper. Todos lo rompen primero y lo entienden después."
+    },
+    {
+      "numero": 5, "oa": "OA-DEVOPS-01",
+      "enunciado": "¿Qué resuelve principalmente la integración continua (CI)?",
+      "opciones": [
+        { "id": "A", "texto": "Detectar conflictos integrando cambios pequeños y frecuentes, en vez de grandes y tardíos." },
+        { "id": "B", "texto": "Que el código se vea más limpio." },
+        { "id": "C", "texto": "Reducir el número de programadores necesarios." }
+      ],
+      "correcta": "A",
+      "susurroSiAcierta": "Anótalo.",
+      "susurroSiFalla": "Cree que la integración continua es estética. Es lo contrario."
+    },
+    {
+      "numero": 6, "oa": "OA-DEVOPS-02",
+      "enunciado": "¿Cuál es la diferencia entre entrega continua y despliegue continuo?",
+      "opciones": [
+        { "id": "A", "texto": "Son lo mismo." },
+        { "id": "B", "texto": "La entrega continua deja el software listo para desplegar; el despliegue continuo lo despliega automáticamente." },
+        { "id": "C", "texto": "El despliegue continuo es más lento." }
+      ],
+      "correcta": "B",
+      "susurroSiAcierta": "La distingue. Anótalo con dos marcas.",
+      "susurroSiFalla": "No la distingue. Nadie la distingue la primera vez."
+    },
+    {
+      "numero": 7, "oa": "OA-DIS-01",
+      "enunciado": "¿Qué significa que dos módulos tengan «bajo acoplamiento»?",
+      "opciones": [
+        { "id": "A", "texto": "Que están escritos en el mismo archivo." },
+        { "id": "B", "texto": "Que comparten toda su lógica interna." },
+        { "id": "C", "texto": "Que dependen poco el uno del otro y pueden cambiar por separado." }
+      ],
+      "correcta": "C",
+      "susurroSiAcierta": "Correcta.",
+      "susurroSiFalla": "No sabe qué es el acoplamiento. Se lo va a explicar Voss, sin querer."
+    },
+    {
+      "numero": 8, "oa": "OA-DOC-01",
+      "enunciado": "¿Para qué sirve un SRS (documento de especificación de requisitos)?",
+      "opciones": [
+        { "id": "A", "texto": "Para fijar de forma verificable qué debe hacer el sistema, antes de construirlo." },
+        { "id": "B", "texto": "Para que el cliente firme algo." },
+        { "id": "C", "texto": "Es un formalismo que nadie lee después." }
+      ],
+      "correcta": "A",
+      "susurroSiAcierta": "Entiende para qué sirve un documento. Rareza.",
+      "susurroSiFalla": "Cree que documentar es un trámite. Lo va a pagar en la fase 1."
+    },
+    {
+      "numero": 9, "oa": "OA-EST-01",
+      "enunciado": "¿Por qué las estimaciones de un equipo tienden a ser optimistas, incluso con experiencia?",
+      "opciones": [
+        { "id": "A", "texto": "Porque el equipo no se esfuerza lo suficiente." },
+        { "id": "B", "texto": "Las estimaciones no siguen ningún patrón." },
+        { "id": "C", "texto": "Por sesgo de optimismo: se estima el caso ideal, no el caso con interrupciones e imprevistos." }
+      ],
+      "correcta": "C",
+      "susurroSiAcierta": "Sabe que va a fallar y por qué. Es lo máximo que se puede pedir.",
+      "susurroSiFalla": "Cree que estimar bien es cuestión de esfuerzo. No lo es."
+    },
+    {
+      "numero": 10, "oa": "OA-GIT-01",
+      "enunciado": "¿Qué hace un merge en control de versiones?",
+      "opciones": [
+        { "id": "A", "texto": "Borra el historial de una rama." },
+        { "id": "B", "texto": "Combina los cambios de dos ramas en una sola línea de desarrollo." },
+        { "id": "C", "texto": "Crea una copia de seguridad del repositorio." }
+      ],
+      "correcta": "B",
+      "susurroSiAcierta": "Anótalo.",
+      "susurroSiFalla": "No sabe qué hace un merge. Lo va a aprender un viernes, a las malas."
+    },
+    {
+      "numero": 11, "oa": "OA-MLOPS-01",
+      "enunciado": "Un modelo de aprendizaje automático en producción falla cada vez más, sin que nadie haya cambiado el código. ¿A qué se debe probablemente?",
+      "opciones": [
+        { "id": "A", "texto": "A la deriva de datos: el mundo cambió y los datos de entrada ya no se parecen a los de entrenamiento." },
+        { "id": "B", "texto": "A un error de programación oculto." },
+        { "id": "C", "texto": "A que el modelo se «cansa»." }
+      ],
+      "correcta": "A",
+      "susurroSiAcierta": "No es común que sepan esto tan pronto.",
+      "susurroSiFalla": "No conoce la deriva. La va a ver antes de saber cómo se llama."
+    },
+    {
+      "numero": 12, "oa": "OA-PAT-01",
+      "enunciado": "¿Qué es un patrón de diseño?",
+      "opciones": [
+        { "id": "A", "texto": "Una librería que se instala." },
+        { "id": "B", "texto": "Un estilo de indentación estándar." },
+        { "id": "C", "texto": "Una solución reutilizable y documentada a un problema de diseño recurrente; no es código para copiar." }
+      ],
+      "correcta": "C",
+      "susurroSiAcierta": "Correcta.",
+      "susurroSiFalla": "Cree que un patrón es una librería. Va a copiar mal uno, seguro."
+    },
+    {
+      "numero": 13, "oa": "OA-CAL-01",
+      "enunciado": "Según ISO 25010, ¿cuál de estos NO es un atributo de calidad del software?",
+      "opciones": [
+        { "id": "A", "texto": "Mantenibilidad." },
+        { "id": "B", "texto": "Precio de mercado." },
+        { "id": "C", "texto": "Fiabilidad." }
+      ],
+      "correcta": "B",
+      "susurroSiAcierta": "Sabe que la calidad no es un precio. Anótalo.",
+      "susurroSiFalla": "Confunde calidad con precio. Casi todos lo hacen al principio."
+    },
+    {
+      "numero": 14, "oa": "OA-TEST-01",
+      "enunciado": "¿Qué diferencia a una prueba unitaria de una prueba de integración?",
+      "opciones": [
+        { "id": "A", "texto": "La unitaria prueba un componente aislado; la de integración prueba que varios componentes funcionen juntos." },
+        { "id": "B", "texto": "La de integración es más rápida." },
+        { "id": "C", "texto": "No hay una diferencia real." }
+      ],
+      "correcta": "A",
+      "susurroSiAcierta": "Correcta.",
+      "susurroSiFalla": "No distingue los niveles de prueba. Va a probar mal, y no va a saber qué probó."
+    },
+    {
+      "numero": 15, "oa": "OA-TEST-02",
+      "enunciado": "Un módulo tiene un 100 % de cobertura de pruebas. ¿Garantiza eso que no tiene errores?",
+      "opciones": [
+        { "id": "A", "texto": "Sí: cobertura total es sinónimo de corrección." },
+        { "id": "B", "texto": "No: la cobertura mide qué líneas se ejecutaron, no si el resultado era correcto." },
+        { "id": "C", "texto": "Solo si las pruebas las escribió alguien senior." }
+      ],
+      "correcta": "B",
+      "susurroSiAcierta": "Sabe que una métrica perfecta puede mentir. Es lo único que me importa de esta lista.",
+      "susurroSiFalla": "Cree que un número perfecto es una garantía. Va a aprender lo contrario, y le va a doler."
+    }
+  ]
+}

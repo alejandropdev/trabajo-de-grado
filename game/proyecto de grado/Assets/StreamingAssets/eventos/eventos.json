@@ -3,8 +3,92 @@
   "eventos": [
 
     {
+      "id": "EV-TUT-01",
+      "nombre": "El requisito que nadie escribió",
+      "soloNiveles": ["nivel-00"],
+      "tags": ["tutorial"],
+      "fases": ["desarrollo"],
+      "severidad": 1,
+      "objetivoAprendizaje": "OA-DOC-01",
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 1,
+        "canal": "ticket",
+        "texto": "Nuevo comentario en el ticket NEX-4417, de otro concursante: «¿Hay que contemplar visitantes sin cita?». Nadie le ha contestado."
+      },
+      "opciones": [
+        {
+          "id": "escribirlo",
+          "texto": "Escribirlo como requisito, con su criterio de aceptación: un visitante sin cita queda registrado y se avisa a la persona a la que viene a ver.",
+          "efectosInmediatos": { "Alcance": 2, "Documentacion": 5 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-DOC-01",
+            "razon": "Una pregunta sin contestar en un ticket es un requisito sin escribir. Escribirlo con su criterio de aceptación convierte una suposición en algo que se puede comprobar el viernes."
+          }
+        },
+        {
+          "id": "suponerlo",
+          "texto": "Suponer que no hace falta y seguir con lo que había.",
+          "efectosInmediatos": { "Avance": 1 },
+          "efectosDiferidos": [ { "enDias": 2, "efectos": { "SatisfaccionCliente": -6, "DeudaTecnica": 3 } } ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-DOC-01",
+            "razon": "Lo que no se pregunta ahora se supone después, y casi siempre mal. El jurado prueba justo ese caso dos días más tarde."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-TUT-02",
+      "nombre": "La demo de mañana",
+      "soloNiveles": ["nivel-00"],
+      "tags": ["tutorial"],
+      "fases": ["desarrollo"],
+      "severidad": 1,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "precondiciones": ["diaActual >= 2"],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 1,
+        "canal": "chat",
+        "texto": "Marisol Andrade, por el canal del concurso: «Mañana a las once el jurado pasa por los puestos a ver cómo van.»"
+      },
+      "opciones": [
+        {
+          "id": "ensenar-lo-que-hay",
+          "texto": "Enseñar lo que funciona de verdad, aunque sea poco.",
+          "efectosInmediatos": { "SatisfaccionCliente": 3 },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Un incremento pequeño y real vale más que uno grande y falso: el jurado puede opinar sobre lo que ve, y lo que ve es cierto."
+          }
+        },
+        {
+          "id": "maquillar",
+          "texto": "Preparar una pantalla bonita que todavía no hace nada.",
+          "efectosInmediatos": { "SatisfaccionCliente": 6 },
+          "efectosDiferidos": [ { "enDias": 1, "efectos": { "SatisfaccionCliente": -10, "Reputacion": -5 } } ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Funciona un día. Al siguiente alguien pulsa un botón, y un jurado que descubre una pantalla falsa no vuelve a creerse la siguiente."
+          }
+        }
+      ]
+    },
+
+    {
       "id": "EV-TEC-02",
       "nombre": "Lecturas duplicadas",
+      "soloNiveles": ["nivel-01"],
       "tags": ["tecnico"],
       "fases": ["desarrollo"],
       "severidad": 2,
@@ -46,6 +130,7 @@
     {
       "id": "EV-TEC-05",
       "nombre": "La deuda que vuelve",
+      "soloNiveles": ["nivel-01"],
       "tags": ["tecnico"],
       "fases": ["desarrollo", "lanzamiento"],
       "severidad": 3,
@@ -87,6 +172,7 @@
     {
       "id": "EV-ALC-01",
       "nombre": "Ah, y también…",
+      "soloNiveles": ["nivel-01"],
       "tags": ["alcance"],
       "fases": ["desarrollo"],
       "severidad": 2,
@@ -141,6 +227,7 @@
     {
       "id": "EV-EQ-03",
       "nombre": "El héroe",
+      "soloNiveles": ["nivel-01"],
       "tags": ["equipo"],
       "fases": ["desarrollo"],
       "severidad": 2,
@@ -182,6 +269,7 @@
     {
       "id": "EV-EQ-02",
       "nombre": "El que se va",
+      "soloNiveles": ["nivel-01"],
       "tags": ["equipo"],
       "fases": ["desarrollo", "lanzamiento"],
       "severidad": 3,
@@ -223,6 +311,7 @@
     {
       "id": "EV-INT-01",
       "nombre": "El merge del viernes",
+      "soloNiveles": ["nivel-01"],
       "tags": ["integracion"],
       "fases": ["desarrollo"],
       "severidad": 2,
@@ -264,6 +353,7 @@
     {
       "id": "EV-DVO-02",
       "nombre": "El servidor de integración se cae",
+      "soloNiveles": ["nivel-01"],
       "tags": ["devops"],
       "fases": ["desarrollo", "lanzamiento"],
       "severidad": 2,
@@ -305,6 +395,7 @@
     {
       "id": "EV-CAL-02",
       "nombre": "La cobertura que miente",
+      "soloNiveles": ["nivel-01"],
       "tags": ["calidad"],
       "fases": ["desarrollo"],
       "severidad": 2,
@@ -346,6 +437,7 @@
     {
       "id": "EV-BUE-04",
       "nombre": "La semana tranquila",
+      "soloNiveles": ["nivel-01"],
       "tags": ["buenas"],
       "fases": ["desarrollo"],
       "severidad": 0,
@@ -387,6 +479,7 @@
     {
       "id": "EV-BUE-02",
       "nombre": "El cliente que entiende",
+      "soloNiveles": ["nivel-01"],
       "tags": ["buenas", "cliente"],
       "fases": ["desarrollo", "lanzamiento"],
       "severidad": 0,
