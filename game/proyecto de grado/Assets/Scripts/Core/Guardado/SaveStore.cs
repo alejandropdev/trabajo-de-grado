@@ -199,6 +199,7 @@ namespace Nexus.Core.Guardado {
                 e.Add("La Fase 1 está cerrada pero falta 'nivel.metodologiaId'.");
             if (n.ColaDeEfectos == null) e.Add("Falta 'nivel.colaDeEfectos': sin ella se esquivan consecuencias recargando.");
             if (n.Telegrafiados == null) e.Add("Falta 'nivel.telegrafiados'.");
+            if (n.Alertas == null) e.Add("Falta 'nivel.alertas': sin ellas se esquiva una alerta guardando.");
             if (n.ConsumosDelRng < 0) e.Add("'nivel.consumosDelRng' no puede ser negativo.");
         }
 

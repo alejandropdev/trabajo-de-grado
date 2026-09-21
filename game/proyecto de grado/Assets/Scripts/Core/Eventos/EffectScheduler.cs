@@ -71,7 +71,8 @@ namespace Nexus.Core.Eventos {
         /// Agenda un evento y su aviso previo. El dia del aviso nunca baja de 1: si un evento del dia 2
         /// se telegrafiara con 3 dias de antelacion, el aviso caeria antes de empezar el nivel.
         /// </summary>
-        public void AgendarTelegrafiado(string eventoId, int diaDelEvento, int diasAntes, string canal, string texto) {
+        public void AgendarTelegrafiado(string eventoId, int diaDelEvento, int diasAntes, string canal, string texto,
+                                        int minutoDelEvento = -1) {
             if (string.IsNullOrEmpty(eventoId))
                 throw new ArgumentException("No se puede agendar un evento sin id.", nameof(eventoId));
 
@@ -81,6 +82,7 @@ namespace Nexus.Core.Eventos {
                 EventoId = eventoId,
                 DiaDelEvento = diaDelEvento,
                 DiaDelAviso = Math.Max(1, diaDelEvento - antelacion),
+                MinutoDelEvento = minutoDelEvento,
                 Canal = canal,
                 Texto = texto,
                 Emitido = false

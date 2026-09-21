@@ -62,6 +62,15 @@ namespace Nexus.Core.Eventos {
         /// <summary>Dia absoluto en que el evento se presentara.</summary>
         public int DiaDelEvento;
 
+        /// <summary>
+        /// Minuto del dia en que sonara la alerta, del mismo DeterministicRng que eligio el evento
+        /// (§7.5 paso 7). -1 = el director no eligio hora y la decide quien construya la alerta.
+        ///
+        /// Es LO UNICO que cambio al pasar al dia continuo: antes se agendaba un dia, ahora un
+        /// (dia, minuto). La reproducibilidad del Modo Aula se mantiene al minuto.
+        /// </summary>
+        public int MinutoDelEvento = -1;
+
         /// <summary>Dia absoluto en que sale el aviso.</summary>
         public int DiaDelAviso;
 

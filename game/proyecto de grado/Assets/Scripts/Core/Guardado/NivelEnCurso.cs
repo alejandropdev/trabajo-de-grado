@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Nexus.Core.Evaluacion;
 using Nexus.Core.Eventos;
+using Nexus.Core.Jornada;
 using Nexus.Core.Modelo;
 using Nexus.Core.Simulacion;
 
@@ -42,6 +43,13 @@ namespace Nexus.Core.Guardado {
         // --- la agenda del tiempo: SIN ESTO el jugador esquiva consecuencias recargando ---
         public List<EfectoEnCola> ColaDeEfectos = new List<EfectoEnCola>();              // C4
         public List<TelegrafiadoPendiente> Telegrafiados = new List<TelegrafiadoPendiente>();   // C4
+
+        /// <summary>
+        /// Las alertas de HOY con su estado (C11). Guardar a las 14:00 con una alerta viva hasta las
+        /// 16:00 y recargar tiene que devolver exactamente esa situacion: si no, guardar seria una
+        /// forma de esquivarla, que es justo lo que INV-7 prohibe.
+        /// </summary>
+        public List<Alerta> Alertas = new List<Alerta>();
 
         // --- el estado del azar: se queman estas tiradas al restaurar DeterministicRng ---
         public int ConsumosDelRng;
