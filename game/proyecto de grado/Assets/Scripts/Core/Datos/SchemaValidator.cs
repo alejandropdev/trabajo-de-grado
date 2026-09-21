@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Nexus.Core.Evaluacion;
 using Nexus.Core.Eventos;
+using Nexus.Core.Jornada;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Modelo;
@@ -223,8 +224,23 @@ namespace Nexus.Core.Datos {
                 e.Add($"{id}: falta 'metodologiasPermitidas'; el jugador tiene que poder elegir algo.");
 
             ValidarDirector(id, p.Director, e);
+            ValidarJornada(id, p.Jornada, e);
             ValidarFase1(id, p.Fase1, e);
             return e;
+        }
+
+        /// <summary>
+        /// La jornada del dia continuo (§3.3). Se delega en el constructor de RelojDeJornada, que es
+        /// quien de verdad ejercita la configuracion: la misma politica que con MethodologyRules.
+        /// </summary>
+        private static void ValidarJornada(string id, JornadaConfig j, List<string> e) {
+            if (j == null) { e.Add($"{id}: falta el bloque 'jornada'."); return; }
+
+            try {
+                var _ = new RelojDeJornada(j);
+            } catch (InvalidOperationException ex) {
+                e.Add($"{id}: {ex.Message}");
+            }
         }
 
         private static void ValidarDirector(string id, DirectorConfig d, List<string> e) {
