@@ -913,6 +913,63 @@ namespace Nexus.Tests {
             Assert.Fail("no salio ninguna alerta que cumpliera el filtro en 20 dias");
         }
 
+        /// <summary>
+        /// Una jornada de 08:00 a 11:00 con 3 h de ventana: el UNICO minuto en que cabe una alerta entera
+        /// es el de entrada. Asi se prueba el borde sin depender de que el sorteo caiga ahi por suerte.
+        /// </summary>
+        private static Catalogo CatalogoConAlertasALasOcho() {
+            var c = Catalogo();
+            var jornada = c.Niveles["nivel-01"].Jornada;
+            jornada.HoraInicio = 8;
+            jornada.HoraCierre = 11;
+            jornada.HoraLimite = 13;
+            jornada.VentanaDeAtencionMinutos = 180;
+            return c;
+        }
+
+        [Test]
+        public void Una_alerta_a_la_hora_de_entrada_suena_en_el_primer_tramo_y_solo_una_vez() {
+            // Antes del arreglo, el intervalo (desde, hasta] nunca contenia las 08:00: la alerta sonaba sin
+            // avisar y expiraba como omitida (scrum, semilla 16, del contenido real de N1).
+            var s = Empezada(catalogo: CatalogoConAlertasALasOcho());
+            int dia;
+            HastaUnDiaConAlerta(s, out dia);
+            var alerta = s.AlertasDeHoy.First();
+            Assert.AreEqual(8 * 60, alerta.MinutoDeLaAlerta, "con esta jornada no cabe en ningun otro minuto");
+
+            var primerTramo = s.AvanzarReloj(15);
+            CollectionAssert.Contains(primerTramo.AlertasQueSuenan, alerta, "la de las 08:00 tiene que sonar");
+
+            var segundoTramo = s.AvanzarReloj(15);
+            CollectionAssert.DoesNotContain(segundoTramo.AlertasQueSuenan, alerta, "suena una vez, no en cada tramo");
+        }
+
+        [Test]
+        public void Avanzar_cero_minutos_a_las_ocho_no_gasta_el_aviso() {
+            var s = Empezada(catalogo: CatalogoConAlertasALasOcho());
+            int dia;
+            HastaUnDiaConAlerta(s, out dia);
+            var alerta = s.AlertasDeHoy.First();
+
+            Assert.IsEmpty(s.AvanzarReloj(0).AlertasQueSuenan, "sin mover el reloj no suena nada");
+            CollectionAssert.Contains(s.AvanzarReloj(15).AlertasQueSuenan, alerta,
+                                      "y el aviso sigue ahi para el primer tramo que de verdad avanza");
+        }
+
+        [Test]
+        public void Una_alerta_de_las_ocho_atendida_sin_mover_el_reloj_no_vuelve_a_sonar() {
+            var s = Empezada(catalogo: CatalogoConAlertasALasOcho());
+            int dia;
+            HastaUnDiaConAlerta(s, out dia);
+            var alerta = s.AlertasDeHoy.First();
+
+            // AtenderAlerta cobra su tiempo con AvanzarReloj, que arranca justo a las 08:00.
+            var resultado = s.AtenderAlerta(alerta.Id);
+
+            CollectionAssert.DoesNotContain(resultado.AlertasQueSuenan, alerta,
+                                            "ya estaba atendida: anunciarla ahora seria mentirle a la pantalla");
+        }
+
         /// <summary>Un mapa de dos zonas, con una puerta que solo se abre desde el dia 3.</summary>
         private static Catalogo CatalogoConMapa() {
             var c = Catalogo();

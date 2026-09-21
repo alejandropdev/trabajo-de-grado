@@ -427,8 +427,15 @@ namespace Nexus.Core.Sesion {
             var avanzados = _reloj.Avanzar(minutos);
             R.MinutoDelDia = _reloj.Minuto;
 
+            // ★ El intervalo es (desde, hasta], asi que una alerta sorteada justo a la hora de entrada no
+            // caia en ninguno: sonaba sin avisar y expiraba como omitida. El primer tramo que de verdad
+            // mueve el reloj incluye su propio arranque. Solo las pendientes: si se atendio a las 08:00
+            // antes de mover el reloj, AtenderAlerta llega aqui desde las 08:00 y no debe volver a sonar.
+            var desdeExclusivo = desde == _reloj.MinutoDeInicio && avanzados > 0 ? desde - 1 : desde;
+
             var resultado = new ResultadoDeAvance { MinutosAvanzados = avanzados };
-            resultado.AlertasQueSuenan.AddRange(_alertas.SuenanEntre(desde, _reloj.Minuto));
+            foreach (var alerta in _alertas.SuenanEntre(desdeExclusivo, _reloj.Minuto))
+                if (alerta.EstaPendiente) resultado.AlertasQueSuenan.Add(alerta);
 
             foreach (var expirada in _alertas.Expirar(_reloj.Minuto, R.ZonaActual)) {
                 AplicarOmision(expirada);

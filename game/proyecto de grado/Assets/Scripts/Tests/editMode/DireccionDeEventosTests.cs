@@ -436,6 +436,36 @@ namespace Nexus.Tests {
         }
 
         [Test]
+        public void ForzarEvento_no_cae_encima_de_otro_evento_y_se_corre_al_primer_dia_libre() {
+            var b = Montar(new List<EventDefinition> { Ev("EV-A", "tecnico"), Ev("EV-TEC-021", "tecnico") });
+            b.Contexto.R.DiaActual = 9;
+
+            // El director ya habia agendado otro evento justo para el dia 11, que es donde caeria la cadena.
+            // Solo se presenta uno por dia: antes de este arreglo, uno de los dos se perdia en silencio
+            // (scrum, semilla 5, del contenido real de N1: EV-TEC-05 desaparecia tras EV-CAL-02).
+            b.Scheduler.AgendarTelegrafiado("EV-OTRO", 11, 2, "log", "…");
+
+            b.Director.ForzarEvento("EV-TEC-021", b.Contexto.R);
+
+            var cadena = b.Scheduler.Telegrafiados.Single(t => t.EventoId == "EV-TEC-021");
+            Assert.AreEqual(12, cadena.DiaDelEvento, "la cadena se corre al primer dia libre");
+            Assert.AreEqual(9, cadena.DiaDelAviso, "y el aviso sale igual hoy: llega con mas antelacion, no con menos");
+            Assert.AreEqual(1, b.Scheduler.EventosAgendadosEn(11), "el evento que ya estaba no se mueve");
+        }
+
+        [Test]
+        public void ForzarEvento_salta_todos_los_dias_ocupados_seguidos() {
+            var b = Montar(new List<EventDefinition> { Ev("EV-A", "tecnico"), Ev("EV-TEC-021", "tecnico") });
+            b.Contexto.R.DiaActual = 9;
+            b.Scheduler.AgendarTelegrafiado("EV-OTRO", 11, 2, "log", "…");
+            b.Scheduler.AgendarTelegrafiado("EV-OTRO-MAS", 12, 2, "log", "…");
+
+            b.Director.ForzarEvento("EV-TEC-021", b.Contexto.R);
+
+            Assert.AreEqual(13, b.Scheduler.Telegrafiados.Single(t => t.EventoId == "EV-TEC-021").DiaDelEvento);
+        }
+
+        [Test]
         public void ForzarEvento_con_un_id_que_no_existe_lanza() {
             var b = Montar(new List<EventDefinition> { Ev("EV-A", "tecnico") });
             var ex = Assert.Throws<InvalidOperationException>(
