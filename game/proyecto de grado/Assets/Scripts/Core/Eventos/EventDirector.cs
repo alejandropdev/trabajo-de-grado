@@ -300,12 +300,18 @@ namespace Nexus.Core.Eventos {
 
         // ------------------------------------------------------------------ interno
 
+        /// <summary>
+        /// ★ Paso 7 del ciclo (§7.5). Lo UNICO que cambio al pasar al dia continuo: antes se agendaba
+        /// un dia, ahora un (dia, minuto). El minuto sale del mismo DeterministicRng, asi que la
+        /// reproducibilidad del Modo Aula se mantiene al minuto.
+        /// </summary>
         private void Agendar(EventDefinition evento, int diaDelEvento, int diasAntes) {
             var tele = evento.Telegrafiado;
             _scheduler.AgendarTelegrafiado(
                 evento.Id, diaDelEvento, diasAntes,
                 tele == null ? "log" : tele.Canal,
-                tele == null ? null : tele.Texto);
+                tele == null ? null : tele.Texto,
+                SorteoDeMinuto.Elegir(_perfil.Jornada, _rng));
         }
 
         /// <summary>Minimo 1: avisar el mismo dia no es avisar, y eso rompe INV-3.</summary>

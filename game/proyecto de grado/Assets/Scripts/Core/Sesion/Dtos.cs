@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Nexus.Core.Evaluacion;
+using Nexus.Core.Jornada;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Simulacion;
 
@@ -66,6 +67,23 @@ namespace Nexus.Core.Sesion {
 
         /// <summary>Lo que TU metodologia opina de esta opcion hoy.</summary>
         public string NotaDeMetodologia;
+    }
+
+    /// <summary>
+    /// Lo que pasó al hacer correr el reloj un tramo (§3.3). Cubre AvanzarReloj, IrAZona y CerrarJornada:
+    /// las tres formas en que el tiempo se mueve, y las tres pueden hacer sonar o perder una alerta.
+    /// </summary>
+    public sealed class ResultadoDeAvance {
+        public int MinutosAvanzados;
+
+        /// <summary>Las que acaban de sonar en este tramo. «Te necesitan en tu escritorio.»</summary>
+        public List<Alerta> AlertasQueSuenan = new List<Alerta>();
+
+        /// <summary>
+        /// Las que se perdieron en este tramo. Cada una ya produjo su consecuencia 'omitido' — el
+        /// mundo quedó igual que haberla resuelto mal — antes de aparecer aquí.
+        /// </summary>
+        public List<Alerta> AlertasQueExpiraron = new List<Alerta>();
     }
 
     /// <summary>El evento de las 12:00, listo para pintarse.</summary>
