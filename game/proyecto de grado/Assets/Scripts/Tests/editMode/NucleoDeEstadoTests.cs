@@ -241,11 +241,18 @@ namespace Nexus.Tests {
         // ---------------------------------------------------------------- RuntimeState
 
         [Test]
-        public void RuntimeState_expone_solo_los_diez_campos_consultables() {
+        public void RuntimeState_expone_solo_los_campos_consultables() {
             var r = new RuntimeState { DiaActual = 7, Fase = 2, WipActual = 3, LimiteWip = 4, SobreCompromiso = 1.5 };
             double v;
 
-            Assert.AreEqual(10, RuntimeState.Consultables.Count);
+            // Se comprueba la lista, no un numero: si alguien añade un consultable, este test le obliga
+            // a declararlo aqui, que es lo que convierte la lista en un contrato con el contenido.
+            CollectionAssert.AreEquivalent(
+                new[] { "diaActual", "fase", "wipActual", "limiteWip", "sobreCompromiso",
+                        "diasConHorasExtra", "diasSeguidosTrabajando", "cambiosAceptados",
+                        "vecesQueSeFueACasa", "accionesRetroElegidas", "minutoDelDia" },
+                RuntimeState.Consultables);
+
             foreach (var nombre in RuntimeState.Consultables)
                 Assert.IsTrue(r.TryGet(nombre, out v), nombre + " deberia ser consultable");
 

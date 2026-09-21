@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Nexus.Core.Jornada;
 using Nexus.Core.Simulacion;
 
 namespace Nexus.Core.Modelo {
@@ -43,6 +44,12 @@ namespace Nexus.Core.Modelo {
         // --- Grupo 3 · el director de eventos ---
         public DirectorConfig Director = new DirectorConfig();
 
+        /// <summary>
+        /// Como es un dia en este nivel: a que hora empieza, cuando toca decidir si te quedas, hasta
+        /// donde llega si te quedas, y cuanto tiempo da una alerta. El prologo usa jornadas mas cortas.
+        /// </summary>
+        public JornadaConfig Jornada = new JornadaConfig();
+
         // --- Grupo 4 · pedagogia ---
         /// <summary>OA-* que este nivel evalua. Filtra tanto eventos como minijuegos.</summary>
         public string[] ObjetivosActivos = new string[0];
@@ -70,6 +77,7 @@ namespace Nexus.Core.Modelo {
             c.MetodologiasPermitidas = MetodologiasPermitidas == null ? null : (string[])MetodologiasPermitidas.Clone();
             c.Coef = Coef == null ? null : Coef.Clone();
             c.Director = Director == null ? null : Director.Clone();
+            c.Jornada = Jornada == null ? null : Jornada.Clone();
             c.Umbrales = Umbrales == null ? null : Umbrales.Clone();
             c.Fase1 = Fase1 == null ? null : Fase1.Clone();
             return c;
