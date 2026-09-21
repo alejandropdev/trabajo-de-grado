@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7cc9f1df1bcc7d4189e24371c81b316, type: 3}
+  m_Name: NexusTheme
+  m_EditorClassIdentifier: 
+  fondo: {r: 0.105882354, g: 0.16470589, b: 0.19215687, a: 1}
+  fondoSecundario: {r: 0.13725491, g: 0.23137255, b: 0.25882354, a: 1}
+  pared: {r: 0.18039216, g: 0.2901961, b: 0.32156864, a: 1}
+  hormigon: {r: 0.22745098, g: 0.2901961, b: 0.30588236, a: 1}
+  cian: {r: 0.37254903, g: 0.84705883, b: 0.9607843, a: 1}
+  cianClaro: {r: 0.56078434, g: 0.91764706, b: 1, a: 1}
+  mostaza: {r: 0.7882353, g: 0.63529414, b: 0.15294118, a: 1}
+  mostazaClara: {r: 0.8901961, g: 0.7607843, b: 0.30980393, a: 1}
+  mostazaEnvejecida: {r: 0.56078434, g: 0.43529412, b: 0.078431375, a: 1}
+  naranja: {r: 0.9098039, g: 0.4392157, b: 0.22745098, a: 1}
+  rojo: {r: 0.7882353, g: 0.30980393, b: 0.23921569, a: 1}
+  amarillo: {r: 0.9490196, g: 0.75686276, b: 0.30588236, a: 1}
+  texto: {r: 0.8666667, g: 0.9019608, b: 0.9098039, a: 1}
+  textoTenue: {r: 0.56078434, g: 0.6392157, b: 0.6666667, a: 1}
+  textoSobreCian: {r: 0.0627451, g: 0.09803922, b: 0.11372549, a: 1}
+  fuenteTitulo: {fileID: 0}
+  fuenteCuerpo: {fileID: 0}
+  fuenteMonoespaciada: {fileID: 0}
+  tamTitulo: 46
+  tamSubtitulo: 30
+  tamCuerpo: 22
+  tamPequeno: 17
+  spritePanel: {fileID: 0}
+  spriteBoton: {fileID: 0}
+  spriteBarraFondo: {fileID: 0}
+  spriteBarraRelleno: {fileID: 0}
+  spriteDial: {fileID: 0}
+  margen: 24
+  espacio: 12
+  altoBoton: 56
+  altoBarra: 18

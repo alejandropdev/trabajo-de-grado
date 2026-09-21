@@ -55,7 +55,8 @@ namespace Nexus.Core {
             return MigrarSiHaceFalta(perfil);
         }
 
-        private void Guardar(PlayerProfile perfil) {
+        /// <summary>Guarda un perfil modificado: el pre-test de la entrevista, los coleccionables globales…</summary>
+        public void Guardar(PlayerProfile perfil) {
             var json = JsonConvert.SerializeObject(perfil, Formatting.Indented);
             _almacen.Guardar(ClaveDe(perfil.idPerfil), json);
         }
