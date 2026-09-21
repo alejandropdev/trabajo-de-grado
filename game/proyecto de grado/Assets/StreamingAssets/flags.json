@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "flags": [
+
+    { "id": "FLG_DEUDA_TECNICA", "eje": "competencia", "inicial": 0, "min": 0, "max": 100,
+      "descripcion": "Snapshot al cerrar cada nivel de la deuda tecnica con la que termino. Sube con atajos y horas extra, baja refactorizando. F10 si >=90, F5 si >=85, rama F3+ si <=25." },
+
+    { "id": "FLG_CALIDAD_ACUM", "eje": "competencia", "inicial": 0, "min": 0, "max": 100,
+      "descripcion": "Snapshot al cerrar de la calidad entregada. Sube con pruebas y ADRs, baja con releases con defectos. Se lee en la Ronda 1 del juicio del N8." },
+
+    { "id": "FLG_INTEGRIDAD", "eje": "integridad", "inicial": 0, "min": -10, "max": 10,
+      "descripcion": "Sube al rechazar atajos eticos, baja al falsificar u ocultar. F10 si <=-3, F6e si <=-6, F3 si >=+4." },
+
+    { "id": "FLG_DEUDA_MORAL", "eje": "integridad", "inicial": 0, "min": 0, "max": 20, "noBaja": true,
+      "descripcion": "Decisiones con victimas. NO BAJA NUNCA: la deuda tecnica se paga refactorizando, la moral solo se declara o se oculta. F1 si >=12, F3 exige <=8." },
+
+    { "id": "FLG_JAVIER_CONFIANZA", "eje": "relaciones", "inicial": 0, "min": 0, "max": 10,
+      "descripcion": "Sube al buscarlo y aceptar su informacion, baja al ignorarlo. Empieza en 0 en N1. Prueba B del juicio si >=6, F4 si >=8, F8 si <=2." },
+
+    { "id": "FLG_SARAH_VINCULO", "eje": "relaciones", "inicial": 0, "min": 0, "max": 10,
+      "descripcion": "Sube al buscarla y escucharla, baja al ignorar sus mensajes. Con >=2 en N4 se obtiene FLG_SARAH_POLIZA." },
+
+    { "id": "FLG_SARAH_RIESGO", "eje": "relaciones", "inicial": 0, "min": 0, "max": 10,
+      "descripcion": "Sube con cada filtracion suya, baja al protegerla. Si llega a >=7 al cerrar el N7, Sarah muere." },
+
+    { "id": "FLG_ZERO_CONFIANZA", "eje": "relaciones", "inicial": 0, "min": -5, "max": 10,
+      "descripcion": "Sube al notar glitches y devolver el USB, baja al apagar el rack 7 o mentirle. Prueba I si >=4, F4 si >=8." },
+
+    { "id": "FLG_VOSS_AFINIDAD", "eje": "relaciones", "inicial": 0, "min": -5, "max": 10,
+      "descripcion": "Sube con coherencia respecto a su filosofia, baja al contradecirla. Voto decisivo del juicio: F3 si >=6, F3+ si >=8, F7 si >=9." },
+
+    { "id": "FLG_SATO_AFINIDAD", "eje": "relaciones", "inicial": 0, "min": -5, "max": 10,
+      "descripcion": "Afinidad del juez Sato. No se gana con relacion: se compra con la prueba de seguridad." },
+
+    { "id": "FLG_OKAFOR_AFINIDAD", "eje": "relaciones", "inicial": 0, "min": -5, "max": 10,
+      "descripcion": "Afinidad de Okafor, que vota por principio. Prueba F si >=6, F3+ si >=8." },
+
+    { "id": "FLG_MORAL_EQUIPO", "eje": "relaciones", "inicial": 60, "min": 0, "max": 100,
+      "descripcion": "Snapshot al cerrar. Sube al irse a casa y defender al equipo, baja con horas extra y cambios de alcance. F10 si <=15, bus factor del N2 si <40." },
+
+    { "id": "FLG_EVIDENCIA", "eje": "poder", "inicial": 0, "min": 0, "max": 15,
+      "descripcion": "Artefactos y logs guardados. Baja si Sarah muere o Javier se aleja. F8 si <=2, F5 si <=3, F6 entre 4 y 7, F2 si >=8." },
+
+    { "id": "FLG_SOSPECHA_HH", "eje": "poder", "inicial": 0, "min": 0, "max": 10,
+      "descripcion": "Cuanto sospecha HH del jugador. Sube con cada accion visible contra el, baja fingiendo lealtad. Se consulta en los chequeos de fachada de N6 y N7." },
+
+    { "id": "FLG_PACTO", "eje": "poder", "inicial": 0, "min": -1, "max": 2,
+      "descripcion": "Resultado del pacto de CIN-5.3. -1 rechazo tardio, 0 sin pacto, 1 pacto aceptado, 2 pacto fingido. 1 abre F1/F6e, 2 abre F3, -1 abre F3 si FLG_EVIDENCIA>=10." },
+
+    { "id": "FLG_SALUD", "eje": "persona", "inicial": 80, "min": 0, "max": 100,
+      "descripcion": "Snapshot al cerrar. Sube al irse a casa y con los interludios, baja con horas extra y crisis. Umbral de F11 (burnout) pendiente de fijar: la documentacion tiene tres valores distintos." },
+
+    { "id": "FLG_VIDA_EXTERNA", "eje": "persona", "inicial": 0, "min": 0, "max": 10,
+      "descripcion": "Contador acumulado de interludios completados. Cada noche que el jugador se queda en la oficina es una que no suma. Decide el grafico de commits del epilogo." },
+
+    { "id": "FLG_BACKDOOR_DETECTADA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador detecto la puerta trasera del N5. Si sigue en 0, se cierran F2, F3, F4 y F7." },
+
+    { "id": "FLG_BACKDOOR_JUGADOR", "eje": "estado", "inicial": 0, "min": 0, "max": 3,
+      "descripcion": "Que hizo el jugador con la puerta trasera en el N7. 0 nada, 1 la audito (F3), 2 la dejo sin auditar (F1), 3 puso un kill-switch (F5)." },
+
+    { "id": "FLG_USB_COMPLETO", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 con los 8 fragmentos del USB de 256MB reunidos. Habilita la Prueba H del juicio, el final F4 y una rama especial de F3." },
+
+    { "id": "FLG_VOSS_LEGADO", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador recogio y entendio el legado de Voss. Requisito del final F7 junto con los cinco manuales." },
+
+    { "id": "FLG_DEREK_LEAL", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 cuando FLG_DEREK_INTERACCIONES llega a 6. Decide si Derek testifica a favor o en contra en el juicio." },
+
+    { "id": "FLG_SARAH_SALVADA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si Sarah sigue viva al cerrar el N7. Abre la Prueba C junto con FLG_SARAH_LLAVE_UBICACION." },
+
+    { "id": "FLG_SARAH_LLAVE_UBICACION", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 tras el interludio INT-5 (La Caja de Seguridad). Una de las tres piezas del final canonico; tambien abre la Prueba C aunque Sarah haya muerto." },
+
+    { "id": "FLG_SARAH_POLIZA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si Sarah conto lo de la caja de seguridad fuera del campus (requiere FLG_SARAH_VINCULO>=2 en N4). Precondicion de INT-5." },
+
+    { "id": "FLG_CATACUMBAS_CONOCIDAS", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador llego a las catacumbas del N6. Requisito duro del final F4." },
+
+    { "id": "FLG_ZERO_ESCONDITE", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador encontro el escondite de Zero en el N4. Da el fragmento COL-USB-04." },
+
+    { "id": "FLG_ZERO_NOTADO_N1", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador se fijo en el log raro de CIN-1.4 (El Primer Glitch) en el N1. Es la semilla de Zero: se lee mucho mas tarde." },
+
+    { "id": "FLG_OFERTA_EXTERNA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 cuando llega la oferta de fuera. Se otorga siempre al cerrar el N2 y habilita la opcion RENUNCIAR (final F9)." },
+
+    { "id": "FLG_ADR_COUNT", "eje": "estado", "inicial": 0, "sinTecho": true,
+      "descripcion": "Contador de ADRs escritos en toda la partida. Con >=8 se abre la Prueba G del juicio." },
+
+    { "id": "FLG_DEREK_INTERACCIONES", "eje": "estado", "inicial": 0, "min": 0, "max": 12,
+      "descripcion": "Veces que el jugador trato con Derek. Al llegar a 6 activa FLG_DEREK_LEAL." },
+
+    { "id": "FLG_OSCAR_VIVO", "eje": "estado", "inicial": 1, "min": 0, "max": 1,
+      "descripcion": "Empieza en 1. Pasa a 0 si Oscar muere. Es el ancla emocional del juego y se lee en varios finales." },
+
+    { "id": "FLG_OSCAR_PROTEGIDO", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador completo INT-3 (La Azotea), tiene FLG_JAVIER_CONFIANZA>=4 y nunca humillo a Oscar. Decide si el nombre de Oscar esta en la lista de 340 despidos del N6." },
+
+    { "id": "FLG_MARTA_ALIADA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador acepto la alianza de Marta Oyola en el prologo. En el N4 reaparece como QA de tu equipo; si es 0, reaparece como QA de Derek." },
+
+    { "id": "FLG_REPUTACION", "eje": "estado", "inicial": 50, "min": 0, "max": 100,
+      "descripcion": "Snapshot al cerrar de como te ve la empresa. Es uno de los cinco que vuelca el puente de flags en Cerrar()." },
+
+    { "id": "FLG_HORAS_EXTRA", "eje": "estado", "inicial": 0, "sinTecho": true,
+      "descripcion": "Contador acumulado de dias con horas extra en TODA la partida, no del ultimo nivel. El Dashboard lo muestra sumando los ocho niveles." },
+
+    { "id": "FLG_ORIGEN", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "De donde viene el jugador, elegido en el prologo. 0 Pueblo Deprimido, 1 Universitario. Colorea lineas de dialogo (por ejemplo, con quien habla en INT-1), nunca condiciones de final." },
+
+    { "id": "FLG_VIO_PANTALLA_DORADA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador se fijo en la pared de metricas doradas de CIN-1.0. Flag de color: activa variantes de dialogo, no finales." },
+
+    { "id": "FLG_VIO_COMMIT_SOSPECHOSO", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador noto el commit con dos autores durante una auditoria de grafo. Flag de color." },
+
+    { "id": "FLG_ZERO_INVESTIGA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador intento averiguar quien esta detras de los glitches. Flag de color." },
+
+    { "id": "FLG_INTENTO_OFICIAL", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador reporto por el canal oficial y el ticket se cerro como comportamiento esperado. Flag de color, y HH sabe que el jugador sabe." },
+
+    { "id": "FLG_LEYO_NDA", "eje": "estado", "inicial": 0, "min": 0, "max": 1,
+      "descripcion": "1 si el jugador leyo el NDA antes de firmarlo y entendio que firmaba no hablar con Elena. Otorga COL-DEV-16. Flag de color." },
+
+    { "id": "FLG_CARTAS", "eje": "estado", "inicial": 0, "sinTecho": true,
+      "descripcion": "Cartas de desarrollador recogidas. Umbrales: 8 modo Guia, 16 Diario de Campo, 24 Post-Mortem, 32 la Carta Maldita. Sin techo a proposito: la Carta Maldita es la 33." },
+
+    { "id": "FLG_CODIGOS", "eje": "estado", "inicial": 0, "sinTecho": true,
+      "descripcion": "Codigos secretos de terminal descubiertos, de los 10 de la serie." },
+
+    { "id": "FLG_DEUDA_TECNICA_N1", "eje": "estado", "inicial": 0, "min": 0, "max": 100,
+      "descripcion": "Snapshot de la deuda tecnica con la que se cerro el N1 en concreto, para poder compararla con niveles posteriores. Hoy ningun codigo lo escribe: ver la nota del minidoc B1.1." },
+
+    { "id": "FLG_HORAS_EXTRA_N1", "eje": "estado", "inicial": 0, "sinTecho": true,
+      "descripcion": "Dias con horas extra del N1 en concreto. Hoy ningun codigo lo escribe: ver la nota del minidoc B1.1." }
+  ]
+}
