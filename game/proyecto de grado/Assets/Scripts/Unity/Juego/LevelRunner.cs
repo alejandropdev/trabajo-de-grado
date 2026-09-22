@@ -128,6 +128,32 @@ namespace Nexus.Unity.Juego {
             return true;
         }
 
+        /// <summary>
+        /// Atiende una alerta. Atender tambien mueve el reloj (MinutosPorAtender), y en ese rato puede sonar o
+        /// caducar OTRA alerta: por eso pasa por aqui y no directo a la sesion, para que las pantallas se enteren.
+        /// Devuelve false si la alerta ya no estaba pendiente.
+        /// </summary>
+        public bool Atender(string alertaId) {
+            ExigirSesion();
+            if (Estado != EstadoDelDia.Corriendo) return false;
+            Alerta alerta = null;
+            foreach (var a in _sesion.AlertasDeHoy) if (a.Id == alertaId) alerta = a;
+            if (alerta == null || !alerta.EstaPendiente) return false;
+
+            Notificar(_sesion.AtenderAlerta(alertaId));
+            ComprobarCierre();
+            return true;
+        }
+
+        /// <summary>Ir a otra zona del mapa. El viaje cuesta minutos, y en ellos el dia sigue pasando.</summary>
+        public void IrAZona(string zonaId) {
+            ExigirSesion();
+            if (Estado != EstadoDelDia.Corriendo && Estado != EstadoDelDia.Prorroga) return;
+            if (string.Equals(_sesion.ZonaActual, zonaId, StringComparison.OrdinalIgnoreCase)) return;
+            Notificar(_sesion.IrAZona(zonaId));
+            ComprobarCierre();
+        }
+
         /// <summary>Durante las horas extra: dar la jornada por terminada ya, sin esperar a la hora limite.</summary>
         public void TerminarLaProrroga() {
             ExigirEstado(EstadoDelDia.Prorroga);

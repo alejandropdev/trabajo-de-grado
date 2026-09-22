@@ -17,6 +17,17 @@
     "lo_pidio_la_gerencia"
   ],
 
+  "textosDeRazones": {
+    "el_cliente_cambiara_de_opinion": "El cliente va a cambiar de opinión por el camino.",
+    "el_problema_no_esta_del_todo_definido": "El problema todavía no está del todo definido.",
+    "hace_falta_enseñar_avance_pronto": "Hace falta enseñar avance pronto y a menudo.",
+    "el_equipo_puede_entregar_algo_usable_cada_pocas_semanas": "El equipo puede entregar algo usable cada pocas semanas.",
+    "es_lo_que_usa_todo_el_mundo": "Es lo que usa todo el mundo.",
+    "asi_se_trabaja_mas_rapido": "Así se trabaja más rápido.",
+    "no_hay_que_documentar_nada": "Así no hay que documentar nada.",
+    "lo_pidio_la_gerencia": "Lo pidió la gerencia."
+  },
+
   "calendario": {
     "tipo": "iterativo",
     "etiquetaUnidad": "Sprint",

@@ -1,0 +1,56 @@
+{
+  "id": "MJ-F2-08",
+  "verbo": "V2_REPARTIR",
+  "lienzo": "depositos",
+  "temaPrincipal": "PTP",
+  "objetivoAprendizaje": "OA-TEST-01",
+  "presentacion": {
+    "titulo": "Las horas de pruebas",
+    "comoSeJuega": "Tienes 40 horas de pruebas para el release. Repártelas entre los cuatro tipos. Cada tipo solo encuentra los defectos de su clase; lo que no encuentres, lo encontrará el cliente.",
+    "quienEspera": "Óscar",
+    "textoPresion": "El release candidato sale el viernes",
+    "segundosReloj": 120
+  },
+  "repartir": {
+    "presupuesto": 40,
+    "unidad": "horas",
+    "toleranciaDeEscapes": 1,
+    "depositos": [
+      { "id": "unitarias", "nombre": "Unitarias", "costePorDefecto": 2, "defectosOcultos": 5,
+        "descripcion": "Cada función por separado. Baratas. El módulo de reservas tiene mucha lógica de fechas y turnos." },
+      { "id": "integracion", "nombre": "Integración", "costePorDefecto": 4, "defectosOcultos": 4,
+        "descripcion": "Que las piezas hablen entre sí: el lector con el módulo de acceso, el módulo con la barrera y con la base de datos." },
+      { "id": "e2e", "nombre": "De extremo a extremo", "costePorDefecto": 6, "defectosOcultos": 2,
+        "descripcion": "Un carro de verdad entrando y saliendo. Caras, pero son las únicas que ven el sistema como lo ve el guardia." },
+      { "id": "regresion", "nombre": "Regresión", "costePorDefecto": 3, "defectosOcultos": 3,
+        "descripcion": "Que lo que ya funcionaba siga funcionando. Este sprint se tocó el registro de accesos, que ya estaba en producción." }
+    ]
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": { "Cobertura": 10 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "correcta", "oa": "OA-TEST-01", "razon": "Repartiste las horas donde estaba el riesgo. No hay presupuesto para probarlo todo: planificar las pruebas es decidir qué no se prueba, y hacerlo a propósito." }
+    },
+    "parcial": {
+      "efectosInmediatos": { "Cobertura": 4 },
+      "efectosDiferidos": [ { "enDias": 5, "efectos": { "SatisfaccionCliente": -5, "DeudaTecnica": 4 } } ],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "aceptable", "oa": "OA-TEST-01", "razon": "Varios defectos escaparon, y escaparon justo del tipo en el que invertiste poco. Lo que no se prueba no desaparece: lo prueba el cliente." }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": { "Cobertura": 6 },
+      "efectosDiferidos": [ { "enDias": 5, "efectos": { "SatisfaccionCliente": -7, "DeudaTecnica": 5 } } ],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-TEST-01", "razon": "Pusiste horas de sobra en un tipo de prueba mientras otro, con defectos, se quedaba a cero. La cobertura del informe sube y el cliente encuentra el error igual." }
+    },
+    "omitido": {
+      "efectosInmediatos": { "DeudaTecnica": 6, "Cobertura": -4 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-TEST-01", "razon": "El release salió sin plan de pruebas. Todos los defectos que había los va a encontrar el cliente." }
+    }
+  },
+  "cierre": { "texto": "Semanas después, los defectos que escaparon son exactamente del tipo que no compraste." }
+}

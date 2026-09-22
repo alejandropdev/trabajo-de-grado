@@ -5,6 +5,9 @@ using System.Linq;
 using Nexus.Core.Datos;
 using Nexus.Core.Eventos;
 using Nexus.Core.Minijuegos;
+using Nexus.Core.Minijuegos.Detectar;
+using Nexus.Core.Minijuegos.Ordenar;
+using Nexus.Core.Minijuegos.Repartir;
 using Nexus.Core.Narrativa;
 using Nexus.Core.Sesion;
 using NUnit.Framework;
@@ -49,6 +52,7 @@ namespace Nexus.Tests {
             public readonly List<string> Variantes = new List<string>();    // "CIN-X:variante"
             public readonly List<string> Expiradas = new List<string>();
             public readonly List<int> DiasConPlanificacion = new List<int>();
+            public readonly List<string> Minijuegos = new List<string>();  // "MJ-X:resultado:respuesta@dia"
         }
 
         private static GameSession Empezar(string nivel, string metodologia, int semilla, FlagStore flags = null) {
@@ -66,7 +70,46 @@ namespace Nexus.Tests {
         }
 
         /// <summary>Juega un nivel entero eligiendo al azar (con su propio azar, no el del motor) y lo cierra.</summary>
-        private static Partida Jugar(string nivel, string metodologia, int semilla, FlagStore flags = null) {
+        /// <summary>
+        /// Juega un minijuego DE VERDAD, con su escena y su evaluador, eligiendo al azar: marcas en el V1, un orden
+        /// y una respuesta en el V3, un reparto en el V2. Asi las consecuencias (y las cadenas que agendan) son las
+        /// reales, no un resultado inventado.
+        /// </summary>
+        private static ResultadoMinijuego JugarMinijuego(PendingMinigame pendiente, Random azar) {
+            var def = CatalogoMinijuegos.Parsear(File.ReadAllText(Path.Combine(Raiz(), pendiente.Archivo)));
+            switch (Verbos.Normalizar(def.Verbo)) {
+                case Verbos.Ordenar: {
+                    var orden = def.Ordenar.Tarjetas.Select(t => t.Id).OrderBy(_ => azar.Next()).ToList();
+                    var respuestas = new[] { "obedecer", "rechazar", "negociar" };
+                    return OrdenarEvaluador.Evaluar(def, orden, respuestas[azar.Next(3)]);
+                }
+                case Verbos.Repartir: {
+                    var asignacion = new Dictionary<string, int>();
+                    var restante = def.Repartir.Presupuesto;
+                    foreach (var d in def.Repartir.Depositos.OrderBy(_ => azar.Next())) {
+                        var horas = azar.Next(0, restante + 1);
+                        asignacion[d.Id] = horas;
+                        restante -= horas;
+                    }
+                    return RepartirEvaluador.Evaluar(def, asignacion);
+                }
+                default: {
+                    var estado = new DetectarState(def.Presentacion.SegundosReloj);
+                    var piezas = def.Artefacto.Commits.Select(c => c.Id)
+                        .Concat(def.Artefacto.Elementos.Select(e => e.Id))
+                        .Concat(def.Artefacto.Conexiones.Select(c => c.Id)).ToList();
+                    var marcas = azar.Next(0, 4);
+                    for (var i = 0; i < marcas; i++) {
+                        estado.Alternar(piezas[azar.Next(piezas.Count)]);
+                        estado.Marcar(def.PaletaEtiquetas[azar.Next(def.PaletaEtiquetas.Count)], i);
+                    }
+                    return DetectarEvaluador.Evaluar(def, estado);
+                }
+            }
+        }
+
+        private static Partida Jugar(string nivel, string metodologia, int semilla, FlagStore flags = null,
+                                     bool dejarCaducarLosMinijuegos = false) {
             var p = new Partida { Sesion = Empezar(nivel, metodologia, semilla, flags) };
             var s = p.Sesion;
             var azar = new Random(semilla * 31 + metodologia.Length);
@@ -85,8 +128,20 @@ namespace Nexus.Tests {
                     s.ElegirAccionRetro(s.PendingRetro.Acciones[azar.Next(s.PendingRetro.Acciones.Count)].Id);
 
                 for (var v = 0; v < 60 && !s.SePuedeCerrarLaJornada; v++) {
-                    var avance = s.AvanzarReloj(30);
-                    foreach (var a in avance.AlertasQueSuenan) s.AtenderAlerta(a.Id);
+                    // Atender tambien mueve el reloj, y en ese rato puede sonar (o caducar) otra alerta:
+                    // se procesan todas, como haria la pantalla, hasta que no quede ninguna por atender.
+                    var tramos = new Queue<ResultadoDeAvance>();
+                    tramos.Enqueue(s.AvanzarReloj(30));
+                    var sonaron = new List<Nexus.Core.Jornada.Alerta>();
+                    var caducaron = new List<Nexus.Core.Jornada.Alerta>();
+                    while (tramos.Count > 0) {
+                        var tramo = tramos.Dequeue();
+                        caducaron.AddRange(tramo.AlertasQueExpiraron);
+                        foreach (var a in tramo.AlertasQueSuenan)
+                            if (!(dejarCaducarLosMinijuegos && a.Tipo == Nexus.Core.Jornada.TiposDeAlerta.Minijuego))
+                                tramos.Enqueue(s.AtenderAlerta(a.Id));
+                    }
+                    var avance = new { AlertasQueExpiraron = caducaron };
                     foreach (var a in avance.AlertasQueExpiraron) p.Expiradas.Add(a.Id + "@" + s.R.DiaActual);
 
                     if (s.Decision != null) {
@@ -96,11 +151,15 @@ namespace Nexus.Tests {
                         p.Decisiones.Add($"{s.Decision.EventoId}:{elegida.Id}@{s.R.DiaActual}");
                         s.ResolverDecision(elegida.Id);
                     }
-                    if (s.Minijuego != null)
-                        s.ResolverMinijuego(new ResultadoMinijuego {
-                            MinijuegoId = s.Minijuego.MinijuegoId, Resultado = ResultadosDeMinijuego.Parcial,
-                            Rubrica = new Rubrica { Veredicto = "aceptable", Oa = "OA-GIT-01", Razon = "robot" }
-                        });
+                    if (s.Minijuego != null) {
+                        var resultado = JugarMinijuego(s.Minijuego, azar);
+                        var respuesta = resultado.Hallazgos.FirstOrDefault(h => h.StartsWith("respuesta:"));
+                        p.Minijuegos.Add($"{resultado.MinijuegoId}:{resultado.Resultado}:{respuesta}@{s.R.DiaActual}");
+                        s.ResolverMinijuego(resultado);
+                    }
+                    foreach (var a in avance.AlertasQueExpiraron)
+                        if (a.Tipo == Nexus.Core.Jornada.TiposDeAlerta.Minijuego)
+                            p.Minijuegos.Add($"{a.Id}:caducado:@{s.R.DiaActual}");
                 }
                 s.CerrarJornada();
                 s.TerminarDia(false);
@@ -173,6 +232,8 @@ namespace Nexus.Tests {
                     CollectionAssert.AreEqual(new[] { "TUT-0.1@1", "TUT-0.2@2", "TUT-0.3@3", "TUT-0.4@4", "TUT-0.5@5" },
                                               p.Beats, $"{metodologia}/{semilla}: el tutorial tiene una guia por dia, en orden");
 
+                    Assert.IsTrue(p.Minijuegos.Any(m => m.StartsWith("MJ-F0-01")),
+                                  $"{metodologia}/{semilla}: el tutorial tiene que enseñar un minijuego");
                     Assert.IsTrue(Ids(p).All(id => id.StartsWith("EV-TUT")),
                                   $"{metodologia}/{semilla}: salio un evento que no es del concurso");
                     foreach (var id in Ids(p)) { int n; vistos.TryGetValue(id, out n); vistos[id] = n + 1; }
@@ -188,7 +249,7 @@ namespace Nexus.Tests {
 
         [Test]
         public void N1_se_juega_entero_y_las_cadenas_se_respetan_y_se_cierran() {
-            int parcheos = 0, volvio = 0, heroes = 0, seFue = 0;
+            int parcheos = 0, volvio = 0, heroes = 0, seFue = 0, alcances = 0, clientes = 0, minijuegos = 0;
             foreach (var metodologia in new[] { "scrum", "kanban", "cascada" })
                 for (var semilla = 1; semilla <= 60; semilla++) {
                     var p = Jugar("nivel-01", metodologia, semilla);
@@ -198,8 +259,15 @@ namespace Nexus.Tests {
                     Assert.IsTrue(p.Sesion.NivelTerminado, donde);
                     Assert.AreEqual(ids.Count, ids.Distinct().Count(), donde + ": ningun evento sale dos veces");
                     Assert.IsFalse(ids.Any(id => id.StartsWith("EV-TUT")), donde + ": un evento del concurso salio en N1");
-                    Assert.IsFalse(ids.Contains("EV-ALC-01") || ids.Contains("EV-BUE-02"),
-                                   donde + ": esos dos solo los disparan sus minijuegos");
+                    var fallaDiagrama = p.Minijuegos.Any(m => m.StartsWith("MJ-F1-07:parcial") || m.StartsWith("MJ-F1-07:omitido"));
+                    var negocio = p.Minijuegos.Any(m => m.StartsWith("MJ-F1-08:") && m.Contains("respuesta:negociar"));
+                    Assert.AreEqual(fallaDiagrama, ids.Contains("EV-ALC-01"),
+                                    donde + ": «Ah, y también…» sale si y solo si se falló la revisión del diagrama");
+                    Assert.AreEqual(negocio, ids.Contains("EV-BUE-02"),
+                                    donde + ": «El cliente que entiende» sale si y solo si se negoció el backlog " + string.Join(",", p.Minijuegos) + " / " + string.Join(",", p.Decisiones) + " / exp " + string.Join(",", p.Expiradas));
+                    if (fallaDiagrama) alcances++;
+                    if (negocio) clientes++;
+                    minijuegos += p.Minijuegos.Count;
 
                     var parcheo = p.Decisiones.FindIndex(d => d.StartsWith("EV-TEC-02:parchear"));
                     if (ids.Contains("EV-TEC-05")) Assert.GreaterOrEqual(parcheo, 0, donde + ": la deuda volvio sin causa");
@@ -213,9 +281,26 @@ namespace Nexus.Tests {
                 }
 
             TestContext.WriteLine($"parcheo {parcheos} veces y la deuda volvio {volvio}; dejaron solo a Oscar {heroes} y se fue {seFue}");
+            TestContext.WriteLine($"minijuegos jugados: {minijuegos} en 180 partidas; fallaron el diagrama {alcances}; negociaron {clientes}");
+            Assert.Greater(alcances, 0, "la cadena del requisito ambiguo tiene que haberse visto alguna vez");
+            Assert.Greater(clientes, 0, "y la del cliente que entiende, tambien");
             Assert.Greater(parcheos, 0);
             Assert.AreEqual(parcheos, volvio, "una cadena empezada tiene que terminar dentro del nivel");
             Assert.AreEqual(heroes, seFue, "la cadena del bus factor tambien");
+        }
+
+        [Test]
+        public void Dejar_caducar_la_revision_del_diagrama_tambien_trae_el_requisito_ambiguo() {
+            // Si la alerta caduca, se aplica el 'omitido' de la escena, que encadena EV-ALC-01. Con el omitido
+            // generico de antes, no mirar el diagrama salia gratis.
+            var vistas = 0;
+            for (var semilla = 1; semilla <= 40; semilla++) {
+                var p = Jugar("nivel-01", "scrum", semilla, dejarCaducarLosMinijuegos: true);
+                if (!p.Minijuegos.Any(m => m.StartsWith("MJ-F1-07:caducado"))) continue;
+                vistas++;
+                CollectionAssert.Contains(Ids(p).ToList(), "EV-ALC-01", $"semilla {semilla}");
+            }
+            Assert.Greater(vistas, 0);
         }
 
         [Test]

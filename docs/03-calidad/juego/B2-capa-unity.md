@@ -15,26 +15,27 @@
 
 ### 1 · La aplicación
 
-| Pieza | Qué hace |
-|---|---|
-| **`AppRoot`** | El único objeto de la escena. Al arrancar **carga y valida todo el catálogo**, crea el lienzo (1920×1080, escalado), el `EventSystem` y el router, y abre la primera pantalla. Después es el dueño de lo que dura más que una pantalla: perfil activo, partida, sesión del motor y autoguardado |
-| **`ScreenRouter`** | La navegación, como una pila: `IrA<T>()` (vacía y abre), `Apilar<T>()` (encima; modal o no), `Volver()`, `VolverA<T>()` y `Repintar()`. Sustituye al `MenuController` y sus `SetActive` |
-| **`Pantalla`** | La clase base. Una pantalla **no vive en ninguna escena ni prefab**: el router la crea en tiempo de ejecución, así que añadir una pantalla es añadir una clase |
-| **`RutasDeGuardado`** | `persistentDataPath/NexusProtocol/`, la raíz de la especificación §8.3.7. Las claves dentro las siguen decidiendo `ProfileStore` y `SaveStore` |
-| **`PantallaDeError`** | INV-5 hecho pantalla. Si el contenido no valida, el juego **no arranca a medias**: lista cada error del validador, que nombra archivo y campo, y ofrece **Recargar** tras corregir el JSON |
+| Pieza                 | Qué hace                                                                                                                                                                                                                                                                                        |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`AppRoot`**         | El único objeto de la escena. Al arrancar **carga y valida todo el catálogo**, crea el lienzo (1920×1080, escalado), el `EventSystem` y el router, y abre la primera pantalla. Después es el dueño de lo que dura más que una pantalla: perfil activo, partida, sesión del motor y autoguardado |
+| **`ScreenRouter`**    | La navegación, como una pila: `IrA<T>()` (vacía y abre), `Apilar<T>()` (encima; modal o no), `Volver()`, `VolverA<T>()` y `Repintar()`. Sustituye al `MenuController` y sus `SetActive`                                                                                                         |
+| **`Pantalla`**        | La clase base. Una pantalla **no vive en ninguna escena ni prefab**: el router la crea en tiempo de ejecución, así que añadir una pantalla es añadir una clase                                                                                                                                  |
+| **`RutasDeGuardado`** | `persistentDataPath/NexusProtocol/`, la raíz de la especificación §8.3.7. Las claves dentro las siguen decidiendo `ProfileStore` y `SaveStore`                                                                                                                                                  |
+| **`PantallaDeError`** | INV-5 hecho pantalla. Si el contenido no valida, el juego **no arranca a medias**: lista cada error del validador, que nombra archivo y campo, y ofrece **Recargar** tras corregir el JSON                                                                                                      |
 
 `AppRoot` ya sabe hacer el ciclo entero de una partida con las APIs del Core que existían:
+
 - Seleccionar perfil, crear partida en el primer nivel y abrirla (empieza o rehidrata).
 - Guardar con `AutoGuardado` en los cinco puntos del §5.7.
 - Pasar al siguiente nivel al cerrar uno, y guardar al salir de la aplicación a mitad de día. INV-7 garantiza que recargar da lo mismo.
 
 ### 2 · El aspecto
 
-| Pieza | Qué hace |
-|---|---|
+| Pieza                               | Qué hace                                                                                                                                                                                                                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`NexusTheme`** (ScriptableObject) | La paleta de la Biblia §11.4.1, «Búnker Corporativo v2», además de fuentes, tamaños de texto, **sprites** y medidas. Hoy los sprites están vacíos y se pintan rectángulos de color; **el día que arrastres un sprite a un campo, cambia en todas las pantallas a la vez** |
-| **`UiKit`** | La fábrica de piezas: paneles, columnas, filas, listas con scroll, textos (5 estilos), botones (Primario, Secundario, Peligro y Fantasma), **barras, diales y radar**. Ninguna pantalla crea un `Image` a mano |
-| **`GraficoRadar`** | El radar de competencias del Dashboard, dibujado con la malla de uGUI, sin texturas |
+| **`UiKit`**                         | La fábrica de piezas: paneles, columnas, filas, listas con scroll, textos (5 estilos), botones (Primario, Secundario, Peligro y Fantasma), **barras, diales y radar**. Ninguna pantalla crea un `Image` a mano                                                            |
+| **`GraficoRadar`**                  | El radar de competencias del Dashboard, dibujado con la malla de uGUI, sin texturas                                                                                                                                                                                       |
 
 La regla de color más fácil de romper sin querer está escrita en el propio tema: **el mostaza es el
 peligro y no pasa del 12 % del encuadre**. Solo lo usan el botón «Peligro», la hora en la última hora
@@ -42,17 +43,18 @@ antes del cierre y las alertas pendientes.
 
 ### 3 · El día continuo en tiempo real
 
-| Pieza | Qué hace |
-|---|---|
-| **`RelojEnTiempoReal`** (Core) | Convierte segundos de pantalla en minutos de juego y **acumula la fracción**: a 60 fotogramas por segundo, redondear cada fotograma dejaría el reloj parado. Velocidad de ×0,25 a ×4 para que el docente comprima una sesión, y pausa |
-| **`LevelRunner`** | Máquina de estados del día: `Corriendo → EnElCierre → (Irse · Quedarse → Prórroga) → DiaTerminado`, o bien `DesarrolloTerminado`. Avisa con eventos (alerta que suena o que expira, cierre, fin de día, fin del desarrollo) |
-| **`RelojView`** | El reloj en pantalla: día y unidad, la hora, la barra de la jornada, el estado y las alertas que esperan |
-| **`ProgresionDeNiveles`** (Core) | Qué nivel viene después de otro |
+| Pieza                            | Qué hace                                                                                                                                                                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`RelojEnTiempoReal`** (Core)   | Convierte segundos de pantalla en minutos de juego y **acumula la fracción**: a 60 fotogramas por segundo, redondear cada fotograma dejaría el reloj parado. Velocidad de ×0,25 a ×4 para que el docente comprima una sesión, y pausa |
+| **`LevelRunner`**                | Máquina de estados del día: `Corriendo → EnElCierre → (Irse · Quedarse → Prórroga) → DiaTerminado`, o bien `DesarrolloTerminado`. Avisa con eventos (alerta que suena o que expira, cierre, fin de día, fin del desarrollo)           |
+| **`RelojView`**                  | El reloj en pantalla: día y unidad, la hora, la barra de la jornada, el estado y las alertas que esperan                                                                                                                              |
+| **`ProgresionDeNiveles`** (Core) | Qué nivel viene después de otro                                                                                                                                                                                                       |
 
 Tres formas de detener el reloj, y **no son lo mismo**:
+
 - **`EnEscena`**: hay una decisión o un minijuego abiertos. La alerta ya se atendió, así que congelar el mundo aquí no regala nada.
 - **`Pausado`**: el menú de pausa.
-- **Nunca** mientras el jugador *decide si ir* a atender una alerta. Si el mundo se parara, esa decisión no costaría nada (§M8).
+- **Nunca** mientras el jugador _decide si ir_ a atender una alerta. Si el mundo se parara, esa decisión no costaría nada (§M8).
 
 ### 4 · La escena
 
@@ -100,7 +102,7 @@ guardado` te enseña dónde están los perfiles y las partidas.
 ### Para ver fallar la pantalla de error
 
 Cambia `"diasTotales": 5` por `"diasTotales": 1` en `niveles/nivel-00.json` y pulsa Play. Tiene que
-salir *«El contenido del juego tiene errores»* con el mensaje exacto del validador. Deshaz el cambio,
+salir _«El contenido del juego tiene errores»_ con el mensaje exacto del validador. Deshaz el cambio,
 pulsa **«Recargar el contenido»** y vuelve el diagnóstico, sin salir de Play.
 
 ### Test Runner
@@ -115,18 +117,20 @@ en tiempo real, la progresión de niveles y el guardado del perfil.
 **1 · No puedo ejecutar Unity, así que monté dos arneses que compilan contra tu instalación real.**
 Compilan el Core, la capa Unity y los scripts de editor contra las DLL de **Unity 6000.0.82f1** y las
 de uGUI, TextMeshPro e Input System del propio proyecto. Todo compila sin un solo aviso de API
-obsoleta. **Lo que un compilador no puede decirme es cómo se ve**: el *layout*, los colores y el ritmo
+obsoleta. **Lo que un compilador no puede decirme es cómo se ve**: el _layout_, los colores y el ritmo
 del reloj los tienes que mirar tú en Play, con la lista de arriba. La capa Unity no tiene tests
 automáticos porque el ensamblado de tests es `noEngineReferences`. Por eso toda la lógica que se podía
 separar (el reloj en tiempo real, la progresión) está en el Core, con sus pruebas.
 
 **2 · Añadí dos referencias al `Nexus.Unity.asmdef`: `UnityEngine.UI` y `Unity.InputSystem`.** Saqué
 los GUID de los `.meta` de los paquetes instalados, no de memoria:
+
 - `UnityEngine.UI` ya se usaba (`PantallaPerfiles` usa `Button`), pero llegaba de forma implícita a través de TextMeshPro. Ahora está declarada.
 - `Unity.InputSystem` hace falta porque el proyecto está en **modo «solo Input System nuevo»** (`activeInputHandler: 1`). Con ese modo, el `StandaloneInputModule` clásico lanza excepciones, y leer la tecla Escape exige su API. `AppRoot` crea el mismo `InputSystemUIInputModule` que ya usa tu escena `MenuInicial`.
 
 **3 · Tres bugs que encontré revisando y que ningún compilador ve:**
-- En uGUI, un panel con una columna *estirada* dentro mide **0 de alto** dentro de una fila: el reloj habría sido invisible. `UiKit.PanelColumna` lo resuelve.
+
+- En uGUI, un panel con una columna _estirada_ dentro mide **0 de alto** dentro de una fila: el reloj habría sido invisible. `UiKit.PanelColumna` lo resuelve.
 - En una columna sin ancho forzado, un texto mide lo que ocupa en **una sola línea**: los briefings y las rúbricas se habrían salido de la pantalla. Las columnas de `UiKit` fuerzan el ancho completo y las filas no.
 - Una `Image` sin sprite **ignora el modo rellenado**, así que un dial sin sprite no se dibujaría nunca. `UiKit` genera un círculo en memoria cuando el tema no trae sprite.
 
@@ -138,7 +142,7 @@ del reloj por «•», que seguro está en la fuente.
 pre-test de la entrevista ni los coleccionables en el perfil. Tiene su prueba de ida y vuelta.
 
 **6 · `MenuController` y `ProfileManager` siguen en el proyecto.** El plan decía retirarlos aquí,
-pero la escena `MenuInicial` los usa: si los borrara ahora, esa escena quedaría con *scripts* rotos.
+pero la escena `MenuInicial` los usa: si los borrara ahora, esa escena quedaría con _scripts_ rotos.
 Se retiran en C, cuando las pantallas nuevas de perfiles y menú la sustituyan.
 
 **7 · Los datos de prueba antiguos no se pierden, pero no se ven.** La raíz de guardado pasa a ser
@@ -163,9 +167,7 @@ git add "game/proyecto de grado/Assets/Scripts" \
         "game/proyecto de grado/ProjectSettings/EditorBuildSettings.asset" \
         docs/03-calidad/juego/B2-capa-unity.md
 
-git commit -m "feat(unity): la capa Unity — AppRoot, router de pantallas, tema, UiKit y el dia continuo en tiempo real
-
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+git commit -m "feat(unity): la capa Unity — AppRoot, router de pantallas, tema, UiKit y el dia continuo en tiempo real"
 ```
 
 Antes de commitear, un `git status` rápido. Si ves cambios en `ProjectSettings/` que no sean

@@ -5,6 +5,7 @@ using Nexus.Core.Datos;
 using Nexus.Core.Guardado;
 using Nexus.Core.Sesion;
 using Nexus.Unity.Juego;
+using Nexus.Unity.Pantallas;
 using Nexus.Unity.Tema;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,7 +24,7 @@ namespace Nexus.Unity.Aplicacion {
     /// motor y el autoguardado. Las pantallas se lo piden a el; nunca se lo pasan entre ellas.
     ///
     /// Sustituye al ProfileManager (y el ScreenRouter al MenuController). Los dos siguen en el proyecto
-    /// porque la escena MenuInicial los usa; se retiran cuando las pantallas nuevas de menu la reemplacen.
+    /// solo porque la escena antigua MenuInicial los referencia; la escena Nexus ya no los usa.
     /// </summary>
     [DefaultExecutionOrder(-100)]
     public sealed class AppRoot : MonoBehaviour {
@@ -79,9 +80,10 @@ namespace Nexus.Unity.Aplicacion {
             MostrarInicio();
         }
 
-        /// <summary>La primera pantalla. Hoy es el diagnostico de la capa Unity; las pantallas de menu la sustituyen.</summary>
+        /// <summary>La primera pantalla: elegir quien juega. Con un perfil ya elegido, su menu de partidas.</summary>
         public void MostrarInicio() {
-            Router.IrA<PantallaDeDiagnostico>();
+            if (PerfilActivo != null) Router.IrA<PantallaDePartidas>();
+            else Router.IrA<PantallaDePerfiles>();
         }
 
         /// <summary>Vuelve a leer el contenido del disco. Para la pantalla de error: corregir el JSON y reintentar.</summary>
@@ -167,9 +169,40 @@ namespace Nexus.Unity.Aplicacion {
         /// </summary>
         public GameSession AbrirPartida(SaveGame partida) {
             PartidaActiva = partida ?? throw new ArgumentNullException(nameof(partida));
-            Sesion = Partidas.AbrirSesion(partida, null, new FabricaDeSesion(Catalogo));
             _autoGuardado = new AutoGuardado(Partidas, partida, Debug.LogWarning);
+            UltimoCierre = null;
+
+            // ★ Una partida que se cerro justo despues de terminar un nivel (antes de pasar al siguiente) se
+            // guardo sin nivel en curso y con el nivel ya en NivelesCompletados: abrirla tal cual empezaria
+            // otra vez el nivel terminado. Se avanza al primero que falte.
+            if (partida.Nivel == null) {
+                var datos = partida.Partida;
+                while (datos.NivelActualId != null && datos.NivelesCompletados.Contains(datos.NivelActualId))
+                    datos.NivelActualId = ProgresionDeNiveles.Siguiente(Catalogo, datos.NivelActualId);
+                if (datos.NivelActualId == null) {
+                    Sesion = null;   // ya no quedan niveles: la partida esta terminada
+                    return null;
+                }
+                datos.NivelAndamiaje = Catalogo.Niveles[datos.NivelActualId].NivelAndamiaje;
+            }
+
+            Sesion = Partidas.AbrirSesion(partida, null, new FabricaDeSesion(Catalogo));
             return Sesion;
+        }
+
+        /// <summary>El informe del ultimo nivel cerrado, para el Dashboard de Lecciones. Solo vive en memoria.</summary>
+        public DebriefReport UltimoCierre { get; set; }
+
+        /// <summary>
+        /// Un coleccionable encontrado pasa a la coleccion del PERFIL en el momento, no al cerrar el nivel: la
+        /// coleccion es del estudiante y sobrevive a las partidas. Lo que se escribe en Cerrar() son los flags.
+        /// </summary>
+        public void AnotarColeccionable(string id) {
+            if (PerfilActivo == null || string.IsNullOrEmpty(id)) return;
+            if (PerfilActivo.coleccionablesGlobales == null) PerfilActivo.coleccionablesGlobales = new List<string>();
+            if (PerfilActivo.coleccionablesGlobales.Contains(id)) return;
+            PerfilActivo.coleccionablesGlobales.Add(id);
+            GuardarPerfil();
         }
 
         /// <summary>

@@ -30,6 +30,12 @@ namespace Nexus.Core.Minijuegos
         public Dictionary<string, Consecuencia> Consecuencias = new Dictionary<string, Consecuencia>();
 
         public Cierre Cierre = new Cierre();
+
+        /// <summary>Solo verbo V3 (ordenar con restricciones): el backlog.</summary>
+        public OrdenarCfg Ordenar;
+
+        /// <summary>Solo verbo V2 (repartir un presupuesto escaso): las horas de pruebas.</summary>
+        public RepartirCfg Repartir;
     }
 
     public sealed class Presentacion
@@ -46,6 +52,90 @@ namespace Nexus.Core.Minijuegos
         public List<Rama> Ramas = new List<Rama>();
         public List<Commit> Commits = new List<Commit>();
         public Dictionary<string, Diff> Diffs = new Dictionary<string, Diff>();
+
+        /// <summary>
+        /// Lienzos "diagrama" y "secuencia": piezas genericas que se pueden marcar (componentes, participantes,
+        /// lineas de una traza). Las zonas y los señuelos las nombran por id, igual que a los commits.
+        /// </summary>
+        public List<Elemento> Elementos = new List<Elemento>();
+
+        /// <summary>Flechas entre elementos (dependencias de un diagrama, mensajes de una secuencia). Tambien se marcan.</summary>
+        public List<Conexion> Conexiones = new List<Conexion>();
+    }
+
+    public sealed class Elemento
+    {
+        public string Id;
+        public string Texto;
+        /// <summary>"componente", "baseDeDatos", "externo", "participante", "linea"…: solo cambia como se dibuja.</summary>
+        public string Tipo;
+        /// <summary>Lienzo "secuencia": "diagrama" (lo que se diseño) o "traza" (lo que paso de verdad).</summary>
+        public string Grupo;
+        public int Fila;
+        public int Columna;
+        public string Detalle;
+    }
+
+    public sealed class Conexion
+    {
+        public string Id;
+        public string Desde;
+        public string Hasta;
+        public string Texto;
+        /// <summary>El orden en el tiempo, en un diagrama de secuencia.</summary>
+        public int Orden;
+        public string Grupo;
+    }
+
+    /// <summary>El backlog del verbo V3: tarjetas, capacidad y la peticion del cliente.</summary>
+    public sealed class OrdenarCfg
+    {
+        public List<Tarjeta> Tarjetas = new List<Tarjeta>();
+        /// <summary>Los puntos que caben. Lo que quede por debajo de la linea no entra.</summary>
+        public int Capacidad;
+        /// <summary>Que parte del valor total tiene que caber para considerarlo un buen orden (0-1).</summary>
+        public double UmbralDeValor = 0.7;
+        /// <summary>Lo que pide el cliente, con su nombre: "La Ministra quiere todo para el dia 10".</summary>
+        public string Peticion;
+        /// <summary>obedecer | rechazar | negociar -> lo que pasa con cada respuesta.</summary>
+        public Dictionary<string, Respuesta> Respuestas = new Dictionary<string, Respuesta>();
+    }
+
+    public sealed class Tarjeta
+    {
+        public string Id;
+        public string Titulo;
+        public int Valor;
+        public int Esfuerzo;
+        /// <summary>Tarjetas que tienen que ir ANTES. No se enseñan hasta que el jugador choca con ellas.</summary>
+        public List<string> DependeDe = new List<string>();
+    }
+
+    public sealed class Respuesta
+    {
+        public string Texto;
+        public Consecuencia Consecuencia = new Consecuencia();
+    }
+
+    /// <summary>Las horas del verbo V2: depositos con su coste y los defectos que hay escondidos.</summary>
+    public sealed class RepartirCfg
+    {
+        public int Presupuesto;
+        public string Unidad = "horas";
+        public List<Deposito> Depositos = new List<Deposito>();
+        /// <summary>Cuantos defectos escapan como maximo para considerar el reparto bueno.</summary>
+        public int ToleranciaDeEscapes = 1;
+    }
+
+    public sealed class Deposito
+    {
+        public string Id;
+        public string Nombre;
+        public string Descripcion;
+        /// <summary>Lo que cuesta encontrar UN defecto de este tipo.</summary>
+        public int CostePorDefecto;
+        /// <summary>Los defectos de este tipo que hay de verdad. El jugador no lo ve: lo descubre despues.</summary>
+        public int DefectosOcultos;
     }
 
     public sealed class Rama

@@ -169,7 +169,9 @@ namespace Nexus.Tests {
                 D("FLG_REPUTACION", EjesDeFlag.Estado, 50, 0, 100),
                 new DefinicionDeFlag { Id = "FLG_HORAS_EXTRA", Eje = EjesDeFlag.Estado, SinTecho = true,
                                        Descripcion = "Contador acumulado." },
-                D("FLG_MARTA_ALIADA", EjesDeFlag.Estado, 0, 0, 1)
+                D("FLG_MARTA_ALIADA", EjesDeFlag.Estado, 0, 0, 1),
+                D("FLG_VOSS_AFINIDAD", EjesDeFlag.Relaciones, 0, -5, 10),
+                new DefinicionDeFlag { Id = "FLG_CARTAS", Eje = EjesDeFlag.Estado, SinTecho = true, Descripcion = "Cartas." }
             };
         }
 
@@ -1097,6 +1099,72 @@ namespace Nexus.Tests {
                           "es lo que da lector a los flags de color de dialogo");
         }
 
+        // ================================================================ lo que piden las pantallas
+
+        [Test]
+        public void Un_coleccionable_solo_se_recoge_en_su_zona_y_cuenta_al_cerrar() {
+            var c = CatalogoConMapa();
+            c.Coleccionables.Add(new Nexus.Core.Coleccion.Coleccionable {
+                Id = "COL-DEV-02", Serie = Nexus.Core.Coleccion.SeriesDeColeccionables.Carta, Titulo = "Ley de Conway" });
+            c.Coleccionables.Add(new Nexus.Core.Coleccion.Coleccionable {
+                Id = "COL-DEV-03", Serie = Nexus.Core.Coleccion.SeriesDeColeccionables.Carta, Titulo = "Therac-25" });
+            c.Niveles["nivel-01"].Mapa.PorId("escritorio").Coleccionables.Add("COL-DEV-02");
+            c.Niveles["nivel-01"].Mapa.PorId("bullpen").Coleccionables.Add("COL-DEV-03");
+
+            var s = Empezada(catalogo: c);
+            s.ComenzarDia();
+            CollectionAssert.AreEqual(new[] { "COL-DEV-02" }, s.ColeccionablesAqui(), "en el escritorio solo esta la suya");
+            Assert.Throws<InvalidOperationException>(() => s.RecogerColeccionable("COL-DEV-03"), "la del bullpen no se coge desde aqui");
+
+            s.RecogerColeccionable("COL-DEV-02");
+            Assert.IsEmpty(s.ColeccionablesAqui());
+            Assert.Throws<InvalidOperationException>(() => s.RecogerColeccionable("COL-DEV-02"), "no se recoge dos veces");
+
+            RecorrerElDia(s);
+            s.CerrarJornada();
+            s.TerminarDia(false);
+            Jugar(s, 19);
+            Assert.AreEqual(0, s.Flags.Get("FLG_CARTAS"), "INV-6: nada se escribe antes de cerrar");
+            s.Cerrar();
+            Assert.AreEqual(1, s.Flags.Get("FLG_CARTAS"));
+        }
+
+        [Test]
+        public void La_arquitectura_elegida_deja_su_flag_al_cerrar() {
+            var c = Catalogo();
+            c.Niveles["nivel-01"].Fase1.Arquitecturas.First(a => a.Id == "monolito").FlagsAlCerrar["FLG_VOSS_AFINIDAD"] = 1;
+            var s = Empezada(catalogo: c);   // Empezada elige el monolito
+            Jugar(s, 20);
+            Assert.AreEqual(0, s.Flags.Get("FLG_VOSS_AFINIDAD"));
+            s.Cerrar();
+            Assert.AreEqual(1, s.Flags.Get("FLG_VOSS_AFINIDAD"), "Voss aprueba el monolito, y se sabe al cerrar");
+        }
+
+        [Test]
+        public void Un_minijuego_de_otro_nivel_no_sale_nunca() {
+            var c = Catalogo();
+            c.Minijuegos[0].SoloNiveles.Add("nivel-00");
+            c.Niveles["nivel-01"].Director.ProbabilidadDeDiaTranquiloMinijuegos = 0;
+            var s = Empezada(catalogo: c);
+            Jugar(s, 20);
+            Assert.AreEqual(0, s.R.MinijuegosJugados);
+        }
+
+        [Test]
+        public void La_probabilidad_de_dia_tranquilo_decide_si_sale_el_minijuego() {
+            var seguro = Catalogo();
+            seguro.Niveles["nivel-01"].Director.ProbabilidadDeDiaTranquiloMinijuegos = 0;
+            var s = Empezada(catalogo: seguro);
+            Jugar(s, 20);
+            Assert.AreEqual(1, s.R.MinijuegosJugados, "con 0, el primer dia elegible sale seguro (y solo una vez: maxOcurrencias)");
+
+            var nunca = Catalogo();
+            nunca.Niveles["nivel-01"].Director.ProbabilidadDeDiaTranquiloMinijuegos = 1;
+            var t = Empezada(catalogo: nunca);
+            Jugar(t, 20);
+            Assert.AreEqual(0, t.R.MinijuegosJugados, "con 1, no sale nunca");
+        }
+
         /// <summary>Un mapa de dos zonas, con una puerta que solo se abre desde el dia 3.</summary>
         private static Catalogo CatalogoConMapa() {
             var c = Catalogo();
@@ -1164,6 +1232,9 @@ namespace Nexus.Tests {
 
             var ex = Assert.Throws<InvalidOperationException>(() => s.IrAZona("sala-comite"));
             StringAssert.Contains("sala-comite", ex.Message);
+            Assert.IsFalse(s.ZonaAbierta("sala-comite"), "el mapa tiene que poder enseñarla cerrada sin probar a entrar");
+            Assert.IsTrue(s.ZonaAbierta("escritorio"));
+            Assert.IsFalse(s.ZonaAbierta("no-existe"));
         }
 
         [Test]
@@ -1179,6 +1250,7 @@ namespace Nexus.Tests {
             }
             s.ComenzarDia();   // dia 3: ahora "diaActual >= 3" se cumple
 
+            Assert.IsTrue(s.ZonaAbierta("sala-comite"));
             Assert.DoesNotThrow(() => s.IrAZona("sala-comite"), "desde el dia 3 la puerta esta abierta");
         }
 

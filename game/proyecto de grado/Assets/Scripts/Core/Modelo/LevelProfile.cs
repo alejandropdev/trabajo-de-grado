@@ -122,6 +122,12 @@ namespace Nexus.Core.Modelo {
         /// <summary>Semilla propia del nivel. 0 = la usa la de la partida.</summary>
         public int Semilla;
 
+        /// <summary>
+        /// Que parte de los dias elegibles NO trae minijuego. 0,45 por defecto (§6.2); el tutorial la pone a 0
+        /// para enseñar uno seguro en cinco dias.
+        /// </summary>
+        public double ProbabilidadDeDiaTranquiloMinijuegos = 0.45;
+
         public DirectorConfig Clone() {
             var c = (DirectorConfig)MemberwiseClone();
             c.PresupuestoDrama = PresupuestoDrama == null ? null : (int[])PresupuestoDrama.Clone();

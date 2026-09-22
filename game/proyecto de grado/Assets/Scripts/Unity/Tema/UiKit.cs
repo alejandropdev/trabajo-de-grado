@@ -254,11 +254,65 @@ namespace Nexus.Unity.Tema {
             return boton;
         }
 
+        /// <summary>Un campo de texto de una linea (el nombre de un perfil, de una partida, una semilla).</summary>
+        public TMP_InputField CampoDeTexto(Transform padre, string indicacion, string valor = "", float ancho = 420) {
+            var rt = Nodo(padre, "Campo");
+            var fondo = rt.gameObject.AddComponent<Image>();
+            Vestir(fondo, Tema.spriteBoton, Tema.fondo);
+            var campo = rt.gameObject.AddComponent<TMP_InputField>();
+            campo.targetGraphic = fondo;
+            campo.colors = Colores(Tema.fondo);
+            Tamano(rt, ancho, Tema.altoBoton);
+
+            var area = Rellenar(Nodo(rt, "Area"));
+            area.offsetMin = new Vector2(Tema.espacio, 6);
+            area.offsetMax = new Vector2(-Tema.espacio, -6);
+            area.gameObject.AddComponent<RectMask2D>();
+
+            var marcador = Texto(area, indicacion, EstiloTexto.Cuerpo, Tema.textoTenue, TextAlignmentOptions.MidlineLeft);
+            marcador.fontStyle = FontStyles.Italic;
+            marcador.textWrappingMode = TextWrappingModes.NoWrap;
+            Rellenar((RectTransform)marcador.transform);
+
+            var texto = Texto(area, "", EstiloTexto.Cuerpo, null, TextAlignmentOptions.MidlineLeft);
+            texto.textWrappingMode = TextWrappingModes.NoWrap;
+            Rellenar((RectTransform)texto.transform);
+
+            campo.textViewport = area;
+            campo.textComponent = texto;
+            campo.placeholder = marcador;
+            campo.fontAsset = texto.font;
+            campo.pointSize = texto.fontSize;
+            campo.caretColor = Tema.cian;
+            campo.selectionColor = new Color(Tema.cian.r, Tema.cian.g, Tema.cian.b, 0.35f);
+            campo.text = valor ?? "";
+            return campo;
+        }
+
+        /// <summary>Una etiqueta pequeña con fondo de color: el estado de algo (aquí estás, cerrada, 3 h).</summary>
+        public RectTransform Chip(Transform padre, string texto, Color fondo, Color? colorTexto = null) {
+            var chip = PanelColumna(padre, "Chip " + texto, 6, 0, fondo);
+            var t = Texto(chip, texto, EstiloTexto.Pequeno, colorTexto ?? Tema.textoSobreCian, TextAlignmentOptions.Center);
+            t.textWrappingMode = TextWrappingModes.NoWrap;
+            return chip;
+        }
+
         /// <summary>Una tarjeta: un panel con titulo cuyo alto sale de su contenido. Devuelve donde meter las cosas.</summary>
         public RectTransform Tarjeta(Transform padre, string titulo, Color? colorTitulo = null) {
             var panel = PanelColumna(padre, "Tarjeta " + titulo, Tema.margen * 0.75f, Tema.espacio);
             if (!string.IsNullOrEmpty(titulo)) Texto(panel, titulo.ToUpperInvariant(), EstiloTexto.Pequeno, colorTitulo ?? Tema.cian);
             return panel;
+        }
+
+        /// <summary>
+        /// Pinta un boton ya creado como elegido (cian) o normal. Para las piezas que se seleccionan y deseleccionan:
+        /// las piezas de un diagrama, la respuesta al cliente, el atributo de calidad.
+        /// </summary>
+        public void Resaltar(Button boton, bool elegido, Color? normal = null) {
+            var fondo = elegido ? Tema.cian : normal ?? Tema.pared;
+            boton.colors = Colores(fondo);
+            foreach (var t in boton.GetComponentsInChildren<TMP_Text>())
+                t.color = elegido ? Tema.textoSobreCian : (t.fontStyle & FontStyles.Bold) != 0 ? Tema.texto : Tema.textoTenue;
         }
 
         private static ColorBlock Colores(Color baseColor) {

@@ -70,6 +70,9 @@ namespace Nexus.Core.Modelo {
         /// </summary>
         public Dictionary<string, string> EleccionesNarrativas = new Dictionary<string, string>(StringComparer.Ordinal);
 
+        /// <summary>Los coleccionables recogidos en este nivel. Al cerrar se cuentan en FLG_CARTAS y FLG_CODIGOS.</summary>
+        public List<string> ColeccionablesRecogidos = new List<string>();
+
         // --- Registro pedagogico ---
         /// <summary>Estimado vs real: alimenta el cono de incertidumbre y el sesgo de optimismo del verbo V5.</summary>
         public List<Estimacion> HistorialEstimaciones = new List<Estimacion>();
@@ -177,6 +180,7 @@ namespace Nexus.Core.Modelo {
             // Un guardado anterior a las elecciones narrativas no trae el campo.
             if (EleccionesNarrativas == null)
                 EleccionesNarrativas = new Dictionary<string, string>(StringComparer.Ordinal);
+            if (ColeccionablesRecogidos == null) ColeccionablesRecogidos = new List<string>();
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,

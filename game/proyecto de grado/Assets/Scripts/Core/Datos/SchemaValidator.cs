@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Nexus.Core.Coleccion;
 using Nexus.Core.Evaluacion;
@@ -314,6 +315,8 @@ namespace Nexus.Core.Datos {
                     if (drama < 0) e.Add($"{id}: el presupuesto de drama no puede ser negativo.");
 
             if (d.MaxEventosPorDia < 1) e.Add($"{id}: 'maxEventosPorDia' vale {d.MaxEventosPorDia}; minimo 1.");
+            if (d.ProbabilidadDeDiaTranquiloMinijuegos < 0 || d.ProbabilidadDeDiaTranquiloMinijuegos > 1)
+                e.Add($"{id}: 'probabilidadDeDiaTranquiloMinijuegos' vale {d.ProbabilidadDeDiaTranquiloMinijuegos}; va de 0 a 1.");
             if (d.EnfriamientoGlobal < 0) e.Add($"{id}: 'enfriamientoGlobal' no puede ser negativo.");
             if (d.VentanaTelegrafiado < 1)
                 e.Add($"{id}: 'ventanaTelegrafiado' vale {d.VentanaTelegrafiado}; avisar el mismo dia no es avisar.");
@@ -371,6 +374,10 @@ namespace Nexus.Core.Datos {
                     e.Add($"{id}: la arquitectura '{a.Id}' no explica su veredicto.");
 
                 ValidarEfectos(a.Efectos, $"{id}: arquitectura '{a.Id}'", e);
+                if (a.FlagsAlCerrar != null)
+                    foreach (var kv in a.FlagsAlCerrar)
+                        if (!kv.Key.StartsWith(FlagStore.Prefijo, StringComparison.Ordinal))
+                            e.Add($"{id}: la arquitectura '{a.Id}' escribe '{kv.Key}', que no empieza por {FlagStore.Prefijo}.");
 
                 if (a.ModificadoresModelo != null)
                     foreach (var kv in a.ModificadoresModelo) ValidarCoeficiente($"{id}: arquitectura '{a.Id}'", kv.Key, e);
@@ -437,6 +444,12 @@ namespace Nexus.Core.Datos {
 
             if (p.Lanzamiento != null && p.Lanzamiento.FactorRiesgo <= 0)
                 e.Add($"{id}: 'lanzamiento.factorRiesgo' vale {p.Lanzamiento.FactorRiesgo}; tiene que ser positivo.");
+
+            // Si la metodologia trae textos, tienen que estar todos: una razon sin texto sale en pantalla como un id.
+            if (p.TextosDeRazones != null && p.TextosDeRazones.Count > 0)
+                foreach (var razon in (p.RazonesValidas ?? new List<string>()).Concat(p.RazonesTrampa ?? new List<string>()))
+                    if (!p.TextosDeRazones.ContainsKey(razon))
+                        e.Add($"{id}: la razon '{razon}' no tiene texto en 'textosDeRazones'.");
 
             // Una razon no puede ser valida y trampa a la vez: el jugador no podria acertar nunca.
             if (p.RazonesValidas != null && p.RazonesTrampa != null)
@@ -637,6 +650,40 @@ namespace Nexus.Core.Datos {
             return e;
         }
 
+        /// <summary>
+        /// Una escena de minijuego puede encadenar un evento (fallar el diagrama trae EV-ALC-01). Ese id solo
+        /// se puede comprobar con los eventos ya cargados; sin esta comprobacion, la cadena rota no estalla
+        /// hasta el dia en que un jugador falla ese minijuego concreto.
+        /// </summary>
+        private static List<string> ValidarCadenasDeEscenas(Catalogo catalogo, ICatalogSource fuente) {
+            var e = new List<string>();
+            if (catalogo.Minijuegos == null) return e;
+            var eventos = new HashSet<string>(StringComparer.Ordinal);
+            if (catalogo.Eventos != null) foreach (var ev in catalogo.Eventos) if (ev != null && ev.Id != null) eventos.Add(ev.Id);
+
+            foreach (var def in catalogo.Minijuegos) {
+                if (def == null || string.IsNullOrEmpty(def.Archivo) || !fuente.Existe(def.Archivo)) continue;
+                MinijuegoDef escena;
+                try { escena = CatalogoMinijuegos.Parsear(fuente.LeerCatalogo(def.Archivo)); }
+                catch (Exception) { continue; }   // ValidarEscena ya lo dijo
+
+                var consecuencias = new List<KeyValuePair<string, Consecuencia>>();
+                if (escena.Consecuencias != null) consecuencias.AddRange(escena.Consecuencias);
+                if (escena.Ordenar != null && escena.Ordenar.Respuestas != null)
+                    foreach (var kv in escena.Ordenar.Respuestas)
+                        if (kv.Value != null && kv.Value.Consecuencia != null)
+                            consecuencias.Add(new KeyValuePair<string, Consecuencia>("respuesta " + kv.Key, kv.Value.Consecuencia));
+
+                foreach (var kv in consecuencias) {
+                    if (kv.Value == null || kv.Value.EfectosDiferidos == null) continue;
+                    foreach (var diferido in kv.Value.EfectosDiferidos)
+                        if (diferido != null && !string.IsNullOrEmpty(diferido.EventoForzado) && !eventos.Contains(diferido.EventoForzado))
+                            e.Add($"{def.Id} ({kv.Key}): encadena '{diferido.EventoForzado}', que no esta en el catalogo de eventos.");
+                }
+            }
+            return e;
+        }
+
         // ============================================================ el catalogo entero
 
         /// <summary>Las comprobaciones que solo se pueden hacer con todo cargado a la vez.</summary>
@@ -646,6 +693,7 @@ namespace Nexus.Core.Datos {
 
             e.AddRange(ValidarEventos(catalogo.Eventos));
             e.AddRange(ValidarMinijuegos(catalogo.Minijuegos, fuente));
+            if (fuente != null) e.AddRange(ValidarCadenasDeEscenas(catalogo, fuente));
             e.AddRange(ValidarNarrativa(catalogo.Beats));
             e.AddRange(ValidarFlags(catalogo.Flags));
 
@@ -740,6 +788,26 @@ namespace Nexus.Core.Datos {
                     foreach (var nivel in ev.SoloNiveles)
                         if (!c.Niveles.ContainsKey(nivel ?? ""))
                             e.Add($"{ev.Id}: 'soloNiveles' menciona '{nivel}', que no es un nivel del catalogo.");
+                }
+
+            if (c.Minijuegos != null)
+                foreach (var mj in c.Minijuegos) {
+                    if (mj == null || mj.SoloNiveles == null) continue;
+                    foreach (var nivel in mj.SoloNiveles)
+                        if (!c.Niveles.ContainsKey(nivel ?? ""))
+                            e.Add($"{mj.Id}: 'soloNiveles' menciona '{nivel}', que no es un nivel del catalogo.");
+                }
+
+            if (c.Flags != null && c.Flags.Count > 0)
+                foreach (var kv in c.Niveles) {
+                    var arquitecturas = kv.Value == null || kv.Value.Fase1 == null ? null : kv.Value.Fase1.Arquitecturas;
+                    if (arquitecturas == null) continue;
+                    foreach (var a in arquitecturas) {
+                        if (a == null || a.FlagsAlCerrar == null) continue;
+                        foreach (var flag in a.FlagsAlCerrar.Keys)
+                            if (!c.Flags.Exists(f => f != null && f.Id == flag))
+                                e.Add($"{kv.Key}: la arquitectura '{a.Id}' escribe '{flag}', que no esta en el censo de flags.");
+                    }
                 }
 
             if (c.Beats != null)

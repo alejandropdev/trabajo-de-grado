@@ -460,7 +460,9 @@
       "efectosDiferidos": [
         {
           "enDias": 3,
-          "eventoForzado": "EV-EQ-07"
+          "efectos": {
+            "MoralEquipo": -3
+          }
         }
       ],
       "hallazgos": [],

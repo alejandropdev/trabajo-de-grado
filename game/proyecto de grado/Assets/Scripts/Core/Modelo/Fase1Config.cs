@@ -104,6 +104,12 @@ namespace Nexus.Core.Modelo {
         public string Veredicto;   // correcta | aceptable | incorrecta
         public string Razon;
 
+        /// <summary>
+        /// Flags que la eleccion suma AL CERRAR el nivel (INV-6): el canon dice que Voss aprueba el monolito
+        /// y desprecia los microservicios en N1 ({"FLG_VOSS_AFINIDAD": 1}).
+        /// </summary>
+        public Dictionary<string, double> FlagsAlCerrar = new Dictionary<string, double>(StringComparer.Ordinal);
+
         public ArquitecturaOpcion Clone() {
             var c = (ArquitecturaOpcion)MemberwiseClone();
             c.Efectos = Efectos == null ? null : new Dictionary<string, object>(Efectos, StringComparer.Ordinal);
@@ -112,6 +118,7 @@ namespace Nexus.Core.Modelo {
                 : new Dictionary<string, double>(ModificadoresModelo, StringComparer.OrdinalIgnoreCase);
             c.RazonesValidas = RazonesValidas == null ? null : new List<string>(RazonesValidas);
             c.RazonesTrampa = RazonesTrampa == null ? null : new List<string>(RazonesTrampa);
+            c.FlagsAlCerrar = FlagsAlCerrar == null ? null : new Dictionary<string, double>(FlagsAlCerrar, StringComparer.Ordinal);
             return c;
         }
 
