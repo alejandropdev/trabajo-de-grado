@@ -74,8 +74,14 @@ namespace Nexus.Unity.Aplicacion {
         private T Crear<T>(Action<T> configurar, bool notificar = true) where T : Pantalla {
             var rt = UiKit.Rellenar(_app.Ui.Nodo(_capa, typeof(T).Name));
             var pantalla = rt.gameObject.AddComponent<T>();
-            configurar?.Invoke(pantalla);
-            pantalla.Inicializar(_app);
+            try {
+                configurar?.Invoke(pantalla);
+                pantalla.Inicializar(_app);
+            } catch {
+                // Una pantalla que no se pudo construir no se queda a medias en la pila: se quita y se avisa arriba.
+                UnityEngine.Object.Destroy(rt.gameObject);
+                throw;
+            }
             _pila.Add(pantalla);
             pantalla.AlMostrar();
             if (notificar) AlCambiar?.Invoke(pantalla);

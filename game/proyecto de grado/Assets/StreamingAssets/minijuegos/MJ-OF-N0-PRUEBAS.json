@@ -1,0 +1,87 @@
+{
+  "id": "MJ-OF-N0-PRUEBAS",
+  "verbo": "V2_REPARTIR",
+  "lienzo": "depositos",
+  "temaPrincipal": "PTP",
+  "objetivoAprendizaje": "OA-TEST-01",
+  "presentacion": {
+    "titulo": "Práctica: las horas de pruebas",
+    "comoSeJuega": "Tienes 12 horas para buscar errores. Cada tipo de prueba solo encuentra sus propios errores: repártelas donde creas que hay más.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 90
+  },
+  "repartir": {
+    "presupuesto": 12,
+    "unidad": "horas",
+    "toleranciaDeEscapes": 1,
+    "depositos": [
+      {
+        "id": "unitarias",
+        "nombre": "Unitarias",
+        "costePorDefecto": 2,
+        "defectosOcultos": 3,
+        "descripcion": "Prueban cada pieza sola, como revisar cada ladrillo."
+      },
+      {
+        "id": "integracion",
+        "nombre": "Integración",
+        "costePorDefecto": 3,
+        "defectosOcultos": 2,
+        "descripcion": "Prueban que las piezas funcionen juntas, como revisar que la pared no se caiga."
+      },
+      {
+        "id": "e2e",
+        "nombre": "De extremo a extremo",
+        "costePorDefecto": 4,
+        "defectosOcultos": 1,
+        "descripcion": "Prueban todo como lo usaría la recepcionista, de principio a fin."
+      }
+    ]
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-TEST-01",
+        "razon": "Pusiste las horas donde estaban los errores."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-TEST-01",
+        "razon": "Se escaparon errores de los tipos en los que invertiste poco."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "Gastaste de más en un tipo y dejaste otro a cero."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "No se probó nada."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Práctica terminada."
+  }
+}

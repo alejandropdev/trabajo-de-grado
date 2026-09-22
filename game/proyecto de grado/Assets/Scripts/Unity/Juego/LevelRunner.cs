@@ -45,6 +45,18 @@ namespace Nexus.Unity.Juego {
         /// <summary>Lo activa quien abre una decision, un minijuego o una cinematica; lo desactiva al cerrarla.</summary>
         public bool EnEscena { get; set; }
 
+        /// <summary>
+        /// Si el jugador puede ir a otra zona ahora. ★ Con el reloj parado NO: si estas dentro de una escena
+        /// (una decision, un minijuego, una carta) o en pausa, estas ocupado en un sitio. Poder viajar con el
+        /// tiempo congelado seria moverse gratis.
+        /// </summary>
+        public bool PuedeMoverse {
+            get {
+                return _sesion != null && !EnEscena && !Pausado &&
+                       (Estado == EstadoDelDia.Corriendo || Estado == EstadoDelDia.Prorroga);
+            }
+        }
+
         /// <summary>El multiplicador de la simulacion, de 0,25 a 4. El docente puede comprimir una sesion.</summary>
         public double Velocidad {
             get { return _reloj == null ? 1.0 : _reloj.Velocidad; }
@@ -135,7 +147,7 @@ namespace Nexus.Unity.Juego {
         /// </summary>
         public bool Atender(string alertaId) {
             ExigirSesion();
-            if (Estado != EstadoDelDia.Corriendo) return false;
+            if (Estado != EstadoDelDia.Corriendo || EnEscena || Pausado) return false;
             Alerta alerta = null;
             foreach (var a in _sesion.AlertasDeHoy) if (a.Id == alertaId) alerta = a;
             if (alerta == null || !alerta.EstaPendiente) return false;
@@ -145,10 +157,22 @@ namespace Nexus.Unity.Juego {
             return true;
         }
 
+        /// <summary>
+        /// Empieza una tarea de oficina: su tiempo se cobra del reloj ya, y en ese rato pueden sonar o caducar
+        /// avisos (por eso pasa por aqui). Devuelve false si ahora no se puede.
+        /// </summary>
+        public bool EmpezarTarea(string tareaId) {
+            ExigirSesion();
+            if (!PuedeMoverse || _sesion.PorQueNoSePuedeHacer(tareaId) != null) return false;
+            Notificar(_sesion.EmpezarTarea(tareaId));
+            ComprobarCierre();
+            return true;
+        }
+
         /// <summary>Ir a otra zona del mapa. El viaje cuesta minutos, y en ellos el dia sigue pasando.</summary>
         public void IrAZona(string zonaId) {
             ExigirSesion();
-            if (Estado != EstadoDelDia.Corriendo && Estado != EstadoDelDia.Prorroga) return;
+            if (!PuedeMoverse) return;
             if (string.Equals(_sesion.ZonaActual, zonaId, StringComparison.OrdinalIgnoreCase)) return;
             Notificar(_sesion.IrAZona(zonaId));
             ComprobarCierre();

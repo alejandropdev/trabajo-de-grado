@@ -248,6 +248,184 @@ namespace Nexus.Core.Sesion {
             }
         }
 
+        // ==================================================================== recoleccion 3D (Fase 1)
+
+        public Nexus.Core.Fase1.RecoleccionConfig Recoleccion {
+            get { return Perfil.Fase1 == null ? null : Perfil.Fase1.Recoleccion; }
+        }
+
+        public bool RecoleccionHecha { get { return R.RecoleccionHecha; } }
+
+        /// <summary>
+        /// La ENTRADA del modulo 3D: un documento autocontenido (zonas, hallazgos, tiempo, semilla) que se puede
+        /// pasar tal cual al subequipo. El 3D devuelve un ResultadoDeRecoleccion y el motor lo aplica.
+        /// </summary>
+        public Nexus.Core.Fase1.EntradaDeRecoleccion EntradaDeRecoleccion(IEnumerable<string> coleccionablesDelPerfil = null) {
+            var cfg = Recoleccion;
+            if (cfg == null) return null;
+            var e = new Nexus.Core.Fase1.EntradaDeRecoleccion {
+                NivelId = Perfil.Id, Semilla = Semilla, NivelAndamiaje = Perfil.NivelAndamiaje,
+                MinutosDisponibles = cfg.MinutosDisponibles, Texto = cfg.Texto
+            };
+            foreach (var z in cfg.Zonas) if (z != null) e.Zonas.Add(z.Clone());
+            foreach (var h in cfg.Hallazgos) if (h != null) e.Hallazgos.Add(h.Clone());
+            if (coleccionablesDelPerfil != null) e.ColeccionablesYaEnElPerfil.AddRange(coleccionablesDelPerfil);
+            foreach (var nombre in WorldState.Nombres) {
+                double v;
+                if (W.TryGet(nombre, out v)) e.EstadoInicial[nombre] = v;
+            }
+            return e;
+        }
+
+        /// <summary>
+        /// Aplica lo que devolvio el modulo 3D (o su simulacion). Una sola vez, en la Fase 1. El 3D solo dice QUE
+        /// recogio; los efectos salen del catalogo, y todo lo que llega se valida contra lo que se ofrecio: un
+        /// hallazgo que no existia, o recogido en una zona que no se visito, es un error del 3D y se rechaza.
+        /// </summary>
+        public void AplicarRecoleccion(Nexus.Core.Fase1.ResultadoDeRecoleccion resultado) {
+            ExigirFase1Abierta();
+            var cfg = Recoleccion;
+            if (cfg == null) throw new InvalidOperationException($"{Perfil.Id} no tiene recoleccion.");
+            if (R.RecoleccionHecha) throw new InvalidOperationException("La recoleccion ya se aplico: es una vez por nivel.");
+            if (resultado == null) throw new ArgumentNullException(nameof(resultado));
+            if (!string.IsNullOrEmpty(resultado.NivelId) && resultado.NivelId != Perfil.Id)
+                throw new InvalidOperationException($"La recoleccion es de '{resultado.NivelId}' y el nivel es '{Perfil.Id}'.");
+            if (resultado.MinutosUsados < 0 || resultado.MinutosUsados > cfg.MinutosDisponibles)
+                throw new InvalidOperationException($"La recoleccion uso {resultado.MinutosUsados} minutos y solo habia {cfg.MinutosDisponibles}.");
+
+            var visitadas = new HashSet<string>(resultado.ZonasVisitadas ?? new List<string>(), StringComparer.Ordinal);
+            foreach (var z in visitadas)
+                if (cfg.Zona(z) == null) throw new InvalidOperationException($"La zona '{z}' no es de la recoleccion de {Perfil.Id}.");
+
+            var recogidos = new List<Nexus.Core.Fase1.Hallazgo>();
+            var vistos = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var id in resultado.Hallazgos ?? new List<string>()) {
+                var h = cfg.Hallazgo(id);
+                if (h == null) throw new InvalidOperationException($"'{id}' no es un hallazgo de la recoleccion de {Perfil.Id}.");
+                if (!vistos.Add(id)) throw new InvalidOperationException($"'{id}' se recogio dos veces.");
+                if (!visitadas.Contains(h.Zona))
+                    throw new InvalidOperationException($"'{id}' esta en la zona {h.Zona}, que no se visito.");
+                recogidos.Add(h);
+            }
+
+            foreach (var h in recogidos) {
+                if (h.Tipo == Nexus.Core.Fase1.TiposDeHallazgo.Coleccionable) {
+                    if (!R.ColeccionablesRecogidos.Contains(h.Id)) R.ColeccionablesRecogidos.Add(h.Id);
+                    continue;
+                }
+                if (h.Efectos == null) continue;
+                foreach (var kv in h.Efectos) {
+                    double actual;
+                    if (W.TryGet(kv.Key, out actual)) W.Set(kv.Key, actual + kv.Value);
+                }
+            }
+            R.HallazgosDeRecoleccion = new List<string>(vistos);
+            R.MinutosDeRecoleccion = resultado.MinutosUsados;
+            R.RecoleccionHecha = true;
+        }
+
+        /// <summary>Los hallazgos recogidos, en el orden del catalogo.</summary>
+        public List<Nexus.Core.Fase1.Hallazgo> HallazgosRecogidos() {
+            var lista = new List<Nexus.Core.Fase1.Hallazgo>();
+            var cfg = Recoleccion;
+            if (cfg == null) return lista;
+            foreach (var h in cfg.Hallazgos)
+                if (h != null && R.HallazgosDeRecoleccion.Contains(h.Id)) lista.Add(h);
+            return lista;
+        }
+
+        /// <summary>Las pistas encontradas: las lineas que se añaden al encargo.</summary>
+        public List<string> PistasEncontradas() {
+            var lista = new List<string>();
+            foreach (var h in HallazgosRecogidos())
+                if (h.Tipo == Nexus.Core.Fase1.TiposDeHallazgo.Pista && !string.IsNullOrEmpty(h.Texto)) lista.Add(h.Texto);
+            return lista;
+        }
+
+        /// <summary>Al cerrar: los personajes que dejan huella en la historia (INV-6: solo aqui).</summary>
+        private void VolcarRecoleccion() {
+            foreach (var h in HallazgosRecogidos())
+                if (!string.IsNullOrEmpty(h.FlagAlCerrar)) Flags.Sumar(h.FlagAlCerrar, h.ValorDelFlag);
+        }
+
+        // ==================================================================== trabajo de oficina
+
+        public IReadOnlyList<Nexus.Core.Oficina.TareaDeOficina> TareasDeOficina {
+            get {
+                return Perfil.Oficina == null || Perfil.Oficina.Tareas == null
+                    ? (IReadOnlyList<Nexus.Core.Oficina.TareaDeOficina>)new List<Nexus.Core.Oficina.TareaDeOficina>()
+                    : Perfil.Oficina.Tareas;
+            }
+        }
+
+        public Nexus.Core.Oficina.TareaDeOficina TareaAbierta {
+            get {
+                return string.IsNullOrEmpty(R.TareaDeOficinaAbierta) || Perfil.Oficina == null
+                    ? null : Perfil.Oficina.PorId(R.TareaDeOficinaAbierta);
+            }
+        }
+
+        public int VecesHoy(string tareaId) {
+            int n;
+            return R.TareasDeOficinaHoy.TryGetValue(tareaId ?? "", out n) ? n : 0;
+        }
+
+        /// <summary>null si la tarea se puede empezar ahora; si no, el porque, en palabras para el jugador.</summary>
+        public string PorQueNoSePuedeHacer(string tareaId) {
+            var t = Perfil.Oficina == null ? null : Perfil.Oficina.PorId(tareaId);
+            if (t == null) return "Esa tarea no existe en este nivel.";
+            if (R.Fase != 2 || R.DiaActual == 0) return "Solo se puede durante los días de desarrollo.";
+            if (_reloj.Terminada || (_reloj.LlegoElCierre && !R.JornadaProrrogada)) return "La jornada ya terminó.";
+            if (TareaAbierta != null) return "Ya estás con otra tarea.";
+            if (Decision != null || Minijuego != null) return "Tienes algo abierto: termínalo primero.";
+            var ancla = Perfil.Mapa != null && !Perfil.Mapa.Vacio ? Perfil.Mapa.Ancla : null;
+            if (ancla != null && !string.Equals(R.ZonaActual, ancla.Id, StringComparison.OrdinalIgnoreCase))
+                return "El trabajo se hace en tu escritorio.";
+            if (VecesHoy(tareaId) >= t.VecesPorDia) return "Por hoy ya la hiciste.";
+            var restantes = R.JornadaProrrogada ? _reloj.MinutosRestantes : Math.Max(0, _reloj.MinutoDeCierre - _reloj.Minuto);
+            if (restantes < t.Minutos) return "No queda tiempo hoy para esto.";
+            return null;
+        }
+
+        /// <summary>
+        /// Empieza una tarea: cobra sus minutos del reloj YA (pueden sonar o caducar avisos mientras tanto:
+        /// trabajar tambien es no estar pendiente de otra cosa) y la deja abierta hasta ResolverTarea.
+        /// </summary>
+        public ResultadoDeAvance EmpezarTarea(string tareaId) {
+            ExigirFase2();
+            var motivo = PorQueNoSePuedeHacer(tareaId);
+            if (motivo != null) throw new InvalidOperationException(motivo);
+            var t = Perfil.Oficina.PorId(tareaId);
+            R.TareaDeOficinaAbierta = t.Id;
+            R.TareasDeOficinaHoy[t.Id] = VecesHoy(t.Id) + 1;
+            return AvanzarReloj(t.Minutos);
+        }
+
+        /// <summary>
+        /// Cierra la tarea abierta con el resultado de su minijuego. Aplica SOLO los efectos de la tarea para ese
+        /// resultado: no escribe traza, ni competencia, ni agenda nada. Devuelve lo que cambio.
+        /// </summary>
+        public Dictionary<string, double> ResolverTarea(ResultadoMinijuego resultado) {
+            var t = TareaAbierta;
+            if (t == null) throw new InvalidOperationException("No hay ninguna tarea de oficina abierta.");
+            if (resultado == null) throw new ArgumentNullException(nameof(resultado));
+
+            var cambios = new Dictionary<string, double>(StringComparer.Ordinal);
+            Dictionary<string, double> efectos;
+            if (t.Efectos != null && t.Efectos.TryGetValue(resultado.Resultado ?? "", out efectos) && efectos != null)
+                foreach (var kv in efectos) {
+                    double antes;
+                    if (!W.TryGet(kv.Key, out antes)) continue;
+                    W.Set(kv.Key, antes + kv.Value);
+                    double despues;
+                    W.TryGet(kv.Key, out despues);
+                    cambios[kv.Key] = despues - antes;
+                }
+            R.TareaDeOficinaAbierta = null;
+            R.TareasDeOficinaHechas++;
+            return cambios;
+        }
+
         /// <summary>Las que este nivel permite, en el orden del perfil.</summary>
         public List<MethodologyProfile> MetodologiasDisponibles() {
             var lista = new List<MethodologyProfile>();
@@ -415,6 +593,8 @@ namespace Nexus.Core.Sesion {
             _alertas.VaciarDelDia();
             R.MinutoDelDia = _reloj.Minuto;
             R.JornadaProrrogada = false;
+            R.TareasDeOficinaHoy.Clear();
+            R.TareaDeOficinaAbierta = null;
             R.ZonaActual = Perfil.Mapa != null && !Perfil.Mapa.Vacio ? Perfil.Mapa.Ancla?.Id : null;
 
             Decision = null;
@@ -938,6 +1118,7 @@ namespace Nexus.Core.Sesion {
             VolcarEleccionesNarrativas();
             VolcarArquitectura();
             VolcarColeccionables();
+            VolcarRecoleccion();
             reporte.Flags = Flags.Copia();
 
             NivelTerminado = true;

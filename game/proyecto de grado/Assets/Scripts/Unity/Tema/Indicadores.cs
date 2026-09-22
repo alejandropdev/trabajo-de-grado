@@ -60,7 +60,13 @@ namespace Nexus.Unity.Tema {
     /// <summary>
     /// Un grafico de radar dibujado con la malla de uGUI (sin texturas): anillos de referencia, un eje por
     /// valor y el poligono de los valores. Es el radar de competencias del Dashboard de Lecciones.
+    ///
+    /// ★ RequireComponent(CanvasRenderer) no es decorativo. Image y TMP lo traen de serie; un Graphic propio no.
+    /// Sin el, en el editor GetComponent devuelve un «falso null» que Graphic cachea como si fuera un
+    /// CanvasRenderer, y al destruir la pantalla (RectMask2D.OnDisable) salta MissingComponentException y corta
+    /// el flujo a medias: la pantalla vacia al cerrar el N0.
     /// </summary>
+    [RequireComponent(typeof(CanvasRenderer))]
     public sealed class GraficoRadar : MaskableGraphic {
         public Color ColorRejilla = Color.gray;
         public Color ColorValor = new Color(0.37f, 0.85f, 0.96f, 0.45f);

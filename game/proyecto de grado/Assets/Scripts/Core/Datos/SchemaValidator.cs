@@ -731,8 +731,124 @@ namespace Nexus.Core.Datos {
 
             e.AddRange(ValidarColeccionables(catalogo.Coleccionables));
             ValidarColeccionablesEnElMapa(catalogo, e);
+            ValidarRecoleccionYOficina(catalogo, fuente, e);
+            ValidarGuia(catalogo, e);
 
             return e;
+        }
+
+        // ============================================================ la guia del tutorial
+
+        private static void ValidarGuia(Catalogo c, List<string> e) {
+            if (c.Guia == null) return;
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var p in c.Guia) {
+                if (p == null || string.IsNullOrEmpty(p.Id)) { e.Add("guia: hay un paso sin 'id'."); continue; }
+                var donde = "guia/" + p.Id;
+                if (!ids.Add(p.Id)) e.Add($"{donde}: el id esta repetido.");
+                LevelProfile nivel;
+                if (string.IsNullOrEmpty(p.Nivel) || !c.Niveles.TryGetValue(p.Nivel, out nivel)) {
+                    e.Add($"{donde}: el nivel '{p.Nivel}' no existe.");
+                    nivel = null;
+                }
+                if (!DisparadoresDeGuia.EsValido(p.Disparador))
+                    e.Add($"{donde}: el disparador '{p.Disparador}' no existe; el paso no saldria nunca.");
+                if (string.IsNullOrEmpty(p.Texto)) e.Add($"{donde}: falta 'texto'.");
+                if (!AccionesDeGuia.EsValida(p.EsperaAccion)) e.Add($"{donde}: 'esperaAccion' vale '{p.EsperaAccion}', que no es una accion.");
+                if (!string.IsNullOrEmpty(p.EsperaAccion) && p.PausaElReloj)
+                    e.Add($"{donde}: un paso que espera una accion no puede parar el reloj (con el reloj parado no se puede hacer nada).");
+                if (nivel != null && p.EsperaAccion != null && p.EsperaAccion.StartsWith("ir-a-zona:", StringComparison.Ordinal)) {
+                    var zona = p.EsperaAccion.Substring("ir-a-zona:".Length);
+                    if (nivel.Mapa == null || nivel.Mapa.PorId(zona) == null) e.Add($"{donde}: la zona '{zona}' no esta en el mapa de {nivel.Id}.");
+                }
+            }
+        }
+
+        // ============================================================ recoleccion 3D y trabajo de oficina
+
+        /// <summary>
+        /// La recoleccion de la Fase 1 y las tareas de oficina de cada nivel. Lo que se comprueba es lo que haria
+        /// fallar la partida o engañaria al jugador: un hallazgo en una zona que no existe, un efecto sobre un
+        /// stock que no existe, un coleccionable que no esta en el catalogo, un flag fuera del censo, una escena
+        /// de practica que no se puede abrir o que tambien esta en el indice (y saldria como alerta evaluada).
+        /// </summary>
+        private static void ValidarRecoleccionYOficina(Catalogo c, ICatalogSource fuente, List<string> e) {
+            var censo = new HashSet<string>(StringComparer.Ordinal);
+            if (c.Flags != null) foreach (var f in c.Flags) if (f != null && f.Id != null) censo.Add(f.Id);
+            var coleccionables = new HashSet<string>(StringComparer.Ordinal);
+            if (c.Coleccionables != null) foreach (var col in c.Coleccionables) if (col != null && col.Id != null) coleccionables.Add(col.Id);
+            var enElIndice = new HashSet<string>(StringComparer.Ordinal);
+            if (c.Minijuegos != null) foreach (var m in c.Minijuegos) if (m != null && m.Id != null) enElIndice.Add(m.Id);
+
+            foreach (var kv in c.Niveles) {
+                var nivel = kv.Value;
+                if (nivel == null) continue;
+
+                var rec = nivel.Fase1 == null ? null : nivel.Fase1.Recoleccion;
+                if (rec != null) {
+                    var donde = nivel.Id + "/recoleccion";
+                    if (rec.MinutosDisponibles <= 0) e.Add($"{donde}: 'minutosDisponibles' tiene que ser mayor que 0.");
+                    var zonas = new HashSet<string>(StringComparer.Ordinal);
+                    foreach (var z in rec.Zonas ?? new List<Nexus.Core.Fase1.ZonaDeRecoleccion>()) {
+                        if (z == null || string.IsNullOrEmpty(z.Id)) { e.Add($"{donde}: hay una zona sin 'id'."); continue; }
+                        if (!zonas.Add(z.Id)) e.Add($"{donde}: la zona '{z.Id}' esta repetida.");
+                        if (z.MinutosDeVisita <= 0) e.Add($"{donde}/{z.Id}: 'minutosDeVisita' tiene que ser mayor que 0.");
+                    }
+                    if (zonas.Count == 0) e.Add($"{donde}: no tiene zonas.");
+                    var ids = new HashSet<string>(StringComparer.Ordinal);
+                    foreach (var h in rec.Hallazgos ?? new List<Nexus.Core.Fase1.Hallazgo>()) {
+                        if (h == null || string.IsNullOrEmpty(h.Id)) { e.Add($"{donde}: hay un hallazgo sin 'id'."); continue; }
+                        if (!ids.Add(h.Id)) e.Add($"{donde}: el hallazgo '{h.Id}' esta repetido.");
+                        if (!Nexus.Core.Fase1.TiposDeHallazgo.EsValido(h.Tipo))
+                            e.Add($"{donde}/{h.Id}: el tipo '{h.Tipo}' no existe. Validos: " +
+                                  string.Join(", ", new List<string>(Nexus.Core.Fase1.TiposDeHallazgo.Todos).ToArray()) + ".");
+                        if (!zonas.Contains(h.Zona ?? "")) e.Add($"{donde}/{h.Id}: esta en la zona '{h.Zona}', que no existe.");
+                        if (h.Tipo == Nexus.Core.Fase1.TiposDeHallazgo.Coleccionable && !coleccionables.Contains(h.Id))
+                            e.Add($"{donde}/{h.Id}: un hallazgo coleccionable tiene que llevar el id de un coleccionable del catalogo.");
+                        if (h.Tipo == Nexus.Core.Fase1.TiposDeHallazgo.Pista && string.IsNullOrEmpty(h.Texto))
+                            e.Add($"{donde}/{h.Id}: una pista sin 'texto' no dice nada.");
+                        if (h.Efectos != null)
+                            foreach (var ef in h.Efectos.Keys)
+                                if (!WorldState.EsStock(ef)) e.Add($"{donde}/{h.Id}: el efecto '{ef}' no es un stock del proyecto.");
+                        if (!string.IsNullOrEmpty(h.FlagAlCerrar) && censo.Count > 0 && !censo.Contains(h.FlagAlCerrar))
+                            e.Add($"{donde}/{h.Id}: el flag '{h.FlagAlCerrar}' no esta en el censo.");
+                    }
+                }
+
+                var oficina = nivel.Oficina;
+                if (oficina == null || oficina.Tareas == null) continue;
+                var tareas = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var t in oficina.Tareas) {
+                    if (t == null || string.IsNullOrEmpty(t.Id)) { e.Add($"{nivel.Id}/oficina: hay una tarea sin 'id'."); continue; }
+                    var donde = $"{nivel.Id}/oficina/{t.Id}";
+                    if (!tareas.Add(t.Id)) e.Add($"{donde}: esta repetida.");
+                    if (string.IsNullOrEmpty(t.Titulo)) e.Add($"{donde}: falta 'titulo'.");
+                    if (t.Minutos <= 0) e.Add($"{donde}: 'minutos' tiene que ser mayor que 0.");
+                    if (t.VecesPorDia < 1) e.Add($"{donde}: 'vecesPorDia' tiene que ser al menos 1.");
+                    if (t.Efectos != null)
+                        foreach (var ef in t.Efectos) {
+                            if (!EsUnaDe(ef.Key, "todos", "parcial", "falsoPositivo", "omitido"))
+                                e.Add($"{donde}: el resultado '{ef.Key}' no existe (todos, parcial, falsoPositivo, omitido).");
+                            if (ef.Value != null)
+                                foreach (var stock in ef.Value.Keys)
+                                    if (!WorldState.EsStock(stock)) e.Add($"{donde}: el efecto '{stock}' no es un stock del proyecto.");
+                        }
+                    if (enElIndice.Contains(t.Minijuego ?? ""))
+                        e.Add($"{donde}: la escena '{t.Minijuego}' esta en el indice del director: saldria como alerta evaluada. Las de oficina van aparte.");
+                    if (fuente == null) continue;
+                    if (string.IsNullOrEmpty(t.Archivo) || !fuente.Existe(t.Archivo)) {
+                        e.Add($"{donde}: la escena '{t.Archivo}' no existe.");
+                        continue;
+                    }
+                    try {
+                        var escena = CatalogoMinijuegos.Parsear(fuente.LeerCatalogo(t.Archivo));
+                        if (escena.Id != t.Minijuego) e.Add($"{donde}: el archivo '{t.Archivo}' dice llamarse '{escena.Id}', no '{t.Minijuego}'.");
+                        foreach (var error in CatalogoMinijuegos.Validar(escena)) e.Add($"{donde}: {error}");
+                    } catch (Exception ex) {
+                        e.Add($"{donde}: '{t.Archivo}' no se pudo leer. {ex.Message}");
+                    }
+                }
+            }
         }
 
         // ============================================================ flags leidos

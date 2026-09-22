@@ -1,0 +1,94 @@
+{
+  "id": "MJ-OF-N1-PRUEBAS",
+  "verbo": "V2_REPARTIR",
+  "lienzo": "depositos",
+  "temaPrincipal": "PTP",
+  "objetivoAprendizaje": "OA-TEST-01",
+  "presentacion": {
+    "titulo": "Práctica: probar las reservas",
+    "comoSeJuega": "Tienes 30 horas para probar el módulo de reservas. Repártelas entre los cuatro tipos de prueba.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "repartir": {
+    "presupuesto": 30,
+    "unidad": "horas",
+    "toleranciaDeEscapes": 1,
+    "depositos": [
+      {
+        "id": "unitarias",
+        "nombre": "Unitarias",
+        "costePorDefecto": 2,
+        "defectosOcultos": 5,
+        "descripcion": "Mucha lógica de fechas y turnos: cada regla por separado."
+      },
+      {
+        "id": "integracion",
+        "nombre": "Integración",
+        "costePorDefecto": 4,
+        "defectosOcultos": 3,
+        "descripcion": "Las reservas con la base de datos y con el controlador del ascensor."
+      },
+      {
+        "id": "regresion",
+        "nombre": "Regresión",
+        "costePorDefecto": 3,
+        "defectosOcultos": 3,
+        "descripcion": "Que lo de la barrera, que ya funcionaba, siga funcionando."
+      },
+      {
+        "id": "e2e",
+        "nombre": "De extremo a extremo",
+        "costePorDefecto": 6,
+        "defectosOcultos": 1,
+        "descripcion": "Una reserva de verdad, del portal al ascensor."
+      }
+    ]
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-TEST-01",
+        "razon": "Las horas fueron donde estaba el riesgo."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-TEST-01",
+        "razon": "Escaparon errores de donde invertiste poco."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "Sobraron horas en un tipo mientras otro se quedó a cero."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "No se probó nada."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Práctica terminada."
+  }
+}

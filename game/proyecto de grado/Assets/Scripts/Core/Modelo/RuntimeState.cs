@@ -73,6 +73,16 @@ namespace Nexus.Core.Modelo {
         /// <summary>Los coleccionables recogidos en este nivel. Al cerrar se cuentan en FLG_CARTAS y FLG_CODIGOS.</summary>
         public List<string> ColeccionablesRecogidos = new List<string>();
 
+        /// <summary>Lo que se recogio en la recoleccion 3D de la Fase 1 (ids de hallazgo). Una vez por nivel.</summary>
+        public List<string> HallazgosDeRecoleccion = new List<string>();
+        public bool RecoleccionHecha;
+        public int MinutosDeRecoleccion;
+
+        /// <summary>El trabajo de oficina de hoy: cuantas veces se hizo cada tarea, y la que esta abierta.</summary>
+        public Dictionary<string, int> TareasDeOficinaHoy = new Dictionary<string, int>(StringComparer.Ordinal);
+        public string TareaDeOficinaAbierta;
+        public int TareasDeOficinaHechas;
+
         // --- Registro pedagogico ---
         /// <summary>Estimado vs real: alimenta el cono de incertidumbre y el sesgo de optimismo del verbo V5.</summary>
         public List<Estimacion> HistorialEstimaciones = new List<Estimacion>();
@@ -181,6 +191,8 @@ namespace Nexus.Core.Modelo {
             if (EleccionesNarrativas == null)
                 EleccionesNarrativas = new Dictionary<string, string>(StringComparer.Ordinal);
             if (ColeccionablesRecogidos == null) ColeccionablesRecogidos = new List<string>();
+            if (HallazgosDeRecoleccion == null) HallazgosDeRecoleccion = new List<string>();
+            if (TareasDeOficinaHoy == null) TareasDeOficinaHoy = new Dictionary<string, int>(StringComparer.Ordinal);
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,

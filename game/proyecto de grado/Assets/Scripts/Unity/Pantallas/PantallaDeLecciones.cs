@@ -4,6 +4,7 @@ using System.Linq;
 using Nexus.Core.Evaluacion;
 using Nexus.Core.Sesion;
 using Nexus.Unity.Aplicacion;
+using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -31,6 +32,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "DASHBOARD DE LECCIONES · " + (r.NivelNombre ?? r.NivelId).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cian);
             Ui.Texto(titulos, r.CumpleUmbralesDeExito ? "Nivel superado" : "Nivel no superado", EstiloTexto.Titulo);
+            GuiaView.BotonDeAyuda(App, cabecera);
             Ui.Boton(cabecera, "Continuar", () => AlSeguir?.Invoke(), VarianteBoton.Primario);
 
             RectTransform contenido;
@@ -48,6 +50,7 @@ namespace Nexus.Unity.Pantallas {
 
             Decisiones(contenido, r);
             Cadena(contenido, r);
+            GuiaView.Avisar(App, "lecciones");
         }
 
         // 1
@@ -95,6 +98,7 @@ namespace Nexus.Unity.Pantallas {
         // 3
         private RectTransform Competencias(Transform padre, DebriefReport r) {
             var t = Ui.Tarjeta(padre, "3 · Tus competencias");
+            GuiaView.Registrar("lecciones.radar", t);
             var oas = r.Competencia == null ? new List<string>() : r.Competencia.PorObjetivo.Keys.OrderBy(k => k).ToList();
             if (oas.Count == 0) {
                 Ui.Texto(t, "Todavía no hay decisiones evaluadas.", EstiloTexto.Pequeno);
@@ -132,7 +136,7 @@ namespace Nexus.Unity.Pantallas {
             if (m.Practicas.Count > 0) {
                 Ui.Texto(t, "Sus prácticas, contra lo que pasó:", EstiloTexto.Pequeno);
                 foreach (var p in m.Practicas.Where(x => x.Evaluable))
-                    Ui.Texto(t, (p.Cumple ? "✓ " : "✗ ") + p.Descripcion + (string.IsNullOrEmpty(p.Razon) ? "" : " — " + p.Razon),
+                    Ui.Texto(t, (p.Cumple ? "√ " : "× ") + p.Descripcion + (string.IsNullOrEmpty(p.Razon) ? "" : " — " + p.Razon),
                              EstiloTexto.Pequeno, p.Cumple ? Tema.texto : Tema.amarillo);
             }
             return t;
@@ -152,6 +156,7 @@ namespace Nexus.Unity.Pantallas {
         // 6
         private void Decisiones(Transform padre, DebriefReport r) {
             var t = Ui.Tarjeta(padre, "6 · Cada decisión, y por qué");
+            GuiaView.Registrar("lecciones.decisiones", t);
             if (r.Traza == null || r.Traza.Entradas.Count == 0) {
                 Ui.Texto(t, "No hay decisiones registradas.", EstiloTexto.Pequeno);
                 return;

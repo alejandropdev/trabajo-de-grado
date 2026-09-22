@@ -65,14 +65,14 @@ namespace Nexus.Unity.Pantallas {
 
             UiKit.Vaciar(_acciones);
             if (!EnLaUltima) {
-                Ui.Boton(Ui.Fila(_acciones), "Siguiente  ▸", Avanzar, VarianteBoton.Primario);
+                Ui.Boton(Ui.Fila(_acciones), "Siguiente  ►", Avanzar, VarianteBoton.Primario);
             } else if (TieneOpciones) {
                 foreach (var opcion in Guion.Opciones) {
                     var o = opcion;
                     Ui.BotonDeOpcion(_acciones, o.Texto, null, () => Elegir(o));
                 }
             } else {
-                Ui.Boton(Ui.Fila(_acciones), "Continuar  ▸", Terminar, VarianteBoton.Primario);
+                Ui.Boton(Ui.Fila(_acciones), "Continuar  ►", Terminar, VarianteBoton.Primario);
             }
             Canvas.ForceUpdateCanvases();
             _scroll.verticalNormalizedPosition = 0;   // la ultima linea, abajo, siempre a la vista

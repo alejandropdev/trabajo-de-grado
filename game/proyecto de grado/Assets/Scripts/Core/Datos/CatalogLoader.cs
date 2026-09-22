@@ -34,11 +34,14 @@ namespace Nexus.Core.Datos {
 
         public List<Coleccionable> Coleccionables = new List<Coleccionable>();
 
+        /// <summary>Los pasos de la guia del tutorial (la burbuja de Marisol). Vacio = ningun nivel tiene guia.</summary>
+        public List<PasoDeGuia> Guia = new List<PasoDeGuia>();
+
         public override string ToString() {
             return $"{Eventos.Count} eventos, {Niveles.Count} niveles, {Metodologias.Count} metodologias, " +
                    $"{Minijuegos.Count} minijuegos, {Beats.Count} beats, {Flags.Count} flags, " +
                    $"{Guiones.Count} guiones, {(Admision == null ? 0 : Admision.Preguntas.Count)} preguntas, " +
-                   $"{Coleccionables.Count} coleccionables";
+                   $"{Coleccionables.Count} coleccionables, {Guia.Count} pasos de guia";
         }
     }
 
@@ -68,6 +71,7 @@ namespace Nexus.Core.Datos {
         public const string ArchivoGuiones = "narrativa/guiones.json";
         public const string ArchivoAdmision = "prueba-de-admision.json";
         public const string ArchivoColeccionables = "coleccionables.json";
+        public const string ArchivoGuia = "narrativa/guia-tutorial.json";
 
         public static JsonSerializerSettings Settings { get { return JsonDeGuardado.Settings; } }
 
@@ -100,6 +104,11 @@ namespace Nexus.Core.Datos {
         private sealed class ArchivoDeGuiones {
             public int Version { get; set; }
             public List<Guion> Guiones { get; set; }
+        }
+
+        private sealed class ArchivoDeGuia {
+            public int Version { get; set; }
+            public List<PasoDeGuia> Pasos { get; set; }
         }
 
         private sealed class ArchivoDeColeccionables {
@@ -282,6 +291,15 @@ namespace Nexus.Core.Datos {
                     var archivo = Parsear<ArchivoDeColeccionables>(fuente.LeerCatalogo(ArchivoColeccionables),
                                                                    ArchivoColeccionables);
                     catalogo.Coleccionables = archivo.Coleccionables ?? new List<Coleccionable>();
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            if (fuente.Existe(ArchivoGuia)) {
+                try {
+                    var archivo = Parsear<ArchivoDeGuia>(fuente.LeerCatalogo(ArchivoGuia), ArchivoGuia);
+                    catalogo.Guia = archivo.Pasos ?? new List<PasoDeGuia>();
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
                 }

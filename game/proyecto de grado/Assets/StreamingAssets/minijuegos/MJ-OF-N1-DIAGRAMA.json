@@ -1,0 +1,204 @@
+{
+  "id": "MJ-OF-N1-DIAGRAMA",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de las reservas",
+    "comoSeJuega": "El diagrama del módulo de reservas de ascensores. Encuentra las piezas o flechas con problemas y ponles nombre. No todo lo raro está mal.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "portal",
+        "texto": "Portal de Facilities",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Desde aquí se pide un ascensor de carga."
+      },
+      {
+        "id": "reservas",
+        "texto": "Módulo de reservas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Crea, mueve y cancela reservas."
+      },
+      {
+        "id": "turnos",
+        "texto": "Calendario de turnos",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Decide quién va primero cuando dos reservas chocan. (Nadie ha escrito cómo.)"
+      },
+      {
+        "id": "bd",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 0,
+        "detalle": "Guarda reservas y turnos."
+      },
+      {
+        "id": "ascensor",
+        "texto": "Control del ascensor",
+        "tipo": "externo",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "El controlador del fabricante del ascensor."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "r1",
+        "desde": "portal",
+        "hasta": "reservas",
+        "texto": "pide una reserva"
+      },
+      {
+        "id": "r2",
+        "desde": "reservas",
+        "hasta": "bd",
+        "texto": "guarda la reserva"
+      },
+      {
+        "id": "r3",
+        "desde": "reservas",
+        "hasta": "turnos",
+        "texto": "¿hay choque?"
+      },
+      {
+        "id": "r4",
+        "desde": "reservas",
+        "hasta": "ascensor",
+        "texto": "bloquea el ascensor a su hora"
+      },
+      {
+        "id": "r5",
+        "desde": "ascensor",
+        "hasta": "bd",
+        "texto": "escribe directo en las tablas"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "turnos"
+      ],
+      "defecto": "elemento_sin_especificar",
+      "explicacion": "El calendario de turnos decide quién va primero, pero nadie escribió con qué regla. Una pieza que decide algo sin regla escrita es una pieza sin especificar."
+    },
+    {
+      "id": "Z2",
+      "tipo": "commit",
+      "commits": [
+        "r5"
+      ],
+      "defecto": "acoplamiento_indebido",
+      "explicacion": "El controlador del fabricante escribe directo en nuestras tablas. Si cambiamos una tabla, rompemos el ascensor; si el fabricante cambia algo, rompe las reservas."
+    }
+  ],
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "r4"
+      ],
+      "razonNoEsDefecto": "Que el módulo de reservas le avise al ascensor es su trabajo: por eso existe."
+    }
+  ],
+  "paletaEtiquetas": [
+    "acoplamiento_indebido",
+    "elemento_sin_especificar",
+    "requisito_ambiguo",
+    "falla_de_seguridad"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "elemento_sin_especificar",
+        "requisito_ambiguo"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "elemento_sin_especificar",
+        "requisito_ambiguo",
+        "falla_de_seguridad"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "falla_de_seguridad"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Viste la pieza sin reglas y la flecha que se salta el camino."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Encontraste una de las dos."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Práctica terminada."
+  }
+}

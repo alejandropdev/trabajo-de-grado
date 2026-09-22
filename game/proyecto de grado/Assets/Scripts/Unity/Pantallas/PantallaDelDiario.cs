@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Coleccion;
 using Nexus.Unity.Aplicacion;
+using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -45,6 +46,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
             var scroll = Ui.Desplazable(panel, out _lista);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
+            GuiaView.Avisar(App, "diario");
         }
 
         private void Cerrar() { App.Router.Volver(); }

@@ -58,6 +58,8 @@ namespace Nexus.Unity.Pantallas {
         public List<string> Parrafos = new List<string>();
         public string TextoBoton = "Volver al menú";
         public Action AlPulsar;
+        public string TextoSecundario;
+        public Action AlSecundario;
 
         public override bool PuedeVolver { get { return false; } }
 
@@ -72,7 +74,9 @@ namespace Nexus.Unity.Pantallas {
             if (!string.IsNullOrEmpty(Etiqueta)) hoja.Etiqueta(Etiqueta);
             hoja.Titulo(Titulo);
             foreach (var p in Parrafos) hoja.Parrafo(p);
-            hoja.Accion(TextoBoton, () => (AlPulsar ?? App.MostrarInicio)());
+            var boton = hoja.Accion(TextoBoton, () => (AlPulsar ?? App.MostrarInicio)());
+            if (!string.IsNullOrEmpty(TextoSecundario))
+                Ui.Boton(boton.transform.parent, TextoSecundario, () => AlSecundario?.Invoke(), VarianteBoton.Fantasma);
         }
     }
 

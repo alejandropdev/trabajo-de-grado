@@ -4,6 +4,7 @@ using System.Linq;
 using Nexus.Core.Guardado;
 using Nexus.Core.Narrativa;
 using Nexus.Unity.Aplicacion;
+using UnityEngine;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>
@@ -47,7 +48,7 @@ namespace Nexus.Unity.Pantallas {
                 pasos.Add(siguiente => Reproducir(app, g, NarrativeBeat.VarianteDefecto, false, siguiente));
             }
             pasos.Add(_ => app.Router.IrA<PantallaDeFase1>());
-            Ejecutar(pasos);
+            Ejecutar(app, pasos);
         }
 
         /// <summary>La Fase 1 ya esta cerrada: primer autoguardado (§5.7) y al dia 1.</summary>
@@ -92,7 +93,7 @@ namespace Nexus.Unity.Pantallas {
                 if (siguienteNivel == null) FinDeLaVersion(app);
                 else EmpezarNivel(app);
             });
-            Ejecutar(pasos);
+            Ejecutar(app, pasos);
         }
 
         public static void FinDeLaVersion(AppRoot app) {
@@ -147,10 +148,37 @@ namespace Nexus.Unity.Pantallas {
             else app.Router.IrA(configurar);
         }
 
-        /// <summary>Corre una lista de pasos en orden: cada uno recibe como argumento como seguir con el siguiente.</summary>
-        private static void Ejecutar(List<Action<Action>> pasos, int desde = 0) {
+        /// <summary>
+        /// Corre una lista de pasos en orden: cada uno recibe como argumento como seguir con el siguiente.
+        /// ★ Si un paso falla, nunca se queda la pantalla vacia: se dice que fallo, con la opcion de reintentar
+        /// ese mismo paso o volver al menu (la partida ya esta guardada en el ultimo punto de autoguardado).
+        /// </summary>
+        private static void Ejecutar(AppRoot app, List<Action<Action>> pasos, int desde = 0) {
             if (desde >= pasos.Count) return;
-            pasos[desde](() => Ejecutar(pasos, desde + 1));
+            try {
+                pasos[desde](() => Ejecutar(app, pasos, desde + 1));
+            } catch (Exception ex) {
+                Debug.LogException(ex);
+                MostrarFallo(app, ex, () => Ejecutar(app, pasos, desde));
+            }
+        }
+
+        public static void MostrarFallo(AppRoot app, Exception ex, Action reintentar) {
+            app.Router.IrA<PantallaDeMensaje>(p => {
+                p.Etiqueta = "Algo ha fallado";
+                p.Titulo = "El juego no pudo seguir en este punto";
+                p.Parrafos.Add(ex.GetType().Name + ": " + ex.Message);
+                p.Parrafos.Add("Tu partida está guardada en el último punto de autoguardado. Puedes reintentar este paso, o volver al menú y continuarla después. " +
+                               "Si se repite, copia el error de la consola de Unity.");
+                if (reintentar != null) {
+                    p.TextoBoton = "Reintentar";
+                    p.AlPulsar = reintentar;
+                    p.TextoSecundario = "Volver al menú";
+                    p.AlSecundario = () => { app.CerrarPartida(); app.MostrarInicio(); };
+                } else {
+                    p.AlPulsar = () => { app.CerrarPartida(); app.MostrarInicio(); };
+                }
+            });
         }
     }
 }

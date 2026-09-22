@@ -78,6 +78,12 @@ namespace Nexus.Core.Modelo {
 
         public Fase1Config Fase1 = new Fase1Config();
 
+        /// <summary>
+        /// El trabajo de oficina: los minijuegos de practica que se pueden hacer en el escritorio cuando no
+        /// suena nada. Dan recursos y no cuentan para la evaluacion. Vacio = el nivel no tiene.
+        /// </summary>
+        public Nexus.Core.Oficina.OficinaConfig Oficina = new Nexus.Core.Oficina.OficinaConfig();
+
         /// <summary>Copia profunda. Todo lo mutable (arrays, diccionarios, subobjetos) se duplica.</summary>
         public LevelProfile Clone() {
             var c = (LevelProfile)MemberwiseClone();
@@ -90,6 +96,7 @@ namespace Nexus.Core.Modelo {
             c.Mapa = Mapa == null ? null : Mapa.Clone();
             c.Umbrales = Umbrales == null ? null : Umbrales.Clone();
             c.Fase1 = Fase1 == null ? null : Fase1.Clone();
+            c.Oficina = Oficina == null ? null : Oficina.Clone();
             return c;
         }
     }

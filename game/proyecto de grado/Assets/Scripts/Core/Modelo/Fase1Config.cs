@@ -14,8 +14,15 @@ namespace Nexus.Core.Modelo {
         /// <summary>El menu de razones del verbo V4. Se comparte entre metodologia y arquitectura.</summary>
         public List<RazonOpcion> RazonesDisponibles = new List<RazonOpcion>();
 
+        /// <summary>
+        /// El recorrido por el plano (zonas A–F): lo construye el modulo 3D, y mientras no existe se simula.
+        /// null = el nivel no tiene recoleccion.
+        /// </summary>
+        public Nexus.Core.Fase1.RecoleccionConfig Recoleccion;
+
         public Fase1Config Clone() {
             var c = new Fase1Config();
+            c.Recoleccion = Recoleccion == null ? null : Recoleccion.Clone();
             c.Calidad = Calidad == null ? null : Calidad.Clone();
             if (Arquitecturas != null) {
                 c.Arquitecturas = new List<ArquitecturaOpcion>(Arquitecturas.Count);

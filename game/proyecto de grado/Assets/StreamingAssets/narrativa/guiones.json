@@ -61,7 +61,7 @@
       "variantes": {
         "default": [
           { "quien": "Marisol Andrade", "texto": "Antes de la primera línea de código hay tres decisiones, y las tres se registran." },
-          { "quien": "Marisol Andrade", "texto": "Primero, cómo va a trabajar: con sprints cerrados o con un flujo continuo. Le pedirán que diga por qué. El porqué cuenta tanto como la elección." },
+          { "quien": "Marisol Andrade", "texto": "Primero, cómo va a trabajar: por etapas, con sprints cerrados o con un flujo continuo. Le pedirán que diga por qué. El porqué cuenta tanto como la elección." },
           { "quien": "Marisol Andrade", "texto": "Segundo, a qué dedica su cuidado. Tiene cuatro fichas y tres cosas que proteger. Lo que deje sin fichas es lo que el jurado va a probar." },
           { "quien": "Marisol Andrade", "texto": "Tercero, la forma de lo que va a construir. Vuelva a leer la restricción del ticket antes de elegir." }
         ]

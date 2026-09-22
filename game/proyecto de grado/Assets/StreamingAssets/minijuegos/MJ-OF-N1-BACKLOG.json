@@ -1,0 +1,158 @@
+{
+  "id": "MJ-OF-N1-BACKLOG",
+  "verbo": "V3_ORDENAR",
+  "lienzo": "backlog",
+  "temaPrincipal": "Scrum",
+  "objetivoAprendizaje": "OA-SCRUM-01",
+  "presentacion": {
+    "titulo": "Práctica: el backlog de las reservas",
+    "comoSeJuega": "Ordena las tarjetas de arriba abajo. Entran las que caben en la capacidad. Algunas dependen de otras.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 120
+  },
+  "ordenar": {
+    "capacidad": 12,
+    "umbralDeValor": 0.8,
+    "peticion": "Facilities pregunta si pueden tener también las estadísticas de uso de los ascensores esta semana.",
+    "tarjetas": [
+      {
+        "id": "t1",
+        "titulo": "Crear una reserva",
+        "valor": 8,
+        "esfuerzo": 3
+      },
+      {
+        "id": "t2",
+        "titulo": "Cancelar una reserva",
+        "valor": 5,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t3",
+        "titulo": "Detectar choques de horario",
+        "valor": 7,
+        "esfuerzo": 3,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t4",
+        "titulo": "Bloquear el ascensor a su hora",
+        "valor": 6,
+        "esfuerzo": 4,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t5",
+        "titulo": "Estadísticas de uso",
+        "valor": 2,
+        "esfuerzo": 3,
+        "dependeDe": [
+          "t4"
+        ]
+      },
+      {
+        "id": "t6",
+        "titulo": "Recordatorio por correo",
+        "valor": 2,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t1"
+        ]
+      }
+    ],
+    "respuestas": {
+      "obedecer": {
+        "texto": "Dices que sí a las estadísticas.",
+        "consecuencia": {
+          "efectosInmediatos": {},
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Aceptar lo que no cabe lo paga el equipo."
+          }
+        }
+      },
+      "rechazar": {
+        "texto": "Dices que no, sin explicar.",
+        "consecuencia": {
+          "efectosInmediatos": {},
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Proteges al equipo, pero el cliente no puede elegir."
+          }
+        }
+      },
+      "negociar": {
+        "texto": "Explicas qué cabe y le pides que elija qué sale.",
+        "consecuencia": {
+          "efectosInmediatos": {},
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Negociar es enseñar el coste y dejar elegir."
+          }
+        }
+      }
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Lo que más valía entró, en un orden que se puede construir."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-SCRUM-01",
+        "razon": "Quedó fuera valor que cabía."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Algo quedó antes de lo que necesita."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "No se ordenó nada."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Práctica terminada."
+  }
+}
