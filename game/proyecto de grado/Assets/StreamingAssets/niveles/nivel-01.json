@@ -206,6 +206,7 @@
         "razon": "Tres personas, un edificio, cuarenta carros y nadie para operar servicios: un único despliegue, con módulos bien separados por dentro, es lo que este equipo puede construir y mantener. Voss gruñe en señal de aprobación.",
         "efectos": { "Documentacion": 5 },
         "razonesValidas": ["equipo_pequeno", "despliegue_simple", "un_solo_edificio", "plazo_corto"],
+        "flagsAlCerrar": { "FLG_VOSS_AFINIDAD": 1 },
         "razonesTrampa": ["lo_mas_rapido"]
       },
       {
@@ -216,7 +217,8 @@
         "efectos": { "DeudaTecnica": 10, "Cansancio": 8 },
         "modificadoresModelo": { "gamma": 1.15 },
         "razonesValidas": [],
-        "razonesTrampa": ["esta_de_moda", "escala_mejor"]
+        "razonesTrampa": ["esta_de_moda", "escala_mejor"],
+        "flagsAlCerrar": { "FLG_VOSS_AFINIDAD": -1 }
       },
       {
         "id": "parche-sobre-la-barrera",

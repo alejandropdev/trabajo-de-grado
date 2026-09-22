@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "minijuegos": [
+    { "id": "MJ-F0-01", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F0-01.json", "objetivoAprendizaje": "OA-DOC-01",
+      "presionDiegetica": "Marisol recoge las propuestas revisadas a las 12:00", "reloj": 90,
+      "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
+      "precondiciones": ["diaActual >= 3"], "soloNiveles": ["nivel-00"] },
+
+    { "id": "MJ-F1-07", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F1-07.json", "objetivoAprendizaje": "OA-DOC-01",
+      "presionDiegetica": "Javier empieza a programar sobre este diagrama a las 11:00", "reloj": 120,
+      "pesoBase": 12, "enfriamiento": 6, "maxOcurrencias": 1,
+      "precondiciones": ["diaActual >= 2", "diaActual <= 8"], "soloNiveles": ["nivel-01"] },
+
+    { "id": "MJ-F1-08", "verbo": "V3_ORDENAR", "archivo": "minijuegos/MJ-F1-08.json", "objetivoAprendizaje": "OA-SCRUM-01",
+      "presionDiegetica": "Facilities espera respuesta antes de la reunión de las 12:00", "reloj": 150,
+      "pesoBase": 12, "enfriamiento": 6, "maxOcurrencias": 1,
+      "precondiciones": ["diaActual >= 2", "diaActual <= 12"], "soloNiveles": ["nivel-01"] },
+
+    { "id": "MJ-F2-02", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F2-02.json", "objetivoAprendizaje": "OA-GIT-01",
+      "presionDiegetica": "Javier necesita esto antes de las 10:00", "reloj": 90,
+      "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
+      "precondiciones": ["diaActual >= 6"], "soloNiveles": ["nivel-01"] },
+
+    { "id": "MJ-F2-07", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F2-07.json", "objetivoAprendizaje": "OA-DOC-01",
+      "presionDiegetica": "Javier sacó esta traza del log de producción de las 07:58", "reloj": 120,
+      "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
+      "precondiciones": ["diaActual >= 7"], "soloNiveles": ["nivel-01"] },
+
+    { "id": "MJ-F2-08", "verbo": "V2_REPARTIR", "archivo": "minijuegos/MJ-F2-08.json", "objetivoAprendizaje": "OA-TEST-01",
+      "presionDiegetica": "El release candidato sale el viernes", "reloj": 120,
+      "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
+      "precondiciones": ["diaActual >= 8"], "soloNiveles": ["nivel-01"] }
+  ]
+}

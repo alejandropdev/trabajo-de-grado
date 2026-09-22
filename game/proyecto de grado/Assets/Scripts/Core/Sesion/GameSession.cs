@@ -145,6 +145,13 @@ namespace Nexus.Core.Sesion {
             return lista;
         }
 
+        private static List<MinigameDefinition> MinijuegosDelNivel(Catalogo catalogo, string nivelId) {
+            var lista = new List<MinigameDefinition>();
+            foreach (var mj in catalogo.Minijuegos)
+                if (mj != null && mj.AplicaAlNivel(nivelId)) lista.Add(mj);
+            return lista;
+        }
+
         private static List<NarrativeBeat> BeatsDelNivel(Catalogo catalogo, string nivelId) {
             var lista = new List<NarrativeBeat>();
             foreach (var beat in catalogo.Beats)
@@ -178,6 +185,52 @@ namespace Nexus.Core.Sesion {
                 throw new InvalidOperationException($"En {guionId} ya se eligio: una decision narrativa no se deshace.");
 
             R.EleccionesNarrativas[guionId] = opcionId;
+        }
+
+        // ==================================================================== coleccionables
+
+        /// <summary>Los coleccionables de la zona donde esta el jugador que todavia no ha recogido.</summary>
+        public List<string> ColeccionablesAqui() {
+            var lista = new List<string>();
+            var zona = Perfil.Mapa == null ? null : Perfil.Mapa.PorId(R.ZonaActual);
+            if (zona == null || zona.Coleccionables == null) return lista;
+            foreach (var id in zona.Coleccionables)
+                if (!R.ColeccionablesRecogidos.Contains(id)) lista.Add(id);
+            return lista;
+        }
+
+        /// <summary>
+        /// Recoge un coleccionable. Solo se puede donde esta: moverse por el mapa es lo que cuesta tiempo, y
+        /// ese coste es lo que hace que encontrar cosas sea una decision.
+        /// </summary>
+        public void RecogerColeccionable(string id) {
+            if (NivelTerminado) throw new InvalidOperationException("El nivel ya se cerro.");
+            if (!ColeccionablesAqui().Contains(id))
+                throw new InvalidOperationException($"'{id}' no esta en la zona actual, o ya se recogio.");
+            R.ColeccionablesRecogidos.Add(id);
+        }
+
+        /// <summary>Al cerrar: cuantas cartas y cuantos codigos se encontraron en este nivel.</summary>
+        private void VolcarColeccionables() {
+            if (_catalogo.Coleccionables == null || R.ColeccionablesRecogidos.Count == 0) return;
+            var cartas = 0;
+            var codigos = 0;
+            foreach (var col in _catalogo.Coleccionables) {
+                if (col == null || !R.ColeccionablesRecogidos.Contains(col.Id)) continue;
+                if (col.Serie == Nexus.Core.Coleccion.SeriesDeColeccionables.Carta) cartas++;
+                if (col.Serie == Nexus.Core.Coleccion.SeriesDeColeccionables.Codigo) codigos++;
+            }
+            if (cartas > 0) Flags.Sumar("FLG_CARTAS", cartas);
+            if (codigos > 0) Flags.Sumar("FLG_CODIGOS", codigos);
+        }
+
+        /// <summary>Al cerrar: lo que la arquitectura elegida deja escrito (la opinion de Voss, en N1).</summary>
+        private void VolcarArquitectura() {
+            if (string.IsNullOrEmpty(_arquitectura) || Perfil.Fase1 == null || Perfil.Fase1.Arquitecturas == null) return;
+            foreach (var a in Perfil.Fase1.Arquitecturas) {
+                if (a == null || a.Id != _arquitectura || a.FlagsAlCerrar == null) continue;
+                foreach (var kv in a.FlagsAlCerrar) Flags.Sumar(kv.Key, kv.Value);
+            }
         }
 
         /// <summary>La otra mitad del puente de Cerrar(): las elecciones de escena que llevan flag.</summary>
@@ -343,7 +396,7 @@ namespace Nexus.Core.Sesion {
             R.CoberturaAlCerrarDiseno = W.Cobertura;
 
             _eventos = new EventDirector(EventosDelNivel(_catalogo, Perfil.Id), Perfil, Reglas, _rng, _scheduler);
-            _minijuegos = new MinigameDirector(_catalogo.Minijuegos, Perfil, _rng);
+            _minijuegos = new MinigameDirector(MinijuegosDelNivel(_catalogo, Perfil.Id), Perfil, _rng);
         }
 
         // ==================================================================== FASE 2 · el dia continuo (§3.3)
@@ -532,6 +585,12 @@ namespace Nexus.Core.Sesion {
             return resultado;
         }
 
+        /// <summary>Si hoy se puede entrar en esa zona. Para que el mapa enseñe las puertas cerradas sin probar a entrar.</summary>
+        public bool ZonaAbierta(string zonaId) {
+            var zona = Perfil.Mapa == null ? null : Perfil.Mapa.PorId(zonaId);
+            return zona != null && PuertaAbierta(zona.Puerta);
+        }
+
         private bool PuertaAbierta(PuertaDeZona puerta) {
             if (puerta == null || puerta.SiempreAbierta) return true;
             if (!ConditionEvaluator.EvaluarTodas(puerta.Precondiciones, this)) return false;
@@ -579,7 +638,8 @@ namespace Nexus.Core.Sesion {
                 var oa = _minijuegoDeHoy != null && string.Equals(_minijuegoDeHoy.MinijuegoId, alerta.Id, StringComparison.Ordinal)
                     ? _minijuegoDeHoy.ObjetivoAprendizaje
                     : null;
-                AplicarResultadoDeMinijuego(PuenteDelMotor.Omitido(alerta.Id, oa, null));
+                var def = _minijuegos == null ? null : _minijuegos.PorId(alerta.Id);
+                AplicarResultadoDeMinijuego(PuenteDelMotor.Omitido(alerta.Id, oa, def == null ? null : def.ConsecuenciaOmitido));
             }
         }
 
@@ -876,6 +936,8 @@ namespace Nexus.Core.Sesion {
             // ★ EL PUENTE. Una vez, aqui.
             PuenteDeFlags.VolcarAlCerrar(W, R, Flags);
             VolcarEleccionesNarrativas();
+            VolcarArquitectura();
+            VolcarColeccionables();
             reporte.Flags = Flags.Copia();
 
             NivelTerminado = true;
@@ -1061,7 +1123,7 @@ namespace Nexus.Core.Sesion {
 
             if (s.Fase1Cerrada) {
                 s._eventos = new EventDirector(EventosDelNivel(catalogo, s.Perfil.Id), s.Perfil, s.Reglas, s._rng, s._scheduler);
-                s._minijuegos = new MinigameDirector(catalogo.Minijuegos, s.Perfil, s._rng);
+                s._minijuegos = new MinigameDirector(MinijuegosDelNivel(catalogo, s.Perfil.Id), s.Perfil, s._rng);
             }
 
             // 5 · el plan de hoy

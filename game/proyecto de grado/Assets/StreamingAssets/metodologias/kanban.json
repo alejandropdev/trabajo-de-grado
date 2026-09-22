@@ -17,6 +17,17 @@
     "no_hace_falta_planificar"
   ],
 
+  "textosDeRazones": {
+    "el_trabajo_llega_de_forma_impredecible": "El trabajo llega de forma impredecible.",
+    "hay_mucho_soporte_y_mantenimiento_mezclado": "Hay mucho soporte y mantenimiento mezclado.",
+    "el_equipo_ya_esta_saturado_y_hay_que_ver_donde": "El equipo ya está saturado y hay que ver dónde.",
+    "las_prioridades_cambian_mas_rapido_que_un_sprint": "Las prioridades cambian más rápido que un sprint.",
+    "asi_no_hay_que_estimar_nada": "Así no hay que estimar nada.",
+    "es_scrum_pero_sin_reuniones": "Es como Scrum, pero sin reuniones.",
+    "asi_el_equipo_va_mas_suelto": "Así el equipo va más suelto.",
+    "no_hace_falta_planificar": "No hace falta planificar."
+  },
+
   "calendario": {
     "tipo": "continuo",
     "etiquetaUnidad": "Flujo continuo",

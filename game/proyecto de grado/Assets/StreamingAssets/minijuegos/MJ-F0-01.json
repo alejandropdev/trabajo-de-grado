@@ -1,0 +1,75 @@
+{
+  "id": "MJ-F0-01",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SRS",
+  "objetivoAprendizaje": "OA-DOC-01",
+  "presentacion": {
+    "titulo": "La revisión de tu propuesta",
+    "comoSeJuega": "Este es el diagrama de tu propuesta para el concurso. Pincha lo que tenga un problema y dile qué problema es. Cuidado: marcar lo que está bien también cuenta en contra.",
+    "quienEspera": "Marisol Andrade",
+    "textoPresion": "Marisol recoge las propuestas revisadas a las 12:00",
+    "segundosReloj": 90
+  },
+  "artefacto": {
+    "elementos": [
+      { "id": "pantalla", "texto": "Pantalla de recepción", "tipo": "componente", "fila": 0, "columna": 0,
+        "detalle": "El navegador del único equipo de la recepción." },
+      { "id": "registro", "texto": "Registro de visitas", "tipo": "componente", "fila": 1, "columna": 0,
+        "detalle": "Registra al visitante si trae una cita confirmada." },
+      { "id": "aviso", "texto": "Aviso al anfitrión", "tipo": "componente", "fila": 1, "columna": 1,
+        "detalle": "Avisa por correo a la persona a la que viene a ver el visitante." },
+      { "id": "bd", "texto": "Base de datos", "tipo": "baseDeDatos", "fila": 2, "columna": 0,
+        "detalle": "Guarda quién entró y quién sigue dentro." },
+      { "id": "correo", "texto": "Correo de Nexus", "tipo": "externo", "fila": 2, "columna": 1,
+        "detalle": "El servicio de correo corporativo." }
+    ],
+    "conexiones": [
+      { "id": "c1", "desde": "pantalla", "hasta": "registro", "texto": "datos del visitante" },
+      { "id": "c2", "desde": "registro", "hasta": "bd", "texto": "guarda la visita" },
+      { "id": "c3", "desde": "registro", "hasta": "aviso", "texto": "visita registrada" },
+      { "id": "c4", "desde": "aviso", "hasta": "correo", "texto": "envía el aviso" }
+    ]
+  },
+  "zonas": [
+    { "id": "Z1", "tipo": "commit", "commits": ["registro"], "defecto": "requisito_incompleto",
+      "explicacion": "Solo registra a quien trae cita. ¿Y los visitantes sin cita? Alguien lo preguntó en los comentarios del ticket y nadie contestó: el requisito está incompleto." }
+  ],
+  "senuelos": [
+    { "id": "S1", "commits": ["correo"], "razonNoEsDefecto": "Usar el correo de la empresa para avisar es lo más sencillo, y la restricción del ticket pedía justo eso: nada que instalar." }
+  ],
+  "paletaEtiquetas": ["requisito_incompleto", "acoplamiento_indebido", "elemento_sin_especificar"],
+  "andamiaje": {
+    "3": { "resaltarZonasCandidatas": true, "etiquetas": ["requisito_incompleto", "acoplamiento_indebido"], "contadorRestantes": true },
+    "2": { "resaltarZonasCandidatas": false, "etiquetas": ["requisito_incompleto", "acoplamiento_indebido", "elemento_sin_especificar"], "contadorRestantes": true },
+    "1": { "resaltarZonasCandidatas": false, "etiquetas": [], "contadorRestantes": false },
+    "0": { "resaltarZonasCandidatas": false, "etiquetas": [], "contadorRestantes": false, "etiquetasTrampa": ["acoplamiento_indebido"] }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": { "Documentacion": 5 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "correcta", "oa": "OA-DOC-01", "razon": "Un requisito incompleto es el defecto más barato de corregir: cuesta una línea en el diagrama. Encontrado en el código, cuesta días." }
+    },
+    "parcial": {
+      "efectosInmediatos": { "DeudaTecnica": 2 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "aceptable", "oa": "OA-DOC-01", "razon": "Encontraste parte del problema. Lo que quede sin marcar, el jurado lo va a probar." }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": { "Dias": 0.3 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-DOC-01", "razon": "Marcaste algo que estaba bien. Revisar no es sospechar de todo: es saber distinguir." }
+    },
+    "omitido": {
+      "efectosInmediatos": { "DeudaTecnica": 3 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-DOC-01", "razon": "La propuesta se entregó sin revisar. Los visitantes sin cita siguen sin existir para el sistema." }
+    }
+  },
+  "cierre": { "texto": "Marisol recoge tu hoja sin mirarla. La mirará el jurado." }
+}

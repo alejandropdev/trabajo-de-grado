@@ -17,6 +17,17 @@
     "es_lo_que_siempre_hemos_hecho"
   ],
 
+  "textosDeRazones": {
+    "el_dominio_es_conocido_y_estable": "El dominio es conocido y no va a cambiar.",
+    "hay_que_certificar_o_auditar_el_resultado": "Hay que certificar o auditar el resultado.",
+    "el_cliente_necesita_un_precio_cerrado": "El cliente necesita un precio cerrado.",
+    "el_coste_de_equivocarse_en_produccion_es_altisimo": "Equivocarse en producción cuesta muchísimo.",
+    "asi_no_hay_que_hablar_con_el_cliente": "Así no hay que hablar con el cliente.",
+    "es_mas_serio_y_profesional": "Es más serio y profesional.",
+    "asi_queda_todo_documentado": "Así queda todo documentado.",
+    "es_lo_que_siempre_hemos_hecho": "Es lo que siempre hemos hecho."
+  },
+
   "calendario": {
     "tipo": "secuencial",
     "etiquetaUnidad": "Etapa",

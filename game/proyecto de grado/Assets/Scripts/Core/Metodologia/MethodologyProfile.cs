@@ -67,6 +67,18 @@ namespace Nexus.Core.Metodologia {
         /// <summary>Razones que suenan bien y no lo son. Permiten acertar por el motivo equivocado, y detectarlo.</summary>
         public List<string> RazonesTrampa = new List<string>();
 
+        /// <summary>id de razon -> como se lee en pantalla. Los ids no llevan tildes; los textos si.</summary>
+        public Dictionary<string, string> TextosDeRazones = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        /// <summary>El texto de una razon; si no lo hay, el id legible.</summary>
+        public string TextoDe(string razonId) {
+            string texto;
+            if (razonId != null && TextosDeRazones != null && TextosDeRazones.TryGetValue(razonId, out texto)) return texto;
+            if (string.IsNullOrEmpty(razonId)) return "";
+            var legible = razonId.Replace('_', ' ');
+            return char.ToUpperInvariant(legible[0]) + legible.Substring(1) + ".";
+        }
+
         // --- los ocho bloques ---
         public Calendario Calendario = new Calendario();                                   // 1
         public List<Ceremonia> Ceremonias = new List<Ceremonia>();                         // 2

@@ -25,7 +25,8 @@
     "enfriamientoGlobal": 1,
     "maxEventosPorDia": 1,
     "ventanaTelegrafiado": 1,
-    "multiplicadorSeveridad": 0.6
+    "multiplicadorSeveridad": 0.6,
+    "probabilidadDeDiaTranquiloMinijuegos": 0
   },
 
   "jornada": {

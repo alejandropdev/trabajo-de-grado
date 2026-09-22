@@ -1,0 +1,92 @@
+{
+  "id": "MJ-F1-07",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SSD / SDD",
+  "objetivoAprendizaje": "OA-DOC-01",
+  "presentacion": {
+    "titulo": "La revisión del diagrama",
+    "comoSeJuega": "Pincha las piezas o las flechas que tienen un problema y ponles nombre. No todo lo raro está mal: marcar lo que está bien también cuesta.",
+    "quienEspera": "Javier",
+    "textoPresion": "Javier empieza a programar sobre este diagrama a las 11:00",
+    "segundosReloj": 120
+  },
+  "artefacto": {
+    "elementos": [
+      { "id": "garita", "texto": "Lector de la garita", "tipo": "externo", "fila": 0, "columna": 0,
+        "detalle": "Cámara que lee la matrícula y la envía." },
+      { "id": "app-guardia", "texto": "Pantalla del guardia", "tipo": "componente", "fila": 0, "columna": 1,
+        "detalle": "Enseña quién entra y quién sale." },
+      { "id": "app-facilities", "texto": "Portal de Facilities", "tipo": "componente", "fila": 0, "columna": 2,
+        "detalle": "Desde aquí se piden los ascensores de carga." },
+      { "id": "mod-acceso", "texto": "Módulo de acceso", "tipo": "componente", "fila": 1, "columna": 0,
+        "detalle": "Decide si una matrícula puede entrar y registra la entrada." },
+      { "id": "mod-reservas", "texto": "Módulo de reservas", "tipo": "componente", "fila": 1, "columna": 1,
+        "detalle": "Reserva un ascensor de carga. Si dos reservas chocan, gana la prioritaria." },
+      { "id": "mod-informes", "texto": "Módulo de informes", "tipo": "componente", "fila": 1, "columna": 2,
+        "detalle": "Genera el informe mensual de uso." },
+      { "id": "barrera", "texto": "Controlador de la barrera", "tipo": "externo", "fila": 2, "columna": 0,
+        "detalle": "Abre o cierra la barrera cuando recibe la orden. Acepta cualquier orden que le llegue." },
+      { "id": "bd", "texto": "Base de datos", "tipo": "baseDeDatos", "fila": 2, "columna": 1,
+        "detalle": "Una sola base de datos, con las tablas de cada módulo separadas." },
+      { "id": "correo", "texto": "Servicio de correo", "tipo": "externo", "fila": 2, "columna": 2,
+        "detalle": "Servicio de correo corporativo de Nexus." }
+    ],
+    "conexiones": [
+      { "id": "c1", "desde": "garita", "hasta": "mod-acceso", "texto": "envía la matrícula leída" },
+      { "id": "c2", "desde": "mod-acceso", "hasta": "barrera", "texto": "abrir / cerrar" },
+      { "id": "c3", "desde": "app-guardia", "hasta": "mod-acceso", "texto": "consulta los accesos" },
+      { "id": "c4", "desde": "app-facilities", "hasta": "mod-reservas", "texto": "pide un ascensor" },
+      { "id": "c5", "desde": "mod-reservas", "hasta": "bd", "texto": "guarda las reservas" },
+      { "id": "c6", "desde": "mod-acceso", "hasta": "bd", "texto": "guarda los accesos" },
+      { "id": "c7", "desde": "mod-informes", "hasta": "bd", "texto": "lee directamente las tablas internas de reservas" },
+      { "id": "c8", "desde": "mod-reservas", "hasta": "correo", "texto": "avisa de la reserva" }
+    ]
+  },
+  "zonas": [
+    { "id": "Z1", "tipo": "commit", "commits": ["mod-reservas"], "defecto": "requisito_ambiguo",
+      "explicacion": "«Gana la prioritaria», pero nadie ha dicho qué es la prioridad. Facilities salió de su primera reunión con tres ideas distintas: el diagrama lo copió sin resolverlo, y alguien lo va a interpretar a su manera." },
+    { "id": "Z2", "tipo": "commit", "commits": ["c7"], "defecto": "acoplamiento_indebido",
+      "explicacion": "El módulo de informes lee las tablas internas del de reservas sin pasar por él. El día que reservas cambie una tabla, los informes se rompen sin que nadie sepa por qué." },
+    { "id": "Z3", "tipo": "commit", "commits": ["barrera"], "defecto": "falla_de_seguridad",
+      "explicacion": "El controlador obedece cualquier orden, venga de donde venga. Es exactamente como la abrieron la primera vez: con el mando genérico del fabricante." }
+  ],
+  "senuelos": [
+    { "id": "S1", "commits": ["c6"], "razonNoEsDefecto": "En un monolito modular es normal que varios módulos compartan la base de datos. Lo que no deben hacer es leer las tablas de otro módulo sin pasar por él." },
+    { "id": "S2", "commits": ["correo"], "razonNoEsDefecto": "Usar el servicio de correo de la empresa no es un defecto: es no reinventar la rueda." }
+  ],
+  "paletaEtiquetas": ["requisito_ambiguo", "acoplamiento_indebido", "falla_de_seguridad", "dependencia_circular", "elemento_sin_especificar"],
+  "andamiaje": {
+    "3": { "resaltarZonasCandidatas": true, "etiquetas": ["requisito_ambiguo", "acoplamiento_indebido", "falla_de_seguridad"], "contadorRestantes": true },
+    "2": { "resaltarZonasCandidatas": false, "etiquetas": ["requisito_ambiguo", "acoplamiento_indebido", "falla_de_seguridad", "dependencia_circular"], "contadorRestantes": true },
+    "1": { "resaltarZonasCandidatas": false, "etiquetas": [], "contadorRestantes": false },
+    "0": { "resaltarZonasCandidatas": false, "etiquetas": [], "contadorRestantes": false, "etiquetasTrampa": ["dependencia_circular", "elemento_sin_especificar"] }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": { "Documentacion": 6 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "correcta", "oa": "OA-DOC-01", "razon": "Encontraste los tres problemas antes de que nadie programara sobre ellos. Un defecto en el diagrama cuesta un borrador; el mismo defecto en el código cuesta semanas." }
+    },
+    "parcial": {
+      "efectosInmediatos": { "DeudaTecnica": 3 },
+      "efectosDiferidos": [ { "enDias": 3, "efectos": {}, "eventoForzado": "EV-ALC-01" } ],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "aceptable", "oa": "OA-DOC-01", "razon": "Encontraste parte de lo que había. Lo que se quedó en el diagrama se va a construir tal cual, y un requisito ambiguo siempre vuelve como «ah, y también…»." }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": { "Dias": 0.5, "MoralEquipo": -2 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-DOC-01", "razon": "Marcaste algo que estaba bien. Javier: «Revisé lo que marcaste. Estaba bien. Perdí la mañana». Un revisor que lo marca todo hace perder el tiempo a su equipo." }
+    },
+    "omitido": {
+      "efectosInmediatos": { "DeudaTecnica": 5, "Documentacion": -3 },
+      "efectosDiferidos": [ { "enDias": 3, "efectos": {}, "eventoForzado": "EV-ALC-01" } ],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-DOC-01", "razon": "Nadie revisó el diagrama. Se va a construir exactamente lo que dice, incluida la parte que no dice nada." }
+    }
+  },
+  "cierre": { "texto": "El diagrama se queda como lo dejes. Lo que no marques, alguien lo construirá tal cual." }
+}

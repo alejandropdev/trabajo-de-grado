@@ -1,0 +1,83 @@
+{
+  "id": "MJ-F2-07",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "secuencia",
+  "temaPrincipal": "SSD / SDD",
+  "objetivoAprendizaje": "OA-DOC-01",
+  "presentacion": {
+    "titulo": "El diagrama de secuencia contra la realidad",
+    "comoSeJuega": "A la izquierda, lo que se diseñó. A la derecha, lo que pasó de verdad esta mañana en la garita. No coinciden del todo: marca dónde se separan, y qué tipo de diferencia es.",
+    "quienEspera": "Javier",
+    "textoPresion": "Javier sacó esta traza del log de producción de las 07:58",
+    "segundosReloj": 120
+  },
+  "artefacto": {
+    "elementos": [
+      { "id": "p-garita", "texto": "Garita", "tipo": "participante", "grupo": "diagrama", "columna": 0 },
+      { "id": "p-acceso", "texto": "Módulo de acceso", "tipo": "participante", "grupo": "diagrama", "columna": 1 },
+      { "id": "p-bd", "texto": "Base de datos", "tipo": "participante", "grupo": "diagrama", "columna": 2 },
+      { "id": "p-barrera", "texto": "Barrera", "tipo": "participante", "grupo": "diagrama", "columna": 3 },
+
+      { "id": "t1", "tipo": "linea", "grupo": "traza", "fila": 1, "texto": "07:58:02  garita  → acceso   registrarEntrada(ABC-123)" },
+      { "id": "t2", "tipo": "linea", "grupo": "traza", "fila": 2, "texto": "07:58:02  acceso  → bd       buscarPermiso(ABC-123)" },
+      { "id": "t3", "tipo": "linea", "grupo": "traza", "fila": 3, "texto": "07:58:03  acceso  → barrera  abrir()" },
+      { "id": "t4", "tipo": "linea", "grupo": "traza", "fila": 4, "texto": "07:58:03  bd      → acceso   permiso: DENEGADO" },
+      { "id": "t5", "tipo": "linea", "grupo": "traza", "fila": 5, "texto": "07:58:04  acceso  → bd       guardarAcceso(ABC-123)" },
+      { "id": "t6", "tipo": "linea", "grupo": "traza", "fila": 6, "texto": "07:58:04  acceso  → bd       guardarAcceso(ABC-123)" },
+      { "id": "t7", "tipo": "linea", "grupo": "traza", "fila": 7, "texto": "07:58:06  garita  → acceso   reintento: registrarEntrada(ABC-123)" }
+    ],
+    "conexiones": [
+      { "id": "m1", "desde": "p-garita", "hasta": "p-acceso", "orden": 1, "grupo": "diagrama", "texto": "registrarEntrada(matrícula)" },
+      { "id": "m2", "desde": "p-acceso", "hasta": "p-bd", "orden": 2, "grupo": "diagrama", "texto": "buscarPermiso(matrícula)" },
+      { "id": "m3", "desde": "p-bd", "hasta": "p-acceso", "orden": 3, "grupo": "diagrama", "texto": "permiso" },
+      { "id": "m4", "desde": "p-acceso", "hasta": "p-bd", "orden": 4, "grupo": "diagrama", "texto": "guardarAcceso(matrícula)" },
+      { "id": "m5", "desde": "p-acceso", "hasta": "p-barrera", "orden": 5, "grupo": "diagrama", "texto": "abrir()  — solo si el permiso es válido" }
+    ]
+  },
+  "zonas": [
+    { "id": "Z1", "tipo": "commit", "commits": ["t3"], "defecto": "orden_incorrecto",
+      "explicacion": "La barrera se abre antes de que llegue la respuesta del permiso. Con un DENEGADO, el carro ya ha entrado. El diagrama lo tenía bien; el código no lo siguió." },
+    { "id": "Z2", "tipo": "commit", "commits": ["t6"], "defecto": "mensaje_duplicado",
+      "explicacion": "El acceso se guarda dos veces. Es el origen de las «lecturas duplicadas» que la garita lleva días reportando." },
+    { "id": "Z3", "tipo": "commit", "commits": ["t7"], "defecto": "mensaje_no_documentado",
+      "explicacion": "La garita reintenta cuando la red falla, y el diagrama no lo contempla. Si nadie diseñó el reintento, nadie diseñó que un reintento no duplique el acceso." }
+  ],
+  "senuelos": [
+    { "id": "S1", "commits": ["t2"], "razonNoEsDefecto": "Dos mensajes en el mismo segundo no son un error: el sistema es rápido, y buscar el permiso justo al recibir la matrícula es lo que dice el diagrama." },
+    { "id": "S2", "commits": ["m3"], "razonNoEsDefecto": "Que la base de datos responda al módulo es exactamente lo que un diagrama de secuencia tiene que mostrar: la respuesta también es un mensaje." }
+  ],
+  "paletaEtiquetas": ["orden_incorrecto", "mensaje_duplicado", "mensaje_no_documentado", "participante_equivocado"],
+  "andamiaje": {
+    "3": { "resaltarZonasCandidatas": true, "etiquetas": ["orden_incorrecto", "mensaje_duplicado", "mensaje_no_documentado"], "contadorRestantes": true },
+    "2": { "resaltarZonasCandidatas": false, "etiquetas": ["orden_incorrecto", "mensaje_duplicado", "mensaje_no_documentado", "participante_equivocado"], "contadorRestantes": true },
+    "1": { "resaltarZonasCandidatas": false, "etiquetas": [], "contadorRestantes": false },
+    "0": { "resaltarZonasCandidatas": false, "etiquetas": [], "contadorRestantes": false, "etiquetasTrampa": ["participante_equivocado"] }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": { "Documentacion": 5, "Cobertura": 3 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "correcta", "oa": "OA-DOC-01", "razon": "Un diagrama de secuencia sirve para comparar lo diseñado con lo que pasa. Encontraste las tres diferencias, y una de ellas explica un bug que llevaba días abierto." }
+    },
+    "parcial": {
+      "efectosInmediatos": { "DeudaTecnica": 4 },
+      "efectosDiferidos": [ { "enDias": 4, "efectos": { "SatisfaccionCliente": -4 } } ],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "aceptable", "oa": "OA-DOC-01", "razon": "Encontraste parte de la diferencia. Lo que no marcaste sigue pasando cada mañana en la garita." }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": { "Dias": 0.5, "MoralEquipo": -2 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-DOC-01", "razon": "Marcaste como diferencia algo que el diagrama sí decía. Comparar exige leer los dos lados con el mismo cuidado." }
+    },
+    "omitido": {
+      "efectosInmediatos": { "DeudaTecnica": 6, "Documentacion": -3 },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-DOC-01", "razon": "La traza se quedó sin revisar. El diagrama sigue diciendo una cosa y el sistema haciendo otra." }
+    }
+  },
+  "cierre": { "texto": "Un diagrama que nadie compara con la realidad se convierte en ficción." }
+}

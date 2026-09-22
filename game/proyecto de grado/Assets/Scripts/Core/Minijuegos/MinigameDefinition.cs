@@ -106,6 +106,23 @@ namespace Nexus.Core.Minijuegos {
 
         /// <summary>Fases en las que puede salir. Vacia = solo desarrollo, que es donde vive la ventana de las 15:00.</summary>
         public List<string> Fases = new List<string>();
+
+        /// <summary>
+        /// Lo que pasa si la alerta caduca sin que nadie la atienda: la consecuencia 'omitido' de SU escena.
+        /// No se escribe en el indice; la copia el cargador desde el JSON de la escena. Sin esto, dejar caducar
+        /// un minijuego aplicaria un omitido generico y se saltaria lo que la escena encadena (EV-ALC-01).
+        /// </summary>
+        public Consecuencia ConsecuenciaOmitido;
+
+        /// <summary>Vacia = todos los niveles. Igual que en eventos y escenas.</summary>
+        public List<string> SoloNiveles = new List<string>();
+
+        public bool AplicaAlNivel(string nivelId) {
+            if (SoloNiveles == null || SoloNiveles.Count == 0) return true;
+            foreach (var n in SoloNiveles)
+                if (string.Equals(n, nivelId, StringComparison.Ordinal)) return true;
+            return false;
+        }
     }
 
     /// <summary>

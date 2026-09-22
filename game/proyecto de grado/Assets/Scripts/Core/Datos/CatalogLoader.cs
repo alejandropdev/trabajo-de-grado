@@ -226,6 +226,20 @@ namespace Nexus.Core.Datos {
                 }
             }
 
+            // Cada entrada del indice se queda con el 'omitido' de su escena: es lo que se aplica si la alerta
+            // caduca. Si la escena no se puede leer, el validador lo dira con su propio mensaje.
+            foreach (var mj in catalogo.Minijuegos) {
+                if (mj == null || string.IsNullOrEmpty(mj.Archivo) || !fuente.Existe(mj.Archivo)) continue;
+                try {
+                    var escena = CatalogoMinijuegos.Parsear(fuente.LeerCatalogo(mj.Archivo));
+                    Consecuencia omitido;
+                    if (escena.Consecuencias != null && escena.Consecuencias.TryGetValue(ResultadosDeMinijuego.Omitido, out omitido))
+                        mj.ConsecuenciaOmitido = omitido;
+                } catch (Exception) {
+                    // lo informa ValidarMinijuegos
+                }
+            }
+
             // Narrativa y flags tambien son opcionales: un prototipo de motor puede correr sin trama.
             if (fuente.Existe(ArchivoNarrativa)) {
                 try {

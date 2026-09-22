@@ -101,7 +101,10 @@ namespace Nexus.Core.Minijuegos {
             // 4 · el 45 % de los dias elegibles no sale ninguno.
             // La tirada se gasta AQUI, despues de saber que habia candidatos: si se tirara antes,
             // un nivel sin minijuegos elegibles consumiria azar y las partidas dejarian de cuadrar.
-            if (_rng.NextDouble() < ProbabilidadDeDiaTranquilo) {
+            // La tirada se gasta siempre, aunque la probabilidad sea 0: si no, cambiar este numero en un
+            // nivel desalinearia todo lo que el azar sortea despues (INV-7 con la misma semilla).
+            var tranquilo = _perfil.Director == null ? ProbabilidadDeDiaTranquilo : _perfil.Director.ProbabilidadDeDiaTranquiloMinijuegos;
+            if (_rng.NextDouble() < tranquilo) {
                 decision.Resultado = DecisionDeMinijuego.DiaTranquilo;
                 return null;
             }
