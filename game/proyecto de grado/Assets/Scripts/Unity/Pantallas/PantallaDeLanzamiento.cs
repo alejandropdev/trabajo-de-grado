@@ -1,5 +1,6 @@
 using System;
 using Nexus.Unity.Aplicacion;
+using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using UnityEngine;
 
@@ -37,6 +38,7 @@ namespace Nexus.Unity.Pantallas {
             Ui.Barra(datos, (float)l.RiesgoDeLanzamiento / 100f, l.RiesgoDeLanzamiento > 50 ? Tema.rojo : Tema.mostaza);
 
             hoja.Accion("Cerrar el nivel", () => AlSeguir?.Invoke());
+            GuiaView.Avisar(App, "lanzamiento");
         }
     }
 }

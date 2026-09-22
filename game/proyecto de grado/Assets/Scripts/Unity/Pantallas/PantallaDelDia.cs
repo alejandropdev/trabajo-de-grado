@@ -7,6 +7,7 @@ using Nexus.Core.Jornada;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Sesion;
 using Nexus.Unity.Aplicacion;
+using Nexus.Unity.Guia;
 using Nexus.Unity.Juego;
 using Nexus.Unity.Pantallas.Minijuegos;
 using Nexus.Unity.Tema;
@@ -74,6 +75,7 @@ namespace Nexus.Unity.Pantallas {
             var scroll = Ui.Desplazable(centro, out contenido);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
             _ahora = new Hoja(Ui, contenido);
+            GuiaView.Registrar("dia.ahora", centro);
 
             ConstruirDerecha(cuerpo);
 
@@ -89,6 +91,7 @@ namespace Nexus.Unity.Pantallas {
             Anotar(S.R.DiaActual == 0
                 ? $"Empieza «{S.Perfil.Nombre}» con {S.Metodologia.Nombre}."
                 : $"Partida recuperada: día {S.R.DiaActual}, {S.HoraActual}.");
+            if (S.R.DiaActual == 0) GuiaView.Avisar(App, "dia.antes");
         }
 
         private void ConstruirCabecera(Transform padre) {
@@ -104,21 +107,25 @@ namespace Nexus.Unity.Pantallas {
                 var velocidad = v;
                 UiKit.Tamano(Ui.Boton(cabecera, "×" + v, () => Runner.Velocidad = velocidad, VarianteBoton.Fantasma), ancho: 64);
             }
-            Ui.Boton(cabecera, "Diario", AbrirDiario);
+            GuiaView.Registrar("dia.velocidad", _pausa);
+            GuiaView.Registrar("dia.diario", Ui.Boton(cabecera, "Diario", AbrirDiario));
+            GuiaView.BotonDeAyuda(App, cabecera);
             Ui.Boton(cabecera, "Menú", () => App.Router.Apilar<PantallaDePausa>());
         }
 
         private void ConstruirIzquierda(Transform padre) {
             var izquierda = Ui.Columna(padre, "Izquierda", Tema.espacio);
             UiKit.Tamano(izquierda, ancho: 400, flexAlto: 1);
-            RelojView.Crear(Ui, izquierda, Runner);
+            GuiaView.Registrar("dia.reloj", RelojView.Crear(Ui, izquierda, Runner));
 
             RectTransform contenido;
             var scroll = Ui.Desplazable(izquierda, out contenido);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
             var mapa = Ui.Tarjeta(contenido, "El mapa");
+            GuiaView.Registrar("dia.mapa", mapa);
             _mapa = Ui.Columna(mapa, "Zonas", 6);
             var aqui = Ui.Tarjeta(contenido, "Aquí");
+            GuiaView.Registrar("dia.aqui", aqui);
             _aqui = Ui.Columna(aqui, "Zona actual", 6);
         }
 
@@ -127,6 +134,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(derecha, ancho: 420, flexAlto: 1);
 
             var proyecto = Ui.Tarjeta(derecha, "El proyecto");
+            GuiaView.Registrar("dia.proyecto", proyecto);
             var nombres = new[] { "Avance", "Deuda técnica", "Moral del equipo", "Cobertura de pruebas", "Cansancio" };
             var colores = new[] { Tema.cian, Tema.mostaza, Tema.cianClaro, Tema.cian, Tema.naranja };
             for (var i = 0; i < nombres.Length; i++) {
@@ -178,17 +186,18 @@ namespace Nexus.Unity.Pantallas {
 
             // ★ El reloj se para dentro de una escena, y solo ahi.
             Runner.EnEscena = _escenaApilada || _decidido != null || S.Decision != null || S.PendingPlanning != null ||
-                              (S.PendingRetro != null && S.PendingRetro.Acciones.Count > 0);
+                              (S.PendingRetro != null && S.PendingRetro.Acciones.Count > 0) || GuiaView.PausaActiva;
 
             var paso = PasoActual();
             var clave = $"{paso}|{S.R.DiaActual}|{S.ZonaActual}|{string.Join(",", AlertasSonando().Select(a => a.Id))}|" +
-                        $"{S.SePuedeCerrarLaJornada}|{QuedaAlgunAviso()}|{_compromiso}";
+                        $"{S.SePuedeCerrarLaJornada}|{QuedaAlgunAviso()}|{_compromiso}|{Runner.PuedeMoverse}|" +
+                        string.Join(",", S.TareasDeOficina.Select(t => S.PorQueNoSePuedeHacer(t.Id) == null ? "1" : "0"));
             if (clave != _claveAhora) {
                 _claveAhora = clave;
                 PintarAhora(paso);
             }
 
-            var claveMapa = $"{S.R.DiaActual}|{S.ZonaActual}|{Runner.Estado}|{S.ColeccionablesAqui().Count}";
+            var claveMapa = $"{S.R.DiaActual}|{S.ZonaActual}|{Runner.Estado}|{Runner.PuedeMoverse}|{S.ColeccionablesAqui().Count}";
             if (claveMapa != _claveMapa) {
                 _claveMapa = claveMapa;
                 PintarMapa();
@@ -244,6 +253,14 @@ namespace Nexus.Unity.Pantallas {
                 case Paso.Resumen: Resumen(); break;
                 case Paso.FinDelDesarrollo: FinDelDesarrollo(); break;
             }
+            switch (paso) {
+                case Paso.Retro: GuiaView.Avisar(App, "retro"); break;
+                case Paso.Planificacion: GuiaView.Avisar(App, "planificacion"); break;
+                case Paso.Decision: GuiaView.Avisar(App, "decision.abierta"); break;
+                case Paso.Cierre: GuiaView.Avisar(App, "cierre"); break;
+                case Paso.Prorroga: GuiaView.Avisar(App, "prorroga"); break;
+                case Paso.Resumen: GuiaView.Avisar(App, "resumen"); break;
+            }
         }
 
         // ---------------------------------------------------------------- cada paso
@@ -283,7 +300,7 @@ namespace Nexus.Unity.Pantallas {
                 _compromiso = Math.Round(plan.CapacidadSugerida);
             }
             _ahora.Etiqueta("Ceremonia · planificación de " + plan.Unidad);
-            _ahora.Titulo(string.IsNullOrEmpty(plan.Texto) ? "¿Con cuánto te comprometes?" : plan.Texto);
+            _ahora.Titulo("¿Con cuánto te comprometes?");
             _ahora.Parrafo($"El equipo calcula que puede con unos {plan.CapacidadSugerida:0.#} puntos. Quedan {plan.PuntosPendientes:0} puntos por hacer.");
             _ahora.Nota("Prometer más de lo que cabe no da error: genera sobrecompromiso, y el sobrecompromiso genera deuda técnica cada día hasta que se cierra.");
 
@@ -315,14 +332,50 @@ namespace Nexus.Unity.Pantallas {
                 foreach (var aviso in brief.Avisos) Ui.Texto(anuncios, aviso, EstiloTexto.Cuerpo);
             }
 
+            PintarOficina();
+
             _ahora.Espacio();
             var botones = _ahora.Fila();
             if (porSonar) Ui.Boton(botones, "Esperar al siguiente aviso", () => Runner.AdelantarHastaElSiguienteAviso());
-            var cerrar = Ui.Boton(botones, "Cerrar la jornada", () => Runner.CerrarJornada(),
+            var cerrar = Ui.Boton(botones, "Cerrar la jornada", () => { Runner.CerrarJornada(); GuiaView.Hecho(App, "cerrar-jornada"); },
                                   porSonar ? VarianteBoton.Secundario : VarianteBoton.Primario);
             cerrar.interactable = S.SePuedeCerrarLaJornada;
             if (!S.SePuedeCerrarLaJornada)
                 _ahora.Nota("«Cerrar la jornada» salta al final del día, y solo se puede cuando no queda nada pendiente: saltar nunca te ahorra una consecuencia.");
+        }
+
+        /// <summary>
+        /// El trabajo de oficina: para que un rato sin avisos no sea solo esperar. Cada tarea es un minijuego de
+        /// practica que cuesta tiempo del dia y mejora el stock de su tema. No cuenta para la evaluacion.
+        /// </summary>
+        private void PintarOficina() {
+            if (S.TareasDeOficina.Count == 0) return;
+            var tarjeta = _ahora.Tarjeta("Trabajo en tu escritorio");
+            GuiaView.Registrar("dia.oficina", tarjeta);
+            Ui.Texto(tarjeta, "Mientras no suena nada, puedes adelantar trabajo. Cada tarea cuesta tiempo del día y mejora el proyecto. " +
+                              "Es práctica: no cuenta para tu evaluación.", EstiloTexto.Pequeno);
+            foreach (var t in S.TareasDeOficina) {
+                var tarea = t;
+                var motivo = S.PorQueNoSePuedeHacer(tarea.Id);
+                var detalle = $"{tarea.Minutos} min · mejora: {tarea.Mejora}" + (motivo == null ? "" : "   —   " + motivo);
+                var boton = Ui.BotonDeOpcion(tarjeta, tarea.Titulo, detalle, () => EmpezarTarea(tarea));
+                boton.interactable = motivo == null && Runner.PuedeMoverse;
+            }
+            GuiaView.Avisar(App, "oficina.disponible");
+        }
+
+        private void EmpezarTarea(Nexus.Core.Oficina.TareaDeOficina tarea) {
+            if (!Runner.EmpezarTarea(tarea.Id)) return;
+            Anotar($"{S.HoraActual} · Trabajo: «{tarea.Titulo}».");
+            var pendiente = new PendingMinigame {
+                MinijuegoId = tarea.Minijuego, Archivo = tarea.Archivo, NivelAndamiaje = S.Perfil.NivelAndamiaje
+            };
+            AbrirEscenaDeMinijuego(pendiente, true, resultado => {
+                var cambios = S.ResolverTarea(resultado);
+                Anotar($"Trabajo terminado: {Textos.Previsualizar(cambios)}.");
+                GuiaView.Hecho(App, "oficina");
+                GuiaView.Avisar(App, "oficina.hecha");
+            });
         }
 
         private void Aviso() {
@@ -377,7 +430,7 @@ namespace Nexus.Unity.Pantallas {
                            ": hoy avanzas un 25 % más, pero lo pagas en cansancio, salud y deuda técnica, y se acumula.");
             _ahora.Parrafo("Si te quedas, hasta esa hora no llegan avisos: es tiempo libre para recorrer el mapa.");
             var botones = _ahora.Fila();
-            Ui.Boton(botones, "Irme a casa", () => { Runner.Irse(); Anotar("Te fuiste a casa."); }, VarianteBoton.Primario);
+            Ui.Boton(botones, "Irme a casa", () => { Runner.Irse(); Anotar("Te fuiste a casa."); GuiaView.Hecho(App, "irse"); }, VarianteBoton.Primario);
             Ui.Boton(botones, "Quedarme", () => { Runner.Quedarse(); Anotar("Te quedaste haciendo horas extra."); }, VarianteBoton.Peligro);
         }
 
@@ -419,7 +472,7 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Texto(_mapa, "Este nivel no tiene mapa.", EstiloTexto.Pequeno);
                 return;
             }
-            var puedeMoverse = Runner.Estado == EstadoDelDia.Corriendo || Runner.Estado == EstadoDelDia.Prorroga;
+            var puedeMoverse = Runner.PuedeMoverse;
 
             foreach (var zona in mapa.Zonas) {
                 var z = zona;
@@ -429,12 +482,15 @@ namespace Nexus.Unity.Pantallas {
                             : !abierta ? "Cerrada por ahora"
                             : $"{mapa.CosteDeVisitar(S.ZonaActual, z.Id)} min";
                 if (z.EsAncla) detalle += " · tu escritorio";
-                var boton = Ui.BotonDeOpcion(_mapa, z.Nombre, detalle, () => Runner.IrAZona(z.Id));
+                var boton = Ui.BotonDeOpcion(_mapa, z.Nombre, detalle, () => IrA(z.Id));
+                GuiaView.Registrar("mapa." + z.Id, boton);
                 boton.interactable = !aqui && abierta && puedeMoverse;
                 if (aqui) Ui.Resaltar(boton, true);
             }
             if (!puedeMoverse && Runner.Estado != EstadoDelDia.DesarrolloTerminado)
-                Ui.Texto(_mapa, "Solo te puedes mover mientras corre la jornada.", EstiloTexto.Pequeno);
+                Ui.Texto(_mapa, Runner.EnEscena || Runner.Pausado
+                    ? "Estás ocupado aquí: termina lo que tienes abierto antes de irte."
+                    : "Solo te puedes mover mientras corre la jornada.", EstiloTexto.Pequeno, Tema.amarillo);
 
             var actual = mapa.PorId(S.ZonaActual);
             if (actual == null) return;
@@ -448,11 +504,18 @@ namespace Nexus.Unity.Pantallas {
                 var c = id;
                 var col = App.Catalogo.Coleccionables.FirstOrDefault(x => x.Id == c);
                 var que = col == null ? "algo" : PantallaDelDiario.NombreDeSerie(col.Serie, true);
-                Ui.BotonDeOpcion(_aqui, "Hay algo aquí: " + que, "Mirarlo", () => Recoger(c));
+                Ui.BotonDeOpcion(_aqui, "Hay algo aquí: " + que, "Mirarlo", () => Recoger(c)).interactable = puedeMoverse;
             }
         }
 
         // ==================================================================== acciones
+
+        private void IrA(string zonaId) {
+            Runner.IrAZona(zonaId);
+            if (S.ZonaActual != zonaId) return;
+            GuiaView.Hecho(App, "ir-a-zona:" + zonaId);
+            GuiaView.Avisar(App, "mapa.zona");
+        }
 
         private void EmpezarDia() {
             var w = S.W;
@@ -462,6 +525,8 @@ namespace Nexus.Unity.Pantallas {
 
             var brief = Runner.EmpezarDia();
             if (brief == null) return;
+            GuiaView.Hecho(App, "empezar-dia");
+            var dia = brief.Dia;
             Anotar($"— Día {brief.Dia} · {brief.EtiquetaUnidad} —");
             if (brief.Ceremonias.Count > 0) Anotar("Ceremonias: " + string.Join(", ", brief.Ceremonias));
             foreach (var origen in brief.EfectosQueVencieronHoy.Distinct())
@@ -473,9 +538,14 @@ namespace Nexus.Unity.Pantallas {
                     Anotar($"Escena: «{guion.Titulo}»");
                     _escenaApilada = true;
                     Runner.EnEscena = true;
-                    FlujoDelNivel.Reproducir(App, guion, S.Beat.Variante, true, () => _escenaApilada = false);
+                    FlujoDelNivel.Reproducir(App, guion, S.Beat.Variante, true, () => {
+                        _escenaApilada = false;
+                        GuiaView.Avisar(App, "dia." + dia);
+                    });
+                    return;
                 }
             }
+            GuiaView.Avisar(App, "dia." + dia);
         }
 
         private void Atender(Alerta alerta) {
@@ -486,17 +556,26 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
             if (!Runner.Atender(alerta.Id)) return;
+            GuiaView.Hecho(App, "atender");
             if (S.Minijuego != null) AbrirMinijuego(S.Minijuego);
         }
 
         private void AbrirMinijuego(PendingMinigame pendiente) {
+            AbrirEscenaDeMinijuego(pendiente, false, resultado => {
+                S.ResolverMinijuego(resultado);
+                Anotar($"{S.HoraActual} · {PantallaDeMinijuego.TituloDelResultado(resultado.Resultado)}.");
+            });
+        }
+
+        /// <summary>Abre la escena de un minijuego encima del dia, con el reloj parado. 'practica' = trabajo de oficina.</summary>
+        private void AbrirEscenaDeMinijuego(PendingMinigame pendiente, bool practica, Action<ResultadoMinijuego> alResolver) {
             MinijuegoDef def;
             try {
                 def = Nexus.Core.Datos.CatalogoMinijuegos.Parsear(new Nexus.Core.Datos.CatalogoDeArchivos(RutasDeGuardado.Contenido).LeerCatalogo(pendiente.Archivo));
             } catch (Exception ex) {
                 // El catalogo se valido al arrancar (INV-5), asi que esto no deberia pasar; si pasa, la partida sigue.
                 Debug.LogException(ex);
-                S.ResolverMinijuego(PuenteDelMotor.Omitido(pendiente.MinijuegoId, pendiente.ObjetivoAprendizaje, null));
+                alResolver(PuenteDelMotor.Omitido(pendiente.MinijuegoId, pendiente.ObjetivoAprendizaje, null));
                 Anotar("No se pudo abrir el minijuego " + pendiente.MinijuegoId + ".");
                 return;
             }
@@ -504,20 +583,19 @@ namespace Nexus.Unity.Pantallas {
             _escenaApilada = true;
             Runner.EnEscena = true;
             Action<ResultadoMinijuego> alTerminar = resultado => {
-                S.ResolverMinijuego(resultado);
+                alResolver(resultado);
                 App.Router.Volver();
                 _escenaApilada = false;
-                Anotar($"{S.HoraActual} · {def.Presentacion.Titulo}: {PantallaDeMinijuego.TituloDelResultado(resultado.Resultado).ToLowerInvariant()}.");
             };
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar:
-                    App.Router.Apilar<PantallaOrdenar>(p => { p.Def = def; p.Pendiente = pendiente; p.AlTerminar = alTerminar; });
+                    App.Router.Apilar<PantallaOrdenar>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
                 case Verbos.Repartir:
-                    App.Router.Apilar<PantallaRepartir>(p => { p.Def = def; p.Pendiente = pendiente; p.AlTerminar = alTerminar; });
+                    App.Router.Apilar<PantallaRepartir>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
                 default:
-                    App.Router.Apilar<PantallaDetectar>(p => { p.Def = def; p.Pendiente = pendiente; p.AlTerminar = alTerminar; });
+                    App.Router.Apilar<PantallaDetectar>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
             }
         }
@@ -536,6 +614,8 @@ namespace Nexus.Unity.Pantallas {
             }
             _cambiosDeLaDecision = Textos.Previsualizar(cambios);
             if (_decidido != null) Anotar($"{S.HoraActual} · Decidiste en «{_decidido.Titulo}».");
+            GuiaView.Hecho(App, "decidir");
+            GuiaView.Avisar(App, "decision.hecha");
         }
 
         private void Recoger(string id) {
@@ -550,6 +630,8 @@ namespace Nexus.Unity.Pantallas {
                 p.Coleccionable = col;
                 p.AlCerrar = () => _escenaApilada = false;
             });
+            GuiaView.Hecho(App, "recoger");
+            GuiaView.Avisar(App, "coleccionable");
         }
 
         private void AbrirDiario() {
@@ -561,6 +643,10 @@ namespace Nexus.Unity.Pantallas {
 
         private void AlSonar(Alerta alerta) {
             Anotar($"{RelojDeJornada.Formatear(alerta.MinutoDeLaAlerta)} · Aviso: {alerta.Texto}");
+            // Primero «estás lejos» (que para el reloj), y despues «pulsa Atender», que espera a que se haga.
+            var ancla = Ancla();
+            if (ancla != null && S.ZonaActual != ancla.Id) GuiaView.Avisar(App, "alerta.lejos");
+            GuiaView.Avisar(App, "alerta.suena");
         }
 
         private void AlExpirar(Alerta alerta) {

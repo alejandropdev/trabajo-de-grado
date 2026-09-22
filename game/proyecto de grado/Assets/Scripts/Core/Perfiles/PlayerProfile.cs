@@ -13,6 +13,8 @@ namespace Nexus.Core {
         // Si la entrevista del N0 ya se hizo con este perfil. El pre-test es UNO: el de la primera vez, antes de
         // haber jugado. Una segunda partida repite la entrevista, pero ya no mide lo mismo.
         public bool preTestHecho;
+        // Los pasos de la guia del tutorial que este perfil ya vio: la guia no se repite en otra partida.
+        public List<string> guiaVista = new List<string>();
         public int[] resultadoPostTest = new int[15];
         public List<string> coleccionablesGlobales = new List<string>();
         public string notaNGplus = "";

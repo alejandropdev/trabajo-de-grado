@@ -1,0 +1,146 @@
+{
+  "id": "MJ-OF-N0-BACKLOG",
+  "verbo": "V3_ORDENAR",
+  "lienzo": "backlog",
+  "temaPrincipal": "Scrum",
+  "objetivoAprendizaje": "OA-SCRUM-01",
+  "presentacion": {
+    "titulo": "Práctica: ¿qué hacemos primero?",
+    "comoSeJuega": "Ordena las tarjetas: arriba lo más importante. Solo entran las que caben en el tiempo de hoy (la línea). Ojo: hay tarjetas que necesitan otra antes.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 90
+  },
+  "ordenar": {
+    "capacidad": 8,
+    "umbralDeValor": 0.75,
+    "peticion": "Marisol pregunta si también te da tiempo a poner los colores de la marca del concurso.",
+    "tarjetas": [
+      {
+        "id": "t1",
+        "titulo": "Formulario de inscripción",
+        "valor": 5,
+        "esfuerzo": 3
+      },
+      {
+        "id": "t2",
+        "titulo": "Guardar a los concursantes",
+        "valor": 6,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t3",
+        "titulo": "Pantalla del jurado",
+        "valor": 4,
+        "esfuerzo": 3,
+        "dependeDe": [
+          "t2"
+        ]
+      },
+      {
+        "id": "t4",
+        "titulo": "Colores de la marca",
+        "valor": 1,
+        "esfuerzo": 2
+      },
+      {
+        "id": "t5",
+        "titulo": "Exportar a hoja de cálculo",
+        "valor": 2,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t2"
+        ]
+      }
+    ],
+    "respuestas": {
+      "obedecer": {
+        "texto": "Le dices que sí, que cabe todo.",
+        "consecuencia": {
+          "efectosInmediatos": {},
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Decir que cabe lo que no cabe no lo hace caber."
+          }
+        }
+      },
+      "rechazar": {
+        "texto": "Le dices que no, sin más.",
+        "consecuencia": {
+          "efectosInmediatos": {},
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Proteges el tiempo, pero ella no sabe por qué."
+          }
+        }
+      },
+      "negociar": {
+        "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
+        "consecuencia": {
+          "efectosInmediatos": {},
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Enseñar lo que cuesta y dejar elegir es negociar."
+          }
+        }
+      }
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Lo importante primero, y cada cosa después de lo que necesita."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-SCRUM-01",
+        "razon": "Entró poco de lo que más valía."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "No se ordenó nada."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Práctica terminada."
+  }
+}

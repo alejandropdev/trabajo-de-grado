@@ -1,0 +1,192 @@
+{
+  "id": "MJ-OF-N0-DIAGRAMA",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de las inscripciones",
+    "comoSeJuega": "Es el diagrama del sistema de inscripciones del concurso. Cada caja es una pieza y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí y dile qué problema tiene.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 90
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "formulario",
+        "texto": "Formulario de inscripción",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Donde cada concursante escribe sus datos."
+      },
+      {
+        "id": "pantalla-jurado",
+        "texto": "Pantalla del jurado",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 2,
+        "detalle": "El jurado ve aquí la lista de concursantes."
+      },
+      {
+        "id": "validacion",
+        "texto": "Validación de datos",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Comprueba que no falte ningún dato obligatorio."
+      },
+      {
+        "id": "lista",
+        "texto": "Lista de concursantes",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 2,
+        "detalle": "Prepara la lista ordenada para el jurado."
+      },
+      {
+        "id": "bd",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "Guarda las inscripciones."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "c1",
+        "desde": "formulario",
+        "hasta": "validacion",
+        "texto": "datos escritos"
+      },
+      {
+        "id": "c2",
+        "desde": "validacion",
+        "hasta": "bd",
+        "texto": "guarda la inscripción"
+      },
+      {
+        "id": "c3",
+        "desde": "lista",
+        "hasta": "bd",
+        "texto": "lee las inscripciones"
+      },
+      {
+        "id": "c4",
+        "desde": "lista",
+        "hasta": "pantalla-jurado",
+        "texto": "envía la lista"
+      },
+      {
+        "id": "c5",
+        "desde": "pantalla-jurado",
+        "hasta": "formulario",
+        "texto": "lee lo que se está escribiendo"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "c5"
+      ],
+      "defecto": "acoplamiento_indebido",
+      "explicacion": "La pantalla del jurado lee directamente del formulario, a medio escribir y sin validar. Si cambia el formulario, se rompe la pantalla: están pegadas. Lo correcto es que lea de la lista, como ya hace."
+    }
+  ],
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "c3"
+      ],
+      "razonNoEsDefecto": "Que la lista lea de la base de datos es justo lo esperado: para eso se guardan las inscripciones."
+    }
+  ],
+  "paletaEtiquetas": [
+    "acoplamiento_indebido",
+    "requisito_incompleto",
+    "elemento_sin_especificar"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "requisito_incompleto"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "requisito_incompleto",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "elemento_sin_especificar"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Dos piezas que se hablan saltándose el camino acordado están acopladas: cambiar una rompe la otra."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Práctica terminada."
+  }
+}

@@ -127,8 +127,15 @@ namespace Nexus.Unity.Aplicacion {
             img.color = Ui.Tema.fondo;
             img.raycastTarget = false;
 
-            return UiKit.Rellenar(Ui.Nodo(go.transform, "Pantallas"));
+            var pantallas = UiKit.Rellenar(Ui.Nodo(go.transform, "Pantallas"));
+            // La guia va en su propia capa, por encima de TODAS las pantallas (tambien de los modales).
+            // Un RectTransform sin Graphic no captura clics: solo la burbuja los captura.
+            CapaGuia = UiKit.Rellenar(Ui.Nodo(go.transform, "Guia"));
+            return pantallas;
         }
+
+        /// <summary>La capa de la guia del tutorial, encima de todo. La usa GuiaView.</summary>
+        public RectTransform CapaGuia { get; private set; }
 
         /// <summary>
         /// El proyecto usa el Input System nuevo en exclusiva (activeInputHandler = 1), y con el el
@@ -238,6 +245,7 @@ namespace Nexus.Unity.Aplicacion {
         public void CerrarPartida() {
             Guardar("salir");
             if (Runner != null) Runner.Detener();
+            Nexus.Unity.Guia.GuiaView.Reiniciar();
             Sesion = null;
             PartidaActiva = null;
             _autoGuardado = null;

@@ -32,6 +32,13 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Pequeno, Tema.cian);
             Ui.Texto(titulos, "Hola, " + App.PerfilActivo.nombreEstudiante, EstiloTexto.Titulo);
             Ui.Boton(cabecera, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
+            if (App.PerfilActivo.guiaVista != null && App.PerfilActivo.guiaVista.Count > 0)
+                Ui.Boton(cabecera, "Volver a ver la guía", () => {
+                    // La guia sale una vez por perfil; esto la reinicia para la proxima partida del tutorial.
+                    App.PerfilActivo.guiaVista.Clear();
+                    App.GuardarPerfil();
+                    App.Router.IrA<PantallaDePartidas>();
+                }, VarianteBoton.Fantasma);
             Ui.Boton(cabecera, "Cambiar de perfil", () => App.Router.IrA<PantallaDePerfiles>(), VarianteBoton.Fantasma);
 
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);

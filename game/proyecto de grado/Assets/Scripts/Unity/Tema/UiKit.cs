@@ -129,7 +129,12 @@ namespace Nexus.Unity.Tema {
         /// <summary>Ocupa todo el espacio sobrante de una fila o columna: empuja lo siguiente al otro extremo.</summary>
         public void Resorte(Transform padre) {
             var le = Nodo(padre, "Resorte").gameObject.AddComponent<LayoutElement>();
-            le.flexibleWidth = le.flexibleHeight = 1;
+            // ★ Solo en el eje de su contenedor. Con los dos, un resorte dentro de una FILA le daba a la fila
+            // flexibilidad vertical, y esa fila se comia la mitad del alto de la columna (la lista de «¿Por qué?»
+            // de la Fase 1 quedaba cortada a media pantalla).
+            var enFila = padre.GetComponent<HorizontalLayoutGroup>() != null;
+            le.flexibleWidth = enFila ? 1 : 0;
+            le.flexibleHeight = enFila ? 0 : 1;
         }
 
         /// <summary>Una linea fina de separacion.</summary>
@@ -151,6 +156,10 @@ namespace Nexus.Unity.Tema {
             if (alto.HasValue) le.minHeight = le.preferredHeight = alto.Value;
             if (flexAncho.HasValue) le.flexibleWidth = flexAncho.Value;
             if (flexAlto.HasValue) le.flexibleHeight = flexAlto.Value;
+            // ★ Un tamaño fijo es fijo: sin esto, una columna de 420 con una barra dentro (que es flexible)
+            // heredaba esa flexibilidad y se repartia el sobrante con el centro, y el centro quedaba estrecho.
+            if (ancho.HasValue && !flexAncho.HasValue) le.flexibleWidth = 0;
+            if (alto.HasValue && !flexAlto.HasValue) le.flexibleHeight = 0;
             return le;
         }
 
@@ -407,6 +416,7 @@ namespace Nexus.Unity.Tema {
             le.minWidth = le.preferredWidth = lado;
             le.minHeight = le.preferredHeight = lado;
 
+            rt.gameObject.AddComponent<CanvasRenderer>();   // antes que el Graphic: ver GraficoRadar
             var radar = rt.gameObject.AddComponent<GraficoRadar>();
             radar.raycastTarget = false;
             radar.ColorRejilla = Tema.hormigon;
@@ -446,6 +456,53 @@ namespace Nexus.Unity.Tema {
             // respeta el ancho natural de cada pieza (y el que la quiera estirar pide flexAncho).
             grupo.childForceExpandWidth = grupo is VerticalLayoutGroup;
             grupo.childForceExpandHeight = false;
+        }
+
+        private Sprite _redondeado;
+        private TMP_FontAsset _tiza;
+        private bool _tizaIntentada;
+
+        /// <summary>
+        /// Un rectangulo de esquinas redondeadas, blanco y «9-slice»: estirado a cualquier tamaño conserva las
+        /// esquinas. Para pastillas (etiquetas de flecha, chips) y cajas de los lienzos.
+        /// </summary>
+        public Sprite SpriteRedondeado() {
+            if (_redondeado != null) return _redondeado;
+            const int lado = 64, r = 30;
+            var tex = new Texture2D(lado, lado, TextureFormat.RGBA32, false) { name = "RedondeadoNexus", wrapMode = TextureWrapMode.Clamp };
+            var pixeles = new Color32[lado * lado];
+            for (var y = 0; y < lado; y++)
+                for (var x = 0; x < lado; x++) {
+                    var cx = Mathf.Clamp(x + 0.5f, r, lado - r);
+                    var cy = Mathf.Clamp(y + 0.5f, r, lado - r);
+                    var d = Mathf.Sqrt((x + 0.5f - cx) * (x + 0.5f - cx) + (y + 0.5f - cy) * (y + 0.5f - cy));
+                    pixeles[y * lado + x] = new Color32(255, 255, 255, (byte)(Mathf.Clamp01(r - d) * 255));
+                }
+            tex.SetPixels32(pixeles);
+            tex.Apply(false, true);
+            _redondeado = Sprite.Create(tex, new Rect(0, 0, lado, lado), new Vector2(0.5f, 0.5f), 100, 0,
+                                        SpriteMeshType.FullRect, new Vector4(r, r, r, r));
+            _redondeado.name = "RedondeadoNexus";
+            return _redondeado;
+        }
+
+        /// <summary>
+        /// La letra de tiza de las recetas (Gochi Hand, licencia OFL, en Resources/Fuentes). Se crea en tiempo de
+        /// ejecucion desde el TTF, con la fuente normal de reserva para cualquier glifo que no tenga. Si no esta,
+        /// se usa la fuente del cuerpo: las recetas se leen igual, solo pierden el aire de pizarra.
+        /// </summary>
+        public TMP_FontAsset FuenteTiza {
+            get {
+                if (_tizaIntentada) return _tiza != null ? _tiza : Tema.FuenteCuerpo;
+                _tizaIntentada = true;
+                var ttf = Resources.Load<Font>("Fuentes/GochiHand-Regular");
+                if (ttf != null) {
+                    _tiza = TMP_FontAsset.CreateFontAsset(ttf);
+                    if (_tiza != null && Tema.FuenteCuerpo != null)
+                        _tiza.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset> { Tema.FuenteCuerpo };
+                }
+                return _tiza != null ? _tiza : Tema.FuenteCuerpo;
+            }
         }
 
         /// <summary>Un circulo blanco de 128 px, generado una vez. Lo necesitan el dial y los puntos de estado.</summary>

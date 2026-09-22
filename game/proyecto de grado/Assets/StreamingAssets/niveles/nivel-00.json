@@ -8,7 +8,6 @@
     "Restricción: la recepción tiene un solo equipo con un navegador y nadie de sistemas. Ningún visitante va a instalar nada en su móvil para una visita de una hora.",
     "Comentario de Marisol Andrade: «El jurado valorará que funcione el viernes. No que sea bonito el lunes.»"
   ],
-
   "diasTotales": 5,
   "presupuestoInicial": 3000,
   "alcanceInicial": 12,
@@ -16,19 +15,23 @@
   "deudaHeredada": 0,
   "coberturaHeredada": 20,
   "documentacionHeredada": 20,
-
   "velocidadBase": 3.0,
-
   "director": {
-    "presupuestoDrama": [0, 3, 0, 0],
-    "pesosPorTag": { "tutorial": 1.0 },
+    "presupuestoDrama": [
+      0,
+      3,
+      0,
+      0
+    ],
+    "pesosPorTag": {
+      "tutorial": 1.0
+    },
     "enfriamientoGlobal": 1,
     "maxEventosPorDia": 1,
     "ventanaTelegrafiado": 1,
     "multiplicadorSeveridad": 0.6,
     "probabilidadDeDiaTranquiloMinijuegos": 0
   },
-
   "jornada": {
     "horaInicio": 9,
     "horaCierre": 17,
@@ -38,7 +41,6 @@
     "minutosPorAtender": 30,
     "granularidadDeAlertas": 15
   },
-
   "mapa": {
     "costeBaseDeViaje": 10,
     "zonas": [
@@ -48,7 +50,9 @@
         "descripcion": "Doce puestos en fila bajo un reloj enorme. En el tuyo hay un portátil de préstamo y un cajón que nadie ha abierto.",
         "esAncla": true,
         "minutosDeVisita": 0,
-        "coleccionables": ["COL-ADV-11"],
+        "coleccionables": [
+          "COL-ADV-11"
+        ],
         "queDa": "Tu puesto: aquí llegan los avisos y aquí se atienden."
       },
       {
@@ -56,8 +60,13 @@
         "nombre": "El pasillo de los concursantes",
         "descripcion": "Una máquina de café, un tablón de corcho y los demás concursantes fingiendo que no se miran.",
         "minutosDeVisita": 20,
-        "quienEsta": ["Marta Oyola", "otros concursantes"],
-        "coleccionables": ["COL-ADV-01"],
+        "quienEsta": [
+          "Marta Oyola",
+          "otros concursantes"
+        ],
+        "coleccionables": [
+          "COL-ADV-01"
+        ],
         "queDa": "Cómo van los demás. Y Marta, que tiene algo que proponerte."
       },
       {
@@ -65,7 +74,9 @@
         "nombre": "La terminal pública",
         "descripcion": "Un equipo viejo junto a la escalera, con un cartel de «solo consultas». Nadie lo ha apagado en años.",
         "minutosDeVisita": 20,
-        "coleccionables": ["COL-COD-01"],
+        "coleccionables": [
+          "COL-COD-01"
+        ],
         "queDa": "Una línea de comandos con acceso al sistema del concurso. Nadie te ha dicho qué se puede escribir en ella."
       },
       {
@@ -73,7 +84,11 @@
         "nombre": "El auditorio de N1",
         "descripcion": "Butacas vacías y un escenario donde el viernes se anunciará al ganador. Hoy solo hay técnicos probando el holograma.",
         "minutosDeVisita": 30,
-        "puerta": { "precondiciones": ["diaActual >= 3"] },
+        "puerta": {
+          "precondiciones": [
+            "diaActual >= 3"
+          ]
+        },
         "queDa": "El tablón con la clasificación provisional: dónde estás respecto a los demás."
       }
     ],
@@ -85,18 +100,28 @@
       "pasillo>auditorio": 10
     }
   },
-
-  "objetivosActivos": ["OA-INTRO-01", "OA-DOC-01", "OA-SCRUM-01", "OA-KANBAN-01", "OA-GIT-01"],
-
+  "objetivosActivos": [
+    "OA-INTRO-01",
+    "OA-DOC-01",
+    "OA-SCRUM-01",
+    "OA-KANBAN-01",
+    "OA-GIT-01"
+  ],
   "umbrales": {
-    "exito": { "avanceMinimo": 9, "coberturaMinima": 15, "deudaMaxima": 70 },
+    "exito": {
+      "avanceMinimo": 9,
+      "coberturaMinima": 15,
+      "deudaMaxima": 70
+    },
     "fallo": {}
   },
-
-  "metodologiasPermitidas": ["scrum", "kanban"],
+  "metodologiasPermitidas": [
+    "scrum",
+    "cascada",
+    "kanban"
+  ],
   "nivelAndamiaje": 3,
   "volatilidadReal": 55,
-
   "fase1": {
     "calidad": {
       "fichas": 4,
@@ -124,15 +149,28 @@
         }
       ]
     },
-
     "razonesDisponibles": [
-      { "id": "un_solo_equipo", "texto": "La recepción tiene un solo equipo con navegador." },
-      { "id": "nadie_instala_nada", "texto": "Ningún visitante va a instalar nada para una visita de una hora." },
-      { "id": "cinco_dias", "texto": "Hay cinco días." },
-      { "id": "queda_mas_moderno", "texto": "Queda más moderno." },
-      { "id": "todo_el_mundo_tiene_movil", "texto": "Todo el mundo tiene móvil." }
+      {
+        "id": "un_solo_equipo",
+        "texto": "La recepción tiene un solo equipo con navegador."
+      },
+      {
+        "id": "nadie_instala_nada",
+        "texto": "Ningún visitante va a instalar nada para una visita de una hora."
+      },
+      {
+        "id": "cinco_dias",
+        "texto": "Hay cinco días."
+      },
+      {
+        "id": "queda_mas_moderno",
+        "texto": "Queda más moderno."
+      },
+      {
+        "id": "todo_el_mundo_tiene_movil",
+        "texto": "Todo el mundo tiene móvil."
+      }
     ],
-
     "arquitecturas": [
       {
         "id": "web-sencilla",
@@ -140,18 +178,167 @@
         "esLaAdecuada": true,
         "veredicto": "correcta",
         "razon": "Un único equipo, un navegador y ninguna instalación: el ticket lo decía en su restricción. Leer bien el enunciado ya era la mitad de la arquitectura.",
-        "efectos": { "Documentacion": 3 },
-        "razonesValidas": ["un_solo_equipo", "nadie_instala_nada", "cinco_dias"],
-        "razonesTrampa": ["queda_mas_moderno"]
+        "efectos": {
+          "Documentacion": 3
+        },
+        "razonesValidas": [
+          "un_solo_equipo",
+          "nadie_instala_nada",
+          "cinco_dias"
+        ],
+        "razonesTrampa": [
+          "queda_mas_moderno"
+        ]
       },
       {
         "id": "app-movil",
         "nombre": "App móvil para los visitantes",
         "veredicto": "incorrecta",
         "razon": "Pide que cada visitante instale algo para una visita de una hora, y la restricción del ticket decía justo lo contrario.",
-        "efectos": { "DeudaTecnica": 8, "Cansancio": 5 },
+        "efectos": {
+          "DeudaTecnica": 8,
+          "Cansancio": 5
+        },
         "razonesValidas": [],
-        "razonesTrampa": ["todo_el_mundo_tiene_movil", "queda_mas_moderno"]
+        "razonesTrampa": [
+          "todo_el_mundo_tiene_movil",
+          "queda_mas_moderno"
+        ]
+      }
+    ],
+    "recoleccion": {
+      "minutosDisponibles": 45,
+      "texto": "Antes de decidir nada, recorre el edificio donde se va a usar lo que construyas. Mira, pregunta y recoge lo que te sirva.",
+      "zonas": [
+        {
+          "id": "A",
+          "nombre": "La entrada del edificio",
+          "descripcion": "Gente entrando y saliendo; una máquina de café junto a la puerta.",
+          "minutosDeVisita": 15
+        },
+        {
+          "id": "B",
+          "nombre": "El mostrador de recepción",
+          "descripcion": "Donde hoy se apuntan las visitas en un cuaderno.",
+          "minutosDeVisita": 15
+        },
+        {
+          "id": "C",
+          "nombre": "La sala de espera",
+          "descripcion": "Sillas, revistas viejas y visitantes aburridos.",
+          "minutosDeVisita": 15
+        }
+      ],
+      "hallazgos": [
+        {
+          "id": "PISTA-N0-01",
+          "tipo": "pista",
+          "zona": "B",
+          "texto": "La recepcionista cuenta que la mitad de los visitantes llega sin cita."
+        },
+        {
+          "id": "MOR-N0-01",
+          "tipo": "moral",
+          "zona": "A",
+          "nombre": "Café gratis",
+          "texto": "Una máquina de café gratis para los concursantes.",
+          "efectos": {
+            "MoralEquipo": 4
+          }
+        },
+        {
+          "id": "REC-N0-01",
+          "tipo": "recurso",
+          "zona": "C",
+          "nombre": "El cuaderno de visitas",
+          "texto": "Las visitas del último mes, apuntadas a mano.",
+          "efectos": {
+            "Documentacion": 4
+          }
+        },
+        {
+          "id": "RIE-N0-01",
+          "tipo": "riesgo",
+          "zona": "C",
+          "nombre": "Una charla eterna",
+          "texto": "Un visitante te cuenta su vida entera.",
+          "efectos": {
+            "Cansancio": 3
+          }
+        }
+      ]
+    }
+  },
+  "oficina": {
+    "tareas": [
+      {
+        "id": "of-diagrama",
+        "titulo": "Revisar un diagrama",
+        "descripcion": "Busca el error en el diagrama de las inscripciones.",
+        "mejora": "Documentación y deuda técnica",
+        "minijuego": "MJ-OF-N0-DIAGRAMA",
+        "archivo": "minijuegos/MJ-OF-N0-DIAGRAMA.json",
+        "minutos": 45,
+        "vecesPorDia": 1,
+        "efectos": {
+          "todos": {
+            "Documentacion": 4,
+            "DeudaTecnica": -2
+          },
+          "parcial": {
+            "Documentacion": 2
+          },
+          "falsoPositivo": {
+            "Dias": 0.1
+          },
+          "omitido": {}
+        }
+      },
+      {
+        "id": "of-backlog",
+        "titulo": "Ordenar el trabajo",
+        "descripcion": "Decide qué se hace primero.",
+        "mejora": "Avance",
+        "minijuego": "MJ-OF-N0-BACKLOG",
+        "archivo": "minijuegos/MJ-OF-N0-BACKLOG.json",
+        "minutos": 45,
+        "vecesPorDia": 1,
+        "efectos": {
+          "todos": {
+            "Avance": 1,
+            "SatisfaccionCliente": 2
+          },
+          "parcial": {
+            "Avance": 0.5
+          },
+          "falsoPositivo": {
+            "DeudaTecnica": 1
+          },
+          "omitido": {}
+        }
+      },
+      {
+        "id": "of-pruebas",
+        "titulo": "Probar lo que hay",
+        "descripcion": "Reparte horas de pruebas.",
+        "mejora": "Cobertura de pruebas",
+        "minijuego": "MJ-OF-N0-PRUEBAS",
+        "archivo": "minijuegos/MJ-OF-N0-PRUEBAS.json",
+        "minutos": 45,
+        "vecesPorDia": 1,
+        "efectos": {
+          "todos": {
+            "Cobertura": 5
+          },
+          "parcial": {
+            "Cobertura": 2
+          },
+          "falsoPositivo": {
+            "Cobertura": 1,
+            "Cansancio": 2
+          },
+          "omitido": {}
+        }
       }
     ]
   }
