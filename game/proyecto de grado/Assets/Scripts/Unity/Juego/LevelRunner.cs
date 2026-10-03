@@ -169,6 +169,21 @@ namespace Nexus.Unity.Juego {
             return true;
         }
 
+        /// <summary>
+        /// Contestar en una conversacion. La charla cuesta minutos y en ellos pueden sonar o caducar avisos: por eso
+        /// pasa por aqui. Se llama con la escena de la conversacion abierta, asi que no exige poder moverse, solo que
+        /// la jornada este corriendo. null si ahora no se puede.
+        /// </summary>
+        public Nexus.Core.Relaciones.ResultadoDeConversacion Hablar(string conversacionId, string opcionId) {
+            ExigirSesion();
+            if (Estado != EstadoDelDia.Corriendo && Estado != EstadoDelDia.Prorroga) return null;
+            ResultadoDeAvance avance;
+            var resultado = _sesion.Hablar(conversacionId, opcionId, out avance);
+            Notificar(avance);
+            ComprobarCierre();
+            return resultado;
+        }
+
         /// <summary>Ir a otra zona del mapa. El viaje cuesta minutos, y en ellos el dia sigue pasando.</summary>
         public void IrAZona(string zonaId) {
             ExigirSesion();

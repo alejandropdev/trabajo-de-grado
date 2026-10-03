@@ -145,8 +145,13 @@ namespace Nexus.Core.Guardado {
             if (sesion == null) throw new ArgumentNullException(nameof(sesion));
 
             if (sesion.NivelTerminado) {
-                // El WorldState se tira. Los flags y la competencia se quedan.
+                // El WorldState se tira. Los flags, la competencia y la confianza de quien sigue, se quedan.
                 save.Nivel = null;
+                var relaciones = (sesion as IRelacionesPersistibles)?.CapturarRelaciones();
+                if (relaciones != null) {
+                    if (save.Relaciones == null) save.Relaciones = new Dictionary<string, int>();
+                    foreach (var kv in relaciones) save.Relaciones[kv.Key] = kv.Value;
+                }
                 if (!string.IsNullOrEmpty(sesion.NivelId) && !save.Partida.NivelesCompletados.Contains(sesion.NivelId))
                     save.Partida.NivelesCompletados.Add(sesion.NivelId);
             } else {

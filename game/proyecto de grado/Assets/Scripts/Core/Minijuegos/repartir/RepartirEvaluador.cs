@@ -63,10 +63,46 @@ namespace Nexus.Core.Minijuegos.Repartir {
             else clave = ResultadosDeMinijuego.Parcial;
 
             if (escapan > 0) {
-                var tipos = reparto.Where(r => r.Escapan > 0).Select(r => porId[r.DepositoId].Nombre.ToLowerInvariant());
-                detalle.Add("Los defectos que escaparon son exactamente del tipo en el que no invertiste: " + string.Join(", ", tipos) + ".");
+                var sinNada = reparto.Where(r => r.Escapan > 0 && r.Horas == 0).Select(r => porId[r.DepositoId].Nombre.ToLowerInvariant()).ToList();
+                var corto = reparto.Where(r => r.Escapan > 0 && r.Horas > 0).Select(r => porId[r.DepositoId].Nombre.ToLowerInvariant()).ToList();
+                if (sinNada.Count > 0)
+                    detalle.Add("Cada tipo de prueba solo encuentra sus propios errores. No pusiste horas en: " + string.Join(", ", sinNada) + ", y por ahí se escaparon.");
+                if (corto.Count > 0)
+                    detalle.Add("Pusiste horas, pero no las suficientes, en: " + string.Join(", ", corto) + ".");
             }
             return Construir(def, clave, detalle);
+        }
+
+        /// <summary>
+        /// Los repartos que ganan ("todos"), contando solo los que se pueden hacer con los botones (multiplos de
+        /// 'paso') y sin desperdiciar horas en un tipo que ya lo encontro todo. Sirve para que el validador
+        /// rechace una escena imposible y para que un test la pruebe entera.
+        /// </summary>
+        public static List<Dictionary<string, int>> RepartosGanadores(RepartirCfg cfg) {
+            var ganadores = new List<Dictionary<string, int>>();
+            if (cfg == null || cfg.Depositos.Count == 0) return ganadores;
+            var paso = Math.Max(1, cfg.Paso);
+            var actual = new Dictionary<string, int>();
+
+            Action<int, int> probar = null;
+            probar = (i, restante) => {
+                if (i == cfg.Depositos.Count) {
+                    var escapan = Calcular(cfg, actual).Sum(r => r.Escapan);
+                    if (actual.Values.Sum() > 0 && escapan <= cfg.ToleranciaDeEscapes)
+                        ganadores.Add(new Dictionary<string, int>(actual));
+                    return;
+                }
+                var d = cfg.Depositos[i];
+                var utiles = d.CostePorDefecto * d.DefectosOcultos;
+                var tope = Math.Min(restante, ((utiles + paso - 1) / paso) * paso);
+                for (var h = 0; h <= tope; h += paso) {
+                    actual[d.Id] = h;
+                    probar(i + 1, restante - h);
+                }
+                actual.Remove(d.Id);
+            };
+            probar(0, cfg.Presupuesto);
+            return ganadores;
         }
 
         private static ResultadoMinijuego Construir(MinijuegoDef def, string clave, List<string> detalle) {

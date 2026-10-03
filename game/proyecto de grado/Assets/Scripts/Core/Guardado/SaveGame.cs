@@ -15,6 +15,19 @@ namespace Nexus.Core.Guardado {
         /// <summary>Los FLG_*. Persisten entre niveles: los proyectos se olvidan, las decisiones no.</summary>
         public Dictionary<string, double> Flags = new Dictionary<string, double>();
 
+        /// <summary>
+        /// Los flags tal y como estaban al empezar el nivel actual. Repetir un nivel vuelve a ellos: si no, lo que
+        /// el nivel escribio al cerrarse (cartas, confianza, la opinion de Voss) se sumaria dos veces.
+        /// </summary>
+        public Dictionary<string, double> FlagsAlEmpezarNivel;
+
+        /// <summary>
+        /// La confianza con los personajes que siguen de un nivel a otro (Javier, Sarah, Óscar, Voss, Marta). Se
+        /// vuelca al cerrar cada nivel y se hereda al empezar el siguiente. Con su foto para «Repetir el nivel».
+        /// </summary>
+        public Dictionary<string, int> Relaciones = new Dictionary<string, int>();
+        public Dictionary<string, int> RelacionesAlEmpezarNivel;
+
         public NivelEnCurso Nivel;
     }
 

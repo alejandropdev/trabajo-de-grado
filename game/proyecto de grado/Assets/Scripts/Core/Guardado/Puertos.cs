@@ -19,6 +19,15 @@ namespace Nexus.Core.Guardado {
     }
 
     /// <summary>
+    /// Opcional: una sesion que tiene relaciones que sobreviven al nivel (la confianza de Javier, de Sarah…).
+    /// Se pide aparte para no obligar a cualquier ISesionPersistible a tenerlas.
+    /// </summary>
+    public interface IRelacionesPersistibles {
+        /// <summary>personaje -> confianza, solo de los personajes que siguen en los niveles siguientes.</summary>
+        Dictionary<string, int> CapturarRelaciones();
+    }
+
+    /// <summary>
     /// Como se construye la sesion al abrir una partida (§5.7). La implementara quien conoce
     /// los catalogos: Nueva = new GameSession(...) y se juega la Fase 1;
     /// Restaurar = ReaplicarPesosDeCalidad + GameSession.Restaurar(...), en el orden de §7.6.

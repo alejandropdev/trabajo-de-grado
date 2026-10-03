@@ -28,8 +28,11 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(titulos, "¿Quién juega?", EstiloTexto.Titulo);
             Ui.Texto(titulos, "Cada estudiante tiene su perfil: ahí se guardan sus partidas, su entrevista de admisión y todo lo que encuentre.",
                      EstiloTexto.Pequeno);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // Herramientas del equipo de desarrollo: en la build que juegan estudiantes y jurado no existen.
             Ui.Boton(cabecera, "Prueba del motor", () => App.Router.Apilar<PantallaDeDiagnostico>(), VarianteBoton.Fantasma);
             Ui.Boton(cabecera, "Ver el tema", () => App.Router.Apilar<PantallaDelTema>(), VarianteBoton.Fantasma);
+#endif
 
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);
@@ -42,12 +45,23 @@ namespace Nexus.Unity.Pantallas {
 
             var nuevo = Ui.Tarjeta(cuerpo, "Perfil nuevo");
             UiKit.Tamano(nuevo, ancho: 560);
-            Ui.Texto(nuevo, "Tu nombre, como quieras que aparezca en el juego.", EstiloTexto.Pequeno);
-            _nombre = Ui.CampoDeTexto(nuevo, "Nombre del estudiante", "", 500);
+            Ui.Texto(nuevo, "Escribe tu nombre (como quieras que aparezca en el juego) y pulsa «Crear perfil» o Enter.", EstiloTexto.Pequeno);
+            _nombre = Ui.CampoDeTexto(nuevo, "Nombre del jugador", "", 500);
             _nombre.characterLimit = 40;
             _nombre.onSubmit.AddListener(_ => Crear());
+            _enfocarPendiente = true;
             _aviso = Ui.Texto(nuevo, "", EstiloTexto.Pequeno, Tema.mostaza);
             Ui.Boton(Ui.Fila(nuevo), "Crear perfil", Crear, VarianteBoton.Primario);
+        }
+
+        private bool _enfocarPendiente;
+
+        /// <summary>El campo del nombre ya esta listo para escribir al llegar: el cursor parpadea en el.</summary>
+        private void Update() {
+            if (!_enfocarPendiente || _nombre == null) return;
+            _enfocarPendiente = false;
+            _nombre.Select();
+            _nombre.ActivateInputField();
         }
 
         public override void Repintar() {

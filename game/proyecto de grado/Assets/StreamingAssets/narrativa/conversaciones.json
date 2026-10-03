@@ -1,0 +1,1907 @@
+{
+  "version": 1,
+  "personajes": [
+    {
+      "id": "marta",
+      "nombre": "Marta Oyola",
+      "rol": "Concursante del puesto ocho · obsesionada con probarlo todo",
+      "ayudas": [
+        {
+          "umbral": 7,
+          "tipo": "pista-detectar",
+          "usos": 1,
+          "texto": "Si te toca revisar un diagrama, pásamelo: te marco dónde miraría yo primero."
+        },
+        {
+          "umbral": 12,
+          "tipo": "minutos-extra",
+          "usos": 1,
+          "texto": "Te cubro con el jurado un rato: si un reto te pilla justo, tienes un poco más de tiempo."
+        }
+      ],
+      "persistente": true,
+      "charlas": [
+        {
+          "estadistica": "Cobertura",
+          "tramos": [
+            {
+              "hasta": 25,
+              "texto": "Tu cobertura de pruebas está en {valor}. Yo así no entrego: el jurado va a encontrar unos {errores} errores. Prueba lo que hiciste ayer antes de hacer más."
+            },
+            {
+              "hasta": 50,
+              "texto": "Cobertura en {valor}. Vas a medias: lo nuevo que construyas hoy, pruébalo hoy, o mañana estará en el montón de lo no probado."
+            },
+            {
+              "hasta": 100,
+              "texto": "Con la cobertura en {valor} duermo tranquila por ti. El jurado lo va a tener difícil para encontrarte errores."
+            }
+          ]
+        },
+        {
+          "estadistica": "Cansancio",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "Se te ve descansado (cansancio {valor}). Así se piensa mejor: los errores tontos salen de las noches largas."
+            },
+            {
+              "hasta": 60,
+              "texto": "Cansancio {valor}. Ojo: a partir de aquí cada noche extra te cobra el doble al día siguiente."
+            },
+            {
+              "hasta": 100,
+              "texto": "Cansancio {valor}… Hoy vas más lento y te vas a equivocar más. Vete a casa a tu hora, en serio."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ivan",
+      "nombre": "Iván Cárdenas",
+      "rol": "Técnico del concurso · cuida la terminal y los servidores",
+      "ayudas": [
+        {
+          "umbral": 3,
+          "tipo": "revelar-defectos",
+          "usos": 1,
+          "texto": "Tengo los registros de errores de otros años. Si te toca repartir horas de pruebas, te digo cuántos suele haber de cada tipo."
+        },
+        {
+          "umbral": 5,
+          "tipo": "bajar-cansancio",
+          "usos": 1,
+          "valor": 10,
+          "texto": "Si un día vas reventado, avísame: te dejo el sofá de la sala técnica media hora."
+        }
+      ],
+      "persistente": false,
+      "charlas": [
+        {
+          "estadistica": "Cansancio",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "Cansancio {valor}. Bien. Los servidores y la gente, igual: se caen cuando se les exprime."
+            },
+            {
+              "hasta": 60,
+              "texto": "Cansancio {valor}. Todavía aguantas, pero el equipo ya va más lento. Lo veo en la terminal: más reintentos."
+            },
+            {
+              "hasta": 100,
+              "texto": "Cansancio {valor}. Así es como se borra la base de datos de producción un viernes. Descansa."
+            }
+          ]
+        },
+        {
+          "estadistica": "DeudaTecnica",
+          "tramos": [
+            {
+              "hasta": 30,
+              "texto": "Deuda técnica {valor}: poca. Los atajos que no tomas hoy son los arreglos que no harás mañana."
+            },
+            {
+              "hasta": 50,
+              "texto": "Deuda {valor}. Cada atajo que sumas hace más lento todo lo demás. Todavía se paga, pero no esperes mucho."
+            },
+            {
+              "hasta": 100,
+              "texto": "Deuda {valor}. Ya se está rompiendo lo que funcionaba. Para un día y arregla en vez de añadir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oscar",
+      "nombre": "Óscar Rendón",
+      "rol": "Técnico del Edificio Patch · 19 años manteniendo lo que nadie mira",
+      "ayudas": [
+        {
+          "umbral": 7,
+          "tipo": "pista-detectar",
+          "usos": 1,
+          "texto": "Si te toca leer un histórico de git, enséñamelo. He visto cada barbaridad…"
+        },
+        {
+          "umbral": 12,
+          "tipo": "bajar-cansancio",
+          "usos": 2,
+          "valor": 12,
+          "texto": "Cuando el equipo vaya muy cansado, dímelo: me quedo yo con las guardias de la barrera."
+        }
+      ],
+      "persistente": true,
+      "charlas": [
+        {
+          "estadistica": "DeudaTecnica",
+          "tramos": [
+            {
+              "hasta": 30,
+              "texto": "Deuda técnica en {valor}. Así da gusto mantener algo. Lo que se escribe con calma, se arregla con calma."
+            },
+            {
+              "hasta": 50,
+              "texto": "Deuda {valor}. Ya noto los parches: cada cambio pequeño toca tres sitios. El equipo va más lento por eso."
+            },
+            {
+              "hasta": 100,
+              "texto": "Deuda {valor}. Esto ya no es mantener, es apagar fuegos. Cada día se rompe algo que ayer funcionaba."
+            }
+          ]
+        },
+        {
+          "estadistica": "MoralEquipo",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "La moral del equipo está en {valor}. Nadie lo dice en el standup, pero se nota: hay roces y se trabaja a medias."
+            },
+            {
+              "hasta": 65,
+              "texto": "Moral {valor}. Normal. Un par de días buenos y una entrega que salga bien la subirían."
+            },
+            {
+              "hasta": 100,
+              "texto": "Moral {valor}. El equipo está contento: eso rinde más que cualquier hora extra."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sarah",
+      "nombre": "Sarah Lindqvist",
+      "rol": "Analista de Facilities · sabe lo que el cliente dice fuera de las reuniones",
+      "flagAlCerrar": "FLG_SARAH_VINCULO",
+      "puntosPorFlag": 3,
+      "ayudas": [
+        {
+          "umbral": 7,
+          "tipo": "mostrar-dependencias",
+          "usos": 1,
+          "texto": "Si te toca ordenar el backlog, pregúntame: sé qué peticiones dependen de cuáles."
+        },
+        {
+          "umbral": 12,
+          "tipo": "minutos-extra",
+          "usos": 1,
+          "texto": "Puedo entretener a Facilities un rato si necesitas más tiempo para contestarles."
+        }
+      ],
+      "persistente": true,
+      "charlas": [
+        {
+          "estadistica": "SatisfaccionCliente",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "En Facilities están molestos: satisfacción {valor}. Van a pedir explicaciones. Cuéntales qué cabe y por qué antes de que pregunten."
+            },
+            {
+              "hasta": 60,
+              "texto": "Satisfacción {valor}. Ni bien ni mal. Lo que más les gusta es ver algo que funcione, aunque sea pequeño."
+            },
+            {
+              "hasta": 100,
+              "texto": "Satisfacción {valor}. Están encantados contigo. Eso pesa mucho cuando llegue la entrega."
+            }
+          ]
+        },
+        {
+          "estadistica": "Cobertura",
+          "tramos": [
+            {
+              "hasta": 30,
+              "texto": "Me dijo el guardia que ayer la pantalla se colgó dos veces. Con la cobertura en {valor}, no me extraña."
+            },
+            {
+              "hasta": 100,
+              "texto": "Cobertura {valor}. Facilities no sabe qué es eso, pero nota que no se cuelga. Y eso sí lo saben."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "javier",
+      "nombre": "Javier",
+      "rol": "Operador del Data Hub · lee los logs que nadie lee",
+      "flagAlCerrar": "FLG_JAVIER_CONFIANZA",
+      "puntosPorFlag": 3,
+      "ayudas": [
+        {
+          "umbral": 7,
+          "tipo": "revelar-defectos",
+          "usos": 1,
+          "texto": "Los logs dicen dónde fallan las cosas. Si tienes que repartir horas de pruebas, te digo cuántos errores hay en cada sitio."
+        },
+        {
+          "umbral": 12,
+          "tipo": "pista-detectar",
+          "usos": 1,
+          "texto": "Si revisas un diagrama de secuencia, cruzo lo que dice con lo que pasó de verdad en el log."
+        }
+      ],
+      "persistente": true,
+      "charlas": [
+        {
+          "estadistica": "Cobertura",
+          "tramos": [
+            {
+              "hasta": 30,
+              "texto": "…Cobertura {valor}. El log no miente: el cliente va a encontrar unos {errores} errores."
+            },
+            {
+              "hasta": 55,
+              "texto": "Cobertura {valor}. Lo probado no falla. Lo que no… lo veo aquí, de madrugada."
+            },
+            {
+              "hasta": 100,
+              "texto": "Cobertura {valor}. El log está tranquilo. Me gusta el log tranquilo."
+            }
+          ]
+        },
+        {
+          "estadistica": "Documentacion",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "Documentación {valor}. Nadie sabe por qué la barrera hace lo que hace. Eso también es riesgo."
+            },
+            {
+              "hasta": 100,
+              "texto": "Documentación {valor}. Por fin alguien escribe qué hace cada cosa."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "voss",
+      "nombre": "Dra. Helena Voss",
+      "rol": "Arquitecta · ha visto fracasar sistemas que tú todavía no conoces",
+      "ayudas": [
+        {
+          "umbral": 7,
+          "tipo": "minutos-extra",
+          "usos": 2,
+          "texto": "Pensar bien lleva tiempo. Si un reto te aprieta, dile al que espera que estás conmigo."
+        }
+      ],
+      "persistente": true,
+      "charlas": [
+        {
+          "estadistica": "Documentacion",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "Documentación en {valor}. Dentro de un año nadie sabrá por qué está hecho así. Escribe las decisiones, no solo el código."
+            },
+            {
+              "hasta": 100,
+              "texto": "Documentación {valor}. Bien. Un sistema que se explica a sí mismo envejece mejor."
+            }
+          ]
+        },
+        {
+          "estadistica": "DeudaTecnica",
+          "tramos": [
+            {
+              "hasta": 40,
+              "texto": "Deuda {valor}. La arquitectura aguanta. Que siga así."
+            },
+            {
+              "hasta": 100,
+              "texto": "Deuda {valor}. He visto arquitecturas buenas hundirse por atajos pequeños. Una a una no parecen nada."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conversaciones": [
+    {
+      "id": "CV-MARTA-1",
+      "nivel": "nivel-00",
+      "personaje": "marta",
+      "zona": "pasillo",
+      "diaDesde": 1,
+      "diaHasta": 5,
+      "orden": 1,
+      "minutos": 20,
+      "tema": "requisitos",
+      "lineas": [
+        {
+          "quien": "Marta Oyola",
+          "texto": "¿Leíste el comentario del ticket? Alguien pregunta por los visitantes sin cita y nadie contesta."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Tú qué harías con esa pregunta?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Escribirla como requisito, con cómo se comprobará que funciona.",
+            "confianza": 2,
+            "respuesta": "¡Eso! Un requisito que se puede comprobar es un requisito de verdad. Lo que no se escribe, alguien lo supone, y casi siempre mal."
+          },
+          {
+            "id": "b",
+            "texto": "Esperar a que el cliente lo pida otra vez.",
+            "confianza": -1,
+            "respuesta": "Hmm. Para cuando lo pida otra vez, ya habrás construido sin eso. Corregirlo tarde cuesta mucho más que preguntarlo hoy."
+          },
+          {
+            "id": "c",
+            "texto": "Suponer lo más lógico y seguir.",
+            "confianza": 0,
+            "respuesta": "Lo «lógico» para ti no es lo lógico para la recepcionista. Suponer está bien solo si lo escribes y lo confirmas."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-MARTA-2",
+      "nivel": "nivel-00",
+      "personaje": "marta",
+      "zona": "pasillo",
+      "diaDesde": 2,
+      "diaHasta": 5,
+      "orden": 2,
+      "minutos": 20,
+      "tema": "testing",
+      "lineas": [
+        {
+          "quien": "Marta Oyola",
+          "texto": "Ayer probé mi formulario cien veces. Siempre con mi nombre. Siempre funcionó."
+        },
+        {
+          "quien": "Marta Oyola",
+          "texto": "Hoy alguien escribió un apellido con tilde y se cayó."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué hice mal?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Probar cien veces lo mismo no es probar cien cosas: faltaron casos distintos, como los raros.",
+            "confianza": 2,
+            "respuesta": "Exacto. Una buena prueba busca dónde se rompe: vacíos, tildes, números enormes. Repetir el caso feliz no encuentra nada nuevo."
+          },
+          {
+            "id": "b",
+            "texto": "Nada, eso pasa. No se puede probar todo.",
+            "confianza": 0,
+            "respuesta": "No se puede probar todo, cierto. Pero sí se puede elegir mejor qué probar. Los casos límite son los primeros."
+          },
+          {
+            "id": "c",
+            "texto": "Tenías que haberlo probado más veces.",
+            "confianza": -1,
+            "respuesta": "¿Doscientas veces mi nombre? No creo que hubiera cambiado nada…"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-MARTA-3",
+      "nivel": "nivel-00",
+      "personaje": "marta",
+      "zona": "pasillo",
+      "diaDesde": 3,
+      "diaHasta": 5,
+      "orden": 3,
+      "minutos": 20,
+      "tema": "scrum",
+      "lineas": [
+        {
+          "quien": "Marta Oyola",
+          "texto": "El jurado pasa mañana. Tengo tres cosas a medias y ninguna terminada."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué enseño?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Las tres a medias, para que vean todo lo que hay.",
+            "confianza": -1,
+            "respuesta": "Ya… pero nada funciona. Me van a preguntar qué se puede usar y la respuesta es «nada»."
+          },
+          {
+            "id": "b",
+            "texto": "Terminar UNA de verdad hoy y enseñar esa, funcionando.",
+            "confianza": 2,
+            "respuesta": "Tienes razón. Un incremento pequeño y que funciona vale más que tres grandes a medias. Así trabaja Scrum: algo usable en cada vuelta."
+          },
+          {
+            "id": "c",
+            "texto": "Una pantalla bonita aunque no haga nada todavía.",
+            "confianza": 0,
+            "respuesta": "Funciona un día. Al siguiente alguien pulsa un botón y se descubre todo."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-MARTA-4",
+      "nivel": "nivel-00",
+      "personaje": "marta",
+      "zona": "pasillo",
+      "diaDesde": 4,
+      "diaHasta": 5,
+      "orden": 4,
+      "minutos": 20,
+      "tema": "kanban",
+      "lineas": [
+        {
+          "quien": "Marta Oyola",
+          "texto": "Mi tablero tiene once cosas en «haciendo». Llevo tres días sin terminar ninguna."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué me recomiendas?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Ponerte un límite: no empezar nada nuevo hasta terminar algo de lo que ya tienes.",
+            "confianza": 2,
+            "respuesta": "Un límite WIP… Sí. Terminar antes de empezar. Si todo está «haciendo», nada está hecho."
+          },
+          {
+            "id": "b",
+            "texto": "Trabajar más horas para avanzar en todas.",
+            "confianza": -1,
+            "respuesta": "Ya lo intenté anoche. Hoy rindo la mitad. Quedarse es un préstamo."
+          },
+          {
+            "id": "c",
+            "texto": "Mover algunas a «hecho» aunque falte un poco.",
+            "confianza": -1,
+            "respuesta": "¿Mentirle a mi propio tablero? Entonces no me sirve para nada."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-IVAN-1",
+      "nivel": "nivel-00",
+      "personaje": "ivan",
+      "zona": "terminal",
+      "diaDesde": 1,
+      "diaHasta": 5,
+      "orden": 1,
+      "minutos": 20,
+      "tema": "git",
+      "lineas": [
+        {
+          "quien": "Iván Cárdenas",
+          "texto": "¿Tú también vienes a usar la terminal? Cuidado, que aquí alguien borró ayer el trabajo de dos concursantes."
+        },
+        {
+          "quien": "Iván Cárdenas",
+          "texto": "Usó «push --force» sobre la rama compartida para «limpiar la historia»."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Por qué crees que eso fue tan grave?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Porque reescribir la historia compartida borra los commits que otros ya habían subido.",
+            "confianza": 2,
+            "respuesta": "Eso es. Tu rama es tuya; la compartida es de todos. Reescribirla es borrar el trabajo y la autoría de otros."
+          },
+          {
+            "id": "b",
+            "texto": "Porque git es lento con historias largas.",
+            "confianza": -1,
+            "respuesta": "No, no… git aguanta historias enormes. El problema no es la velocidad, es lo que se perdió."
+          },
+          {
+            "id": "c",
+            "texto": "No sé qué es un commit.",
+            "confianza": 1,
+            "respuesta": "Tranquilo: un commit es una foto guardada de los cambios, con un mensaje. La historia es la fila de fotos. Borrarlas es borrar el pasado."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-IVAN-2",
+      "nivel": "nivel-00",
+      "personaje": "ivan",
+      "zona": "terminal",
+      "diaDesde": 2,
+      "diaHasta": 5,
+      "orden": 2,
+      "minutos": 20,
+      "tema": "devops",
+      "lineas": [
+        {
+          "quien": "Iván Cárdenas",
+          "texto": "El año pasado un concursante instaló su sistema a mano el viernes a las cuatro y media. No arrancó."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué harías tú para que no te pase?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Instalarlo en el servidor desde el primer día y repetirlo cada vez que cambie algo.",
+            "confianza": 2,
+            "respuesta": "Ahí está. Si instalar es algo que haces a diario (y mejor si es automático), el viernes no es una sorpresa. Eso es la idea de DevOps."
+          },
+          {
+            "id": "b",
+            "texto": "Instalarlo el jueves, por si acaso.",
+            "confianza": 1,
+            "respuesta": "Mejor que el viernes, sí. Pero un día de margen no es lo mismo que haberlo practicado veinte veces."
+          },
+          {
+            "id": "c",
+            "texto": "No tocar el servidor hasta tener todo terminado.",
+            "confianza": -1,
+            "respuesta": "Eso mismo pensó él."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-IVAN-3",
+      "nivel": "nivel-00",
+      "personaje": "ivan",
+      "zona": "terminal",
+      "diaDesde": 3,
+      "diaHasta": 5,
+      "orden": 3,
+      "minutos": 20,
+      "tema": "estimacion",
+      "lineas": [
+        {
+          "quien": "Iván Cárdenas",
+          "texto": "Me preguntaron cuánto tardo en arreglar la impresora del auditorio. Dije «una hora». Llevo tres."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo estimo mejor la próxima vez?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Mirando cuánto tardaste otras veces en cosas parecidas, y dando un rango en vez de un número.",
+            "confianza": 2,
+            "respuesta": "Con datos de antes y con un rango: «entre una y tres horas». Estimar no es adivinar, es usar lo que ya pasó."
+          },
+          {
+            "id": "b",
+            "texto": "Decir siempre el doble de lo que creas.",
+            "confianza": 0,
+            "respuesta": "Es un truco… pero si siempre inflas, nadie se cree tus números. Mejor aprender de tu historial."
+          },
+          {
+            "id": "c",
+            "texto": "No dar números: «cuando esté, está».",
+            "confianza": -1,
+            "respuesta": "Ya, y el jurado se sienta a esperar. Sin estimación no se puede planificar nada."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-IVAN-4",
+      "nivel": "nivel-00",
+      "personaje": "ivan",
+      "zona": "terminal",
+      "diaDesde": 4,
+      "diaHasta": 5,
+      "orden": 4,
+      "minutos": 20,
+      "tema": "calidad",
+      "lineas": [
+        {
+          "quien": "Iván Cárdenas",
+          "texto": "Un concursante me dijo que su sistema «tiene calidad» porque tiene muchas funciones."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Tú qué le dirías?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Que la calidad son varias cosas: que haga lo pedido, que sea usable, que no se caiga, que sea seguro…",
+            "confianza": 2,
+            "respuesta": "Así es, como la ISO 25010. Mil funciones que se caen a las nueve de la mañana no son calidad."
+          },
+          {
+            "id": "b",
+            "texto": "Que tiene razón: más funciones, más calidad.",
+            "confianza": -1,
+            "respuesta": "Hmm. Más funciones también es más cosas que se pueden romper."
+          },
+          {
+            "id": "c",
+            "texto": "Que la calidad es que el código sea bonito.",
+            "confianza": 0,
+            "respuesta": "Un código limpio ayuda a mantenerlo, pero el cliente no lo ve. Calidad es más que eso."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-1",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 1,
+      "diaHasta": 20,
+      "orden": 1,
+      "minutos": 30,
+      "tema": "intro",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "¿El nuevo? Siéntate. El café es malo pero es gratis."
+        },
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Aquí casi todo lo que hacemos es mantener cosas que otro escribió hace años."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Sabes qué parte del trabajo de software es mantener lo que ya existe?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "La mayor parte: casi todo el coste de un software llega después de entregarlo.",
+            "confianza": 2,
+            "respuesta": "Eso. Escribirlo es el principio. Por eso lo que hagas tiene que poder entenderlo otro dentro de cinco años."
+          },
+          {
+            "id": "b",
+            "texto": "Muy poca: lo difícil es construirlo.",
+            "confianza": -1,
+            "respuesta": "Ja. Ven a mantener la barrera un invierno y me cuentas."
+          },
+          {
+            "id": "c",
+            "texto": "No tengo ni idea, cuéntame.",
+            "confianza": 1,
+            "respuesta": "La mayor parte del coste. Construir es una vez; mantener es para siempre. Por eso importa tanto el diseño."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-2",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 3,
+      "diaHasta": 20,
+      "orden": 2,
+      "minutos": 30,
+      "tema": "git",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Dos del equipo tocaron el mismo archivo y git dice que hay un conflicto. Están discutiendo quién «tiene razón»."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo se resuelve un conflicto de merge?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Se queda la versión del que lo subió primero.",
+            "confianza": -1,
+            "respuesta": "Así se pierde trabajo sin que nadie se entere. No es una carrera."
+          },
+          {
+            "id": "b",
+            "texto": "Mirando juntos las dos versiones y combinando a mano lo que cada uno quería, y probándolo.",
+            "confianza": 2,
+            "respuesta": "Así. El conflicto no es una pelea: es git diciendo «aquí decide una persona». Y después se prueba."
+          },
+          {
+            "id": "c",
+            "texto": "Borrando la rama y empezando de cero.",
+            "confianza": -1,
+            "respuesta": "Tres días de trabajo a la basura por no leer veinte líneas."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-3",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 5,
+      "diaHasta": 20,
+      "orden": 3,
+      "minutos": 30,
+      "tema": "principios",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Mira este módulo de la barrera: lee directamente la base de datos de reservas, se salta su puerta de entrada."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Por qué eso me da miedo?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Porque es acoplamiento: si cambian la base de reservas, la barrera se rompe sin avisar.",
+            "confianza": 2,
+            "respuesta": "Exacto. Cada pieza debería hablar con las otras por su puerta, no por la ventana de atrás."
+          },
+          {
+            "id": "b",
+            "texto": "Porque es más lento.",
+            "confianza": 0,
+            "respuesta": "A lo mejor hasta es más rápido. El problema no es la velocidad, es lo que se rompe cuando algo cambia."
+          },
+          {
+            "id": "c",
+            "texto": "No da miedo: si funciona, no se toca.",
+            "confianza": -1,
+            "respuesta": "Eso dijo el que lo escribió. Ahora no se puede tocar nada sin romper dos cosas."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-4",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 7,
+      "diaHasta": 20,
+      "orden": 4,
+      "minutos": 30,
+      "tema": "devops",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Antes, para instalar algo en la barrera, se apagaba todo un domingo. Ahora queremos hacerlo con un pipeline."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué es lo primero que tiene que hacer ese pipeline?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Compilar y ejecutar las pruebas automáticas: si fallan, no se instala nada.",
+            "confianza": 2,
+            "respuesta": "Esa es la puerta. Un pipeline que instala sin probar solo instala errores más rápido."
+          },
+          {
+            "id": "b",
+            "texto": "Instalar en producción lo antes posible.",
+            "confianza": -1,
+            "respuesta": "Rápido, sí. Y el carro de HH encerrado otras tres horas."
+          },
+          {
+            "id": "c",
+            "texto": "Mandar un correo al equipo.",
+            "confianza": 0,
+            "respuesta": "Avisar está bien, pero eso no evita que se cuele un error."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-5",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 10,
+      "diaHasta": 20,
+      "orden": 5,
+      "minutos": 30,
+      "tema": "equipo",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "El chico nuevo se queda todas las noches. Dice que así avanza más."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Le digo algo?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Sí: quedarse siempre cansa al equipo, sube los errores y al final se avanza menos.",
+            "confianza": 2,
+            "respuesta": "Se lo diré. El ritmo tiene que poder aguantarse veinte días, no tres."
+          },
+          {
+            "id": "b",
+            "texto": "No, si quiere quedarse que se quede.",
+            "confianza": -1,
+            "respuesta": "Ya. Y la semana que viene estará enfermo, y su parte a medias."
+          },
+          {
+            "id": "c",
+            "texto": "Que se quede, pero solo los viernes.",
+            "confianza": 0,
+            "respuesta": "Algo es algo. Lo importante es que no sea lo normal."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-6",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 13,
+      "diaHasta": 20,
+      "orden": 6,
+      "minutos": 30,
+      "tema": "git",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Mira este mensaje de commit: «cambios». ¿Cuáles? ¿Por qué? Nadie lo sabe."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo sería un buen mensaje?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "«Corrige la barrera que no bajaba si el lector fallaba; añade prueba del caso».",
+            "confianza": 2,
+            "respuesta": "Eso le sirve al que lo lea dentro de un año: qué cambió y por qué. Un buen historial es documentación gratis."
+          },
+          {
+            "id": "b",
+            "texto": "«Arreglos varios v2 final».",
+            "confianza": -1,
+            "respuesta": "«Final». Ya. Siempre hay un «final de verdad» después."
+          },
+          {
+            "id": "c",
+            "texto": "No importa el mensaje, importa el código.",
+            "confianza": -1,
+            "respuesta": "El código dice QUÉ hace. Solo el mensaje dice POR QUÉ se cambió."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-7",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "sotano-de-patios",
+      "diaDesde": 8,
+      "diaHasta": 20,
+      "orden": 7,
+      "minutos": 30,
+      "tema": "legacy",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Esto es la maquinaria de verdad. Lo que tu software va a mover."
+        },
+        {
+          "quien": "Óscar Rendón",
+          "texto": "El fabricante nunca nos dio el código del controlador viejo."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué harías con un sistema del que no tienes el código?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Envolverlo: hablar con él solo por una pieza intermedia, para poder cambiarlo algún día sin romperlo todo.",
+            "confianza": 2,
+            "respuesta": "Una fachada. Así lo viejo queda aislado detrás de una puerta, y el día que lo cambies, solo cambias la puerta."
+          },
+          {
+            "id": "b",
+            "texto": "Seguir parcheándolo directamente por todas partes.",
+            "confianza": -1,
+            "respuesta": "Así llegamos a donde estamos."
+          },
+          {
+            "id": "c",
+            "texto": "Tirarlo y reescribir todo de cero ya.",
+            "confianza": 0,
+            "respuesta": "Algún día. En veinte días, con tres personas, no."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-1",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 1,
+      "diaHasta": 20,
+      "orden": 1,
+      "minutos": 30,
+      "tema": "requisitos",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "¿Tú eres el del proyecto de los patios? En Facilities hay tres ideas distintas de quién tiene prioridad en los ascensores."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué harías con tres ideas distintas?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Reunir a los tres, escribir las reglas juntos y que firmen qué se entiende por prioridad.",
+            "confianza": 2,
+            "respuesta": "Eso. Si no se escribe y se acuerda, cada uno va a probar el sistema con su idea y los tres dirán que está mal."
+          },
+          {
+            "id": "b",
+            "texto": "Elegir yo la más lógica.",
+            "confianza": -1,
+            "respuesta": "Y los otros dos te van a odiar en la demo."
+          },
+          {
+            "id": "c",
+            "texto": "Hacer las tres, configurables.",
+            "confianza": 0,
+            "respuesta": "Triple de trabajo y nadie decide nada. A veces la configuración es una forma de no elegir."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-2",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 3,
+      "diaHasta": 20,
+      "orden": 2,
+      "minutos": 30,
+      "tema": "estimacion",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "Mi jefa quiere saber si lo de las estadísticas estará para el viernes. Tú le dijiste «seguro»."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿De verdad estás seguro?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "No del todo: le doy un rango y le explico de qué depende.",
+            "confianza": 2,
+            "respuesta": "Mucho mejor. Un rango con sus riesgos se puede planificar; un «seguro» que falla, no se perdona."
+          },
+          {
+            "id": "b",
+            "texto": "Sí, seguro, ya lo dije.",
+            "confianza": -1,
+            "respuesta": "Vale… Pero si no está, la que queda mal soy yo."
+          },
+          {
+            "id": "c",
+            "texto": "Le diré que no sé.",
+            "confianza": 0,
+            "respuesta": "Es honesto, pero «no sé» no le sirve para planificar nada. Algo de número hace falta."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-3",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 5,
+      "diaHasta": 20,
+      "orden": 3,
+      "minutos": 30,
+      "tema": "scrum",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "En la demo del sprint mi jefa vio la pantalla de reservas y dijo: «esto no es lo que pedí»."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Fue un fracaso?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "No: para eso está la demo. Mejor enterarse en el día cinco que en el veinte.",
+            "confianza": 2,
+            "respuesta": "Eso me tranquiliza. Entonces la demo funcionó: encontró el malentendido cuando todavía es barato arreglarlo."
+          },
+          {
+            "id": "b",
+            "texto": "Sí, había que haberlo entendido bien desde el principio.",
+            "confianza": 0,
+            "respuesta": "Ojalá, pero el cliente casi nunca sabe lo que quiere hasta que lo ve."
+          },
+          {
+            "id": "c",
+            "texto": "No le hagas caso, lo pidió así.",
+            "confianza": -1,
+            "respuesta": "Bueno… pero es quien paga. Y quien lo va a usar."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-4",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 8,
+      "diaHasta": 20,
+      "orden": 4,
+      "minutos": 30,
+      "tema": "kanban",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "Las peticiones de mantenimiento nos llegan a cualquier hora y sin avisar. ¿Les sirve un sprint de dos semanas?"
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Tú qué usarías para ese tipo de trabajo?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Un tablero Kanban con límite de trabajo en curso: entra según prioridad, sin esperar al sprint.",
+            "confianza": 2,
+            "respuesta": "Tiene sentido. Lo imprevisible fluye por un tablero; lo planificable va en sprints."
+          },
+          {
+            "id": "b",
+            "texto": "Meterlo todo en el sprint, aunque llegue a mitad.",
+            "confianza": -1,
+            "respuesta": "Entonces el sprint deja de ser un compromiso: cada día cambia."
+          },
+          {
+            "id": "c",
+            "texto": "Ignorarlas hasta el siguiente sprint.",
+            "confianza": -1,
+            "respuesta": "¿Un ascensor parado dos semanas? Mi jefa me mata."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-5",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 11,
+      "diaHasta": 20,
+      "orden": 5,
+      "minutos": 30,
+      "tema": "alcance",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "Van a pedirte «una cosita más» en la próxima reunión. Te aviso porque me caes bien."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo vas a contestar?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Enseñando qué cuesta y qué sale a cambio, y dejando que ellos elijan.",
+            "confianza": 2,
+            "respuesta": "Negociar con números. Así no eres el que dice que no: son ellos los que eligen."
+          },
+          {
+            "id": "b",
+            "texto": "Que sí, que se puede.",
+            "confianza": -1,
+            "respuesta": "Así empezó el último proyecto que se hundió aquí."
+          },
+          {
+            "id": "c",
+            "texto": "Que no, que el alcance está cerrado.",
+            "confianza": 0,
+            "respuesta": "Protege al equipo, pero se van a ir enfadados."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-6",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 14,
+      "diaHasta": 20,
+      "orden": 6,
+      "minutos": 30,
+      "tema": "calidad",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "El guardia de la garita dice que la pantalla nueva tiene «demasiados botones» a las seis de la mañana."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Eso es un error o una manía suya?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Es un problema de usabilidad real: quien lo usa a diario es quien mejor lo sabe.",
+            "confianza": 2,
+            "respuesta": "Le diré que lo escuchaste. Un sistema que el usuario no puede usar con sueño no está terminado."
+          },
+          {
+            "id": "b",
+            "texto": "Manía: ya se acostumbrará.",
+            "confianza": -1,
+            "respuesta": "Ya. Y mientras se acostumbra, deja pasar a quien no debe."
+          },
+          {
+            "id": "c",
+            "texto": "Le haremos un manual.",
+            "confianza": 0,
+            "respuesta": "Un manual para un botón suele significar que el botón está mal."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-7",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 17,
+      "diaHasta": 20,
+      "orden": 7,
+      "minutos": 30,
+      "tema": "documentacion",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "Cuando os vayáis, lo va a mantener el equipo de mantenimiento. No saben de sistemas."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué les dejas?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Un documento claro de cómo funciona, por qué se decidió así y qué hacer si algo falla.",
+            "confianza": 2,
+            "respuesta": "Eso es lo que más agradecerán. Lo que sabe una persona se va con ella; lo que se escribe, se queda."
+          },
+          {
+            "id": "b",
+            "texto": "El código: está todo ahí.",
+            "confianza": -1,
+            "respuesta": "No saben leer código, te lo acabo de decir…"
+          },
+          {
+            "id": "c",
+            "texto": "Mi número de teléfono.",
+            "confianza": 0,
+            "respuesta": "Muy amable. Hasta que cambies de número."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-JAVIER-1",
+      "nivel": "nivel-01",
+      "personaje": "javier",
+      "zona": "data-hub",
+      "diaDesde": 3,
+      "diaHasta": 20,
+      "orden": 1,
+      "minutos": 30,
+      "tema": "testing",
+      "lineas": [
+        {
+          "quien": "Javier",
+          "texto": "…"
+        },
+        {
+          "quien": "Javier",
+          "texto": "La barrera registró dos entradas del mismo carro en un segundo. Nadie lo ha visto excepto yo."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué harías?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Escribir una prueba que reproduzca ese caso antes de arreglarlo, para que no vuelva.",
+            "confianza": 2,
+            "respuesta": "…Bien. Primero la prueba que falla, luego el arreglo. Así ese error no vuelve nunca sin que alguien se entere."
+          },
+          {
+            "id": "b",
+            "texto": "Borrar la entrada duplicada a mano.",
+            "confianza": -1,
+            "respuesta": "Y mañana habrá otra. Y pasado."
+          },
+          {
+            "id": "c",
+            "texto": "Esperar a que pase más veces para estar seguro.",
+            "confianza": 0,
+            "respuesta": "Ya pasó. El log no miente."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-JAVIER-2",
+      "nivel": "nivel-01",
+      "personaje": "javier",
+      "zona": "data-hub",
+      "diaDesde": 5,
+      "diaHasta": 20,
+      "orden": 2,
+      "minutos": 30,
+      "tema": "testing",
+      "lineas": [
+        {
+          "quien": "Javier",
+          "texto": "Dicen que la cobertura de pruebas es del 90 %. Miré las pruebas. La mitad no comprueba nada."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué significa entonces ese 90 %?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Que el código se ejecutó, no que se comprobara que hace bien su trabajo.",
+            "confianza": 2,
+            "respuesta": "Exacto. La cobertura dice por dónde pasaron las pruebas, no si miraron algo al pasar."
+          },
+          {
+            "id": "b",
+            "texto": "Que el sistema tiene un 10 % de errores.",
+            "confianza": -1,
+            "respuesta": "No. Ese número no dice nada de errores."
+          },
+          {
+            "id": "c",
+            "texto": "Que está casi perfecto.",
+            "confianza": -1,
+            "respuesta": "…No."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-JAVIER-3",
+      "nivel": "nivel-01",
+      "personaje": "javier",
+      "zona": "data-hub",
+      "diaDesde": 7,
+      "diaHasta": 20,
+      "orden": 3,
+      "minutos": 30,
+      "tema": "testing",
+      "lineas": [
+        {
+          "quien": "Javier",
+          "texto": "Arreglaron las reservas. Y ahora la barrera tarda el doble en abrir."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué prueba faltó?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Una de regresión: volver a probar lo que ya funcionaba después del cambio.",
+            "confianza": 2,
+            "respuesta": "Sí. Un cambio aquí rompe algo allá. La regresión es la que lo encuentra."
+          },
+          {
+            "id": "b",
+            "texto": "Una unitaria de las reservas.",
+            "confianza": 0,
+            "respuesta": "Esa ya la tenían. El problema no estaba en las reservas."
+          },
+          {
+            "id": "c",
+            "texto": "Ninguna: eso no se puede prever.",
+            "confianza": -1,
+            "respuesta": "Se puede. Para eso existen."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-JAVIER-4",
+      "nivel": "nivel-01",
+      "personaje": "javier",
+      "zona": "data-hub",
+      "diaDesde": 10,
+      "diaHasta": 20,
+      "orden": 4,
+      "minutos": 30,
+      "tema": "calidad",
+      "lineas": [
+        {
+          "quien": "Javier",
+          "texto": "Alguien entró con el mando genérico otra vez. A las tres de la mañana."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué atributo de calidad se descuidó?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Seguridad: el sistema deja hacer cosas a quien no debería.",
+            "confianza": 2,
+            "respuesta": "Sí. Y nadie le puso fichas, ¿verdad?"
+          },
+          {
+            "id": "b",
+            "texto": "Rendimiento.",
+            "confianza": -1,
+            "respuesta": "Abrió muy rápido, eso sí."
+          },
+          {
+            "id": "c",
+            "texto": "Usabilidad.",
+            "confianza": 0,
+            "respuesta": "Para el intruso fue muy usable, sí. Pero no."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-JAVIER-5",
+      "nivel": "nivel-01",
+      "personaje": "javier",
+      "zona": "data-hub",
+      "diaDesde": 13,
+      "diaHasta": 20,
+      "orden": 5,
+      "minutos": 30,
+      "tema": "devops",
+      "lineas": [
+        {
+          "quien": "Javier",
+          "texto": "El sistema se cayó el martes. Nos enteramos el jueves, por una queja."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué faltaba?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Monitorizarlo: alertas que avisen solas cuando algo deja de funcionar.",
+            "confianza": 2,
+            "respuesta": "Sí. Lo que no se mide, no existe hasta que alguien se queja."
+          },
+          {
+            "id": "b",
+            "texto": "Que el cliente avisara antes.",
+            "confianza": -1,
+            "respuesta": "El cliente no es tu sistema de alertas."
+          },
+          {
+            "id": "c",
+            "texto": "Reiniciarlo todos los días por si acaso.",
+            "confianza": 0,
+            "respuesta": "Tapa el síntoma. Sigues sin saber qué pasó."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-JAVIER-6",
+      "nivel": "nivel-01",
+      "personaje": "javier",
+      "zona": "data-hub",
+      "diaDesde": 16,
+      "diaHasta": 20,
+      "orden": 6,
+      "minutos": 30,
+      "tema": "testing",
+      "lineas": [
+        {
+          "quien": "Javier",
+          "texto": "Quedan veinte horas para probar. No alcanzan para todo."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Por dónde empezarías?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Por lo que más se usa y lo que más se cambió: ahí es donde más errores hay.",
+            "confianza": 2,
+            "respuesta": "Riesgo primero. Probarlo todo un poco es no probar nada bien."
+          },
+          {
+            "id": "b",
+            "texto": "Repartir igual entre todo.",
+            "confianza": 0,
+            "respuesta": "Justo, pero no listo. Los errores no se reparten igual."
+          },
+          {
+            "id": "c",
+            "texto": "Lo más barato primero, aunque casi no tenga errores.",
+            "confianza": -1,
+            "respuesta": "Barato y vacío. El cliente encontrará el resto."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-VOSS-1",
+      "nivel": "nivel-01",
+      "personaje": "voss",
+      "zona": "archivo-de-voss",
+      "diaDesde": 11,
+      "diaHasta": 20,
+      "orden": 1,
+      "minutos": 40,
+      "tema": "patrones",
+      "lineas": [
+        {
+          "quien": "Dra. Voss",
+          "texto": "Tienes cinco lugares en el código que tienen que enterarse cuando una reserva cambia. Y cada uno lo pregunta cada segundo."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué patrón usarías?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Observer: la reserva avisa a los interesados cuando cambia, en vez de que ellos pregunten.",
+            "confianza": 2,
+            "respuesta": "Correcto. Que quien cambia avise. Preguntar cada segundo es gastar y llegar tarde."
+          },
+          {
+            "id": "b",
+            "texto": "Singleton: una sola reserva global.",
+            "confianza": -1,
+            "respuesta": "Eso resuelve otro problema, y suele crear tres más."
+          },
+          {
+            "id": "c",
+            "texto": "Ninguno: que pregunten más rápido.",
+            "confianza": -1,
+            "respuesta": "Fuerza bruta. Funciona hasta que no."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-VOSS-2",
+      "nivel": "nivel-01",
+      "personaje": "voss",
+      "zona": "archivo-de-voss",
+      "diaDesde": 13,
+      "diaHasta": 20,
+      "orden": 2,
+      "minutos": 40,
+      "tema": "patrones",
+      "lineas": [
+        {
+          "quien": "Dra. Voss",
+          "texto": "Las prioridades de los ascensores cambian según el día: urgencias, mudanzas, mantenimiento. Alguien escribió un if de doscientas líneas."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo lo ordenarías?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Strategy: cada regla de prioridad en su propia pieza, y se elige la que toca.",
+            "confianza": 2,
+            "respuesta": "Así se añade una regla nueva sin tocar las otras. El if gigante se rompe cada vez que alguien lo mira."
+          },
+          {
+            "id": "b",
+            "texto": "Más comentarios en el if.",
+            "confianza": 0,
+            "respuesta": "Un if de doscientas líneas bien comentado sigue siendo un if de doscientas líneas."
+          },
+          {
+            "id": "c",
+            "texto": "Copiar el if en cada sitio que lo necesite.",
+            "confianza": -1,
+            "respuesta": "Y cuando cambie una regla, la cambiarás en cinco sitios. O en cuatro, y no te darás cuenta."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-VOSS-3",
+      "nivel": "nivel-01",
+      "personaje": "voss",
+      "zona": "archivo-de-voss",
+      "diaDesde": 15,
+      "diaHasta": 20,
+      "orden": 3,
+      "minutos": 40,
+      "tema": "arquitectura",
+      "lineas": [
+        {
+          "quien": "Dra. Voss",
+          "texto": "Dentro de un año alguien preguntará por qué esto es un monolito y no microservicios."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Dónde estará la respuesta?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "En un registro de decisiones de arquitectura: qué se decidió, por qué y qué se descartó.",
+            "confianza": 2,
+            "respuesta": "Un ADR. Una página que ahorra un año de discusiones. Pocos la escriben."
+          },
+          {
+            "id": "b",
+            "texto": "En la memoria del equipo.",
+            "confianza": -1,
+            "respuesta": "La memoria del equipo se va con el equipo."
+          },
+          {
+            "id": "c",
+            "texto": "En el código, si se lee bien.",
+            "confianza": 0,
+            "respuesta": "El código dice cómo es. No por qué no es de otra forma."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-MARTA-5",
+      "nivel": "nivel-00",
+      "personaje": "marta",
+      "zona": "pasillo",
+      "diaDesde": 4,
+      "diaHasta": 5,
+      "orden": 5,
+      "minutos": 20,
+      "tema": "requisitos",
+      "lineas": [
+        {
+          "quien": "Marta Oyola",
+          "texto": "Mi cliente me dijo «que sea rápido». ¿Eso es un requisito?"
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo lo escribo?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "«La búsqueda de un visitante responde en menos de 2 segundos con 40 personas en cola».",
+            "confianza": 2,
+            "respuesta": "¡Eso! Ahora se puede comprobar. Un requisito sin número es una opinión."
+          },
+          {
+            "id": "b",
+            "texto": "«El sistema debe ser rápido».",
+            "confianza": -1,
+            "respuesta": "Eso es lo que me dijo él… y no se puede probar: ¿rápido para quién?"
+          },
+          {
+            "id": "c",
+            "texto": "No se escribe, se nota al usarlo.",
+            "confianza": 0,
+            "respuesta": "El jurado no lo va a «notar» igual que tú. Mejor medible."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-IVAN-5",
+      "nivel": "nivel-00",
+      "personaje": "ivan",
+      "zona": "terminal",
+      "diaDesde": 4,
+      "diaHasta": 5,
+      "orden": 5,
+      "minutos": 20,
+      "tema": "devops",
+      "lineas": [
+        {
+          "quien": "Iván Cárdenas",
+          "texto": "Un concursante tiene su código solo en su portátil. Ni git, ni copia."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué le dirías?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Que lo suba hoy a un repositorio: si el portátil muere, muere el concurso.",
+            "confianza": 2,
+            "respuesta": "Exacto. Lo que no está en el repositorio no existe."
+          },
+          {
+            "id": "b",
+            "texto": "Que haga una copia en un USB el viernes.",
+            "confianza": 0,
+            "respuesta": "Mejor que nada. Pero el miércoles también existe."
+          },
+          {
+            "id": "c",
+            "texto": "Nada, es su problema.",
+            "confianza": -1,
+            "respuesta": "Ya… hasta que es el tuyo."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-8",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 15,
+      "diaHasta": 20,
+      "orden": 8,
+      "minutos": 30,
+      "tema": "testing",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Arreglé un error de la barrera. ¿Lo subo ya?"
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué haces antes?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Escribir una prueba que falle con el error, arreglarlo y ver que pasa.",
+            "confianza": 2,
+            "respuesta": "Así el error no vuelve sin que nos enteremos. Bien."
+          },
+          {
+            "id": "b",
+            "texto": "Subirlo: si compila, funciona.",
+            "confianza": -1,
+            "respuesta": "Compilar no es funcionar. Lo aprendí hace 19 años."
+          },
+          {
+            "id": "c",
+            "texto": "Esperar a que alguien lo pruebe a mano.",
+            "confianza": 0,
+            "respuesta": "Alguien… ¿quién? Mejor que lo pruebe una máquina cada vez."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-OSCAR-9",
+      "nivel": "nivel-01",
+      "personaje": "oscar",
+      "zona": "bullpen",
+      "diaDesde": 18,
+      "diaHasta": 20,
+      "orden": 9,
+      "minutos": 30,
+      "tema": "kanban",
+      "lineas": [
+        {
+          "quien": "Óscar Rendón",
+          "texto": "Tengo seis cosas empezadas y ninguna terminada."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Por dónde sigo?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Por la que está más cerca de terminar, y no empezar nada más hasta acabarla.",
+            "confianza": 2,
+            "respuesta": "Terminar antes de empezar. Me lo apunto."
+          },
+          {
+            "id": "b",
+            "texto": "Por la más divertida.",
+            "confianza": -1,
+            "respuesta": "Ja. Así llegué a tener seis."
+          },
+          {
+            "id": "c",
+            "texto": "Empiezo otra, que está llegando mucho trabajo.",
+            "confianza": -1,
+            "respuesta": "Siete. Perfecto."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-8",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 9,
+      "diaHasta": 20,
+      "orden": 8,
+      "minutos": 30,
+      "tema": "estimacion",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "Mi jefa pregunta por qué el sprint pasado entregasteis menos de lo prometido."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué le digo?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Que medimos lo que de verdad hicimos, y el próximo sprint prometemos según eso.",
+            "confianza": 2,
+            "respuesta": "Eso le gustará: aprender de los números, no inventar excusas."
+          },
+          {
+            "id": "b",
+            "texto": "Que trabajaremos más horas.",
+            "confianza": -1,
+            "respuesta": "Eso dijeron la última vez. Y la anterior."
+          },
+          {
+            "id": "c",
+            "texto": "Que fue mala suerte.",
+            "confianza": 0,
+            "respuesta": "La mala suerte no se puede planificar…"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-SARAH-9",
+      "nivel": "nivel-01",
+      "personaje": "sarah",
+      "zona": "cafeteria",
+      "diaDesde": 19,
+      "diaHasta": 20,
+      "orden": 9,
+      "minutos": 30,
+      "tema": "cliente",
+      "lineas": [
+        {
+          "quien": "Sarah Lindqvist",
+          "texto": "El guardia quiere un botón para abrir la barrera «por si acaso»."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Se lo damos?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Lo hablo con seguridad: un botón para todo es la puerta que usaron para entrar.",
+            "confianza": 2,
+            "respuesta": "Tienes razón. Se lo explicaré con ese ejemplo."
+          },
+          {
+            "id": "b",
+            "texto": "Sí, el cliente siempre tiene razón.",
+            "confianza": -1,
+            "respuesta": "Y el siguiente hackeo, también."
+          },
+          {
+            "id": "c",
+            "texto": "No, sin más.",
+            "confianza": 0,
+            "respuesta": "Se va a enfadar si no le explicas por qué."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-JAVIER-7",
+      "nivel": "nivel-01",
+      "personaje": "javier",
+      "zona": "data-hub",
+      "diaDesde": 18,
+      "diaHasta": 20,
+      "orden": 7,
+      "minutos": 30,
+      "tema": "devops",
+      "lineas": [
+        {
+          "quien": "Javier",
+          "texto": "El despliegue de ayer tardó cuarenta minutos y alguien lo hizo a mano."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo lo harías tú?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Con un pipeline: el mismo proceso automático, cada vez, con sus pruebas.",
+            "confianza": 2,
+            "respuesta": "…Sí. Lo que se hace a mano, un día se hace mal."
+          },
+          {
+            "id": "b",
+            "texto": "Con una lista de pasos impresa.",
+            "confianza": 0,
+            "respuesta": "Mejor que nada. Pero la lista no se ejecuta sola."
+          },
+          {
+            "id": "c",
+            "texto": "Mejor no desplegar tanto.",
+            "confianza": -1,
+            "respuesta": "Desplegar poco hace cada despliegue más peligroso."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-VOSS-4",
+      "nivel": "nivel-01",
+      "personaje": "voss",
+      "zona": "archivo-de-voss",
+      "diaDesde": 17,
+      "diaHasta": 20,
+      "orden": 4,
+      "minutos": 30,
+      "tema": "principios",
+      "lineas": [
+        {
+          "quien": "Dra. Voss",
+          "texto": "Una clase de la barrera lee matrículas, abre, cierra, guarda en la base de datos y manda correos."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué principio rompe?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Responsabilidad única: hace demasiadas cosas; cambiar una arriesga las demás.",
+            "confianza": 2,
+            "respuesta": "Exacto. Una pieza, una razón para cambiar."
+          },
+          {
+            "id": "b",
+            "texto": "Ninguno, así está todo en un sitio.",
+            "confianza": -1,
+            "respuesta": "Todo en un sitio es justo el problema."
+          },
+          {
+            "id": "c",
+            "texto": "El de rendimiento.",
+            "confianza": 0,
+            "respuesta": "Puede que también sea lenta. Pero el problema es de diseño."
+          }
+        ]
+      }
+    }
+  ]
+}

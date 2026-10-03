@@ -31,7 +31,9 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Pequeno, Tema.cian);
             Ui.Texto(titulos, "Hola, " + App.PerfilActivo.nombreEstudiante, EstiloTexto.Titulo);
-            Ui.Boton(cabecera, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
+            // El diario aparece cuando ya hay algo que leer en el: antes de la primera partida solo confunde.
+            if (App.PerfilActivo.coleccionablesGlobales != null && App.PerfilActivo.coleccionablesGlobales.Count > 0)
+                Ui.Boton(cabecera, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
             if (App.PerfilActivo.guiaVista != null && App.PerfilActivo.guiaVista.Count > 0)
                 Ui.Boton(cabecera, "Volver a ver la guía", () => {
                     // La guia sale una vez por perfil; esto la reinicia para la proxima partida del tutorial.

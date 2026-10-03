@@ -4,9 +4,11 @@
   "lienzo": "backlog",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
+  "modulo": "acceso",
+  "enElProyecto": "Es el backlog del primer sprint del sistema de los patios: leer matrículas, abrir la barrera solo a los autorizados y las reservas de los ascensores.",
   "presentacion": {
     "titulo": "El orden del backlog",
-    "comoSeJuega": "Ordena las tarjetas de arriba abajo. Entran las que caben en la capacidad; las que queden debajo de la línea se quedan fuera. Algunas dependen de otras, y eso no se ve hasta que chocas con ello. Después, contesta a Facilities.",
+    "comoSeJuega": "El backlog es la lista de trabajo pendiente; ordenarlo es decidir qué se hace en este sprint. Arrastra las tarjetas: arriba lo más valioso. Solo entran las que caben sobre la línea (la capacidad del equipo). Algunas necesitan otra antes, y eso no se ve hasta que chocas con ello. Al final, contesta a Facilities: verás en el tablero qué cambia con tu respuesta.",
     "quienEspera": "Facilities",
     "textoPresion": "Facilities espera respuesta antes de la reunión de las 12:00",
     "segundosReloj": 150
@@ -14,29 +16,34 @@
   "ordenar": {
     "capacidad": 16,
     "umbralDeValor": 0.8,
-    "peticion": "Facilities quiere todo para el día 10, incluido el informe mensual por sucursal.",
+    "peticion": "Facilities quiere todo para el día 10, incluido el informe mensual de uso de los patios.",
+    "tarjetaPedida": "t6",
     "tarjetas": [
       { "id": "t1", "titulo": "Leer matrículas en la garita", "valor": 8, "esfuerzo": 5 },
       { "id": "t2", "titulo": "Abrir la barrera solo a autorizados", "valor": 9, "esfuerzo": 3, "dependeDe": ["t1"] },
       { "id": "t3", "titulo": "Registrar entradas y salidas", "valor": 6, "esfuerzo": 3, "dependeDe": ["t1"] },
       { "id": "t4", "titulo": "Reservar ascensores de carga", "valor": 7, "esfuerzo": 5 },
       { "id": "t5", "titulo": "Prioridades entre reservas", "valor": 4, "esfuerzo": 3, "dependeDe": ["t4"] },
-      { "id": "t6", "titulo": "Informe mensual por sucursal", "valor": 3, "esfuerzo": 4, "dependeDe": ["t3"] },
+      { "id": "t6", "titulo": "Informe mensual de uso de los patios", "valor": 3, "esfuerzo": 4, "dependeDe": ["t3"] },
       { "id": "t7", "titulo": "Avisos de reserva por correo", "valor": 2, "esfuerzo": 2, "dependeDe": ["t4"] },
       { "id": "t8", "titulo": "Panel de la garita en tiempo real", "valor": 5, "esfuerzo": 4, "dependeDe": ["t3"] }
     ],
     "respuestas": {
       "obedecer": {
         "texto": "Aceptas el plazo con todo dentro.",
+        "replica": "¡Perfecto! Entonces el informe va primero, que es lo que me pide la gerencia.",
+        "efectoEnBacklog": "forzar-arriba",
         "consecuencia": {
           "efectosInmediatos": { "Cansancio": 8, "DeudaTecnica": 6 },
           "efectosDiferidos": [],
           "hallazgos": [],
-          "rubrica": { "veredicto": "incorrecta", "oa": "OA-SCRUM-01", "razon": "Aceptar un alcance que no cabe no lo hace caber: lo paga el equipo, en horas y en atajos." }
+          "rubrica": { "veredicto": "incorrecta", "oa": "OA-SCRUM-01", "razon": "Aceptar un alcance que no cabe no lo hace caber: el informe se coló arriba sin lo que necesita y lo paga el equipo, en horas y en atajos." }
         }
       },
       "rechazar": {
         "texto": "Dices que no: se hace lo que cabe, y punto.",
+        "replica": "Ajá. Pues tendré que explicarle a la gerencia por qué no hay informe. No me deja muy bien parada.",
+        "efectoEnBacklog": "ninguno",
         "consecuencia": {
           "efectosInmediatos": { "SatisfaccionCliente": -6 },
           "efectosDiferidos": [],
@@ -46,11 +53,13 @@
       },
       "negociar": {
         "texto": "Le explicas qué cabe, qué no y por qué, y le pides que elija.",
+        "replica": "Ya veo… Si algo tiene que salir, que sea lo de menos valor para mí. El informe sí lo necesito este mes.",
+        "efectoEnBacklog": "intercambiar",
         "consecuencia": {
-          "efectosInmediatos": { "SatisfaccionCliente": 2, "Dias": 0.5 },
+          "efectosInmediatos": { "SatisfaccionCliente": 2 },
           "efectosDiferidos": [ { "enDias": 4, "efectos": {}, "eventoForzado": "EV-BUE-02" } ],
           "hallazgos": [],
-          "rubrica": { "veredicto": "correcta", "oa": "OA-SCRUM-01", "razon": "Negociar es enseñarle al cliente el coste de lo que pide y dejarle elegir. Es la opción que casi nadie prueba primero." }
+          "rubrica": { "veredicto": "correcta", "oa": "OA-SCRUM-01", "razon": "Negociar es enseñarle al cliente el coste de lo que pide y dejarle elegir qué sale. El informe entró, a cambio de algo que él valoraba menos." }
         }
       }
     }
@@ -66,13 +75,13 @@
       "efectosInmediatos": { "DeudaTecnica": 2 },
       "efectosDiferidos": [],
       "hallazgos": [],
-      "rubrica": { "veredicto": "aceptable", "oa": "OA-SCRUM-01", "razon": "El orden funciona, pero dejaste fuera trabajo que valía más que lo que entró. Mira valor y esfuerzo a la vez: una tarjeta pequeña y valiosa casi siempre va antes." }
+      "rubrica": { "veredicto": "aceptable", "oa": "OA-SCRUM-01", "razon": "El orden funciona, pero dejaste fuera trabajo que valía más que lo que entró, o la respuesta al cliente lo estropeó. Mira valor y esfuerzo a la vez: una tarjeta pequeña y valiosa casi siempre va antes." }
     },
     "falsoPositivo": {
       "efectosInmediatos": { "DeudaTecnica": 5, "MoralEquipo": -3 },
       "efectosDiferidos": [],
       "hallazgos": [],
-      "rubrica": { "veredicto": "incorrecta", "oa": "OA-SCRUM-01", "razon": "Pusiste una tarea antes que otra de la que depende. El equipo la va a empezar y se va a quedar bloqueado a mitad de sprint." }
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-SCRUM-01", "razon": "Una tarea quedó antes que otra de la que depende. El equipo la va a empezar y se va a quedar bloqueado a mitad de sprint." }
     },
     "omitido": {
       "efectosInmediatos": { "SatisfaccionCliente": -5, "DeudaTecnica": 4 },

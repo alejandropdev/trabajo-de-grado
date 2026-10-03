@@ -191,10 +191,43 @@ namespace Nexus.Unity.Aplicacion {
                     return null;
                 }
                 datos.NivelAndamiaje = Catalogo.Niveles[datos.NivelActualId].NivelAndamiaje;
+                FotografiarFlags();
             }
 
             Sesion = Partidas.AbrirSesion(partida, null, new FabricaDeSesion(Catalogo));
             return Sesion;
+        }
+
+        /// <summary>Lo que valian los flags al empezar este nivel: a esto vuelve «Repetir el nivel».</summary>
+        private void FotografiarFlags() {
+            if (PartidaActiva == null) return;
+            PartidaActiva.FlagsAlEmpezarNivel = PartidaActiva.Flags == null
+                ? new Dictionary<string, double>()
+                : new Dictionary<string, double>(PartidaActiva.Flags);
+            PartidaActiva.RelacionesAlEmpezarNivel = PartidaActiva.Relaciones == null
+                ? new Dictionary<string, int>()
+                : new Dictionary<string, int>(PartidaActiva.Relaciones);
+        }
+
+        /// <summary>
+        /// Tras cerrar un nivel que no salio bien: se vuelve a jugar desde su Fase 1, con los flags como estaban al
+        /// empezarlo (lo que escribio el cierre se deshace) y sin repetir la entrevista ni las escenas de apertura.
+        /// </summary>
+        public void RepetirNivel() {
+            if (Sesion == null || !Sesion.NivelTerminado)
+                throw new InvalidOperationException("Solo se puede repetir un nivel ya cerrado.");
+            var nivel = Sesion.NivelId;
+            if (PartidaActiva.FlagsAlEmpezarNivel != null)
+                PartidaActiva.Flags = new Dictionary<string, double>(PartidaActiva.FlagsAlEmpezarNivel);
+            if (PartidaActiva.RelacionesAlEmpezarNivel != null)
+                PartidaActiva.Relaciones = new Dictionary<string, int>(PartidaActiva.RelacionesAlEmpezarNivel);
+            PartidaActiva.Partida.NivelesCompletados.Remove(nivel);
+            PartidaActiva.Partida.NivelActualId = nivel;
+            PartidaActiva.Nivel = null;
+            Nexus.Unity.Guia.GuiaView.Reiniciar();
+            Sesion = new FabricaDeSesion(Catalogo).Nueva(PartidaActiva);
+            Sesion.R.IntroVista = true;
+            Guardar("repetir nivel");
         }
 
         /// <summary>El informe del ultimo nivel cerrado, para el Dashboard de Lecciones. Solo vive en memoria.</summary>
@@ -209,6 +242,20 @@ namespace Nexus.Unity.Aplicacion {
             if (PerfilActivo.coleccionablesGlobales == null) PerfilActivo.coleccionablesGlobales = new List<string>();
             if (PerfilActivo.coleccionablesGlobales.Contains(id)) return;
             PerfilActivo.coleccionablesGlobales.Add(id);
+            GuardarPerfil();
+        }
+
+        /// <summary>Si este perfil ya termino alguna vez ese minijuego (la primera vez se juega guiado).</summary>
+        public bool YaJugoElMinijuego(string id) {
+            return PerfilActivo != null && PerfilActivo.minijuegosJugados != null && !string.IsNullOrEmpty(id) &&
+                   PerfilActivo.minijuegosJugados.Contains(id);
+        }
+
+        public void AnotarMinijuegoJugado(string id) {
+            if (PerfilActivo == null || string.IsNullOrEmpty(id)) return;
+            if (PerfilActivo.minijuegosJugados == null) PerfilActivo.minijuegosJugados = new List<string>();
+            if (PerfilActivo.minijuegosJugados.Contains(id)) return;
+            PerfilActivo.minijuegosJugados.Add(id);
             GuardarPerfil();
         }
 
@@ -236,6 +283,7 @@ namespace Nexus.Unity.Aplicacion {
 
             PartidaActiva.Partida.NivelActualId = siguiente;
             PartidaActiva.Partida.NivelAndamiaje = Catalogo.Niveles[siguiente].NivelAndamiaje;
+            FotografiarFlags();
             Sesion = new FabricaDeSesion(Catalogo).Nueva(PartidaActiva);
             Guardar("inicio de nivel");
             return siguiente;

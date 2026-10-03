@@ -37,6 +37,12 @@ namespace Nexus.Core.Datos {
         /// <summary>Los pasos de la guia del tutorial (la burbuja de Marisol). Vacio = ningun nivel tiene guia.</summary>
         public List<PasoDeGuia> Guia = new List<PasoDeGuia>();
 
+        /// <summary>Las palabras de la asignatura explicadas («?» en la UI). Vacio = no hay glosario.</summary>
+        public List<EntradaDeGlosario> Glosario = new List<EntradaDeGlosario>();
+
+        /// <summary>Con quien se habla en la Fase 2 y que se dice. Vacio = nadie habla.</summary>
+        public Nexus.Core.Relaciones.CatalogoDeRelaciones Relaciones = new Nexus.Core.Relaciones.CatalogoDeRelaciones();
+
         public override string ToString() {
             return $"{Eventos.Count} eventos, {Niveles.Count} niveles, {Metodologias.Count} metodologias, " +
                    $"{Minijuegos.Count} minijuegos, {Beats.Count} beats, {Flags.Count} flags, " +
@@ -72,6 +78,8 @@ namespace Nexus.Core.Datos {
         public const string ArchivoAdmision = "prueba-de-admision.json";
         public const string ArchivoColeccionables = "coleccionables.json";
         public const string ArchivoGuia = "narrativa/guia-tutorial.json";
+        public const string ArchivoGlosario = "narrativa/glosario.json";
+        public const string ArchivoConversaciones = "narrativa/conversaciones.json";
 
         public static JsonSerializerSettings Settings { get { return JsonDeGuardado.Settings; } }
 
@@ -109,6 +117,17 @@ namespace Nexus.Core.Datos {
         private sealed class ArchivoDeGuia {
             public int Version { get; set; }
             public List<PasoDeGuia> Pasos { get; set; }
+        }
+
+        private sealed class ArchivoDeGlosario {
+            public int Version { get; set; }
+            public List<EntradaDeGlosario> Terminos { get; set; }
+        }
+
+        private sealed class ArchivoDeConversaciones {
+            public int Version { get; set; }
+            public List<Nexus.Core.Relaciones.Personaje> Personajes { get; set; }
+            public List<Nexus.Core.Relaciones.Conversacion> Conversaciones { get; set; }
         }
 
         private sealed class ArchivoDeColeccionables {
@@ -300,6 +319,27 @@ namespace Nexus.Core.Datos {
                 try {
                     var archivo = Parsear<ArchivoDeGuia>(fuente.LeerCatalogo(ArchivoGuia), ArchivoGuia);
                     catalogo.Guia = archivo.Pasos ?? new List<PasoDeGuia>();
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            if (fuente.Existe(ArchivoGlosario)) {
+                try {
+                    var archivo = Parsear<ArchivoDeGlosario>(fuente.LeerCatalogo(ArchivoGlosario), ArchivoGlosario);
+                    catalogo.Glosario = archivo.Terminos ?? new List<EntradaDeGlosario>();
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            if (fuente.Existe(ArchivoConversaciones)) {
+                try {
+                    var archivo = Parsear<ArchivoDeConversaciones>(fuente.LeerCatalogo(ArchivoConversaciones), ArchivoConversaciones);
+                    catalogo.Relaciones = new Nexus.Core.Relaciones.CatalogoDeRelaciones {
+                        Personajes = archivo.Personajes ?? new List<Nexus.Core.Relaciones.Personaje>(),
+                        Conversaciones = archivo.Conversaciones ?? new List<Nexus.Core.Relaciones.Conversacion>()
+                    };
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
                 }

@@ -26,6 +26,12 @@ namespace Nexus.Core.Modelo {
         /// </summary>
         public string[] Briefing = new string[0];
 
+        /// <summary>
+        /// El expediente del proyecto: cliente, sector, modulos, diagrama de contexto, vocabulario, documentos y lo
+        /// que cambia respecto al nivel anterior. null = el nivel no lo tiene (y no se enseña).
+        /// </summary>
+        public Nexus.Core.Proyecto.FichaDelProyecto Proyecto;
+
         // --- Grupo 1 · condiciones iniciales ---
         public int DiasTotales;
         public double PresupuestoInicial;
@@ -64,10 +70,23 @@ namespace Nexus.Core.Modelo {
         public string[] ObjetivosActivos = new string[0];
 
         public Umbrales Umbrales = new Umbrales();
+
+        /// <summary>Lo que exige este nivel para que el lanzamiento salga bien (y lo que ya es salir mal).</summary>
+        public Nexus.Core.Evaluacion.UmbralesDeLanzamiento Lanzamiento = new Nexus.Core.Evaluacion.UmbralesDeLanzamiento();
+
+        /// <summary>Lo que pasa en un dia por como esta el proyecto (deuda alta, cobertura baja…). Vacio = nada.</summary>
+        public List<Nexus.Core.Simulacion.Incidencia> Incidencias = new List<Nexus.Core.Simulacion.Incidencia>();
+
         public string[] MetodologiasPermitidas = new string[0];
 
         /// <summary>0 sin ayudas · 1 sin contadores · 2 normal · 3 tutorial (zonas resaltadas).</summary>
         public int NivelAndamiaje = 2;
+
+        /// <summary>
+        /// Todos los minijuegos del nivel se juegan guiados (RecorridoGuiado), aunque ya se hayan jugado. El tutorial
+        /// lo pone a true; en los demas niveles solo se guia la primera vez de cada minijuego.
+        /// </summary>
+        public bool MinijuegosGuiados;
 
         /// <summary>
         /// 0-100, OCULTO al jugador. En la Fase 4 se compara contra la familia de la metodologia que eligio:
@@ -95,8 +114,11 @@ namespace Nexus.Core.Modelo {
             c.Jornada = Jornada == null ? null : Jornada.Clone();
             c.Mapa = Mapa == null ? null : Mapa.Clone();
             c.Umbrales = Umbrales == null ? null : Umbrales.Clone();
+            c.Lanzamiento = Lanzamiento == null ? null : Lanzamiento.Clone();
+            c.Incidencias = Incidencias == null ? null : Incidencias.ConvertAll(i => i == null ? null : i.Clone());
             c.Fase1 = Fase1 == null ? null : Fase1.Clone();
             c.Oficina = Oficina == null ? null : Oficina.Clone();
+            c.Proyecto = Proyecto == null ? null : Proyecto.Clone();
             return c;
         }
     }

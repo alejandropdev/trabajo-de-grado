@@ -55,6 +55,12 @@ namespace Nexus.Core.Minijuegos.Detectar
             return Construir(def, clave, traza, zonasAcertadas);
         }
 
+        /// <summary>"requisito_ambiguo" -> "requisito ambiguo". Core no conoce los textos de la UI.</summary>
+        private static string Humanizar(string etiqueta)
+        {
+            return string.IsNullOrEmpty(etiqueta) ? "" : etiqueta.Replace('_', ' ');
+        }
+
         /// <summary>Una marca cubre una zona si comparten al menos un commit.</summary>
         private static bool Toca(List<string> commitsMarca, List<string> commitsZona)
         {
@@ -79,17 +85,18 @@ namespace Nexus.Core.Minijuegos.Detectar
                 TextoCierre = def.Cierre?.Texto
             };
 
-            // El detalle explica lo que habia, no puntua. Se muestra al cerrar.
+            // El detalle explica lo que habia, no puntua. Se muestra al cerrar. Tambien lo que se escapo: es justo
+            // lo que mas hay que aprender, y antes no se explicaba.
             foreach (var z in def.Zonas)
-                if (acertadas.Contains(z.Id))
-                    res.Detalle.Add(z.Explicacion);
+                res.Detalle.Add(acertadas.Contains(z.Id)
+                    ? "Encontraste «" + Humanizar(z.Defecto) + "»: " + z.Explicacion
+                    : "Se te escapó «" + Humanizar(z.Defecto) + "»: " + z.Explicacion);
 
-            foreach (var m in traza)
-                if (m.SenueloTocado != null)
-                {
-                    var s = def.Senuelos.First(x => x.Id == m.SenueloTocado);
-                    res.Detalle.Add(s.RazonNoEsDefecto);
-                }
+            foreach (var id in traza.Where(m => m.SenueloTocado != null).Select(m => m.SenueloTocado).Distinct())
+            {
+                var s = def.Senuelos.First(x => x.Id == id);
+                res.Detalle.Add("Marcaste algo que estaba bien: " + s.RazonNoEsDefecto);
+            }
 
             return res;
         }

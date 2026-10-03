@@ -83,6 +83,26 @@ namespace Nexus.Core.Modelo {
         public string TareaDeOficinaAbierta;
         public int TareasDeOficinaHechas;
 
+        // --- Relaciones de la Fase 2 (hablar con la gente de cada sala) ---
+        /// <summary>personaje -> confianza ganada en este nivel. Se vuelca a su flag solo en Cerrar() (INV-6).</summary>
+        public Dictionary<string, int> Confianza = new Dictionary<string, int>(StringComparer.Ordinal);
+        public List<string> ConversacionesHechas = new List<string>();
+        /// <summary>personaje -> ultimo dia en que se hablo con el: una conversacion por persona y dia.</summary>
+        public Dictionary<string, int> UltimoDiaHablado = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>"personaje|umbral" de cada ayuda ya concedida: cada una se concede una sola vez.</summary>
+        public List<string> AyudasConcedidas = new List<string>();
+        /// <summary>tipo de ayuda -> usos que quedan.</summary>
+        public Dictionary<string, int> AyudasDisponibles = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        /// <summary>Incidencia del estado -> veces que ha salido en este nivel (para no repetir siempre la misma).</summary>
+        public Dictionary<string, int> IncidenciasVistas = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        // --- Salir a mitad de la Fase 1 y volver ---
+        /// <summary>La entrevista y las escenas de apertura ya se vieron: al continuar no se repiten.</summary>
+        public bool IntroVista;
+        /// <summary>Lo que el jugador llevaba elegido en la Fase 1 sin confirmar. null = nada.</summary>
+        public Fase1Borrador Fase1Borrador;
+
         // --- Registro pedagogico ---
         /// <summary>Estimado vs real: alimenta el cono de incertidumbre y el sesgo de optimismo del verbo V5.</summary>
         public List<Estimacion> HistorialEstimaciones = new List<Estimacion>();
@@ -193,6 +213,13 @@ namespace Nexus.Core.Modelo {
             if (ColeccionablesRecogidos == null) ColeccionablesRecogidos = new List<string>();
             if (HallazgosDeRecoleccion == null) HallazgosDeRecoleccion = new List<string>();
             if (TareasDeOficinaHoy == null) TareasDeOficinaHoy = new Dictionary<string, int>(StringComparer.Ordinal);
+            // Guardados anteriores a las relaciones.
+            if (Confianza == null) Confianza = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (ConversacionesHechas == null) ConversacionesHechas = new List<string>();
+            if (UltimoDiaHablado == null) UltimoDiaHablado = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (AyudasConcedidas == null) AyudasConcedidas = new List<string>();
+            if (AyudasDisponibles == null) AyudasDisponibles = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (IncidenciasVistas == null) IncidenciasVistas = new Dictionary<string, int>(StringComparer.Ordinal);
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,
@@ -201,6 +228,23 @@ namespace Nexus.Core.Modelo {
         int IContadoresDeSimulacion.DiasSeguidosTrabajando { get { return DiasSeguidosTrabajando; } }
         double IContadoresDeSimulacion.SobreCompromiso { get { return SobreCompromiso; } }
         int IContadoresDeSimulacion.WipActual { get { return WipActual; } }
+    }
+
+    /// <summary>
+    /// Las decisiones de la Fase 1 a medio tomar. Solo se entregan al motor al confirmar; mientras tanto viajan
+    /// aqui para que «Guardar y salir» no obligue a empezar la planificacion de cero.
+    /// </summary>
+    public sealed class Fase1Borrador {
+        public string Paso;
+        public string Metodologia;
+        public string RazonMetodologia;
+        public string Arquitectura;
+        public string RazonArquitectura;
+        public Dictionary<string, int> Fichas = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>«Comprueba que lo entendiste»: pregunta -> opcion acertada (solo las ya acertadas).</summary>
+        public Dictionary<string, int> Comprobacion = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>Las preguntas que se fallaron alguna vez (no cuentan como acierto a la primera).</summary>
+        public List<string> FalladasAlguna = new List<string>();
     }
 
     /// <summary>Una estimacion del jugador frente a lo que costo de verdad (verbo V5).</summary>

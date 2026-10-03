@@ -4,9 +4,11 @@
   "lienzo": "diagrama",
   "temaPrincipal": "SAD",
   "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "dentro",
+  "enElProyecto": "Es el diagrama de cómo viaja una visita desde el formulario de recepción hasta la lista «Quién sigue dentro», la que consulta el vigilante al cerrar.",
   "presentacion": {
-    "titulo": "Práctica: el diagrama de las inscripciones",
-    "comoSeJuega": "Es el diagrama del sistema de inscripciones del concurso. Cada caja es una pieza y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí y dile qué problema tiene.",
+    "titulo": "Práctica: el diagrama del registro de visitas",
+    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza del sistema y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí, púlsala y elige a la derecha qué problema tiene. Como es práctica, te digo al momento si acertaste.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 90
@@ -15,19 +17,19 @@
     "elementos": [
       {
         "id": "formulario",
-        "texto": "Formulario de inscripción",
+        "texto": "Formulario de visita",
         "tipo": "componente",
         "fila": 0,
         "columna": 0,
-        "detalle": "Donde cada concursante escribe sus datos."
+        "detalle": "La recepcionista escribe aquí los datos del visitante: nombre, documento y a quién viene a ver."
       },
       {
-        "id": "pantalla-jurado",
-        "texto": "Pantalla del jurado",
+        "id": "pantalla-seguridad",
+        "texto": "Pantalla del vigilante",
         "tipo": "componente",
         "fila": 0,
         "columna": 2,
-        "detalle": "El jurado ve aquí la lista de concursantes."
+        "detalle": "El vigilante ve aquí quién sigue dentro del edificio."
       },
       {
         "id": "validacion",
@@ -35,15 +37,15 @@
         "tipo": "componente",
         "fila": 1,
         "columna": 0,
-        "detalle": "Comprueba que no falte ningún dato obligatorio."
+        "detalle": "Comprueba que no falte ningún dato obligatorio (por ejemplo, el anfitrión)."
       },
       {
-        "id": "lista",
-        "texto": "Lista de concursantes",
+        "id": "dentro",
+        "texto": "Quién sigue dentro",
         "tipo": "componente",
         "fila": 1,
         "columna": 2,
-        "detalle": "Prepara la lista ordenada para el jurado."
+        "detalle": "Prepara la lista de visitantes que entraron y aún no han salido."
       },
       {
         "id": "bd",
@@ -51,7 +53,7 @@
         "tipo": "baseDeDatos",
         "fila": 2,
         "columna": 1,
-        "detalle": "Guarda las inscripciones."
+        "detalle": "Guarda cada visita: entrada, salida y anfitrión."
       }
     ],
     "conexiones": [
@@ -65,23 +67,23 @@
         "id": "c2",
         "desde": "validacion",
         "hasta": "bd",
-        "texto": "guarda la inscripción"
+        "texto": "guarda la visita"
       },
       {
         "id": "c3",
-        "desde": "lista",
+        "desde": "dentro",
         "hasta": "bd",
-        "texto": "lee las inscripciones"
+        "texto": "lee las visitas abiertas"
       },
       {
         "id": "c4",
-        "desde": "lista",
-        "hasta": "pantalla-jurado",
+        "desde": "dentro",
+        "hasta": "pantalla-seguridad",
         "texto": "envía la lista"
       },
       {
         "id": "c5",
-        "desde": "pantalla-jurado",
+        "desde": "pantalla-seguridad",
         "hasta": "formulario",
         "texto": "lee lo que se está escribiendo"
       }
@@ -95,7 +97,8 @@
         "c5"
       ],
       "defecto": "acoplamiento_indebido",
-      "explicacion": "La pantalla del jurado lee directamente del formulario, a medio escribir y sin validar. Si cambia el formulario, se rompe la pantalla: están pegadas. Lo correcto es que lea de la lista, como ya hace."
+      "explicacion": "La pantalla del vigilante lee directamente del formulario, a medio escribir y sin validar. Si cambia el formulario, se rompe la pantalla: están pegadas. Lo correcto es que lea de «Quién sigue dentro», como ya hace.",
+      "pista": "Sigue las flechas que llegan a la pantalla del vigilante. ¿De dónde debería sacar los datos: de las visitas ya guardadas o de un formulario a medio escribir?"
     }
   ],
   "senuelos": [
@@ -104,7 +107,7 @@
       "commits": [
         "c3"
       ],
-      "razonNoEsDefecto": "Que la lista lea de la base de datos es justo lo esperado: para eso se guardan las inscripciones."
+      "razonNoEsDefecto": "Que «Quién sigue dentro» lea de la base de datos es justo lo esperado: para eso se guardan las visitas."
     }
   ],
   "paletaEtiquetas": [
@@ -187,6 +190,6 @@
     }
   },
   "cierre": {
-    "texto": "Práctica terminada."
+    "texto": "Una pieza solo debería hablar con otra por su puerta de entrada. Si se mete en sus tripas, quedan pegadas: cambiar una rompe la otra."
   }
 }

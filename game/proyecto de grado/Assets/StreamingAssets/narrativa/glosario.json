@@ -1,0 +1,2829 @@
+{
+  "version": 1,
+  "terminos": [
+    {
+      "id": "ingenieria-de-software",
+      "tema": "Introducción a la IS",
+      "termino": "Ingeniería de software",
+      "definicion": "Construir software como se construye un puente: con un plan, con reglas y midiendo lo que se hace, no a ojo.",
+      "ejemplo": "Este concurso entero es un proyecto de software en miniatura: entender, decidir, construir, probar y entregar.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Ingeniería de software?",
+          "texto": "Construir software como se construye un puente: con un plan, con reglas y midiendo lo que se hace, no a ojo.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "entender y planear",
+              "color": ""
+            },
+            {
+              "icono": "caja",
+              "texto": "construir",
+              "color": "cian"
+            },
+            {
+              "icono": "check",
+              "texto": "medir y mantener",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Sin ingeniería, el software sale, pero nadie sabe cuánto costará, si funciona ni cómo arreglarlo. Con ella, cada paso deja algo que se puede revisar.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "a ojo: sorpresas",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "con proceso: se mide",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Todo el juego es un proyecto de ingeniería en miniatura: encargo, decisiones, días de trabajo, pruebas y lanzamiento.\nPor ejemplo: Este concurso entero es un proyecto de software en miniatura: entender, decidir, construir, probar y entregar.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "ciclo-de-vida",
+      "tema": "Modelos de ciclo de vida",
+      "termino": "Ciclo de vida",
+      "definicion": "Las etapas por las que pasa un software: entender qué se pide, diseñar, construir, probar, entregar y mantener.",
+      "ejemplo": "Cascada hace las etapas una vez y en orden; Scrum las repite en vueltas cortas.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Ciclo de vida?",
+          "texto": "Las etapas por las que pasa un software: entender qué se pide, diseñar, construir, probar, entregar y mantener.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "requisitos",
+              "color": ""
+            },
+            {
+              "icono": "caja",
+              "texto": "diseño",
+              "color": ""
+            },
+            {
+              "icono": "servidor",
+              "texto": "construcción",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "pruebas",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Saltarse una etapa no la elimina: la paga otra. Lo que no se entiende al principio se descubre al final, cuando arreglarlo cuesta mucho más.",
+          "vinetas": [
+            {
+              "icono": "reloj",
+              "texto": "error temprano: barato",
+              "color": "cian"
+            },
+            {
+              "icono": "bicho",
+              "texto": "error tardío: caro",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "La Fase 1 es entender y planear; la Fase 2, construir día a día; la Fase 3, entregar. Y Lecciones, aprender para el siguiente.\nPor ejemplo: Cascada hace las etapas una vez y en orden; Scrum las repite en vueltas cortas.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "metodologia",
+      "tema": "Modelos de ciclo de vida",
+      "termino": "Metodología",
+      "definicion": "La forma en que el equipo organiza el trabajo: qué se hace primero, cada cuánto se revisa y cómo se decide.",
+      "ejemplo": "Es la receta del equipo. Una receta de pastel no sirve para hacer arepas.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Metodología?",
+          "texto": "La forma en que el equipo organiza el trabajo: qué se hace primero, cada cuánto se revisa y cómo se decide.",
+          "vinetas": [
+            {
+              "icono": "equipo",
+              "texto": "el equipo",
+              "color": ""
+            },
+            {
+              "icono": "tablero",
+              "texto": "una forma de trabajar",
+              "color": ""
+            },
+            {
+              "icono": "reloj",
+              "texto": "cada cuánto se revisa",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "No hay una metodología mejor que otra: hay una más adecuada para cada proyecto. Elegir mal hace que el equipo luche contra su propio proceso.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "adecuada: fluye",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "inadecuada: fricción",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Es tu primera decisión de la Fase 1. Cambia los días: con Scrum hay sprints y retrospectivas; con Cascada, etapas; con Kanban, un flujo.\nPor ejemplo: Es la receta del equipo. Una receta de pastel no sirve para hacer arepas.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "cascada",
+      "tema": "Modelos de ciclo de vida",
+      "termino": "Cascada",
+      "definicion": "Hacer el proyecto por etapas, una detrás de otra, sin volver atrás: requisitos, diseño, construcción, pruebas.",
+      "ejemplo": "Funciona si todo está claro desde el principio. Si el cliente cambia de idea a mitad, cuesta mucho.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Cascada?",
+          "texto": "Hacer el proyecto por etapas, una detrás de otra, sin volver atrás: requisitos, diseño, construcción, pruebas.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "1 · requisitos",
+              "color": ""
+            },
+            {
+              "icono": "caja",
+              "texto": "2 · diseño",
+              "color": ""
+            },
+            {
+              "icono": "servidor",
+              "texto": "3 · construir",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "4 · probar",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Funciona si todo está claro y no cambia. Si el cliente cambia de idea a mitad, hay que volver atrás y casi todo se rehace.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "encargo estable",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "cliente que cambia",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Si eliges Cascada, tus días se agrupan por etapas y los errores de requisitos aparecen en las pruebas, al final. El riesgo del lanzamiento pesa más.\nPor ejemplo: Funciona si todo está claro desde el principio. Si el cliente cambia de idea a mitad, cuesta mucho.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "scrum",
+      "tema": "Ágiles — Scrum",
+      "termino": "Scrum",
+      "definicion": "Trabajar en vueltas cortas (sprints). En cada una se planea, se construye algo usable y al final se revisa y se mejora.",
+      "ejemplo": "Sirve cuando el cliente todavía no sabe bien lo que quiere: cada sprint le enseñas algo y te corrige pronto.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Scrum?",
+          "texto": "Trabajar en vueltas cortas (sprints). En cada una se planea, se construye algo usable y al final se revisa y se mejora.",
+          "vinetas": [
+            {
+              "icono": "tarjeta",
+              "texto": "se elige qué hacer",
+              "color": ""
+            },
+            {
+              "icono": "reloj",
+              "texto": "sprint corto",
+              "color": ""
+            },
+            {
+              "icono": "persona",
+              "texto": "se enseña al cliente",
+              "color": ""
+            },
+            {
+              "icono": "equipo",
+              "texto": "se mejora",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "El cliente ve algo que funciona cada pocas semanas y corrige pronto. A cambio, hay reuniones fijas y hay que comprometerse con lo que cabe.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "feedback temprano",
+              "color": "cian"
+            },
+            {
+              "icono": "reloj",
+              "texto": "ceremonias",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Con Scrum, algunos días empiezan con la planificación del sprint (¿con cuánto te comprometes?) y otros con la retrospectiva.\nPor ejemplo: Sirve cuando el cliente todavía no sabe bien lo que quiere: cada sprint le enseñas algo y te corrige pronto.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "sprint",
+      "tema": "Ágiles — Scrum",
+      "termino": "Sprint",
+      "definicion": "Un periodo corto y fijo (de una a cuatro semanas) en el que el equipo se compromete a terminar un trozo de trabajo.",
+      "ejemplo": "«Esta semana entregamos el formulario de inscripción funcionando». Eso es un sprint.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Sprint?",
+          "texto": "Un periodo corto y fijo (de una a cuatro semanas) en el que el equipo se compromete a terminar un trozo de trabajo.",
+          "vinetas": [
+            {
+              "icono": "tarjeta",
+              "texto": "lo prometido",
+              "color": ""
+            },
+            {
+              "icono": "reloj",
+              "texto": "1-4 semanas",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "algo usable",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Si se promete más de lo que cabe, el sprint termina a medias y se acumula deuda. Si se promete lo justo, se entrega y se gana confianza.",
+          "vinetas": [
+            {
+              "icono": "barra-subiendo",
+              "texto": "prometer de más: deuda",
+              "color": "roja"
+            },
+            {
+              "icono": "check",
+              "texto": "lo justo: entrega",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En la planificación eliges cuántos puntos comprometes. La cifra sugerida suele ser la sensata.\nPor ejemplo: «Esta semana entregamos el formulario de inscripción funcionando». Eso es un sprint.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "backlog",
+      "tema": "Ágiles — Scrum",
+      "termino": "Backlog",
+      "definicion": "La lista de todo lo que falta por hacer, ordenada de lo más importante a lo menos.",
+      "ejemplo": "Como la lista del mercado ordenada: si solo alcanza la plata para cinco cosas, compras primero lo que no puede faltar.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Backlog?",
+          "texto": "La lista de todo lo que falta por hacer, ordenada de lo más importante a lo menos.",
+          "vinetas": [
+            {
+              "icono": "tarjeta",
+              "texto": "todo lo pendiente",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "ordenado",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "arriba lo valioso",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un backlog sin ordenar hace que el equipo trabaje en lo que llegó primero, que casi nunca es lo que más vale. Ordenarlo es decidir qué se queda fuera.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "por orden de llegada",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "por valor y dependencias",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "El reto «¿Qué hacemos primero?» es ordenar un backlog: arriba lo valioso, cada cosa después de lo que necesita.\nPor ejemplo: Como la lista del mercado ordenada: si solo alcanza la plata para cinco cosas, compras primero lo que no puede faltar.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "product-owner",
+      "tema": "Ágiles — Scrum",
+      "termino": "Product Owner",
+      "definicion": "La persona que decide qué es lo más valioso y ordena el backlog. Habla por el cliente.",
+      "ejemplo": "En el concurso, Marisol hace un poco de ese papel cuando te pregunta qué cabe.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Product Owner?",
+          "texto": "La persona que decide qué es lo más valioso y ordena el backlog. Habla por el cliente.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "habla por el cliente",
+              "color": "mostaza"
+            },
+            {
+              "icono": "tarjeta",
+              "texto": "ordena el backlog",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Sin alguien que decida qué vale más, el equipo se divide entre peticiones y no termina ninguna. El Product Owner dice «esto primero» y responde por ello.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "todos deciden: nadie decide",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "uno prioriza",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Cuando contestas al cliente en un backlog (sí, no o negociar) estás haciendo de Product Owner.\nPor ejemplo: En el concurso, Marisol hace un poco de ese papel cuando te pregunta qué cabe.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "ceremonia",
+      "tema": "Ágiles — Scrum",
+      "termino": "Ceremonia",
+      "definicion": "Una reunión fija del proceso: la planificación del sprint, la reunión diaria, la revisión y la retrospectiva.",
+      "ejemplo": "Cuestan tiempo, pero sin ellas el equipo trabaja a ciegas.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Ceremonia?",
+          "texto": "Una reunión fija del proceso: la planificación del sprint, la reunión diaria, la revisión y la retrospectiva.",
+          "vinetas": [
+            {
+              "icono": "equipo",
+              "texto": "planificación",
+              "color": ""
+            },
+            {
+              "icono": "reloj",
+              "texto": "reunión diaria",
+              "color": ""
+            },
+            {
+              "icono": "persona",
+              "texto": "revisión",
+              "color": ""
+            },
+            {
+              "icono": "equipo",
+              "texto": "retrospectiva",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Cuestan tiempo, pero sin ellas el equipo no sabe qué hace el resto ni mejora. Saltárselas ahorra hoy y se paga después.",
+          "vinetas": [
+            {
+              "icono": "reloj",
+              "texto": "cuestan horas",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "evitan sorpresas",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Las ceremonias de tu metodología aparecen al empezar algunos días y se apuntan en el diario del día.\nPor ejemplo: Cuestan tiempo, pero sin ellas el equipo trabaja a ciegas.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "retrospectiva",
+      "tema": "Ágiles — Scrum",
+      "termino": "Retrospectiva",
+      "definicion": "Al final de un sprint, el equipo mira CÓMO trabajó (no qué hizo) y elige una cosa para mejorar.",
+      "ejemplo": "«Nos quedamos tres noches seguidas: la semana que viene prometemos menos».",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Retrospectiva?",
+          "texto": "Al final de un sprint, el equipo mira CÓMO trabajó (no qué hizo) y elige una cosa para mejorar.",
+          "vinetas": [
+            {
+              "icono": "equipo",
+              "texto": "el equipo se reúne",
+              "color": ""
+            },
+            {
+              "icono": "mano",
+              "texto": "¿cómo trabajamos?",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "UNA mejora",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Es la forma de que el proceso mejore solo. Elegir bien la mejora cambia cómo rinde el equipo en los días siguientes.",
+          "vinetas": [
+            {
+              "icono": "barra-subiendo",
+              "texto": "mejora elegida",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Con Scrum, al terminar un sprint eliges una acción de retrospectiva: cambia los coeficientes del equipo desde ese día.\nPor ejemplo: «Nos quedamos tres noches seguidas: la semana que viene prometemos menos».",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "kanban",
+      "tema": "Ágiles — Kanban",
+      "termino": "Kanban",
+      "definicion": "Un tablero con columnas (por hacer, haciendo, hecho) por el que el trabajo va pasando, sin sprints.",
+      "ejemplo": "Sirve cuando el trabajo llega sin avisar, como en soporte: atiendes lo que entra según la prioridad.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Kanban?",
+          "texto": "Un tablero con columnas (por hacer, haciendo, hecho) por el que el trabajo va pasando, sin sprints.",
+          "vinetas": [
+            {
+              "icono": "tablero",
+              "texto": "por hacer · haciendo · hecho",
+              "color": ""
+            },
+            {
+              "icono": "tarjeta",
+              "texto": "las tareas fluyen",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Sirve cuando el trabajo llega sin avisar. Su regla es terminar antes de empezar: si todo está a medias, nada está hecho.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "flujo continuo",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "demasiado a la vez",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Si eliges Kanban no hay sprints: el trabajo fluye y lo que importa es no tener demasiadas cosas empezadas.\nPor ejemplo: Sirve cuando el trabajo llega sin avisar, como en soporte: atiendes lo que entra según la prioridad.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "wip",
+      "tema": "Ágiles — Kanban",
+      "termino": "Límite WIP",
+      "definicion": "Cuántas cosas puede haber a la vez en «haciendo». Si se llena, no se empieza nada nuevo hasta terminar algo.",
+      "ejemplo": "Malabarear tres pelotas se puede; con siete se te caen todas. Terminar antes de empezar.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Límite WIP?",
+          "texto": "Cuántas cosas puede haber a la vez en «haciendo». Si se llena, no se empieza nada nuevo hasta terminar algo.",
+          "vinetas": [
+            {
+              "icono": "tablero",
+              "texto": "columna «haciendo»",
+              "color": ""
+            },
+            {
+              "icono": "pila",
+              "texto": "máximo N cosas",
+              "color": "mostaza"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Con demasiadas cosas a la vez, cada una avanza más lento y nadie termina. El límite obliga a cerrar antes de abrir.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "7 a medias",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "3 terminadas",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Marta y Óscar te contarán cómo se atascan con demasiadas tareas abiertas. En Kanban, el límite WIP te lo recuerda.\nPor ejemplo: Malabarear tres pelotas se puede; con siete se te caen todas. Terminar antes de empezar.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "tema": "DevOps / MLOps",
+      "termino": "DevOps",
+      "definicion": "Juntar a quien construye el software con quien lo pone a funcionar, y automatizar el camino entre los dos.",
+      "ejemplo": "Cada cambio se prueba y se instala solo, en minutos, en lugar de un «gran día de la instalación» cada mes.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es DevOps?",
+          "texto": "Juntar a quien construye el software con quien lo pone a funcionar, y automatizar el camino entre los dos.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "quien construye",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "automatizado",
+              "color": ""
+            },
+            {
+              "icono": "servidor",
+              "texto": "quien opera",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Si instalar es un evento raro y manual, cada instalación da miedo y falla. Si es diario y automático, deja de ser un problema.",
+          "vinetas": [
+            {
+              "icono": "reloj",
+              "texto": "a mano: horas y errores",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "automático: minutos",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Iván y Óscar te preguntarán cómo instalarías el sistema. Practicarlo desde el día uno evita el viernes de pánico.\nPor ejemplo: Cada cambio se prueba y se instala solo, en minutos, en lugar de un «gran día de la instalación» cada mes.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "pipeline",
+      "tema": "DevOps / MLOps",
+      "termino": "Pipeline (CI/CD)",
+      "definicion": "La cadena automática que compila, prueba y despliega cada cambio. Si algo falla, se para y avisa.",
+      "ejemplo": "Como el control de calidad de una fábrica, pero para el código.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Pipeline (CI/CD)?",
+          "texto": "La cadena automática que compila, prueba y despliega cada cambio. Si algo falla, se para y avisa.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "compila",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "prueba",
+              "color": "cian"
+            },
+            {
+              "icono": "servidor",
+              "texto": "despliega",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un pipeline que no prueba solo instala errores más rápido. Uno que prueba para todo lo que falla antes de que llegue al cliente.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "sin pruebas",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "con pruebas",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Javier te hablará del despliegue de 40 minutos hecho a mano: es lo que un pipeline evita.\nPor ejemplo: Como el control de calidad de una fábrica, pero para el código.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "git",
+      "tema": "git",
+      "termino": "git",
+      "definicion": "La herramienta que guarda la historia de cada cambio del código: quién, cuándo y por qué.",
+      "ejemplo": "Como el historial de versiones de un documento compartido, pero para todo un proyecto.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es git?",
+          "texto": "La herramienta que guarda la historia de cada cambio del código: quién, cuándo y por qué.",
+          "vinetas": [
+            {
+              "icono": "commit",
+              "texto": "cada versión guardada",
+              "color": ""
+            },
+            {
+              "icono": "persona",
+              "texto": "quién y cuándo",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Con git nada se pierde y se sabe quién hizo qué. Mal usado (reescribiendo lo compartido) borra el trabajo de otros.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "historia que se añade",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "historia reescrita",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "El reto del grafo de commits es una auditoría de git: buscar historia reescrita y autoría perdida.\nPor ejemplo: Como el historial de versiones de un documento compartido, pero para todo un proyecto.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "commit",
+      "tema": "git",
+      "termino": "Commit",
+      "definicion": "Una foto guardada de los cambios, con un mensaje que explica qué se hizo.",
+      "ejemplo": "«Arregla el registro de visitantes sin cita». Un buen mensaje le ahorra horas al que venga después.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Commit?",
+          "texto": "Una foto guardada de los cambios, con un mensaje que explica qué se hizo.",
+          "vinetas": [
+            {
+              "icono": "commit",
+              "texto": "una foto del código",
+              "color": ""
+            },
+            {
+              "icono": "documento",
+              "texto": "un mensaje: qué y por qué",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un buen mensaje le ahorra horas al que venga después. «cambios» no dice nada; «arregla la barrera que no bajaba» lo dice todo.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "«cambios v2 final»",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "«arregla X porque Y»",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el grafo de commits lees mensajes, fechas y autores: así se descubre lo que pasó.\nPor ejemplo: «Arregla el registro de visitantes sin cita». Un buen mensaje le ahorra horas al que venga después.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "rama",
+      "tema": "git",
+      "termino": "Rama",
+      "definicion": "Una línea de trabajo paralela para hacer cambios sin romper lo que ya funciona.",
+      "ejemplo": "Pruebas una idea en tu rama; si sale bien, la unes (merge) a la principal.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Rama?",
+          "texto": "Una línea de trabajo paralela para hacer cambios sin romper lo que ya funciona.",
+          "vinetas": [
+            {
+              "icono": "rama",
+              "texto": "una línea paralela",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "se une si funciona",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Las ramas dejan probar sin romper lo que funciona. Una rama abandonada a propósito no es un problema; una historia compartida reescrita, sí.",
+          "vinetas": [
+            {
+              "icono": "rama",
+              "texto": "explorar seguro",
+              "color": ""
+            },
+            {
+              "icono": "cruz",
+              "texto": "reescribir lo común",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el grafo, cada columna es una rama. Hay una de exploración abandonada que parece rara pero está bien.\nPor ejemplo: Pruebas una idea en tu rama; si sale bien, la unes (merge) a la principal.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "merge",
+      "tema": "git",
+      "termino": "Merge",
+      "definicion": "Unir los cambios de una rama con otra. Si dos personas tocaron lo mismo, hay un conflicto que resolver a mano.",
+      "ejemplo": "Reescribir la historia compartida para «dejarla bonita» borra el trabajo de otros: nunca en una rama común.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Merge?",
+          "texto": "Unir los cambios de una rama con otra. Si dos personas tocaron lo mismo, hay un conflicto que resolver a mano.",
+          "vinetas": [
+            {
+              "icono": "rama",
+              "texto": "dos líneas",
+              "color": ""
+            },
+            {
+              "icono": "commit",
+              "texto": "se unen en una",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Si dos personas tocaron lo mismo, git no adivina: hay un conflicto y alguien decide mirando las dos versiones. Después, se prueba.",
+          "vinetas": [
+            {
+              "icono": "equipo",
+              "texto": "se resuelve juntos",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "y se prueba",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Óscar te preguntará cómo se resuelve un conflicto de merge en el equipo.\nPor ejemplo: Reescribir la historia compartida para «dejarla bonita» borra el trabajo de otros: nunca en una rama común.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "estimacion",
+      "tema": "Estimación de proyectos",
+      "termino": "Estimación",
+      "definicion": "Calcular cuánto trabajo cabe en un tiempo, o cuánto tiempo lleva un trabajo, sabiendo que es una aproximación.",
+      "ejemplo": "Prometer más de lo que el equipo puede no da error: da noches sin dormir y atajos.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Estimación?",
+          "texto": "Calcular cuánto trabajo cabe en un tiempo, o cuánto tiempo lleva un trabajo, sabiendo que es una aproximación.",
+          "vinetas": [
+            {
+              "icono": "tarjeta",
+              "texto": "el trabajo",
+              "color": ""
+            },
+            {
+              "icono": "reloj",
+              "texto": "¿cuánto tarda?",
+              "color": ""
+            },
+            {
+              "icono": "barra-subiendo",
+              "texto": "un rango, no un número",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Las estimaciones suelen ser optimistas: se piensa en el caso ideal. Estimar con datos de antes y dar un rango evita prometer de más.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "«seguro, el viernes»",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "«entre 3 y 5 días»",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En la planificación del sprint estimas cuánto cabe; Sarah e Iván te preguntarán cómo estimar mejor.\nPor ejemplo: Prometer más de lo que el equipo puede no da error: da noches sin dormir y atajos.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "punto-de-historia",
+      "tema": "Estimación de proyectos",
+      "termino": "Puntos (de alcance)",
+      "definicion": "Una medida del tamaño del trabajo, no de horas: una tarea de 2 puntos es más o menos el doble que una de 1.",
+      "ejemplo": "El alcance del proyecto se mide en puntos; el avance dice cuántos llevas hechos.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Puntos (de alcance)?",
+          "texto": "Una medida del tamaño del trabajo, no de horas: una tarea de 2 puntos es más o menos el doble que una de 1.",
+          "vinetas": [
+            {
+              "icono": "tarjeta",
+              "texto": "tamaño relativo",
+              "color": ""
+            },
+            {
+              "icono": "pila",
+              "texto": "2 pts ≈ doble de 1",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Los puntos miden el tamaño, no las horas: así se compara trabajo distinto. La velocidad dice cuántos puntos hace el equipo al día.",
+          "vinetas": [
+            {
+              "icono": "barra-subiendo",
+              "texto": "velocidad del equipo",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "El alcance del proyecto y tu avance se miden en puntos: «Avance 9 / 12 pts».\nPor ejemplo: El alcance del proyecto se mide en puntos; el avance dice cuántos llevas hechos.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "requisito",
+      "tema": "SRS / SSD / PMP / PTP / SAD",
+      "termino": "Requisito",
+      "definicion": "Algo que el sistema tiene que hacer (o cumplir), escrito de forma que se pueda comprobar.",
+      "ejemplo": "«Un visitante sin cita queda registrado y se avisa a la persona a la que viene a ver». Eso se puede probar.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Requisito?",
+          "texto": "Algo que el sistema tiene que hacer (o cumplir), escrito de forma que se pueda comprobar.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "lo que se necesita",
+              "color": ""
+            },
+            {
+              "icono": "documento",
+              "texto": "escrito",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "comprobable",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un requisito vago («que sea rápido») no se puede probar. Uno concreto («responde en 2 s con 40 personas») sí. Lo que no se escribe se supone, y mal.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "vago: opinión",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "con número: requisito",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "El primer aviso del concurso es un requisito sin escribir: los visitantes sin cita. Y el primer reto detecta un requisito incompleto.\nPor ejemplo: «Un visitante sin cita queda registrado y se avisa a la persona a la que viene a ver». Eso se puede probar.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "srs",
+      "tema": "SRS / SSD / PMP / PTP / SAD",
+      "termino": "SRS",
+      "definicion": "Especificación de requisitos de software: el documento con todo lo que el sistema debe hacer.",
+      "ejemplo": "Si una pregunta del cliente no está contestada en el SRS, alguien la va a suponer, y casi siempre mal.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es SRS?",
+          "texto": "Especificación de requisitos de software: el documento con todo lo que el sistema debe hacer.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "especificación de requisitos",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "qué debe hacer",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Es el contrato de lo que se construye. Si una pregunta no está contestada en él, alguien la contestará a su manera.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "SRS claro",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "menos sorpresas",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Escribir un requisito con su criterio de aceptación (como te pide el primer aviso) es completar el SRS.\nPor ejemplo: Si una pregunta del cliente no está contestada en el SRS, alguien la va a suponer, y casi siempre mal.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "sad",
+      "tema": "SRS / SSD / PMP / PTP / SAD",
+      "termino": "SAD",
+      "definicion": "Documento de arquitectura de software: la forma del sistema, sus piezas y por qué se eligió así.",
+      "ejemplo": "Explica por qué es una web sencilla y no una app, para que nadie lo cambie sin saber el motivo.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es SAD?",
+          "texto": "Documento de arquitectura de software: la forma del sistema, sus piezas y por qué se eligió así.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "las piezas",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "cómo se hablan",
+              "color": ""
+            },
+            {
+              "icono": "documento",
+              "texto": "por qué así",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Sin él, dentro de un año alguien cambiará la arquitectura sin saber por qué era así. Documenta las decisiones, no solo los dibujos.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "decisiones escritas",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Tu decisión de arquitectura y su porqué son lo que iría en el SAD. Voss te preguntará dónde se guardan esas decisiones.\nPor ejemplo: Explica por qué es una web sencilla y no una app, para que nadie lo cambie sin saber el motivo.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "ptp",
+      "tema": "SRS / SSD / PMP / PTP / SAD",
+      "termino": "PTP",
+      "definicion": "Plan de pruebas: qué se va a probar, cómo, con cuántas horas y qué se deja fuera a propósito.",
+      "ejemplo": "El reto de las horas de pruebas es hacer un PTP en miniatura.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es PTP?",
+          "texto": "Plan de pruebas: qué se va a probar, cómo, con cuántas horas y qué se deja fuera a propósito.",
+          "vinetas": [
+            {
+              "icono": "pila",
+              "texto": "horas por tipo de prueba",
+              "color": ""
+            },
+            {
+              "icono": "bicho",
+              "texto": "qué se busca",
+              "color": ""
+            },
+            {
+              "icono": "cruz",
+              "texto": "qué se deja fuera",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Nunca hay horas para probarlo todo. Un plan de pruebas decide a propósito qué se prueba primero y qué no, según el riesgo.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "según el riesgo",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "todo en un sitio",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "El reto de las horas de pruebas es un PTP en miniatura: repartir horas entre unitarias, integración, regresión y extremo a extremo.\nPor ejemplo: El reto de las horas de pruebas es hacer un PTP en miniatura.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "pmp",
+      "tema": "SRS / SSD / PMP / PTP / SAD",
+      "termino": "PMP",
+      "definicion": "Plan de gestión del proyecto: plazos, recursos, riesgos y cómo se va a controlar el avance.",
+      "ejemplo": "Dice qué hacer si el proyecto se retrasa, antes de que se retrase.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es PMP?",
+          "texto": "Plan de gestión del proyecto: plazos, recursos, riesgos y cómo se va a controlar el avance.",
+          "vinetas": [
+            {
+              "icono": "reloj",
+              "texto": "plazos",
+              "color": ""
+            },
+            {
+              "icono": "equipo",
+              "texto": "recursos",
+              "color": ""
+            },
+            {
+              "icono": "bicho",
+              "texto": "riesgos",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Dice qué hacer cuando algo se tuerce antes de que se tuerza. Sin él, cada problema es una sorpresa.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "riesgo previsto",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "El pronóstico del lanzamiento y los anuncios de cada día hacen lo que un PMP: avisarte del riesgo antes de que llegue.\nPor ejemplo: Dice qué hacer si el proyecto se retrasa, antes de que se retrase.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "sdd",
+      "tema": "SRS / SSD / PMP / PTP / SAD",
+      "termino": "SDD",
+      "definicion": "Documento de diseño de software: cómo es por dentro cada pieza (clases, datos, mensajes).",
+      "ejemplo": "Los diagramas que revisas en los retos de «detectar» son trozos de un SDD.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es SDD?",
+          "texto": "Documento de diseño de software: cómo es por dentro cada pieza (clases, datos, mensajes).",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "cada pieza por dentro",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "sus mensajes",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Es lo que un programador lee antes de tocar algo. Si el diseño tiene un error, se construye el error.",
+          "vinetas": [
+            {
+              "icono": "bicho",
+              "texto": "error en el diseño",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "revisado a tiempo",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Los diagramas que revisas en los retos de «detectar» son trozos de un SDD.\nPor ejemplo: Los diagramas que revisas en los retos de «detectar» son trozos de un SDD.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "principios-de-diseno",
+      "tema": "Principios de diseño",
+      "termino": "Principios de diseño",
+      "definicion": "Reglas para que el código sea fácil de cambiar: cada pieza con una sola responsabilidad y poco enganchada a las demás.",
+      "ejemplo": "Si para cambiar el color de un botón hay que tocar la base de datos, algo está mal diseñado.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Principios de diseño?",
+          "texto": "Reglas para que el código sea fácil de cambiar: cada pieza con una sola responsabilidad y poco enganchada a las demás.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "una pieza, una tarea",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "poco enganchadas",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Con buen diseño, cambiar algo toca un sitio. Con mal diseño, toca diez y rompe tres.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "cambio localizado",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "cambio en cadena",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Voss te preguntará por una clase que lo hace todo: rompe el principio de responsabilidad única.\nPor ejemplo: Si para cambiar el color de un botón hay que tocar la base de datos, algo está mal diseñado.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "acoplamiento",
+      "tema": "Principios de diseño",
+      "termino": "Acoplamiento",
+      "definicion": "Cuánto depende una pieza de las tripas de otra. Mucho acoplamiento = un cambio aquí rompe cosas allá.",
+      "ejemplo": "Un módulo que lee directamente la base de datos de otro, saltándose su puerta, está muy acoplado.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Acoplamiento?",
+          "texto": "Cuánto depende una pieza de las tripas de otra. Mucho acoplamiento = un cambio aquí rompe cosas allá.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "pieza A",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "entra por la puerta",
+              "color": "cian"
+            },
+            {
+              "icono": "caja",
+              "texto": "pieza B",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Si una pieza se mete en las tripas de otra, cambiar una rompe la otra sin avisar. Las piezas deben hablarse por su interfaz.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "por la ventana de atrás",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "por la puerta",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En los diagramas de los retos, busca flechas que entren directo a la base de datos o al formulario de otra pieza.\nPor ejemplo: Un módulo que lee directamente la base de datos de otro, saltándose su puerta, está muy acoplado.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "patron-de-diseno",
+      "tema": "Patrones de diseño",
+      "termino": "Patrón de diseño",
+      "definicion": "Una solución conocida a un problema que se repite, con nombre propio (Observer, Strategy, Fachada…).",
+      "ejemplo": "«Aquí va un Observer» le dice a todo el equipo cómo está hecho, sin explicar cada línea.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Patrón de diseño?",
+          "texto": "Una solución conocida a un problema que se repite, con nombre propio (Observer, Strategy, Fachada…).",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "solución con nombre",
+              "color": ""
+            },
+            {
+              "icono": "equipo",
+              "texto": "todos la entienden",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Decir «aquí va un Observer» explica el diseño en una palabra. Pero un patrón es una idea, no una librería: usarlo sin el problema solo complica.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "Observer, Strategy, Fachada",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Voss te preguntará qué patrón usarías para avisar de cambios o para elegir reglas de prioridad.\nPor ejemplo: «Aquí va un Observer» le dice a todo el equipo cómo está hecho, sin explicar cada línea.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "arquitectura",
+      "tema": "Principios de diseño",
+      "termino": "Arquitectura",
+      "definicion": "La forma general del sistema: qué piezas tiene, cómo se comunican y dónde corre cada una.",
+      "ejemplo": "Como el plano de una casa: una casa grande no es mejor que una pequeña; depende de quién va a vivir.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Arquitectura?",
+          "texto": "La forma general del sistema: qué piezas tiene, cómo se comunican y dónde corre cada una.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "las piezas",
+              "color": ""
+            },
+            {
+              "icono": "servidor",
+              "texto": "dónde corren",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "cómo se hablan",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Decide qué será fácil y qué difícil después. Una arquitectura grande no es mejor: tiene que encajar con el equipo y el problema.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "encaja con el equipo",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "«es lo moderno»",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Es tu tercera decisión de la Fase 1. Cada forma tiene sus propias razones: elige la que de verdad la justifica.\nPor ejemplo: Como el plano de una casa: una casa grande no es mejor que una pequeña; depende de quién va a vivir.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "web-sencilla",
+      "tema": "Principios de diseño",
+      "termino": "Aplicación web sencilla",
+      "definicion": "Un programa que se usa desde el navegador, sin instalar nada, con una sola pieza que se despliega en un sitio.",
+      "ejemplo": "Ideal cuando hay un solo equipo, poco tiempo y nadie para mantener servidores complicados.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Aplicación web sencilla?",
+          "texto": "Un programa que se usa desde el navegador, sin instalar nada, con una sola pieza que se despliega en un sitio.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "usa el navegador",
+              "color": ""
+            },
+            {
+              "icono": "servidor",
+              "texto": "una sola pieza",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Rápida de hacer y fácil de mantener, sin instalar nada. A cambio, depende de tener un navegador y conexión.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "nada que instalar",
+              "color": "cian"
+            },
+            {
+              "icono": "check",
+              "texto": "un equipo pequeño la mantiene",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el concurso, la restricción del encargo (un equipo con navegador, nadie instala nada) apunta a ella.\nPor ejemplo: Ideal cuando hay un solo equipo, poco tiempo y nadie para mantener servidores complicados.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "app-movil",
+      "tema": "Principios de diseño",
+      "termino": "App móvil",
+      "definicion": "Un programa que cada usuario instala en su teléfono. Da avisos y cámara, pero obliga a instalar y a mantener varias versiones.",
+      "ejemplo": "Pedir a alguien que instale una app para una visita de una hora es mucho pedir.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es App móvil?",
+          "texto": "Un programa que cada usuario instala en su teléfono. Da avisos y cámara, pero obliga a instalar y a mantener varias versiones.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "cada usuario",
+              "color": ""
+            },
+            {
+              "icono": "caja",
+              "texto": "instala la app",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Da avisos y acceso al teléfono, pero obliga a instalar, a mantener versiones y a que cada usuario la quiera.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "instalar para una visita",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "uso diario frecuente",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el concurso es la opción trampa: «todo el mundo tiene móvil» suena bien, pero el encargo decía lo contrario.\nPor ejemplo: Pedir a alguien que instale una app para una visita de una hora es mucho pedir.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "monolito-modular",
+      "tema": "Principios de diseño",
+      "termino": "Monolito modular",
+      "definicion": "Un solo programa que se despliega entero, pero bien separado por dentro en módulos con fronteras claras.",
+      "ejemplo": "Una casa de una planta con habitaciones bien separadas: fácil de mantener para un equipo pequeño.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Monolito modular?",
+          "texto": "Un solo programa que se despliega entero, pero bien separado por dentro en módulos con fronteras claras.",
+          "vinetas": [
+            {
+              "icono": "servidor",
+              "texto": "un solo despliegue",
+              "color": ""
+            },
+            {
+              "icono": "caja",
+              "texto": "módulos separados por dentro",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Simple de desplegar y operar, y ordenado por dentro. Si los módulos se respetan, crece bien durante mucho tiempo.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "equipo pequeño",
+              "color": "cian"
+            },
+            {
+              "icono": "check",
+              "texto": "un solo edificio",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En Cradle Lifts es lo que el encargo sostiene: tres personas, un edificio y nadie para operar servicios.\nPor ejemplo: Una casa de una planta con habitaciones bien separadas: fácil de mantener para un equipo pequeño.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "microservicios",
+      "tema": "Principios de diseño",
+      "termino": "Microservicios",
+      "definicion": "Muchos programas pequeños e independientes que hablan por la red. Escalan bien, pero hay que operarlos todos.",
+      "ejemplo": "Con tres personas y sin nadie de operaciones, son cinco servidores que vigilar de noche.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Microservicios?",
+          "texto": "Muchos programas pequeños e independientes que hablan por la red. Escalan bien, pero hay que operarlos todos.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "muchas piezas",
+              "color": ""
+            },
+            {
+              "icono": "servidor",
+              "texto": "cada una aparte",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "hablan por la red",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Escalan y se despliegan por separado, pero hay que operarlas, vigilarlas y versionarlas todas. Para un equipo pequeño es una carga enorme.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "tres personas, cinco servicios",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "equipos grandes",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En Cradle Lifts es la trampa: «escala mejor» y «lo usan las grandes» no son razones para este equipo.\nPor ejemplo: Con tres personas y sin nadie de operaciones, son cinco servidores que vigilar de noche.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "parche-sobre-la-barrera",
+      "tema": "Principios de diseño",
+      "termino": "Parche sobre lo existente",
+      "definicion": "Construir encima de un sistema viejo que ya funciona, sin rehacerlo.",
+      "ejemplo": "Arranca rápido, pero heredas sus problemas, y a veces nadie tiene su código.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Parche sobre lo existente?",
+          "texto": "Construir encima de un sistema viejo que ya funciona, sin rehacerlo.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "lo viejo",
+              "color": ""
+            },
+            {
+              "icono": "caja",
+              "texto": "el parche encima",
+              "color": "mostaza"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Arranca rápido porque algo ya funciona, pero heredas todos sus problemas, incluido no tener su código.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "rápido hoy",
+              "color": "cian"
+            },
+            {
+              "icono": "bicho",
+              "texto": "problemas mañana",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En Cradle Lifts es la opción «aceptable»: resuelve los 20 días y deja el problema para después.\nPor ejemplo: Arranca rápido, pero heredas sus problemas, y a veces nadie tiene su código.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "calidad",
+      "tema": "Calidad de software",
+      "termino": "Calidad (ISO 25010)",
+      "definicion": "Qué tan bueno es el software en varias cosas a la vez: que haga lo pedido, que sea usable, que no se caiga, que sea seguro…",
+      "ejemplo": "No se puede tener todo al máximo: hay que decidir qué cuidar más según quién lo va a usar.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Calidad (ISO 25010)?",
+          "texto": "Qué tan bueno es el software en varias cosas a la vez: que haga lo pedido, que sea usable, que no se caiga, que sea seguro…",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "hace lo pedido",
+              "color": "cian"
+            },
+            {
+              "icono": "persona",
+              "texto": "se usa fácil",
+              "color": ""
+            },
+            {
+              "icono": "candado",
+              "texto": "es seguro",
+              "color": ""
+            },
+            {
+              "icono": "servidor",
+              "texto": "no se cae",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "No se puede tener todo al máximo con un tiempo limitado: hay que decidir qué cuidar más para ESTE cliente.",
+          "vinetas": [
+            {
+              "icono": "pila",
+              "texto": "pocas fichas",
+              "color": ""
+            },
+            {
+              "icono": "bicho",
+              "texto": "lo descuidado falla",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Es tu segunda decisión: repartir fichas de calidad. Lo que dejas en cero es lo que más falla después.\nPor ejemplo: No se puede tener todo al máximo: hay que decidir qué cuidar más según quién lo va a usar.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "adecuacion-funcional",
+      "tema": "Calidad de software",
+      "termino": "Adecuación funcional",
+      "definicion": "Que el sistema haga lo que se pidió, completo y sin errores en las cuentas.",
+      "ejemplo": "Si se pidió registrar visitantes sin cita y no se puede, falla aquí aunque todo lo demás sea perfecto.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Adecuación funcional?",
+          "texto": "Que el sistema haga lo que se pidió, completo y sin errores en las cuentas.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "lo pedido",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "lo hace todo",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un sistema precioso que no hace lo que se pidió no sirve. Es lo primero que el cliente comprueba.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "olvida un caso",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "cubre todos los casos",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el concurso, olvidar a los visitantes sin cita es un fallo de adecuación funcional.\nPor ejemplo: Si se pidió registrar visitantes sin cita y no se puede, falla aquí aunque todo lo demás sea perfecto.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "usabilidad",
+      "tema": "Calidad de software",
+      "termino": "Usabilidad",
+      "definicion": "Que sea fácil de aprender y de usar para quien lo va a usar de verdad, sin manual.",
+      "ejemplo": "La recepcionista con cuarenta personas en fila no puede buscar un botón escondido.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Usabilidad?",
+          "texto": "Que sea fácil de aprender y de usar para quien lo va a usar de verdad, sin manual.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "quien lo usa",
+              "color": ""
+            },
+            {
+              "icono": "mano",
+              "texto": "lo entiende a la primera",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Si cuesta usarlo, se usa mal o no se usa. Quien mejor sabe si es usable es quien lo usa cada día.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "demasiados botones",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "lo justo",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Sarah te contará la queja del guardia de la garita: demasiados botones a las seis de la mañana.\nPor ejemplo: La recepcionista con cuarenta personas en fila no puede buscar un botón escondido.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "fiabilidad",
+      "tema": "Calidad de software",
+      "termino": "Fiabilidad",
+      "definicion": "Que funcione siempre que se necesita y se recupere si algo falla.",
+      "ejemplo": "Si se cae a las nueve de la mañana, vuelve el cuaderno.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Fiabilidad?",
+          "texto": "Que funcione siempre que se necesita y se recupere si algo falla.",
+          "vinetas": [
+            {
+              "icono": "servidor",
+              "texto": "funciona siempre",
+              "color": ""
+            },
+            {
+              "icono": "reloj",
+              "texto": "a cualquier hora",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un sistema que se cae cuando más se necesita hace volver al cuaderno. La fiabilidad es lo que da confianza.",
+          "vinetas": [
+            {
+              "icono": "bicho",
+              "texto": "se cae",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "se recupera",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Si no le das fichas, el director de eventos te pondrá más crisis de caídas.\nPor ejemplo: Si se cae a las nueve de la mañana, vuelve el cuaderno.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "seguridad",
+      "tema": "Calidad de software",
+      "termino": "Seguridad",
+      "definicion": "Que solo pueda entrar y hacer cosas quien debe, y que los datos no se filtren.",
+      "ejemplo": "Una barrera que se abre con el mando genérico del fabricante no es segura.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Seguridad?",
+          "texto": "Que solo pueda entrar y hacer cosas quien debe, y que los datos no se filtren.",
+          "vinetas": [
+            {
+              "icono": "candado",
+              "texto": "solo quien debe",
+              "color": ""
+            },
+            {
+              "icono": "cruz",
+              "texto": "nadie más",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un fallo de seguridad no avisa: un día alguien entra donde no debía. Arreglarlo después cuesta caro y avergüenza.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "mando genérico abre",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "solo autorizados",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "La barrera de Cradle Lifts la abrieron con el mando del fabricante. Javier te preguntará qué atributo se descuidó.\nPor ejemplo: Una barrera que se abre con el mando genérico del fabricante no es segura.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "mantenibilidad",
+      "tema": "Calidad de software",
+      "termino": "Mantenibilidad",
+      "definicion": "Qué tan fácil es cambiar, corregir o ampliar el sistema después.",
+      "ejemplo": "Lo va a mantener un equipo sin personal de sistemas: tiene que entenderse sin el autor al lado.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Mantenibilidad?",
+          "texto": "Qué tan fácil es cambiar, corregir o ampliar el sistema después.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "fácil de cambiar",
+              "color": ""
+            },
+            {
+              "icono": "documento",
+              "texto": "se entiende",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "La mayor parte del coste del software llega después de entregarlo. Si nadie lo entiende, cada cambio es un riesgo.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "otro lo arregla",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "solo el autor sabe",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Óscar mantiene sistemas desde hace 19 años: te contará por qué importa.\nPor ejemplo: Lo va a mantener un equipo sin personal de sistemas: tiene que entenderse sin el autor al lado.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "rendimiento",
+      "tema": "Calidad de software",
+      "termino": "Eficiencia de desempeño",
+      "definicion": "Que responda rápido y aguante la carga esperada sin gastar recursos de más.",
+      "ejemplo": "Cuarenta carros en hora punta no pueden esperar diez segundos cada uno.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Eficiencia de desempeño?",
+          "texto": "Que responda rápido y aguante la carga esperada sin gastar recursos de más.",
+          "vinetas": [
+            {
+              "icono": "reloj",
+              "texto": "responde rápido",
+              "color": ""
+            },
+            {
+              "icono": "equipo",
+              "texto": "aguanta la carga",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Lento en la hora punta es como roto. Pero optimizar lo que no hace falta es tiempo perdido.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "40 carros, sin cola",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En Cradle Lifts, la hora punta tiene cuarenta vehículos esperando.\nPor ejemplo: Cuarenta carros en hora punta no pueden esperar diez segundos cada uno.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "testing",
+      "tema": "Testing",
+      "termino": "Pruebas (testing)",
+      "definicion": "Ejecutar el software a propósito para encontrar errores antes de que los encuentre el cliente.",
+      "ejemplo": "Probar no demuestra que no haya errores; reduce los que se escapan.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Pruebas (testing)?",
+          "texto": "Ejecutar el software a propósito para encontrar errores antes de que los encuentre el cliente.",
+          "vinetas": [
+            {
+              "icono": "bicho",
+              "texto": "buscar errores",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "antes que el cliente",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Probar no demuestra que no haya errores: reduce los que se escapan. Lo que no se prueba, lo prueba el cliente.",
+          "vinetas": [
+            {
+              "icono": "bicho",
+              "texto": "sin probar: al cliente",
+              "color": "roja"
+            },
+            {
+              "icono": "check",
+              "texto": "probado: atrapado",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Tu barra de Cobertura y el reto de las horas de pruebas: cada error que no atrapas llega al lanzamiento.\nPor ejemplo: Probar no demuestra que no haya errores; reduce los que se escapan.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "prueba-unitaria",
+      "tema": "Testing",
+      "termino": "Prueba unitaria",
+      "definicion": "Prueba una pieza pequeña sola (una función), de forma rápida y barata.",
+      "ejemplo": "Comprobar que «calcular el turno» da bien para un lunes festivo.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Prueba unitaria?",
+          "texto": "Prueba una pieza pequeña sola (una función), de forma rápida y barata.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "una pieza sola",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "rápida y barata",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Encuentra errores en la lógica de cada pieza muy pronto. No ve los problemas entre piezas.",
+          "vinetas": [
+            {
+              "icono": "pila",
+              "texto": "barata: muchas",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el reto de pruebas, cada error de unitarias cuesta 2 horas: son las más baratas.\nPor ejemplo: Comprobar que «calcular el turno» da bien para un lunes festivo.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "prueba-de-integracion",
+      "tema": "Testing",
+      "termino": "Prueba de integración",
+      "definicion": "Prueba que varias piezas funcionen juntas: el formulario con la base de datos, el lector con la barrera.",
+      "ejemplo": "Cada ladrillo está bien, pero ¿la pared se sostiene?",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Prueba de integración?",
+          "texto": "Prueba que varias piezas funcionen juntas: el formulario con la base de datos, el lector con la barrera.",
+          "vinetas": [
+            {
+              "icono": "caja",
+              "texto": "pieza A",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "juntas",
+              "color": ""
+            },
+            {
+              "icono": "caja",
+              "texto": "pieza B",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Cada ladrillo puede estar bien y la pared caerse. La integración encuentra lo que falla al juntar piezas.",
+          "vinetas": [
+            {
+              "icono": "bicho",
+              "texto": "fallo al juntar",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el reto de pruebas, integración atrapa los errores entre el formulario, la base de datos y el ascensor.\nPor ejemplo: Cada ladrillo está bien, pero ¿la pared se sostiene?",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "prueba-de-regresion",
+      "tema": "Testing",
+      "termino": "Prueba de regresión",
+      "definicion": "Volver a probar lo que ya funcionaba para comprobar que un cambio nuevo no lo rompió.",
+      "ejemplo": "Arreglaste las reservas… ¿la barrera sigue abriendo?",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Prueba de regresión?",
+          "texto": "Volver a probar lo que ya funcionaba para comprobar que un cambio nuevo no lo rompió.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "ya funcionaba",
+              "color": "cian"
+            },
+            {
+              "icono": "flecha",
+              "texto": "cambio",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "¿sigue funcionando?",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un cambio aquí rompe algo allá sin que nadie lo note. La regresión es la red que lo atrapa.",
+          "vinetas": [
+            {
+              "icono": "bicho",
+              "texto": "se rompió lo viejo",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Javier te contará cómo un arreglo en las reservas hizo más lenta la barrera: faltó una prueba de regresión.\nPor ejemplo: Arreglaste las reservas… ¿la barrera sigue abriendo?",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "prueba-e2e",
+      "tema": "Testing",
+      "termino": "Prueba de extremo a extremo",
+      "definicion": "Prueba el sistema completo como lo usaría una persona real, de principio a fin. Cara y lenta.",
+      "ejemplo": "Un carro de verdad entrando, reservando el ascensor y saliendo.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Prueba de extremo a extremo?",
+          "texto": "Prueba el sistema completo como lo usaría una persona real, de principio a fin. Cara y lenta.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "como un usuario",
+              "color": ""
+            },
+            {
+              "icono": "flecha",
+              "texto": "de principio a fin",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Es la única que ve el sistema como el usuario, pero es cara y lenta. Se usa poco y donde más importa.",
+          "vinetas": [
+            {
+              "icono": "pila",
+              "texto": "cara: pocas",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "En el reto de pruebas, la de extremo a extremo es la más cara: a veces lo inteligente es dejarla fuera.\nPor ejemplo: Un carro de verdad entrando, reservando el ascensor y saliendo.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "avance",
+      "tema": "Métricas del juego",
+      "termino": "Avance",
+      "definicion": "Cuántos puntos del trabajo prometido llevas hechos.",
+      "ejemplo": "Sube cada día con el trabajo del equipo; las horas extra lo suben más, pero cobran después.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Avance?",
+          "texto": "Cuántos puntos del trabajo prometido llevas hechos.",
+          "vinetas": [
+            {
+              "icono": "barra-subiendo",
+              "texto": "puntos hechos",
+              "color": "cian"
+            },
+            {
+              "icono": "tarjeta",
+              "texto": "de los prometidos",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Avanza cada día según la velocidad del equipo. Las horas extra lo suben hoy, pero el cansancio lo frena mañana.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "ritmo sostenible",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "sprint final agotador",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Es la primera barra de tu proyecto. Al final, lo que no esté hecho no llega al cliente.\nPor ejemplo: Sube cada día con el trabajo del equipo; las horas extra lo suben más, pero cobran después.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "alcance",
+      "tema": "Métricas del juego",
+      "termino": "Alcance",
+      "definicion": "Cuántos puntos de trabajo se prometieron en total. Si el cliente pide más y aceptas, crece.",
+      "ejemplo": "Entregar 12 de 12 puntos es entregar todo lo prometido.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Alcance?",
+          "texto": "Cuántos puntos de trabajo se prometieron en total. Si el cliente pide más y aceptas, crece.",
+          "vinetas": [
+            {
+              "icono": "tarjeta",
+              "texto": "todo lo prometido",
+              "color": ""
+            },
+            {
+              "icono": "pila",
+              "texto": "en puntos",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Cada «sí» al cliente sube el alcance. Si sube más que tu avance, no llegas.",
+          "vinetas": [
+            {
+              "icono": "barra-subiendo",
+              "texto": "aceptar todo",
+              "color": "roja"
+            },
+            {
+              "icono": "check",
+              "texto": "negociar",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Aparece como «Avance X / Y pts»: Y es el alcance. Algunas decisiones lo suben.\nPor ejemplo: Entregar 12 de 12 puntos es entregar todo lo prometido.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "deuda-tecnica",
+      "tema": "Métricas del juego",
+      "termino": "Deuda técnica",
+      "definicion": "Los atajos que tomaste para ir más rápido y que tendrás que pagar después con intereses (errores, retrabajo).",
+      "ejemplo": "Como pagar con tarjeta de crédito: hoy rinde, mañana cuesta más.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Deuda técnica?",
+          "texto": "Los atajos que tomaste para ir más rápido y que tendrás que pagar después con intereses (errores, retrabajo).",
+          "vinetas": [
+            {
+              "icono": "mano",
+              "texto": "atajo hoy",
+              "color": ""
+            },
+            {
+              "icono": "bicho",
+              "texto": "error mañana",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Como una tarjeta de crédito: hoy rinde, mañana cobra intereses. Frena al equipo y trae errores; muy alta, rompe lo que funcionaba.",
+          "vinetas": [
+            {
+              "icono": "barra-subiendo",
+              "texto": "deuda alta",
+              "color": "roja"
+            },
+            {
+              "icono": "reloj",
+              "texto": "equipo más lento",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Debajo de su barra ves cuánto frena al equipo y cuántos errores llevará al cliente. Con 50 o más, cada día puede romperse algo.\nPor ejemplo: Como pagar con tarjeta de crédito: hoy rinde, mañana cuesta más.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "moral",
+      "tema": "Métricas del juego",
+      "termino": "Moral del equipo",
+      "definicion": "Las ganas y la energía del equipo. Con moral baja, todo sale más lento y con más errores.",
+      "ejemplo": "Baja con las noches sin dormir y con las promesas imposibles.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Moral del equipo?",
+          "texto": "Las ganas y la energía del equipo. Con moral baja, todo sale más lento y con más errores.",
+          "vinetas": [
+            {
+              "icono": "equipo",
+              "texto": "ganas del equipo",
+              "color": ""
+            },
+            {
+              "icono": "barra-subiendo",
+              "texto": "rinde más",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Con moral baja se trabaja a medias y aparecen roces. Baja con promesas imposibles y noches largas.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "promesas imposibles",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "entregas que salen",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Debajo de su barra ves al cuánto rinde el equipo. Muy baja, trae «roces en el equipo».\nPor ejemplo: Baja con las noches sin dormir y con las promesas imposibles.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "cobertura",
+      "tema": "Métricas del juego",
+      "termino": "Cobertura de pruebas",
+      "definicion": "Qué parte del sistema está probada. Con cobertura baja, más errores le llegan al cliente.",
+      "ejemplo": "Sube con las pruebas que haces; baja sola cuando el producto crece sin probar lo nuevo.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Cobertura de pruebas?",
+          "texto": "Qué parte del sistema está probada. Con cobertura baja, más errores le llegan al cliente.",
+          "vinetas": [
+            {
+              "icono": "pila",
+              "texto": "lo probado",
+              "color": ""
+            },
+            {
+              "icono": "bicho",
+              "texto": "lo que no, escapa",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Cada punto de cobertura que falta son errores que encontrará el cliente. Baja sola cuando el producto crece sin probar lo nuevo.",
+          "vinetas": [
+            {
+              "icono": "bicho",
+              "texto": "cobertura baja: errores",
+              "color": "roja"
+            },
+            {
+              "icono": "check",
+              "texto": "probar lo nuevo",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Debajo de su barra ves cuántos errores llegarían al cliente. Las tareas de pruebas del escritorio la suben.\nPor ejemplo: Sube con las pruebas que haces; baja sola cuando el producto crece sin probar lo nuevo.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "cansancio",
+      "tema": "Métricas del juego",
+      "termino": "Cansancio",
+      "definicion": "Lo agotado que está el equipo. Sube con las horas extra y baja al descansar.",
+      "ejemplo": "Cuando está alto, el equipo rinde menos y se equivoca más: el riesgo del lanzamiento sube.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Cansancio?",
+          "texto": "Lo agotado que está el equipo. Sube con las horas extra y baja al descansar.",
+          "vinetas": [
+            {
+              "icono": "reloj",
+              "texto": "horas extra",
+              "color": ""
+            },
+            {
+              "icono": "persona",
+              "texto": "equipo agotado",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "No es lineal: un poco casi no se nota, mucho hunde al equipo. Y el cansancio de hoy es la lentitud de mañana.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "irse a casa",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "quedarse siempre",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Sube cada vez que eliges quedarte. Debajo de su barra ves cuánto frena; con 60 o más, el equipo se agota.\nPor ejemplo: Cuando está alto, el equipo rinde menos y se equivoca más: el riesgo del lanzamiento sube.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "satisfaccion",
+      "tema": "Métricas del juego",
+      "termino": "Satisfacción del cliente",
+      "definicion": "Lo contento que está el cliente contigo. Cuenta en el lanzamiento.",
+      "ejemplo": "Sube cuando escuchas, explicas y cumples; baja con cada «no» sin explicar y cada sorpresa.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Satisfacción del cliente?",
+          "texto": "Lo contento que está el cliente contigo. Cuenta en el lanzamiento.",
+          "vinetas": [
+            {
+              "icono": "persona",
+              "texto": "el cliente",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "contento",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un cliente contento perdona un retraso; uno molesto no perdona nada. Sube al escuchar, explicar y cumplir.",
+          "vinetas": [
+            {
+              "icono": "check",
+              "texto": "negociar con números",
+              "color": "cian"
+            },
+            {
+              "icono": "cruz",
+              "texto": "«no» sin explicar",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Pesa 15 de 100 en el lanzamiento. Muy baja, el cliente pide reuniones que te quitan tiempo.\nPor ejemplo: Sube cuando escuchas, explicas y cumples; baja con cada «no» sin explicar y cada sorpresa.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "riesgo",
+      "tema": "Métricas del juego",
+      "termino": "Riesgo latente",
+      "definicion": "La probabilidad de que algo salga mal al entregar. Junta cansancio, deuda, falta de pruebas y de documentación.",
+      "ejemplo": "Un proyecto puede estar terminado y aun así salir mal si se entrega con el riesgo por las nubes.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Riesgo latente?",
+          "texto": "La probabilidad de que algo salga mal al entregar. Junta cansancio, deuda, falta de pruebas y de documentación.",
+          "vinetas": [
+            {
+              "icono": "barra-subiendo",
+              "texto": "cansancio + deuda",
+              "color": ""
+            },
+            {
+              "icono": "bicho",
+              "texto": "+ sin probar + sin documentar",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Un proyecto puede estar terminado y salir mal si se entrega con el riesgo por las nubes.",
+          "vinetas": [
+            {
+              "icono": "cruz",
+              "texto": "riesgo alto: sale mal",
+              "color": ""
+            },
+            {
+              "icono": "check",
+              "texto": "riesgo bajo",
+              "color": "cian"
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Lo ves bajo el proyecto cada mañana, y el «Pronóstico del lanzamiento» te dice cómo saldría si entregaras así.\nPor ejemplo: Un proyecto puede estar terminado y aun así salir mal si se entrega con el riesgo por las nubes.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    },
+    {
+      "id": "documentacion",
+      "tema": "Métricas del juego",
+      "termino": "Documentación",
+      "definicion": "Qué tan bien escrito está lo que se sabe del proyecto: requisitos, decisiones, cómo funciona.",
+      "ejemplo": "Sin ella, lo que sabe una persona se va con ella.",
+      "paginas": [
+        {
+          "titulo": "¿Qué es Documentación?",
+          "texto": "Qué tan bien escrito está lo que se sabe del proyecto: requisitos, decisiones, cómo funciona.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "lo que se sabe, escrito",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Qué conlleva",
+          "texto": "Sin documentación, lo que sabe una persona se va con ella, y cada cambio es adivinar. También suma al riesgo.",
+          "vinetas": [
+            {
+              "icono": "documento",
+              "texto": "escrito: se queda",
+              "color": "cian"
+            },
+            {
+              "icono": "persona",
+              "texto": "en la cabeza: se va",
+              "color": ""
+            }
+          ],
+          "enElJuego": false
+        },
+        {
+          "titulo": "Cómo lo verás en el juego",
+          "texto": "Escribir requisitos y decisiones la sube. Voss y Javier te hablarán de ella.\nPor ejemplo: Sin ella, lo que sabe una persona se va con ella.",
+          "vinetas": [],
+          "enElJuego": true
+        }
+      ]
+    }
+  ]
+}

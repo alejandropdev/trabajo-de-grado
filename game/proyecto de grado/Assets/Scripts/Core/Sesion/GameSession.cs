@@ -25,7 +25,7 @@ namespace Nexus.Core.Sesion {
     /// IMetricasDelNivel (lo que mide C8) y, a traves de WorldState/RuntimeState, los de C2.
     /// Ninguno de esos paquetes conoce GameSession: por eso se pudieron escribir y probar antes.
     /// </summary>
-    public sealed class GameSession : IStateContext, ISesionPersistible, IMetricasDelNivel {
+    public sealed class GameSession : IStateContext, ISesionPersistible, IMetricasDelNivel, IRelacionesPersistibles {
         // --- contenido y entradas ---
         private readonly Catalogo _catalogo;
 
@@ -72,6 +72,12 @@ namespace Nexus.Core.Sesion {
         private string _razonMetodologia;
         private string _razonArquitectura;
         private Dictionary<string, int> _fichasDeCalidad = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        // Lo decidido en la Fase 1, de solo lectura: lo leen los apuntes del proyecto.
+        public string ArquitecturaElegida { get { return _arquitectura; } }
+        public string RazonDeLaMetodologia { get { return _razonMetodologia; } }
+        public string RazonDeLaArquitectura { get { return _razonArquitectura; } }
+        public IReadOnlyDictionary<string, int> FichasDeCalidad { get { return _fichasDeCalidad; } }
 
         private DayPlan _planDeHoy;
         private EventDefinition _eventoDeHoy;
@@ -222,6 +228,88 @@ namespace Nexus.Core.Sesion {
             }
             if (cartas > 0) Flags.Sumar("FLG_CARTAS", cartas);
             if (codigos > 0) Flags.Sumar("FLG_CODIGOS", codigos);
+        }
+
+        // ==================================================================== relaciones (Fase 2)
+
+        /// <summary>Donde esta el jugador, con el vacio resuelto a su escritorio.</summary>
+        private string ZonaEfectiva {
+            get {
+                if (!string.IsNullOrEmpty(R.ZonaActual)) return R.ZonaActual;
+                var ancla = Perfil.Mapa != null && !Perfil.Mapa.Vacio ? Perfil.Mapa.Ancla : null;
+                return ancla == null ? null : ancla.Id;
+            }
+        }
+
+        /// <summary>
+        /// Con quien se puede hablar aqui y ahora: una conversacion por persona y dia, en su zona y en su ventana.
+        /// Solo durante la jornada del desarrollo.
+        /// </summary>
+        public List<Nexus.Core.Relaciones.Conversacion> ConversacionesAqui() {
+            if (NivelTerminado || !Fase1Cerrada || R.Fase != 2 || R.DiaActual == 0 || _reloj.Terminada)
+                return new List<Nexus.Core.Relaciones.Conversacion>();
+            return Nexus.Core.Relaciones.MotorDeRelaciones.Disponibles(_catalogo.Relaciones, R, Perfil.Id, ZonaEfectiva, W);
+        }
+
+        /// <summary>
+        /// Habla con alguien y contesta su pregunta. Cobra los minutos de la charla (mientras tanto pueden sonar
+        /// o caducar avisos: hablar tambien es no estar en el escritorio) y devuelve lo que cambio.
+        /// </summary>
+        public Nexus.Core.Relaciones.ResultadoDeConversacion Hablar(string conversacionId, string opcionId) {
+            ResultadoDeAvance ignorado;
+            return Hablar(conversacionId, opcionId, out ignorado);
+        }
+
+        /// <param name="avance">Lo que paso en el reloj mientras se hablaba (avisos que sonaron o caducaron).</param>
+        public Nexus.Core.Relaciones.ResultadoDeConversacion Hablar(string conversacionId, string opcionId, out ResultadoDeAvance avance) {
+            ExigirFase2();
+            var conv = ConversacionesAqui().Find(c => c.Id == conversacionId);
+            if (conv == null) throw new InvalidOperationException($"No se puede hablar ahora de '{conversacionId}'.");
+            var resultado = Nexus.Core.Relaciones.MotorDeRelaciones.Hablar(_catalogo.Relaciones, R, Perfil.Id, ZonaEfectiva,
+                                                                         conversacionId, opcionId, W);
+            avance = AvanzarReloj(Math.Max(0, conv.Minutos));
+            return resultado;
+        }
+
+        public int Confianza(string personaje) { return Nexus.Core.Relaciones.MotorDeRelaciones.ConfianzaDe(R, personaje); }
+
+        /// <summary>Al empezar el nivel: la confianza de los que siguen, desde la partida (y sus ayudas ya ganadas).</summary>
+        public void HeredarRelaciones(IDictionary<string, int> confianza) {
+            Nexus.Core.Relaciones.MotorDeRelaciones.Heredar(_catalogo.Relaciones, R, confianza);
+        }
+
+        public Dictionary<string, int> CapturarRelaciones() {
+            return Nexus.Core.Relaciones.MotorDeRelaciones.Persistentes(_catalogo.Relaciones, R);
+        }
+
+        /// <summary>tipo de ayuda -> usos que quedan. Solo las que tienen algun uso.</summary>
+        public Dictionary<string, int> AyudasDisponibles() {
+            var d = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var kv in R.AyudasDisponibles) if (kv.Value > 0) d[kv.Key] = kv.Value;
+            return d;
+        }
+
+        /// <summary>
+        /// Gasta una ayuda. Las de minijuego solo se descuentan (las aplica la escena); bajar-cansancio se aplica
+        /// aqui. false si no quedaba ninguna.
+        /// </summary>
+        public bool UsarAyuda(string tipo) {
+            ExigirFase2();
+            if (!Nexus.Core.Relaciones.MotorDeRelaciones.Gastar(R, tipo)) return false;
+            if (tipo == Nexus.Core.Relaciones.TiposDeAyuda.BajarCansancio) {
+                var valor = 10.0;
+                foreach (var p in _catalogo.Relaciones.Personajes)
+                    foreach (var a in p.Ayudas)
+                        if (a != null && a.Tipo == tipo) valor = a.Valor;
+                W.Set("Cansancio", Math.Max(0, W.Cansancio - valor));
+            }
+            return true;
+        }
+
+        /// <summary>Al cerrar: la confianza ganada se queda en los flags de relacion (INV-6: solo aqui).</summary>
+        private void VolcarRelaciones() {
+            foreach (var kv in Nexus.Core.Relaciones.MotorDeRelaciones.FlagsAlCerrar(_catalogo.Relaciones, R))
+                Flags.Sumar(kv.Key, kv.Value);
         }
 
         /// <summary>Al cerrar: lo que la arquitectura elegida deja escrito (la opinion de Voss, en N1).</summary>
@@ -402,25 +490,32 @@ namespace Nexus.Core.Sesion {
         }
 
         /// <summary>
-        /// Cierra la tarea abierta con el resultado de su minijuego. Aplica SOLO los efectos de la tarea para ese
-        /// resultado: no escribe traza, ni competencia, ni agenda nada. Devuelve lo que cambio.
+        /// Cierra la tarea abierta con el resultado de su minijuego. Aplica los efectos de la tarea para ese
+        /// resultado y los efectos inmediatos de la propia escena (en una practica son solo los de la respuesta
+        /// al cliente: decir que si a todo cansa aunque sea practica). No escribe traza, ni competencia, ni agenda
+        /// nada. Devuelve lo que cambio.
         /// </summary>
         public Dictionary<string, double> ResolverTarea(ResultadoMinijuego resultado) {
             var t = TareaAbierta;
             if (t == null) throw new InvalidOperationException("No hay ninguna tarea de oficina abierta.");
             if (resultado == null) throw new ArgumentNullException(nameof(resultado));
 
-            var cambios = new Dictionary<string, double>(StringComparer.Ordinal);
+            var total = new Dictionary<string, double>(StringComparer.Ordinal);
             Dictionary<string, double> efectos;
             if (t.Efectos != null && t.Efectos.TryGetValue(resultado.Resultado ?? "", out efectos) && efectos != null)
-                foreach (var kv in efectos) {
-                    double antes;
-                    if (!W.TryGet(kv.Key, out antes)) continue;
-                    W.Set(kv.Key, antes + kv.Value);
-                    double despues;
-                    W.TryGet(kv.Key, out despues);
-                    cambios[kv.Key] = despues - antes;
+                foreach (var kv in efectos) total[kv.Key] = kv.Value;
+            if (resultado.EfectosInmediatos != null)
+                foreach (var kv in resultado.EfectosInmediatos) {
+                    double previo;
+                    total.TryGetValue(kv.Key, out previo);
+                    total[kv.Key] = previo + kv.Value;
                 }
+
+            // Por EffectApplier, como todo lo demas: asi un coste en "Dias" tambien se cobra en avance.
+            var efectosValidos = new Dictionary<string, object>(StringComparer.Ordinal);
+            foreach (var kv in total) if (WorldState.EsStock(kv.Key)) efectosValidos[kv.Key] = kv.Value;
+            var cambios = EffectApplier.Previsualizar(W, efectosValidos);
+            EffectApplier.Aplicar(W, efectosValidos);
             R.TareaDeOficinaAbierta = null;
             R.TareasDeOficinaHechas++;
             return cambios;
@@ -563,6 +658,24 @@ namespace Nexus.Core.Sesion {
                       "OA-ARQ-01", opcion.Razon, antes);
         }
 
+        /// <summary>
+        /// «Comprueba que lo entendiste» (el expediente del proyecto): cuantas preguntas acerto a la primera. Queda en la
+        /// traza para el docente y cada acierto suma 1 de documentacion: entender el problema es parte del trabajo.
+        /// </summary>
+        public void RegistrarComprensionDelProyecto(int aciertosALaPrimera, int preguntas) {
+            ExigirFase1Abierta();
+            if (preguntas <= 0) return;
+            aciertosALaPrimera = Math.Max(0, Math.Min(preguntas, aciertosALaPrimera));
+            var antes = W.ToString();
+            if (aciertosALaPrimera > 0)
+                EffectApplier.Aplicar(W, new Dictionary<string, object>(StringComparer.Ordinal) { { "Documentacion", (double)aciertosALaPrimera } });
+            var veredicto = aciertosALaPrimera == preguntas ? Veredictos.Correcta
+                          : aciertosALaPrimera * 2 >= preguntas ? Veredictos.Aceptable : Veredictos.Incorrecta;
+            // Origen propio: queda para el docente, pero no cuenta en «cómo decidiste» del lanzamiento (no penaliza).
+            Registrar("COMPRENSION", "Comprensión del proyecto", "comprension", null, veredicto, "OA-INTRO-01",
+                      $"Acertó {aciertosALaPrimera} de {preguntas} preguntas sobre el proyecto a la primera.", antes);
+        }
+
         /// <summary>Cierra la planificacion y arranca el bucle diario. El director ya puede agendar.</summary>
         public void CerrarFase1() {
             ExigirFase1Abierta();
@@ -628,7 +741,7 @@ namespace Nexus.Core.Sesion {
             // 3 · ceremonias: cuestan dias de proyecto y pueden abrir planning o retro
             foreach (var ceremonia in _planDeHoy.Ceremonias) {
                 brief.Ceremonias.Add(ceremonia.Nombre ?? ceremonia.Id);
-                if (ceremonia.CosteDias > 0) W.Set("Dias", W.Dias + ceremonia.CosteDias);
+                if (ceremonia.CosteDias > 0) EffectApplier.CobrarDias(W, ceremonia.CosteDias);
                 EffectApplier.Aplicar(W, ceremonia.Efectos);
 
                 if (ceremonia.AjustaCoeficiente)
@@ -655,6 +768,16 @@ namespace Nexus.Core.Sesion {
             //     el telegrafiado es de un evento de dentro de unos dias, no del de hoy
             foreach (var aviso in _scheduler.AvisosDeHoy(R.DiaActual))
                 brief.Avisos.Add($"[{aviso.Canal}] {aviso.Texto}");
+
+            // 6b · lo que hoy pasa por como esta el proyecto: la deuda, la cobertura, el cansancio se notan
+            var incidencia = Nexus.Core.Simulacion.IncidenciasDelEstado.Elegir(Perfil.Incidencias, W, R);
+            if (incidencia != null) {
+                EffectApplier.Aplicar(W, incidencia.Efectos);
+                int vistas;
+                R.IncidenciasVistas.TryGetValue(incidencia.Id ?? "", out vistas);
+                R.IncidenciasVistas[incidencia.Id ?? ""] = vistas + 1;
+                brief.Incidencia = incidencia;
+            }
 
             // 7 · la escena de hoy
             Beat = _narrativa.BeatDeHoy(R, this);
@@ -1049,32 +1172,72 @@ namespace Nexus.Core.Sesion {
             var config = Metodologia.Lanzamiento ?? new LanzamientoConfig();
 
             var riesgo = Math.Min(100.0, d.RiesgoLatente * config.FactorRiesgo);
-            var defectos = (int)Math.Round(((100.0 - W.Cobertura) / 12.0 + W.DeudaTecnica / 15.0) *
-                                           (config.EntregaIncremental ? 1.0 : 1.3));
+            var defectos = PronosticoDeLanzamiento.Defectos(W.Cobertura, W.DeudaTecnica, config.EntregaIncremental);
             var entregado = Math.Min(W.Avance, W.Alcance);
-            var exito = riesgo < 62.0 && entregado >= Perfil.Umbrales.Exito.AvanceMinimo;
 
-            if (!exito) W.Set("MoralEquipo", W.MoralEquipo - 8);
+            // Cuenta todo lo que el cliente nota, no solo el riesgo (ver CalculoDeLanzamiento).
+            var calificacion = CalculoDeLanzamiento.Calcular(new EntradaDeLanzamiento {
+                Riesgo = riesgo, Defectos = defectos, Entregado = entregado, Comprometido = W.Alcance,
+                Satisfaccion = W.SatisfaccionCliente, Traza = Traza
+            }, Perfil.Lanzamiento);
+            var nivel = calificacion.Nivel;
+            var exito = nivel == NivelesDeLanzamiento.Bien;
+
+            // Las consecuencias se notan en el equipo y en como te ve la empresa.
+            if (nivel == NivelesDeLanzamiento.Mal) {
+                W.Set("MoralEquipo", W.MoralEquipo - 10);
+                W.Set("Reputacion", W.Reputacion - 10);
+            } else if (nivel == NivelesDeLanzamiento.ConProblemas) {
+                W.Set("MoralEquipo", W.MoralEquipo - 4);
+                W.Set("Reputacion", W.Reputacion - 3);
+            } else {
+                W.Set("Reputacion", W.Reputacion + 5);
+            }
 
             Lanzamiento = new LaunchResult {
                 Exito = exito,
+                Nivel = nivel,
+                Puntaje = calificacion.Puntaje,
                 RiesgoDeLanzamiento = Math.Round(riesgo, 1),
                 AlcanceEntregado = Math.Round(entregado, 1),
                 AlcanceComprometido = Math.Round(W.Alcance, 1),
-                DefectosEscapados = Math.Max(0, defectos),
+                DefectosEscapados = defectos,
+                SatisfaccionCliente = Math.Round(W.SatisfaccionCliente, 1),
+                Factores = calificacion.Factores,
+                DecisionesQuePesaron = calificacion.DecisionesQuePesaron,
                 Texto = config.Texto,
                 TextoMetodologia = exito ? config.TextoSiSale : config.TextoSiFalla
             };
 
-            Registrar("LANZAMIENTO", "Lanzamiento", exito ? "exito" : "fallo",
-                      $"{Lanzamiento.AlcanceEntregado} de {Lanzamiento.AlcanceComprometido} puntos",
-                      exito ? Veredictos.Correcta : Veredictos.Incorrecta, "OA-PROC-03",
-                      $"Riesgo de lanzamiento {Lanzamiento.RiesgoDeLanzamiento:F1}; " +
-                      $"escaparon {Lanzamiento.DefectosEscapados} defectos.", null);
+            Registrar("LANZAMIENTO", "Lanzamiento", nivel,
+                      $"{NivelesDeLanzamiento.Titulo(nivel)} · {Lanzamiento.AlcanceEntregado} de {Lanzamiento.AlcanceComprometido} puntos",
+                      exito ? Veredictos.Correcta : nivel == NivelesDeLanzamiento.ConProblemas ? Veredictos.Aceptable : Veredictos.Incorrecta,
+                      "OA-PROC-03",
+                      $"Puntaje {Lanzamiento.Puntaje:0}/100. Riesgo de lanzamiento {Lanzamiento.RiesgoDeLanzamiento:F1}; " +
+                      $"escaparon {Lanzamiento.DefectosEscapados} defectos; satisfacción {Lanzamiento.SatisfaccionCliente:0}.", null);
 
             R.Fase = 4;
             return Lanzamiento;
         }
+
+        /// <summary>Las derivadas de ahora mismo (velocidad, riesgo): lo que la UI enseña como efecto de cada barra.</summary>
+        public Derived EstadoDerivado() { return Derivadas(); }
+
+        /// <summary>
+        /// Si se lanzara al ritmo de hoy: el avance de ahora mas lo que el equipo hace en los dias que quedan, con los
+        /// errores, el riesgo y la satisfaccion de ahora. Es la misma cuenta que el lanzamiento real.
+        /// </summary>
+        public CalificacionDeLanzamiento Pronostico() {
+            var config = (Metodologia != null ? Metodologia.Lanzamiento : null) ?? new LanzamientoConfig();
+            var d = Derivadas();
+            var restantes = Math.Max(0, Perfil.DiasTotales - R.DiaActual + (JornadaTerminada ? 0 : 1));
+            return PronosticoDeLanzamiento.Calcular(W.Avance, W.Alcance, d.Velocidad, restantes, W.Cobertura, W.DeudaTecnica,
+                                                    d.RiesgoLatente, config.FactorRiesgo, config.EntregaIncremental,
+                                                    W.SatisfaccionCliente, Traza, Perfil.Lanzamiento);
+        }
+
+        /// <summary>¿La metodologia entrega por partes? (escapan menos errores). Para explicar las barras.</summary>
+        public bool EntregaIncremental { get { return Metodologia != null && Metodologia.Lanzamiento != null && Metodologia.Lanzamiento.EntregaIncremental; } }
 
         // ==================================================================== FASE 4
 
@@ -1119,6 +1282,7 @@ namespace Nexus.Core.Sesion {
             VolcarArquitectura();
             VolcarColeccionables();
             VolcarRecoleccion();
+            VolcarRelaciones();
             reporte.Flags = Flags.Copia();
 
             NivelTerminado = true;
@@ -1326,7 +1490,8 @@ namespace Nexus.Core.Sesion {
                         s._minijuegoDeHoy = new PendingMinigame {
                             MinijuegoId = def.Id, Verbo = def.Verbo, Archivo = def.Archivo,
                             PresionDiegetica = def.PresionDiegetica, Segundos = def.Reloj,
-                            NivelAndamiaje = s.Perfil.NivelAndamiaje, ObjetivoAprendizaje = def.ObjetivoAprendizaje
+                            NivelAndamiaje = s.Perfil.NivelAndamiaje, Guiado = s.Perfil.MinijuegosGuiados,
+                            ObjetivoAprendizaje = def.ObjetivoAprendizaje
                         };
                 }
             }

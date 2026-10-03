@@ -10,6 +10,253 @@
     "La barrera actual la abrieron con el mando genérico del fabricante. Nadie en Nexus tiene su código fuente.",
     "Facilities todavía no sabe bien qué quiere: la primera reunión terminó con tres ideas distintas sobre quién tiene prioridad en los ascensores."
   ],
+  "proyecto": {
+    "nombre": "Cradle Lifts: patios y ascensores de carga",
+    "sector": {
+      "nombre": "Gestión de instalaciones (facility management)",
+      "comoTrabaja": "El departamento de instalaciones cuida que un edificio funcione: quién entra a los patios, cuándo se usa cada ascensor de carga, el mantenimiento. Trabaja con turnos, horas punta y aparatos de fabricantes que no controla."
+    },
+    "cliente": {
+      "nombre": "Facilities",
+      "queHace": "Es el departamento interno de instalaciones de Nexus: patios, ascensores de carga y mantenimiento de los edificios N1 y N2.",
+      "queLeDuele": "Hackearon la barrera de los patios con un mando genérico y no hay forma de controlar quién entra; además, las reservas de los ascensores de carga chocan y nadie sabe quién tiene prioridad.",
+      "distractores": [
+        "Quiere una red social interna para los empleados de Nexus.",
+        "Necesita llevar todos sus sistemas a microservicios en la nube."
+      ]
+    },
+    "usuarios": [
+      {
+        "nombre": "El guardia de la garita",
+        "queNecesita": "Ver en su pantalla, en tiempo real, quién entra y quién sale de los patios.",
+        "modulo": "panel"
+      },
+      {
+        "nombre": "Los conductores de reparto",
+        "queNecesita": "Entrar al patio sin esperar, si su matrícula está autorizada.",
+        "modulo": "acceso"
+      },
+      {
+        "nombre": "El personal de Facilities",
+        "queNecesita": "Reservar un ascensor de carga sin que choque con otra reserva.",
+        "modulo": "reservas"
+      },
+      {
+        "nombre": "El jefe de mantenimiento",
+        "queNecesita": "Un informe mensual de cuánto se usan los patios y los ascensores.",
+        "modulo": "informes"
+      }
+    ],
+    "enUnaFrase": "Un sistema que lee la matrícula en la garita, abre la barrera solo a quien está autorizado, registra entradas y salidas y deja reservar los ascensores de carga sin choques.",
+    "modulos": [
+      {
+        "id": "lectura",
+        "nombre": "Lectura de matrículas",
+        "queHace": "La cámara de la garita lee la matrícula de cada carro y la envía al sistema. La cámara ya existe: falta conectarla.",
+        "peso": 1,
+        "avanceInicial": 30
+      },
+      {
+        "id": "acceso",
+        "nombre": "Control de acceso",
+        "queHace": "Decide si una matrícula puede entrar, ordena abrir la barrera y registra cada entrada y salida.",
+        "peso": 1.5
+      },
+      {
+        "id": "reservas",
+        "nombre": "Reservas de ascensores",
+        "queHace": "Crea, mueve y cancela las reservas de los ascensores de carga.",
+        "peso": 1.5
+      },
+      {
+        "id": "turnos",
+        "nombre": "Prioridades y turnos",
+        "queHace": "Decide quién va primero cuando dos reservas chocan.",
+        "peso": 1
+      },
+      {
+        "id": "panel",
+        "nombre": "Pantalla del guardia",
+        "queHace": "Enseña al guardia, en tiempo real, quién entra y quién sale.",
+        "peso": 0.8
+      },
+      {
+        "id": "informes",
+        "nombre": "Informe mensual de uso",
+        "queHace": "Resume cada mes cuánto se usaron los patios y los ascensores.",
+        "peso": 0.7
+      }
+    ],
+    "contexto": {
+      "actores": [
+        {
+          "id": "conductor",
+          "nombre": "Conductor",
+          "tipo": "persona"
+        },
+        {
+          "id": "vigilante",
+          "nombre": "Guardia de la garita",
+          "tipo": "persona"
+        },
+        {
+          "id": "facilities",
+          "nombre": "Personal de Facilities",
+          "tipo": "persona"
+        },
+        {
+          "id": "mantenimiento",
+          "nombre": "Jefe de mantenimiento",
+          "tipo": "persona"
+        },
+        {
+          "id": "barrera",
+          "nombre": "Barrera (del fabricante)",
+          "tipo": "sistema"
+        },
+        {
+          "id": "ascensor",
+          "nombre": "Ascensor de carga (del fabricante)",
+          "tipo": "sistema"
+        }
+      ],
+      "flujos": [
+        {
+          "desde": "conductor",
+          "hasta": "lectura",
+          "texto": "llega a la garita"
+        },
+        {
+          "desde": "lectura",
+          "hasta": "acceso",
+          "texto": "matrícula leída"
+        },
+        {
+          "desde": "acceso",
+          "hasta": "barrera",
+          "texto": "abrir / no abrir"
+        },
+        {
+          "desde": "acceso",
+          "hasta": "panel",
+          "texto": "entradas y salidas"
+        },
+        {
+          "desde": "panel",
+          "hasta": "vigilante",
+          "texto": "lo ve en tiempo real"
+        },
+        {
+          "desde": "facilities",
+          "hasta": "reservas",
+          "texto": "pide un ascensor"
+        },
+        {
+          "desde": "reservas",
+          "hasta": "turnos",
+          "texto": "¿hay choque?"
+        },
+        {
+          "desde": "reservas",
+          "hasta": "ascensor",
+          "texto": "lo bloquea a su hora"
+        },
+        {
+          "desde": "acceso",
+          "hasta": "informes",
+          "texto": "entradas del mes"
+        },
+        {
+          "desde": "informes",
+          "hasta": "mantenimiento",
+          "texto": "informe mensual"
+        }
+      ]
+    },
+    "vocabulario": [
+      {
+        "termino": "Garita",
+        "definicion": "La caseta a la entrada del patio donde están el guardia y la cámara que lee las matrículas.",
+        "dondeLoVeras": "el diagrama del sistema y la traza de la garita."
+      },
+      {
+        "termino": "Barrera",
+        "definicion": "El brazo que sube y baja para dejar pasar un carro. La de los patios es de un fabricante y obedece cualquier orden que le llegue.",
+        "dondeLoVeras": "el diagrama del sistema (el controlador de la barrera)."
+      },
+      {
+        "termino": "Lectura de matrículas (LPR)",
+        "definicion": "Una cámara con software que reconoce la placa de un carro y la convierte en texto. LPR son sus siglas en inglés.",
+        "dondeLoVeras": "el backlog («Leer matrículas en la garita») y la traza del log."
+      },
+      {
+        "termino": "Permiso de acceso",
+        "definicion": "La lista de matrículas que pueden entrar al patio, y en qué horario.",
+        "dondeLoVeras": "la traza de la garita («permiso: DENEGADO»)."
+      },
+      {
+        "termino": "Ascensor de carga",
+        "definicion": "Un ascensor grande para subir mercancía y equipos. Se reserva por franjas, porque solo cabe un envío a la vez.",
+        "dondeLoVeras": "el módulo de reservas y su backlog."
+      },
+      {
+        "termino": "Franja de reserva",
+        "definicion": "Un tramo de tiempo (por ejemplo, de 10:00 a 10:30) en el que alguien tiene el ascensor para sí.",
+        "dondeLoVeras": "las reservas y sus pruebas."
+      },
+      {
+        "termino": "Choque de reservas",
+        "definicion": "Dos reservas que piden el mismo ascensor en franjas que se pisan. Alguien tiene que decidir cuál gana, con una regla escrita.",
+        "dondeLoVeras": "el diagrama de las reservas (el calendario de turnos)."
+      },
+      {
+        "termino": "Hora punta",
+        "definicion": "El momento del día con más tráfico. Aquí, como mucho cuarenta carros esperando en la garita.",
+        "dondeLoVeras": "el encargo y la decisión de arquitectura."
+      },
+      {
+        "termino": "Controlador del fabricante",
+        "definicion": "El aparato que trae de fábrica la barrera o el ascensor. No tenemos su código: solo se le puede hablar por la puerta que él ofrece.",
+        "dondeLoVeras": "los diagramas: las flechas hacia la barrera y el ascensor."
+      }
+    ],
+    "artefactos": [
+      {
+        "id": "SRS",
+        "glosario": "srs",
+        "paraQueAqui": "Facilities aún no sabe bien qué quiere: el SRS fija qué hace el sistema y con qué regla se decide la prioridad de los ascensores."
+      },
+      {
+        "id": "SAD",
+        "glosario": "sad",
+        "paraQueAqui": "El diagrama del sistema que se revisa antes de que Javier programe: módulos, flechas y lo que nadie especificó."
+      },
+      {
+        "id": "PMP",
+        "glosario": "pmp",
+        "paraQueAqui": "El plan de los veinte días: qué entra en cada sprint o en cada fase, y qué pasa si el cliente cambia de idea."
+      },
+      {
+        "id": "PTP",
+        "glosario": "ptp",
+        "paraQueAqui": "Las horas de pruebas de la versión del viernes, sobre todo de las reservas, que tienen mucha lógica de fechas."
+      }
+    ],
+    "loNuevo": [
+      "Ya no es un concurso: es tu primer cliente de verdad, Facilities, y lo que entregues lo mantendrá su equipo sin ayuda.",
+      "Es más grande: veinte días, seis módulos y un sistema que habla con aparatos de fabricantes (la barrera y los ascensores) cuyo código no tienes.",
+      "El cliente todavía no sabe bien qué quiere: aquí pesan negociar el backlog y escribir los requisitos.",
+      "Aparecen git y los diagramas de secuencia: el trabajo es de un equipo, y hay que revisar lo que pasó de verdad, no solo lo diseñado."
+    ],
+    "temasDelNivel": [
+      "Scrum y Kanban",
+      "Estimación",
+      "Requisitos (SRS) y diseño (SAD)",
+      "Principios de diseño: acoplamiento",
+      "git",
+      "Calidad y testing (PTP)"
+    ]
+  },
   "diasTotales": 20,
   "presupuestoInicial": 18000,
   "alcanceInicial": 34,
@@ -195,6 +442,20 @@
       "dinero": 0
     }
   },
+  "lanzamiento": {
+    "riesgoBien": 40,
+    "riesgoMal": 60,
+    "defectosBien": 5,
+    "defectosMal": 9,
+    "entregaBien": 0.85,
+    "entregaMal": 0.65,
+    "satisfaccionBien": 50,
+    "satisfaccionMal": 35,
+    "decisionesBien": 0.6,
+    "decisionesMal": 0.35,
+    "puntajeBien": 70,
+    "puntajeMal": 45
+  },
   "metodologiasPermitidas": [
     "scrum",
     "kanban",
@@ -280,6 +541,26 @@
       {
         "id": "lo_mas_rapido",
         "texto": "Es lo más rápido para empezar mañana."
+      },
+      {
+        "id": "mono_sin_modulos",
+        "texto": "Así no hace falta separar nada por dentro."
+      },
+      {
+        "id": "micro_por_separado",
+        "texto": "Cada parte se puede desplegar por separado."
+      },
+      {
+        "id": "micro_un_equipo_cada_uno",
+        "texto": "Cada servicio lo puede llevar un equipo distinto."
+      },
+      {
+        "id": "parche_sin_codigo",
+        "texto": "Así nadie tiene que entender el código de la barrera."
+      },
+      {
+        "id": "parche_ya_probado",
+        "texto": "La barrera actual ya está probada: es segura."
       }
     ],
     "arquitecturas": [
@@ -292,6 +573,14 @@
         "efectos": {
           "Documentacion": 5
         },
+        "razones": [
+          "equipo_pequeno",
+          "despliegue_simple",
+          "un_solo_edificio",
+          "plazo_corto",
+          "lo_mas_rapido",
+          "mono_sin_modulos"
+        ],
         "razonesValidas": [
           "equipo_pequeno",
           "despliegue_simple",
@@ -302,7 +591,8 @@
           "FLG_VOSS_AFINIDAD": 1
         },
         "razonesTrampa": [
-          "lo_mas_rapido"
+          "lo_mas_rapido",
+          "mono_sin_modulos"
         ]
       },
       {
@@ -317,10 +607,17 @@
         "modificadoresModelo": {
           "gamma": 1.15
         },
+        "razones": [
+          "escala_mejor",
+          "esta_de_moda",
+          "micro_por_separado",
+          "micro_un_equipo_cada_uno"
+        ],
         "razonesValidas": [],
         "razonesTrampa": [
           "esta_de_moda",
-          "escala_mejor"
+          "escala_mejor",
+          "micro_un_equipo_cada_uno"
         ],
         "flagsAlCerrar": {
           "FLG_VOSS_AFINIDAD": -1
@@ -338,12 +635,21 @@
         "modificadoresModelo": {
           "alpha": 1.1
         },
+        "razones": [
+          "plazo_corto",
+          "ya_existe",
+          "lo_mas_rapido",
+          "parche_sin_codigo",
+          "parche_ya_probado"
+        ],
         "razonesValidas": [
           "plazo_corto",
           "ya_existe"
         ],
         "razonesTrampa": [
-          "lo_mas_rapido"
+          "lo_mas_rapido",
+          "parche_sin_codigo",
+          "parche_ya_probado"
         ]
       }
     ],
@@ -532,5 +838,73 @@
         }
       }
     ]
-  }
+  },
+  "incidencias": [
+    {
+      "id": "INC-DEUDA",
+      "estadistica": "DeudaTecnica",
+      "comparador": ">=",
+      "umbral": 50,
+      "desdeDia": 2,
+      "titulo": "Algo que funcionaba se rompió",
+      "texto": "Con la deuda técnica en {valor}, un atajo de hace días ha roto algo que ya funcionaba. Hoy se pierde tiempo arreglándolo.",
+      "efectos": {
+        "Dias": 0.4,
+        "Cansancio": 3
+      }
+    },
+    {
+      "id": "INC-COBERTURA",
+      "estadistica": "Cobertura",
+      "comparador": "<=",
+      "umbral": 30,
+      "desdeDia": 3,
+      "titulo": "Facilities encontró un error",
+      "texto": "Con la cobertura de pruebas en {valor}, facilities encontró un error que nadie había probado. Su confianza baja.",
+      "efectos": {
+        "SatisfaccionCliente": -5,
+        "DeudaTecnica": 2
+      }
+    },
+    {
+      "id": "INC-CANSANCIO",
+      "estadistica": "Cansancio",
+      "comparador": ">=",
+      "umbral": 60,
+      "desdeDia": 2,
+      "titulo": "El equipo está agotado",
+      "texto": "Con el cansancio en {valor}, hoy el equipo rinde menos y se equivoca más.",
+      "efectos": {
+        "Dias": 0.3,
+        "DeudaTecnica": 3,
+        "MoralEquipo": -3
+      }
+    },
+    {
+      "id": "INC-MORAL",
+      "estadistica": "MoralEquipo",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "Roces en el equipo",
+      "texto": "Con la moral en {valor}, una discusión tonta se come media mañana.",
+      "efectos": {
+        "Dias": 0.3,
+        "Cansancio": 4
+      }
+    },
+    {
+      "id": "INC-SATISFACCION",
+      "estadistica": "SatisfaccionCliente",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "Facilities pide una reunión urgente",
+      "texto": "Con la satisfacción del cliente en {valor}, piden explicaciones. Hoy se va una hora en una reunión.",
+      "efectos": {
+        "Dias": 0.25,
+        "Cansancio": 2
+      }
+    }
+  ]
 }

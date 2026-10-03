@@ -24,7 +24,10 @@ namespace Nexus.Core.Sesion {
 
             var flags = Flags(partida);
             flags.Inicializar();
-            return new GameSession(_catalogo, partida.Partida.NivelActualId, flags, partida.Partida.Semilla);
+            var sesion = new GameSession(_catalogo, partida.Partida.NivelActualId, flags, partida.Partida.Semilla);
+            // Los compañeros que siguen de un nivel a otro traen su confianza (y sus ayudas ya ganadas).
+            sesion.HeredarRelaciones(partida.Relaciones);
+            return sesion;
         }
 
         public GameSession Restaurar(SaveGame partida, NivelEnCurso nivel) {

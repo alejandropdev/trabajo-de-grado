@@ -8,6 +8,198 @@
     "Restricción: la recepción tiene un solo equipo con un navegador y nadie de sistemas. Ningún visitante va a instalar nada en su móvil para una visita de una hora.",
     "Comentario de Marisol Andrade: «El jurado valorará que funcione el viernes. No que sea bonito el lunes.»"
   ],
+  "proyecto": {
+    "nombre": "Registro de visitantes",
+    "sector": {
+      "nombre": "Recepción corporativa y control de visitas",
+      "comoTrabaja": "En la recepción de un edificio de oficinas se decide quién entra, se avisa a la persona que lo espera y, al cerrar, se comprueba que no queda nadie dentro. Se trabaja de pie, en un mostrador y con prisa: lo que no se hace en segundos acaba haciéndose a mano."
+    },
+    "cliente": {
+      "nombre": "La recepción de N1",
+      "queHace": "Atiende a todas las visitas del edificio N1 de Nexus, con una sola recepcionista y un único equipo con navegador.",
+      "queLeDuele": "Los visitantes esperan hasta cuarenta minutos porque se registran a mano en un cuaderno, y al final del día nadie sabe quién sigue dentro.",
+      "distractores": [
+        "Necesita una app móvil para que los visitantes se registren solos desde casa.",
+        "Quiere cambiar los ascensores del edificio por otros más rápidos."
+      ]
+    },
+    "usuarios": [
+      {
+        "nombre": "La recepcionista",
+        "queNecesita": "Registrar a un visitante en segundos, sin cuaderno.",
+        "modulo": "registro"
+      },
+      {
+        "nombre": "El anfitrión",
+        "queNecesita": "Enterarse de que su visita ha llegado sin bajar a preguntar.",
+        "modulo": "aviso"
+      },
+      {
+        "nombre": "El vigilante de noche",
+        "queNecesita": "Saber, al cerrar, si queda algún visitante dentro del edificio.",
+        "modulo": "dentro"
+      }
+    ],
+    "enUnaFrase": "Una aplicación web, en el único equipo de la recepción, que registra a cada visitante, avisa a quien lo espera y sabe quién sigue dentro.",
+    "modulos": [
+      {
+        "id": "recepcion",
+        "nombre": "Pantalla de recepción",
+        "queHace": "Lo que ve la recepcionista en el navegador: el formulario de visita y los botones de entrada y salida.",
+        "peso": 1
+      },
+      {
+        "id": "registro",
+        "nombre": "Registro de visitas",
+        "queHace": "Guarda cada visita: quién es, a qué hora entra, a quién viene a ver y cuándo sale.",
+        "peso": 1.5
+      },
+      {
+        "id": "aviso",
+        "nombre": "Aviso al anfitrión",
+        "queHace": "Manda un correo a la persona a la que viene a ver el visitante.",
+        "peso": 1
+      },
+      {
+        "id": "dentro",
+        "nombre": "Quién sigue dentro",
+        "queHace": "La lista de visitas que entraron y aún no han salido, para el vigilante al cerrar.",
+        "peso": 1
+      }
+    ],
+    "contexto": {
+      "actores": [
+        {
+          "id": "visitante",
+          "nombre": "Visitante",
+          "tipo": "persona"
+        },
+        {
+          "id": "recepcionista",
+          "nombre": "Recepcionista",
+          "tipo": "persona"
+        },
+        {
+          "id": "anfitrion",
+          "nombre": "Anfitrión",
+          "tipo": "persona"
+        },
+        {
+          "id": "vigilante",
+          "nombre": "Vigilante",
+          "tipo": "persona"
+        },
+        {
+          "id": "correo",
+          "nombre": "Correo de Nexus",
+          "tipo": "sistema"
+        }
+      ],
+      "flujos": [
+        {
+          "desde": "recepcionista",
+          "hasta": "recepcion",
+          "texto": "escribe los datos del visitante"
+        },
+        {
+          "desde": "recepcion",
+          "hasta": "registro",
+          "texto": "guarda la visita"
+        },
+        {
+          "desde": "registro",
+          "hasta": "aviso",
+          "texto": "visita registrada"
+        },
+        {
+          "desde": "aviso",
+          "hasta": "correo",
+          "texto": "envía el aviso"
+        },
+        {
+          "desde": "correo",
+          "hasta": "anfitrion",
+          "texto": "«tu visita ha llegado»"
+        },
+        {
+          "desde": "registro",
+          "hasta": "dentro",
+          "texto": "entradas y salidas"
+        },
+        {
+          "desde": "dentro",
+          "hasta": "vigilante",
+          "texto": "quién queda al cerrar"
+        }
+      ]
+    },
+    "vocabulario": [
+      {
+        "termino": "Visitante",
+        "definicion": "Persona de fuera de la empresa que entra al edificio un rato, con cita o sin ella.",
+        "dondeLoVeras": "el formulario de visita y el registro."
+      },
+      {
+        "termino": "Anfitrión",
+        "definicion": "La persona de la empresa a la que viene a ver el visitante: es quien recibe el aviso.",
+        "dondeLoVeras": "el módulo «Aviso al anfitrión» y el diagrama de tu propuesta."
+      },
+      {
+        "termino": "Cita",
+        "definicion": "Una visita acordada de antemano. El visitante sin cita también existe, y alguien tiene que decidir qué se hace con él.",
+        "dondeLoVeras": "el registro de visitas y los comentarios del ticket."
+      },
+      {
+        "termino": "Registro de entrada y salida",
+        "definicion": "Anotar a qué hora entra y sale cada persona. Sin la salida, no se puede saber quién sigue dentro.",
+        "dondeLoVeras": "el backlog y la lista «Quién sigue dentro»."
+      },
+      {
+        "termino": "Credencial",
+        "definicion": "La tarjeta o pegatina que se da al visitante para que se vea que está autorizado a estar dentro.",
+        "dondeLoVeras": "las charlas de la recepción."
+      },
+      {
+        "termino": "Aforo",
+        "definicion": "El número máximo de personas que puede haber a la vez en el edificio. Por seguridad hay que saber cuántas hay.",
+        "dondeLoVeras": "la lista «Quién sigue dentro»."
+      },
+      {
+        "termino": "MVP",
+        "definicion": "Producto mínimo viable: la versión más pequeña que ya resuelve el problema de verdad. Aquí, registrar, avisar y saber quién sigue dentro, sin adornos.",
+        "dondeLoVeras": "el comentario de Marisol: «que funcione el viernes»."
+      }
+    ],
+    "artefactos": [
+      {
+        "id": "SRS",
+        "glosario": "srs",
+        "paraQueAqui": "Dice qué tiene que hacer el registro: registrar, avisar al anfitrión y saber quién sigue dentro. Lo que no esté ahí, nadie lo construirá."
+      },
+      {
+        "id": "SAD",
+        "glosario": "sad",
+        "paraQueAqui": "El diagrama de componentes de tu propuesta. Es lo que se revisa en «La revisión de tu propuesta»."
+      },
+      {
+        "id": "PTP",
+        "glosario": "ptp",
+        "paraQueAqui": "Las horas de pruebas: qué se prueba antes de que lo pruebe el jurado."
+      }
+    ],
+    "loNuevo": [
+      "Es tu primer proyecto: un sistema pequeño, para un solo cliente, en cinco días.",
+      "Todo va guiado: Marisol te acompaña en cada reto para que aprendas qué mirar.",
+      "Lo que cuenta no es que sea bonito, sino que funcione el viernes: aquí aprendes qué es un MVP."
+    ],
+    "temasDelNivel": [
+      "Introducción a la IS",
+      "Requisitos y SRS",
+      "Diagramas de componentes (SAD)",
+      "Scrum y Kanban",
+      "git"
+    ]
+  },
   "diasTotales": 5,
   "presupuestoInicial": 3000,
   "alcanceInicial": 12,
@@ -74,6 +266,9 @@
         "nombre": "La terminal pública",
         "descripcion": "Un equipo viejo junto a la escalera, con un cartel de «solo consultas». Nadie lo ha apagado en años.",
         "minutosDeVisita": 20,
+        "quienEsta": [
+          "Iván Cárdenas, el técnico del concurso"
+        ],
         "coleccionables": [
           "COL-COD-01"
         ],
@@ -115,12 +310,27 @@
     },
     "fallo": {}
   },
+  "lanzamiento": {
+    "riesgoBien": 40,
+    "riesgoMal": 60,
+    "defectosBien": 5,
+    "defectosMal": 8,
+    "entregaBien": 0.85,
+    "entregaMal": 0.6,
+    "satisfaccionBien": 50,
+    "satisfaccionMal": 35,
+    "decisionesBien": 0.6,
+    "decisionesMal": 0.35,
+    "puntajeBien": 68,
+    "puntajeMal": 45
+  },
   "metodologiasPermitidas": [
     "scrum",
     "cascada",
     "kanban"
   ],
   "nivelAndamiaje": 3,
+  "minijuegosGuiados": true,
   "volatilidadReal": 55,
   "fase1": {
     "calidad": {
@@ -169,6 +379,18 @@
       {
         "id": "todo_el_mundo_tiene_movil",
         "texto": "Todo el mundo tiene móvil."
+      },
+      {
+        "id": "web_es_gratis",
+        "texto": "Hacer una web no cuesta nada."
+      },
+      {
+        "id": "movil_avisa",
+        "texto": "Al visitante le llega un aviso al móvil cuando le toca."
+      },
+      {
+        "id": "movil_sin_recepcion",
+        "texto": "Así la recepción ya no tiene que hacer nada."
       }
     ],
     "arquitecturas": [
@@ -181,13 +403,21 @@
         "efectos": {
           "Documentacion": 3
         },
+        "razones": [
+          "un_solo_equipo",
+          "nadie_instala_nada",
+          "cinco_dias",
+          "queda_mas_moderno",
+          "web_es_gratis"
+        ],
         "razonesValidas": [
           "un_solo_equipo",
           "nadie_instala_nada",
           "cinco_dias"
         ],
         "razonesTrampa": [
-          "queda_mas_moderno"
+          "queda_mas_moderno",
+          "web_es_gratis"
         ]
       },
       {
@@ -199,10 +429,17 @@
           "DeudaTecnica": 8,
           "Cansancio": 5
         },
+        "razones": [
+          "todo_el_mundo_tiene_movil",
+          "movil_avisa",
+          "movil_sin_recepcion",
+          "queda_mas_moderno"
+        ],
         "razonesValidas": [],
         "razonesTrampa": [
           "todo_el_mundo_tiene_movil",
-          "queda_mas_moderno"
+          "queda_mas_moderno",
+          "movil_sin_recepcion"
         ]
       }
     ],
@@ -289,7 +526,7 @@
             "Documentacion": 2
           },
           "falsoPositivo": {
-            "Dias": 0.1
+            "Cansancio": 2
           },
           "omitido": {}
         }
@@ -341,5 +578,73 @@
         }
       }
     ]
-  }
+  },
+  "incidencias": [
+    {
+      "id": "INC-DEUDA",
+      "estadistica": "DeudaTecnica",
+      "comparador": ">=",
+      "umbral": 50,
+      "desdeDia": 2,
+      "titulo": "Algo que funcionaba se rompió",
+      "texto": "Con la deuda técnica en {valor}, un atajo de hace días ha roto algo que ya funcionaba. Hoy se pierde tiempo arreglándolo.",
+      "efectos": {
+        "Dias": 0.4,
+        "Cansancio": 3
+      }
+    },
+    {
+      "id": "INC-COBERTURA",
+      "estadistica": "Cobertura",
+      "comparador": "<=",
+      "umbral": 22,
+      "desdeDia": 3,
+      "titulo": "El jurado encontró un error",
+      "texto": "Con la cobertura de pruebas en {valor}, el jurado encontró un error que nadie había probado. Su confianza baja.",
+      "efectos": {
+        "SatisfaccionCliente": -5,
+        "DeudaTecnica": 2
+      }
+    },
+    {
+      "id": "INC-CANSANCIO",
+      "estadistica": "Cansancio",
+      "comparador": ">=",
+      "umbral": 60,
+      "desdeDia": 2,
+      "titulo": "El equipo está agotado",
+      "texto": "Con el cansancio en {valor}, hoy el equipo rinde menos y se equivoca más.",
+      "efectos": {
+        "Dias": 0.3,
+        "DeudaTecnica": 3,
+        "MoralEquipo": -3
+      }
+    },
+    {
+      "id": "INC-MORAL",
+      "estadistica": "MoralEquipo",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "Roces en el equipo",
+      "texto": "Con la moral en {valor}, una discusión tonta se come media mañana.",
+      "efectos": {
+        "Dias": 0.3,
+        "Cansancio": 4
+      }
+    },
+    {
+      "id": "INC-SATISFACCION",
+      "estadistica": "SatisfaccionCliente",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "El jurado pide una reunión urgente",
+      "texto": "Con la satisfacción del cliente en {valor}, piden explicaciones. Hoy se va una hora en una reunión.",
+      "efectos": {
+        "Dias": 0.25,
+        "Cansancio": 2
+      }
+    }
+  ]
 }

@@ -1,32 +1,80 @@
 {
-  "version": 1,
+  "version": 2,
   "pasos": [
+    {
+      "id": "F1-PROYECTO-1",
+      "nivel": "nivel-00",
+      "disparador": "fase1.encargo",
+      "orden": 11,
+      "titulo": "El sistema en una imagen",
+      "texto": "Este dibujo es el diagrama de contexto: fuera, las personas y sistemas que usan el tuyo; dentro, sus partes (los módulos). Cada reto que juegues es una de estas partes, y arriba del reto verás cuál.",
+      "mas": "En un proyecto real este diagrama es lo primero que se dibuja: deja claro qué es tu sistema y qué no, y con quién tiene que hablar. Forma parte del SRS y del SAD.",
+      "resaltar": "fase1.expediente"
+    },
+    {
+      "id": "F1-PROYECTO-2",
+      "nivel": "nivel-00",
+      "disparador": "fase1.encargo",
+      "orden": 12,
+      "titulo": "Las palabras del oficio",
+      "texto": "Cada cliente trabaja en un sector con sus propias palabras: anfitrión, credencial, aforo… Son las que verás en los diagramas y en las tarjetas. Pulsa cualquiera para ver qué significa.",
+      "mas": "Hablar el idioma del cliente es parte del trabajo de un ingeniero de software: los requisitos se escriben con sus palabras, no con las nuestras.",
+      "resaltar": "fase1.vocabulario"
+    },
+    {
+      "id": "F1-PROYECTO-3",
+      "nivel": "nivel-00",
+      "disparador": "fase1.encargo",
+      "orden": 25,
+      "titulo": "Comprueba que lo entendiste",
+      "texto": "Al final hay tres preguntas cortas sobre el proyecto. No restan: si fallas, te explico por qué y lo vuelves a intentar. Las tienes que contestar para pasar a las decisiones.",
+      "resaltar": "fase1.comprobacion"
+    },
+    {
+      "id": "N1-F1-PROYECTO",
+      "nivel": "nivel-01",
+      "disparador": "fase1.encargo",
+      "orden": 12,
+      "titulo": "Qué cambia en este proyecto",
+      "texto": "Otro cliente, otro sector y otro tamaño: mira «Qué tiene de distinto este proyecto», el sistema en una imagen y las palabras del oficio antes de decidir. Las preguntas del final te dirán si lo tienes claro.",
+      "resaltar": "fase1.distinto"
+    },
     {
       "id": "F1-ENCARGO-1",
       "nivel": "nivel-00",
       "disparador": "fase1.encargo",
       "orden": 10,
-      "titulo": "Esto es el encargo",
-      "texto": "Aquí está lo que el cliente necesita. Léalo con calma, como un problema de matemáticas: todas las pistas están en el texto, también en los comentarios del final.",
-      "mas": "En los equipos de software el encargo suele llegar como un «ticket»: un resumen, una descripción, las restricciones (lo que NO se puede hacer) y comentarios. Lo que más se olvida leer son las restricciones.",
+      "titulo": "Esto es el proyecto",
+      "texto": "Antes de decidir nada, entiende QUÉ vas a construir y PARA QUIÉN: el cliente, lo que le duele, su sector y quién usará el sistema. Léelo con calma, como un problema de matemáticas: todas las pistas están aquí, también en el ticket original del final.",
+      "mas": "En los equipos de software el encargo suele llegar como un «ticket»: un resumen, una descripción, las restricciones (lo que NO se puede hacer) y comentarios. Lo que más se olvida leer son las restricciones, y son las que más deciden.",
       "resaltar": "fase1.contenido"
     },
     {
       "id": "F1-ENCARGO-2",
       "nivel": "nivel-00",
       "disparador": "fase1.encargo",
-      "orden": 20,
-      "titulo": "Sus pasos",
-      "texto": "Arriba están los pasos para planear. Puede ir y volver entre ellos cuando quiera: nada queda decidido hasta el final, cuando pulse «Confirmar».",
-      "resaltar": "fase1.pasos"
+      "orden": 15,
+      "titulo": "Cómo se mide tu proyecto",
+      "texto": "Debajo del encargo tienes las barras con las que se mide tu proyecto: cuánto avanzas, los atajos que debes (deuda), lo probado (cobertura), el cansancio y lo contento que está el cliente. Cada decisión que tomes las mueve. Al final, con ellas se decide si el lanzamiento sale bien.",
+      "mas": "Esto es un modelo simplificado de cómo se gestiona un proyecto real: no basta con terminar; importa con cuántos errores, con qué riesgo y con el equipo en qué estado.",
+      "resaltar": "fase1.metricas"
     },
     {
       "id": "F1-ENCARGO-3",
       "nivel": "nivel-00",
       "disparador": "fase1.encargo",
+      "orden": 20,
+      "titulo": "Tus pasos",
+      "texto": "Arriba están los pasos para planear. Puedes ir y volver entre ellos cuando quieras: nada queda decidido hasta el final, cuando pulses «Confirmar».",
+      "resaltar": "fase1.pasos"
+    },
+    {
+      "id": "F1-ENCARGO-4",
+      "nivel": "nivel-00",
+      "disparador": "fase1.encargo",
       "orden": 30,
       "titulo": "Para seguir",
-      "texto": "Cuando termine de leer, pulse «Siguiente» abajo a la derecha.",
+      "texto": "Cuando termines de leer y contestes las preguntas, pulsa «Siguiente», abajo a la derecha. Si te pierdes en cualquier momento, «¿Qué hago ahora?» te lo vuelve a explicar, y «Apuntes» resume todo lo que tienes que saber del nivel: el encargo, tus decisiones, cómo se mide y tu equipo.",
       "resaltar": "fase1.navegacion"
     },
     {
@@ -35,16 +83,16 @@
       "disparador": "fase1.recoleccion",
       "orden": 40,
       "titulo": "Ir a ver antes de decidir",
-      "texto": "Antes de planear, conviene ir a ver dónde se va a usar lo que va a construir. Es como visitar la cancha antes del partido: descubre cosas que el encargo no dice.",
-      "mas": "Esto se llama levantamiento de requisitos en el sitio: observar y preguntar a quien de verdad va a usar el sistema."
+      "texto": "Antes de planear, conviene ir a ver dónde se va a usar lo que vas a construir. Es como visitar la cancha antes del partido: descubres cosas que el encargo no dice.",
+      "mas": "Esto se llama levantamiento de requisitos en el sitio: observar y preguntar a quien de verdad va a usar el sistema. Lo que descubres aquí acaba en el documento de requisitos (SRS)."
     },
     {
       "id": "F1-REC-2",
       "nivel": "nivel-00",
       "disparador": "fase1.recoleccion",
       "orden": 50,
-      "titulo": "Elija cómo recorrer",
-      "texto": "«Rápida» gasta poco tiempo pero encuentra poco. «A fondo» encuentra más, pero también puede tropezar con algo. Si no sabe, pruebe «Normal».",
+      "titulo": "Elige cómo recorrer",
+      "texto": "«Rápida» gasta poco tiempo pero encuentra poco. «A fondo» encuentra más, pero también puedes tropezar con algo. Si no sabes, prueba «Normal».",
       "mas": "Esta parte será en 3D. Mientras se construye, aquí se simula con un botón.",
       "resaltar": "fase1.simular"
     },
@@ -54,7 +102,7 @@
       "disparador": "fase1.metodologia",
       "orden": 60,
       "titulo": "¿Qué es una metodología?",
-      "texto": "Una metodología es la forma de organizar el trabajo del equipo. Es como una receta: dice qué se hace primero, qué después y cuándo se revisa cómo va.",
+      "texto": "Una metodología es la forma de organizar el trabajo del equipo. Es como una receta: dice qué se hace primero, qué después y cada cuánto se revisa cómo va. Junto a cada palabra rara hay un «?»: púlsalo y te digo qué significa.",
       "resaltar": "fase1.metodologias"
     },
     {
@@ -63,8 +111,9 @@
       "disparador": "fase1.metodologia",
       "orden": 70,
       "titulo": "Scrum, fácil",
-      "texto": "Scrum es hacer el trabajo por partes cortas, llamadas sprints. Al final de cada parte se enseña lo hecho y se decide cómo mejorar. Sirve cuando el cliente todavía no sabe bien lo que quiere.",
-      "mas": "En Scrum hay tres papeles: el Product Owner decide qué es más importante, el Scrum Master cuida que el proceso funcione y el equipo construye. Cada sprint empieza con una planificación y termina con una revisión y una retrospectiva."
+      "texto": "Scrum es hacer el trabajo por partes cortas, llamadas sprints (por ejemplo, de una semana). Al final de cada sprint se enseña lo hecho y se decide cómo mejorar. Sirve cuando el cliente todavía no sabe bien lo que quiere.",
+      "mas": "En Scrum hay tres papeles: el Product Owner decide qué es más importante, el Scrum Master cuida que el proceso funcione y el equipo construye. Cada sprint empieza con una planificación y termina con una revisión y una retrospectiva.",
+      "resaltar": "fase1.metodologias"
     },
     {
       "id": "F1-MET-CASCADA",
@@ -73,7 +122,8 @@
       "orden": 80,
       "titulo": "Cascada, fácil",
       "texto": "Cascada es hacerlo por etapas, una detrás de otra, como bajar una escalera: primero entender, después diseñar, después construir y al final probar. Sirve cuando todo está claro desde el principio y no va a cambiar.",
-      "mas": "El problema de la cascada es que los errores de las primeras etapas se descubren al final, en las pruebas, cuando corregirlos cuesta mucho más."
+      "mas": "El problema de la cascada es que los errores de las primeras etapas se descubren al final, en las pruebas, cuando corregirlos cuesta mucho más.",
+      "resaltar": "fase1.metodologias"
     },
     {
       "id": "F1-MET-KANBAN",
@@ -81,8 +131,9 @@
       "disparador": "fase1.metodologia",
       "orden": 90,
       "titulo": "Kanban, fácil",
-      "texto": "Kanban es un tablero con columnas: por hacer, haciendo y hecho. La regla de oro: no empezar algo nuevo sin terminar lo que ya tiene. Sirve cuando el trabajo llega sin avisar.",
-      "mas": "La regla de oro se llama límite WIP (trabajo en curso). Sirve para ver dónde se atasca el trabajo."
+      "texto": "Kanban es un tablero con columnas: por hacer, haciendo y hecho. La regla de oro: no empezar algo nuevo sin terminar lo que ya tienes. Sirve cuando el trabajo llega sin avisar.",
+      "mas": "La regla de oro se llama límite WIP (trabajo en curso). Sirve para ver dónde se atasca el trabajo.",
+      "resaltar": "fase1.metodologias"
     },
     {
       "id": "F1-MET-MOTIVO",
@@ -90,7 +141,8 @@
       "disparador": "fase1.metodologia",
       "orden": 100,
       "titulo": "Y ahora, ¿por qué?",
-      "texto": "Después de elegir, diga por qué. Cuidado: algunos motivos suenan bien pero no lo son. Cuenta tanto la elección como el motivo. Para decidir, vuelva a pensar en el encargo: ¿el cliente sabe lo que quiere?"
+      "texto": "Después de elegir, di por qué. Hay varias razones (baja para verlas todas). Cuidado: algunas suenan bien pero no lo son. Cuenta tanto la elección como el motivo. Para decidir, vuelve a pensar en el encargo: ¿el cliente sabe lo que quiere? ¿Va a cambiar de idea?",
+      "resaltar": "fase1.razones"
     },
     {
       "id": "F1-CAL-1",
@@ -98,8 +150,8 @@
       "disparador": "fase1.calidad",
       "orden": 110,
       "titulo": "Las fichas de calidad",
-      "texto": "Tiene pocas fichas y varias cosas que cuidar. Ponga fichas en lo que más importa. Lo que deje en cero es justo lo que puede fallar. No alcanza para todo: elegir es parte del juego.",
-      "mas": "Estas «cosas que cuidar» son atributos de calidad de la norma ISO 25010: que haga lo que se pidió, que sea fácil de usar, que no se caiga…",
+      "texto": "Tienes pocas fichas y varias cosas que cuidar. Pon fichas en lo que más importa para ESTE cliente. Lo que dejes en cero es justo lo que puede fallar. No alcanza para todo: elegir es parte del juego. Pulsa el «?» de cada una para saber qué es.",
+      "mas": "Estas «cosas que cuidar» son atributos de calidad de la norma ISO 25010: que haga lo que se pidió (adecuación funcional), que sea fácil de usar (usabilidad), que no se caiga (fiabilidad)…",
       "resaltar": "fase1.contenido"
     },
     {
@@ -108,8 +160,9 @@
       "disparador": "fase1.arquitectura",
       "orden": 120,
       "titulo": "¿Qué es la arquitectura?",
-      "texto": "La arquitectura es la forma de lo que va a construir, como el plano de una casa. Una casa grande no es mejor que una pequeña: depende de quién va a vivir en ella.",
-      "mas": "Elegir arquitectura es elegir qué es fácil y qué es difícil después: una arquitectura sencilla se construye y se mantiene rápido; una complicada aguanta más, pero necesita un equipo que sepa manejarla."
+      "texto": "La arquitectura es la forma de lo que vas a construir, como el plano de una casa. Una casa grande no es mejor que una pequeña: depende de quién va a vivir en ella.",
+      "mas": "Elegir arquitectura es elegir qué será fácil y qué será difícil después: una arquitectura sencilla se construye y se mantiene rápido; una complicada aguanta más, pero necesita un equipo que sepa manejarla. Se documenta en el SAD (documento de arquitectura).",
+      "resaltar": "fase1.contenido"
     },
     {
       "id": "F1-ARQ-2",
@@ -117,15 +170,16 @@
       "disparador": "fase1.arquitectura",
       "orden": 130,
       "titulo": "La pista está en el encargo",
-      "texto": "Relea el encargo: ¿cuántas personas lo van a usar? ¿Hay alguien que sepa de sistemas? ¿Se puede instalar algo? La respuesta está ahí. Después, elija el motivo."
+      "texto": "Relee el encargo: ¿cuántas personas lo van a usar? ¿Hay alguien que sepa de sistemas? ¿Se puede instalar algo? La respuesta está ahí. Cuando elijas una opción, abajo salen SUS razones: elige la que de verdad la justifica.",
+      "resaltar": "fase1.razones"
     },
     {
       "id": "F1-RES-1",
       "nivel": "nivel-00",
       "disparador": "fase1.resumen",
       "orden": 140,
-      "titulo": "Su plan",
-      "texto": "Aquí ve todo lo que eligió. Si algo no le convence, pulse «Cambiar». Cuando esté listo, pulse «Confirmar y empezar el nivel»: ya no se puede volver atrás.",
+      "titulo": "Tu plan",
+      "texto": "Aquí ves todo lo que elegiste. Si algo no te convence, pulsa «Cambiar». Cuando estés listo, pulsa «Confirmar y empezar el nivel»: ya no se puede volver atrás.",
       "resaltar": "fase1.confirmar"
     },
     {
@@ -134,7 +188,7 @@
       "disparador": "dia.antes",
       "orden": 150,
       "titulo": "Empieza el concurso",
-      "texto": "Son cinco días. Cada día el reloj avanza solo, desde las 9 hasta las 5. Arriba puede pausarlo o hacerlo ir más rápido (×2, ×4).",
+      "texto": "Son cinco días. Cada día el reloj avanza solo, desde las 9 hasta las 5. Arriba puedes pausarlo o hacerlo ir más rápido (×2, ×4). Con «Menú» puedes guardar y salir cuando quieras.",
       "resaltar": "dia.reloj"
     },
     {
@@ -143,7 +197,7 @@
       "disparador": "dia.antes",
       "orden": 160,
       "titulo": "Las tres columnas",
-      "texto": "A la izquierda, el mapa: dónde está y a dónde puede ir. En el centro, «Ahora»: siempre le dice qué pasa y qué puede hacer. A la derecha, cómo va su proyecto.",
+      "texto": "A la izquierda, el mapa: dónde estás y a dónde puedes ir. En el centro, «Ahora»: siempre te dice qué pasa y qué puedes hacer. A la derecha, cómo va tu proyecto.",
       "resaltar": "dia.ahora"
     },
     {
@@ -151,8 +205,9 @@
       "nivel": "nivel-00",
       "disparador": "dia.antes",
       "orden": 170,
-      "titulo": "Su proyecto",
-      "texto": "Estas barras son su proyecto. Avance: cuánto lleva hecho. Deuda técnica: los atajos que tendrá que pagar después. Moral: las ganas del equipo. Cobertura: cuánto está probado. Cansancio: si sube mucho, todo sale peor.",
+      "titulo": "Tu proyecto",
+      "texto": "Estas barras son tu proyecto. Avance: cuánto llevas hecho. Deuda técnica: los atajos que tendrás que pagar después. Moral: las ganas del equipo. Cobertura: cuánto está probado. Cansancio: si sube mucho, todo sale peor. Pulsa el «?» de cada una si dudas.",
+      "mas": "Debajo verás el «riesgo latente»: junta cansancio, deuda, lo que falta por probar y lo que falta por documentar. Con riesgo alto, el lanzamiento sale mal aunque hayas terminado todo.",
       "resaltar": "dia.proyecto"
     },
     {
@@ -161,7 +216,7 @@
       "disparador": "dia.antes",
       "orden": 180,
       "titulo": "¡A empezar!",
-      "texto": "Pulse «Empezar el día 1» en el centro.",
+      "texto": "Pulsa «Empezar el día 1» en el centro.",
       "resaltar": "dia.ahora",
       "esperaAccion": "empezar-dia",
       "pausaElReloj": false
@@ -171,8 +226,8 @@
       "nivel": "nivel-00",
       "disparador": "dia.1",
       "orden": 190,
-      "titulo": "Su escritorio",
-      "texto": "Está en su puesto de la sala del concurso: es su escritorio. Aquí le llegan los avisos, y solo aquí se pueden atender.",
+      "titulo": "Tu escritorio",
+      "texto": "Estás en tu puesto de la sala del concurso: es tu escritorio. Aquí te llegan los avisos, y solo aquí se pueden atender.",
       "resaltar": "dia.mapa"
     },
     {
@@ -180,10 +235,10 @@
       "nivel": "nivel-00",
       "disparador": "dia.1",
       "orden": 200,
-      "titulo": "Explore",
-      "texto": "Mientras no pase nada, puede explorar. Pulse «El pasillo de los concursantes» en el mapa.",
-      "resaltar": "mapa.pasillo",
-      "esperaAccion": "ir-a-zona:pasillo",
+      "titulo": "Explora",
+      "texto": "Mientras no pase nada, puedes explorar. Pulsa cualquier lugar del mapa, por ejemplo «El pasillo de los concursantes».",
+      "resaltar": "dia.mapa",
+      "esperaAccion": "ir-a-zona",
       "pausaElReloj": false
     },
     {
@@ -192,16 +247,35 @@
       "disparador": "mapa.zona",
       "orden": 210,
       "titulo": "Moverse cuesta tiempo",
-      "texto": "¿Vio que el reloj avanzó? Ir de un lugar a otro cuesta minutos. Cada lugar tiene algo que no está en otro: mire el recuadro «Aquí».",
+      "texto": "¿Viste que el reloj avanzó? Ir de un lugar a otro cuesta minutos. Cada lugar tiene algo que no está en otro: mira el recuadro «Aquí». Si hay alguien, puedes hablar con esa persona.",
       "resaltar": "dia.aqui"
+    },
+    {
+      "id": "CONV-1",
+      "nivel": "nivel-00",
+      "disparador": "conversacion",
+      "orden": 215,
+      "titulo": "Hablar con la gente",
+      "texto": "Cada conversación cuesta unos minutos. Si respondes bien (con lo que sabes de software y con buen trato), ganas su confianza. Con suficiente confianza, te ofrecen una ayuda para un reto o para tu día.",
+      "mas": "En un proyecto real, las relaciones con el equipo y con el cliente pesan tanto como lo técnico: quien confía en ti te avisa antes de los problemas.",
+      "resaltar": "dia.equipo"
+    },
+    {
+      "id": "AYUDA-1",
+      "nivel": "nivel-00",
+      "disparador": "ayuda.disponible",
+      "orden": 216,
+      "titulo": "¡Tienes una ayuda!",
+      "texto": "Alguien confía en ti y te ofrece una ayuda. La verás en el panel «Tu equipo». Las ayudas para retos se eligen en la receta, antes de jugar; las del día se usan desde el panel.",
+      "resaltar": "dia.equipo"
     },
     {
       "id": "COL-1",
       "nivel": "nivel-00",
       "disparador": "coleccionable",
       "orden": 220,
-      "titulo": "¡Encontró algo!",
-      "texto": "Esto se guarda en su Diario de Campo: cartas, códigos y consejos de verdad sobre cómo se hace el software. Puede leerlos cuando quiera con el botón «Diario».",
+      "titulo": "¡Encontraste algo!",
+      "texto": "Ya se guardó solo en tu Diario de Campo: cartas, códigos y consejos de verdad sobre cómo se hace el software. Puedes leerlos cuando quieras con el botón «Diario».",
       "resaltar": "dia.diario"
     },
     {
@@ -209,19 +283,17 @@
       "nivel": "nivel-00",
       "disparador": "coleccionable",
       "orden": 230,
-      "titulo": "Vuelva a su escritorio",
-      "texto": "Ahora vuelva a «La sala del concurso». Recuerde: los avisos solo se atienden desde su escritorio.",
-      "resaltar": "mapa.sala-de-concurso",
-      "esperaAccion": "ir-a-zona:sala-de-concurso",
-      "pausaElReloj": false
+      "titulo": "Recuerda tu escritorio",
+      "texto": "Los avisos solo se atienden desde tu escritorio («La sala del concurso»). Si te alejas mucho, puedes llegar tarde cuando suene uno.",
+      "resaltar": "mapa.sala-de-concurso"
     },
     {
       "id": "OFI-1",
       "nivel": "nivel-00",
       "disparador": "oficina.disponible",
       "orden": 240,
-      "titulo": "Trabajo en su escritorio",
-      "texto": "Cuando no pasa nada, puede trabajar. En «Trabajo en tu escritorio» hay tareas cortas: cuestan tiempo, pero ayudan al proyecto. Son práctica: no cuentan para su nota.",
+      "titulo": "Trabajo en tu escritorio",
+      "texto": "Cuando no pasa nada, puedes trabajar. En «Trabajo en tu escritorio» hay tareas cortas: cuestan tiempo, pero ayudan al proyecto. Son práctica: no cuentan para tu nota, y aquí te corrijo al momento.",
       "resaltar": "dia.oficina"
     },
     {
@@ -230,7 +302,7 @@
       "disparador": "oficina.hecha",
       "orden": 250,
       "titulo": "Trabajo hecho",
-      "texto": "¿Vio cómo cambió una barra a la derecha? Cada tarea mejora algo distinto. Cada una se puede hacer una vez al día.",
+      "texto": "¿Viste cómo cambió una barra a la derecha? Cada tarea mejora algo distinto. Cada una se puede hacer una vez al día.",
       "resaltar": "dia.proyecto"
     },
     {
@@ -239,8 +311,8 @@
       "disparador": "cierre",
       "orden": 260,
       "titulo": "Son las cinco",
-      "texto": "Se acabó la jornada. Puede irse a casa (usted y el equipo descansan) o quedarse dos horas más (avanza más, pero se cansa y mañana rinde menos).",
-      "mas": "Quedarse a menudo es como pedir prestado: hoy avanza, pero lo paga después con intereses (cansancio, errores y deuda técnica)."
+      "texto": "Se acabó la jornada. Puedes irte a casa (tú y el equipo descansan) o quedarte dos horas más (avanzas más, pero te cansas y mañana rindes menos).",
+      "mas": "Quedarse a menudo es como pedir prestado: hoy avanzas, pero lo pagas después con intereses (cansancio, errores y deuda técnica)."
     },
     {
       "id": "CIERRE-2",
@@ -248,7 +320,7 @@
       "disparador": "cierre",
       "orden": 270,
       "titulo": "Hoy, a casa",
-      "texto": "Esta vez, pulse «Irme a casa».",
+      "texto": "Esta vez te recomiendo pulsar «Irme a casa». Si decides quedarte, también vale: lo verás en el cansancio.",
       "resaltar": "dia.ahora",
       "esperaAccion": "irse",
       "pausaElReloj": false
@@ -259,7 +331,7 @@
       "disparador": "resumen",
       "orden": 280,
       "titulo": "El resumen del día",
-      "texto": "Aquí ve qué cambió hoy. Ojo: que un número suba no siempre es bueno. Si suben la deuda o el cansancio, es malo. La partida se guarda sola al final de cada día."
+      "texto": "Aquí ves qué cambió hoy. Ojo: que un número suba no siempre es bueno. Si suben la deuda o el cansancio, es malo. La partida se guarda sola al final de cada día."
     },
     {
       "id": "DIA2-1",
@@ -267,7 +339,7 @@
       "disparador": "dia.2",
       "orden": 290,
       "titulo": "Los avisos",
-      "texto": "Hoy puede llegar un aviso. Lo verá en el centro, con una cuenta atrás. Si lo deja caducar, alguien decide por usted, y casi nunca bien."
+      "texto": "Hoy puede llegar un aviso. Lo verás en el centro, con una cuenta atrás. Si lo dejas caducar, alguien decide por ti, y casi nunca bien."
     },
     {
       "id": "ALERTA-1",
@@ -275,7 +347,7 @@
       "disparador": "alerta.suena",
       "orden": 300,
       "titulo": "¡Llegó un aviso!",
-      "texto": "Tiene un tiempo para atenderlo. Pulse «Atender» en el centro. El reloj NO se para mientras decide si ir.",
+      "texto": "Tienes un tiempo para atenderlo. Pulsa «Atender» en el centro. El reloj NO se para mientras decides si ir.",
       "resaltar": "dia.ahora",
       "esperaAccion": "atender",
       "pausaElReloj": false
@@ -285,8 +357,8 @@
       "nivel": "nivel-00",
       "disparador": "alerta.lejos",
       "orden": 310,
-      "titulo": "Está lejos de su escritorio",
-      "texto": "El aviso llegó y usted no está en su escritorio. Volver cuesta minutos, y por el camino el aviso puede caducar. Por eso conviene no alejarse mucho cuando se espera algo."
+      "titulo": "Estás lejos de tu escritorio",
+      "texto": "El aviso llegó y no estás en tu escritorio. Volver cuesta minutos, y por el camino el aviso puede caducar. Por eso conviene no alejarse mucho cuando se espera algo."
     },
     {
       "id": "DECISION-1",
@@ -294,8 +366,9 @@
       "disparador": "decision.abierta",
       "orden": 320,
       "titulo": "Hay que decidir",
-      "texto": "Elija una opción. Debajo de cada una ve lo que cambia AHORA. Lo que pasa días después no se ve: piense qué puede venir.",
-      "mas": "Muchas decisiones en un proyecto tienen consecuencias diferidas: un atajo hoy puede volver como un problema en unos días. El juego las recuerda."
+      "texto": "Elige una opción. Debajo de cada una ves lo que cambia AHORA. Lo que pasa días después no se ve: piensa qué puede venir. Un atajo que hoy sube el avance puede volver mañana como un problema.",
+      "mas": "Muchas decisiones en un proyecto tienen consecuencias diferidas: un atajo hoy puede volver como un problema en unos días. El juego las recuerda, y se ven en el lanzamiento.",
+      "resaltar": "dia.ahora"
     },
     {
       "id": "DECISION-2",
@@ -303,7 +376,7 @@
       "disparador": "decision.hecha",
       "orden": 330,
       "titulo": "¿Estuvo bien?",
-      "texto": "El juego no le dice ahora si acertó. Se lo explica al final del nivel, en el Dashboard de Lecciones. Así se decide pensando en el proyecto, no adivinando la nota."
+      "texto": "No te digo ahora si acertaste: lo verás en sus consecuencias (en las barras, en los próximos días y en el lanzamiento) y te lo explico al final, en Lecciones. Así decides pensando en el proyecto, no adivinando la nota."
     },
     {
       "id": "MJ-1",
@@ -311,116 +384,206 @@
       "disparador": "minijuego.presentacion",
       "orden": 340,
       "titulo": "Un reto",
-      "texto": "Esto es un ticket con un reto (un minijuego). Lea quién espera y cuánto tiempo tiene. El reloj empieza cuando pulse «Empezar»."
-    },
-    {
-      "id": "MJ-2",
-      "nivel": "nivel-00",
-      "disparador": "minijuego.jugando",
-      "orden": 350,
-      "titulo": "Cómo se juega",
-      "texto": "Pinche la pieza o la flecha que tiene un problema. Después pulse, a la derecha, el nombre del problema. Si se equivoca, puede quitar la marca. Cuando termine, pulse «Entregar».",
-      "mas": "Marcar algo que está bien también cuenta en contra: revisar no es sospechar de todo, es saber distinguir.",
-      "resaltar": "mj.tablero"
+      "texto": "Esto es un reto (un minijuego). Primero sale la receta: te explica con dibujos cómo se juega. La primera vez que juegues cada reto, yo te guío paso a paso arriba del tablero: haz lo que te diga y fíjate en el porqué, que la próxima vez lo harás tú solo. Mientras te guío, el reloj no corre."
     },
     {
       "id": "MJ-3",
       "nivel": "nivel-00",
       "disparador": "minijuego.cierre",
-      "orden": 360,
+      "orden": 370,
       "titulo": "El resultado",
-      "texto": "Aquí ve qué encontró y qué se le escapó, y por qué. Esto sí se lo dice al momento: sirve para aprender a mirar."
+      "texto": "Aquí ves cómo te fue, por qué, y lo que tienes que mirar la próxima vez. Léelo: es lo que te llevas para cuando lo juegues sin ayuda."
     },
     {
       "id": "PLAN-1",
       "nivel": "nivel-00",
       "disparador": "planificacion",
-      "orden": 370,
+      "orden": 380,
       "titulo": "Planificar el sprint",
-      "texto": "Empieza un sprint: el equipo promete cuánto va a hacer. Si promete más de lo que puede, se acumula deuda técnica cada día."
+      "texto": "Empieza un sprint: el equipo promete cuánto va a hacer. Si promete más de lo que puede, se acumula deuda técnica cada día. Lo sugerido suele ser lo sensato.",
+      "mas": "Esto es estimar: calcular cuánto trabajo cabe en un tiempo. Prometer de más es el error más común en los proyectos reales.",
+      "resaltar": "dia.ahora"
     },
     {
       "id": "RETRO-1",
       "nivel": "nivel-00",
       "disparador": "retro",
-      "orden": 380,
+      "orden": 390,
       "titulo": "La retrospectiva",
-      "texto": "Terminó un sprint: el equipo mira cómo trabajó y elige UNA cosa para mejorar. Lo que elija cambia cómo trabajan desde hoy."
+      "texto": "Terminó un sprint: el equipo mira cómo trabajó y elige UNA cosa para mejorar. Lo que elijas cambia cómo trabajan desde hoy.",
+      "resaltar": "dia.ahora"
     },
     {
       "id": "DIA3-1",
       "nivel": "nivel-00",
       "disparador": "dia.3",
-      "orden": 390,
-      "titulo": "Ya sabe lo básico",
-      "texto": "Explorar, atender avisos, decidir y trabajar en su escritorio. Hoy puede llegar un reto, y desde hoy el auditorio está abierto."
+      "orden": 400,
+      "titulo": "Ya sabes lo básico",
+      "texto": "Explorar, hablar con la gente, atender avisos, decidir y trabajar en tu escritorio. Hoy puede llegar un reto, y desde hoy el auditorio está abierto."
     },
     {
       "id": "DIA4-1",
       "nivel": "nivel-00",
       "disparador": "dia.4",
-      "orden": 400,
+      "orden": 410,
       "titulo": "Quedarse o no",
-      "texto": "Hoy fíjese en la barra de «Cansancio». Si se queda muchas noches, sube, y cuando está alta todo sale peor.",
+      "texto": "Hoy fíjate en la barra de «Cansancio». Si te quedas muchas noches, sube, y cuando está alta todo sale peor (y el riesgo del lanzamiento sube).",
       "resaltar": "dia.proyecto"
     },
     {
       "id": "DIA5-1",
       "nivel": "nivel-00",
       "disparador": "dia.5",
-      "orden": 410,
+      "orden": 420,
       "titulo": "El último día",
-      "texto": "Hoy se entrega. Lo que tenga a las cinco es lo que se evalúa. Después viene el lanzamiento."
+      "texto": "Hoy se entrega. Lo que tengas a las cinco es lo que llega al cliente. Después viene el lanzamiento, y ahí se ve si tus decisiones fueron buenas."
     },
     {
       "id": "PRORROGA-1",
       "nivel": "nivel-00",
       "disparador": "prorroga",
-      "orden": 420,
+      "orden": 430,
       "titulo": "Horas extra",
-      "texto": "Se quedó. Hasta la hora límite no llegan avisos: aproveche para explorar lo que le falta."
+      "texto": "Te quedaste. Hasta la hora límite no llegan avisos: aprovecha para explorar o hablar con quien quede. Cuando quieras, pulsa «Irme ya»."
     },
     {
       "id": "LANZ-1",
       "nivel": "nivel-00",
       "disparador": "lanzamiento",
-      "orden": 430,
+      "orden": 440,
       "titulo": "El lanzamiento",
-      "texto": "El trabajo se entregó. Aquí ve qué llegó al cliente y cuántos errores encontró. Todo lo que hizo en los cinco días cuenta aquí."
+      "texto": "El trabajo se entregó. Aquí ves qué llegó al cliente, cuántos errores encontró, cuánto riesgo cargaba y lo contento que quedó. Con todo eso se decide si salió bien, con problemas o mal, y qué decisiones pesaron más."
     },
     {
       "id": "LECC-1",
       "nivel": "nivel-00",
       "disparador": "lecciones",
-      "orden": 440,
-      "titulo": "El Dashboard de Lecciones",
-      "texto": "Esto es lo más importante del nivel: cada decisión con su nota y POR QUÉ. Léalo con calma: lo que aprenda aquí le sirve en los niveles siguientes.",
+      "orden": 450,
+      "titulo": "Las Lecciones",
+      "texto": "Esto es lo más importante del nivel: cada decisión con su nota y POR QUÉ. Léelo con calma: lo que aprendas aquí te sirve en los niveles siguientes.",
       "resaltar": "lecciones.decisiones"
     },
     {
       "id": "LECC-2",
       "nivel": "nivel-00",
       "disparador": "lecciones",
-      "orden": 450,
-      "titulo": "Sus competencias",
-      "texto": "Este gráfico muestra en qué temas le fue bien y en cuáles no. Cuanto más grande la figura, mejor.",
+      "orden": 460,
+      "titulo": "Tus competencias",
+      "texto": "Este gráfico muestra en qué temas te fue bien y en cuáles no. Cuanto más grande la figura, mejor.",
       "resaltar": "lecciones.radar"
     },
     {
       "id": "LECC-3",
       "nivel": "nivel-00",
       "disparador": "lecciones",
-      "orden": 460,
+      "orden": 470,
       "titulo": "Lo que viene",
-      "texto": "En los siguientes niveles todo funciona igual, pero nadie le va a explicar nada. Si se pierde, el botón «¿Qué hago ahora?» repite la última ayuda."
+      "texto": "En el siguiente nivel todo funciona igual, pero yo hablaré mucho menos: ya sabes jugar. Si te pierdes, «¿Qué hago ahora?» te lo vuelve a explicar."
     },
     {
       "id": "DIARIO-1",
       "nivel": "nivel-00",
       "disparador": "diario",
-      "orden": 470,
-      "titulo": "Su Diario de Campo",
-      "texto": "Aquí está todo lo que ha encontrado, en todas sus partidas. Lo que falta sale como «???»: ¡a buscarlo!"
+      "orden": 480,
+      "titulo": "Tu Diario de Campo",
+      "texto": "Aquí está todo lo que has encontrado, en todas tus partidas. Lo que falta sale como «???»: ¡a buscarlo!"
+    },
+    {
+      "id": "N1-F1-1",
+      "nivel": "nivel-01",
+      "disparador": "fase1.encargo",
+      "orden": 10,
+      "titulo": "Un cliente de verdad",
+      "texto": "Esto ya no es un concurso: hay un cliente real y más en juego. Todo funciona como en el tutorial; esta vez decides tú solo. Recuerda: las restricciones del encargo deciden casi todo.",
+      "resaltar": "fase1.contenido"
+    },
+    {
+      "id": "N1-F1-2",
+      "nivel": "nivel-01",
+      "disparador": "fase1.arquitectura",
+      "orden": 20,
+      "titulo": "Más opciones, más razones",
+      "texto": "Aquí hay más arquitecturas y cada una trae sus propias razones. Baja hasta ver todas antes de elegir.",
+      "resaltar": "fase1.razones"
+    },
+    {
+      "id": "N1-DIA-1",
+      "nivel": "nivel-01",
+      "disparador": "dia.antes",
+      "orden": 30,
+      "titulo": "Un edificio más grande",
+      "texto": "Hay más lugares y más gente. Cada persona sabe algo distinto: habla con ellos para ganar su confianza, y te ayudarán en los momentos difíciles. Algunos lugares se abren más adelante.",
+      "resaltar": "dia.mapa"
+    },
+    {
+      "id": "N1-DIA-2",
+      "nivel": "nivel-01",
+      "disparador": "dia.antes",
+      "orden": 40,
+      "titulo": "Los retos ya no corrigen al momento",
+      "texto": "En este nivel los retos no te dicen si vas bien mientras juegas: lo verás al entregar. Si un compañero confía en ti, puede darte una pista.",
+      "resaltar": "dia.ahora"
+    },
+    {
+      "id": "N1-CONV-1",
+      "nivel": "nivel-01",
+      "disparador": "ayuda.disponible",
+      "orden": 50,
+      "titulo": "Una ayuda nueva",
+      "texto": "Alguien del equipo te ofrece una ayuda. Está en el panel «Tu equipo»; las de los retos se eligen en la receta.",
+      "resaltar": "dia.equipo"
+    },
+    {
+      "id": "N1-LANZ-1",
+      "nivel": "nivel-01",
+      "disparador": "lanzamiento",
+      "orden": 60,
+      "titulo": "Sin red",
+      "texto": "Este lanzamiento es más exigente que el del concurso. Mira qué decisiones pesaron más: es lo que te llevas al siguiente nivel."
+    },
+    {
+      "id": "AYUDA-FASE1",
+      "nivel": "*",
+      "disparador": "ayuda.fase1",
+      "orden": 900,
+      "titulo": "Planear antes de construir",
+      "texto": "Estás planeando el proyecto. Recorre los pasos de arriba de izquierda a derecha: en cada uno elige una opción y su razón, y pulsa «Siguiente». Nada queda decidido hasta «Confirmar». Pulsa los «?» para ver qué significa cada palabra.",
+      "resaltar": "fase1.pasos"
+    },
+    {
+      "id": "AYUDA-DIA",
+      "nivel": "*",
+      "disparador": "ayuda.dia",
+      "orden": 901,
+      "titulo": "¿Qué hago en el día?",
+      "texto": "Mira el centro, «Ahora»: siempre dice qué toca. Si no pasa nada, puedes moverte por el mapa, hablar con la gente que haya o trabajar en tu escritorio. Si suena un aviso, vuelve a tu escritorio y atiéndelo antes de que caduque.",
+      "resaltar": "dia.ahora"
+    },
+    {
+      "id": "AYUDA-MJ",
+      "nivel": "*",
+      "disparador": "ayuda.minijuego",
+      "orden": 902,
+      "titulo": "¿Cómo era este reto?",
+      "texto": "Pulsa «Receta» arriba: te explica con dibujos cómo se juega y el reloj se para mientras la lees. Cuando termines, pulsa el botón de entregar.",
+      "resaltar": "mj.tablero"
+    },
+    {
+      "id": "AYUDA-LECC",
+      "nivel": "*",
+      "disparador": "ayuda.lecciones",
+      "orden": 903,
+      "titulo": "Lo que salió",
+      "texto": "Aquí se explica qué salió y por qué. Lee cada decisión con su razón: es lo que te llevas para el siguiente nivel."
+    },
+    {
+      "id": "INC-1",
+      "nivel": "nivel-00",
+      "disparador": "incidencia",
+      "orden": 285,
+      "titulo": "Tus barras tienen consecuencias",
+      "texto": "Lo que acaba de pasar no es mala suerte: lo provocó una de tus barras. Cada barra del proyecto, no solo el avance, cambia lo que pasa cada día. Mira debajo de cada una qué está provocando ahora, y el «Pronóstico del lanzamiento»: te dice cómo saldría si entregaras así.",
+      "resaltar": "dia.pronostico"
     }
   ]
 }

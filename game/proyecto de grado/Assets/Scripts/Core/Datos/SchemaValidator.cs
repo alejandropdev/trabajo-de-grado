@@ -232,6 +232,7 @@ namespace Nexus.Core.Datos {
             ValidarJornada(id, p.Jornada, e);
             ValidarMapa(id, p.Mapa, e);
             ValidarFase1(id, p.Fase1, e);
+            ValidarProyecto(id, p.Proyecto, e);
             return e;
         }
 
@@ -239,6 +240,26 @@ namespace Nexus.Core.Datos {
         /// El mapa recorrible (§3.6). Un nivel puede no tener mapa — entonces no hay exploracion y
         /// todo ocurre en el escritorio — pero si lo tiene, tiene que sostenerse.
         /// </summary>
+        /// <summary>El expediente es opcional; si esta, tiene que ser coherente (sus flujos apuntan a piezas que existen).</summary>
+        private static void ValidarProyecto(string id, Nexus.Core.Proyecto.FichaDelProyecto f, List<string> e) {
+            if (f == null) return;
+            if (string.IsNullOrEmpty(f.Nombre)) e.Add($"{id}: el 'proyecto' no tiene 'nombre'.");
+            if (f.Modulos == null || f.Modulos.Count == 0) { e.Add($"{id}: el 'proyecto' no tiene 'modulos'."); return; }
+            var ids = new HashSet<string>();
+            foreach (var m in f.Modulos) {
+                if (string.IsNullOrEmpty(m.Id) || !ids.Add(m.Id)) e.Add($"{id}: modulo sin id o con id repetido ('{m.Id}').");
+                if (m.AvanceInicial < 0 || m.AvanceInicial > 100) e.Add($"{id}: el modulo '{m.Id}' tiene 'avanceInicial' fuera de 0-100.");
+                if (m.Peso <= 0) e.Add($"{id}: el modulo '{m.Id}' tiene 'peso' {m.Peso}; tiene que ser positivo.");
+            }
+            if (f.Contexto != null)
+                foreach (var fl in f.Contexto.Flujos)
+                    if (f.NombreDePieza(fl.Desde) == null || f.NombreDePieza(fl.Hasta) == null)
+                        e.Add($"{id}: el flujo '{fl.Desde}' -> '{fl.Hasta}' del contexto apunta a algo que no es ni actor ni modulo.");
+            foreach (var u in f.Usuarios)
+                if (!string.IsNullOrEmpty(u.Modulo) && f.Modulo(u.Modulo) == null)
+                    e.Add($"{id}: el usuario '{u.Nombre}' apunta al modulo '{u.Modulo}', que no existe.");
+        }
+
         private static void ValidarMapa(string id, MapaDeZonas mapa, List<string> e) {
             if (mapa == null || mapa.Vacio) return;
 
@@ -373,6 +394,13 @@ namespace Nexus.Core.Datos {
                 if (string.IsNullOrEmpty(a.Razon))
                     e.Add($"{id}: la arquitectura '{a.Id}' no explica su veredicto.");
 
+                if (a.Razones != null && a.Razones.Count > 0) {
+                    foreach (var r in a.Razones)
+                        if (!razones.Contains(r)) e.Add($"{id}: la arquitectura '{a.Id}' ofrece la razon '{r}', que no esta en razonesDisponibles.");
+                    foreach (var r in (a.RazonesValidas ?? new List<string>()).Concat(a.RazonesTrampa ?? new List<string>()))
+                        if (!a.Razones.Contains(r)) e.Add($"{id}: la arquitectura '{a.Id}' evalua la razon '{r}' pero no la ofrece.");
+                    if (a.Razones.Count < 3) e.Add($"{id}: la arquitectura '{a.Id}' ofrece menos de 3 razones: no hay nada que pensar.");
+                }
                 ValidarEfectos(a.Efectos, $"{id}: arquitectura '{a.Id}'", e);
                 if (a.FlagsAlCerrar != null)
                     foreach (var kv in a.FlagsAlCerrar)
@@ -733,8 +761,89 @@ namespace Nexus.Core.Datos {
             ValidarColeccionablesEnElMapa(catalogo, e);
             ValidarRecoleccionYOficina(catalogo, fuente, e);
             ValidarGuia(catalogo, e);
+            ValidarGlosario(catalogo, e);
+            ValidarRelaciones(catalogo, e);
+            ValidarIncidencias(catalogo, e);
 
             return e;
+        }
+
+        // ============================================================ glosario y relaciones
+
+        /// <summary>Las incidencias del estado: un stock que exista, un comparador que se entienda, efectos validos.</summary>
+        private static void ValidarIncidencias(Catalogo c, List<string> e) {
+            foreach (var nivel in c.Niveles.Values) {
+                if (nivel.Incidencias == null) continue;
+                var ids = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var inc in nivel.Incidencias) {
+                    if (inc == null || string.IsNullOrEmpty(inc.Id)) { e.Add($"{nivel.Id}: hay una incidencia sin 'id'."); continue; }
+                    var donde = $"{nivel.Id}/incidencia {inc.Id}";
+                    if (!ids.Add(inc.Id)) e.Add($"{donde}: el id esta repetido.");
+                    if (!WorldState.EsStock(inc.Estadistica)) e.Add($"{donde}: '{inc.Estadistica}' no es un stock del WorldState.");
+                    if (inc.Comparador != ">=" && inc.Comparador != "<=") e.Add($"{donde}: el comparador '{inc.Comparador}' no existe (>= o <=).");
+                    if (string.IsNullOrEmpty(inc.Titulo) || string.IsNullOrEmpty(inc.Texto)) e.Add($"{donde}: falta 'titulo' o 'texto'.");
+                    ValidarEfectos(inc.Efectos, donde, e);
+                }
+            }
+        }
+
+        private static void ValidarGlosario(Catalogo c, List<string> e) {
+            if (c.Glosario == null) return;
+            var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var t in c.Glosario) {
+                if (t == null || string.IsNullOrEmpty(t.Id)) { e.Add("glosario: hay un termino sin 'id'."); continue; }
+                if (!ids.Add(t.Id)) e.Add($"glosario/{t.Id}: el id esta repetido.");
+                if (string.IsNullOrEmpty(t.Termino) || string.IsNullOrEmpty(t.Definicion))
+                    e.Add($"glosario/{t.Id}: falta 'termino' o 'definicion'.");
+                if (t.Paginas == null || t.Paginas.Count == 0) continue;
+                if (t.Paginas.Count < 2) e.Add($"glosario/{t.Id}: un pizarrón necesita al menos dos páginas.");
+                if (!t.Paginas.Any(p => p != null && p.EnElJuego)) e.Add($"glosario/{t.Id}: falta la página que dice dónde se ve en el juego.");
+                foreach (var p in t.Paginas.Where(x => x != null))
+                    foreach (var v in p.Vinetas ?? new List<VinetaDePizarra>())
+                        if (v == null || !IconosDePizarra.Existe(v.Icono)) e.Add($"glosario/{t.Id}: el icono '{v?.Icono}' no existe.");
+            }
+        }
+
+        private static void ValidarRelaciones(Catalogo c, List<string> e) {
+            var rel = c.Relaciones;
+            if (rel == null) return;
+            var censo = new HashSet<string>(c.Flags.Select(f => f.Id), StringComparer.Ordinal);
+            var personajes = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var p in rel.Personajes) {
+                if (p == null || string.IsNullOrEmpty(p.Id)) { e.Add("relaciones: hay un personaje sin 'id'."); continue; }
+                var donde = "relaciones/" + p.Id;
+                if (!personajes.Add(p.Id)) e.Add($"{donde}: el id esta repetido.");
+                if (!string.IsNullOrEmpty(p.FlagAlCerrar) && !censo.Contains(p.FlagAlCerrar))
+                    e.Add($"{donde}: el flag '{p.FlagAlCerrar}' no esta en el censo.");
+                foreach (var a in p.Ayudas)
+                    if (a == null || !Nexus.Core.Relaciones.TiposDeAyuda.EsValido(a.Tipo) || a.Umbral <= 0)
+                        e.Add($"{donde}: una ayuda tiene un tipo desconocido ('{a?.Tipo}') o un umbral no positivo.");
+                    else if (p.Persistente && a.Umbral < 6)
+                        e.Add($"{donde}: sigue en otros niveles, asi que su confianza se acumula: sus ayudas piden 6 o mas (esta pide {a.Umbral}).");
+                foreach (var ch in p.Charlas) {
+                    if (ch == null || !WorldState.EsStock(ch.Estadistica)) { e.Add($"{donde}: una charla habla de '{ch?.Estadistica}', que no es un stock."); continue; }
+                    if (ch.Tramos.Count == 0 || ch.Tramos.Max(t => t.Hasta) < 100)
+                        e.Add($"{donde}: la charla de {ch.Estadistica} no cubre todos los valores (el ultimo tramo tiene que llegar a 100).");
+                }
+            }
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var cv in rel.Conversaciones) {
+                if (cv == null || string.IsNullOrEmpty(cv.Id)) { e.Add("relaciones: hay una conversacion sin 'id'."); continue; }
+                var donde = "conversacion/" + cv.Id;
+                if (!ids.Add(cv.Id)) e.Add($"{donde}: el id esta repetido.");
+                if (!personajes.Contains(cv.Personaje ?? "")) e.Add($"{donde}: el personaje '{cv.Personaje}' no existe.");
+                LevelProfile nivel;
+                if (!c.Niveles.TryGetValue(cv.Nivel ?? "", out nivel)) { e.Add($"{donde}: el nivel '{cv.Nivel}' no existe."); continue; }
+                if (nivel.Mapa == null || nivel.Mapa.PorId(cv.Zona) == null) e.Add($"{donde}: la zona '{cv.Zona}' no esta en el mapa de {nivel.Id}.");
+                if (cv.DiaDesde < 1 || cv.DiaHasta < cv.DiaDesde) e.Add($"{donde}: la ventana de dias no tiene sentido.");
+                if (cv.Minutos < 0) e.Add($"{donde}: 'minutos' no puede ser negativo.");
+                if (cv.Pregunta != null) {
+                    if (cv.Pregunta.Opciones.Count < 2) e.Add($"{donde}: una pregunta necesita al menos dos respuestas.");
+                    if (!cv.Pregunta.Opciones.Any(o => o.Confianza > 0)) e.Add($"{donde}: ninguna respuesta da confianza.");
+                    if (cv.Pregunta.Opciones.Any(o => string.IsNullOrEmpty(o.Respuesta)))
+                        e.Add($"{donde}: cada respuesta necesita su 'respuesta' (es la explicacion).");
+                }
+            }
         }
 
         // ============================================================ la guia del tutorial
@@ -746,8 +855,10 @@ namespace Nexus.Core.Datos {
                 if (p == null || string.IsNullOrEmpty(p.Id)) { e.Add("guia: hay un paso sin 'id'."); continue; }
                 var donde = "guia/" + p.Id;
                 if (!ids.Add(p.Id)) e.Add($"{donde}: el id esta repetido.");
-                LevelProfile nivel;
-                if (string.IsNullOrEmpty(p.Nivel) || !c.Niveles.TryGetValue(p.Nivel, out nivel)) {
+                LevelProfile nivel = null;
+                if (p.Nivel == PasoDeGuia.TodosLosNiveles) {
+                    if (!string.IsNullOrEmpty(p.EsperaAccion)) e.Add($"{donde}: un paso de todos los niveles no puede esperar una accion.");
+                } else if (string.IsNullOrEmpty(p.Nivel) || !c.Niveles.TryGetValue(p.Nivel, out nivel)) {
                     e.Add($"{donde}: el nivel '{p.Nivel}' no existe.");
                     nivel = null;
                 }

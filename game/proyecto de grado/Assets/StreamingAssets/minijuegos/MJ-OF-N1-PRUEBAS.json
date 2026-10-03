@@ -4,15 +4,18 @@
   "lienzo": "depositos",
   "temaPrincipal": "PTP",
   "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "reservas",
+  "enElProyecto": "Es el plan de pruebas del módulo de reservas: fechas, franjas y choques, que es donde más se equivoca un programa.",
   "presentacion": {
     "titulo": "Práctica: probar las reservas",
-    "comoSeJuega": "Tienes 30 horas para probar el módulo de reservas. Repártelas entre los cuatro tipos de prueba.",
+    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 32 horas para el módulo de reservas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. Ganas si al cliente le llega como mucho 1 error.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
-    "segundosReloj": 100
+    "segundosReloj": 120
   },
   "repartir": {
-    "presupuesto": 30,
+    "presupuesto": 32,
+    "paso": 2,
     "unidad": "horas",
     "toleranciaDeEscapes": 1,
     "depositos": [
@@ -21,28 +24,32 @@
         "nombre": "Unitarias",
         "costePorDefecto": 2,
         "defectosOcultos": 5,
-        "descripcion": "Mucha lógica de fechas y turnos: cada regla por separado."
+        "descripcion": "Prueban cada función por separado. Baratas. Hay mucha lógica de fechas y turnos, y cada regla puede fallar sola.",
+        "pista": "Mucha lógica nueva: suele haber 4 o 5 errores."
       },
       {
         "id": "integracion",
         "nombre": "Integración",
         "costePorDefecto": 4,
         "defectosOcultos": 3,
-        "descripcion": "Las reservas con la base de datos y con el controlador del ascensor."
+        "descripcion": "Prueban que las piezas hablen entre sí: las reservas con la base de datos y con el controlador del ascensor.",
+        "pista": "Dos conexiones nuevas: suele haber unos 3 errores."
       },
       {
         "id": "regresion",
         "nombre": "Regresión",
         "costePorDefecto": 3,
         "defectosOcultos": 3,
-        "descripcion": "Que lo de la barrera, que ya funcionaba, siga funcionando."
+        "descripcion": "Vuelven a probar lo que ya funcionaba (la barrera) para ver que el cambio no lo rompió.",
+        "pista": "Se tocó código viejo: suele haber 2 o 3 errores."
       },
       {
         "id": "e2e",
         "nombre": "De extremo a extremo",
         "costePorDefecto": 6,
         "defectosOcultos": 1,
-        "descripcion": "Una reserva de verdad, del portal al ascensor."
+        "descripcion": "Una reserva de verdad, del portal al ascensor, como la haría un usuario. Caras.",
+        "pista": "Si lo demás está bien probado, aquí queda como mucho 1."
       }
     ]
   },
@@ -54,7 +61,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-TEST-01",
-        "razon": "Las horas fueron donde estaba el riesgo."
+        "razon": "Las horas fueron donde había más errores y más baratos de atrapar. Dejar fuera la prueba más cara y con menos errores fue una decisión, no un olvido: eso es planificar pruebas."
       }
     },
     "parcial": {
@@ -64,7 +71,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-TEST-01",
-        "razon": "Escaparon errores de donde invertiste poco."
+        "razon": "Se escaparon errores de los tipos donde pusiste pocas horas. Truco: primero cubre los tipos baratos con muchos errores; lo caro, al final y solo si sobra."
       }
     },
     "falsoPositivo": {
@@ -74,7 +81,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-TEST-01",
-        "razon": "Sobraron horas en un tipo mientras otro se quedó a cero."
+        "razon": "Pusiste más horas de las que servían en un tipo y dejaste otro, con errores, en cero. Esas horas de más no atraparon nada."
       }
     },
     "omitido": {
@@ -84,11 +91,11 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-TEST-01",
-        "razon": "No se probó nada."
+        "razon": "No repartiste ninguna hora: todos los errores le llegan al cliente."
       }
     }
   },
   "cierre": {
-    "texto": "Práctica terminada."
+    "texto": "Probar no es probarlo todo: es decidir a propósito qué se prueba primero y qué se deja fuera."
   }
 }
