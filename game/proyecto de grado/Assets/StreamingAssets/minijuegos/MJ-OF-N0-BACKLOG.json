@@ -6,93 +6,66 @@
   "objetivoAprendizaje": "OA-SCRUM-01",
   "presentacion": {
     "titulo": "Práctica: ¿qué hacemos primero?",
-    "comoSeJuega": "Ordena las tarjetas: arriba lo más importante. Solo entran las que caben en el tiempo de hoy (la línea). Ojo: hay tarjetas que necesitan otra antes.",
+    "comoSeJuega": "Un backlog es la lista de cosas por hacer, ordenada de lo más importante a lo menos. Arrastra las tarjetas (o usa ▲▼): arriba las de más «valor». Solo entra lo que cabe sobre la línea, que es el tiempo de hoy. Ojo: algunas tarjetas necesitan otra antes (no se puede guardar a un concursante sin el formulario). Al final, contesta a Marisol y mira qué cambia en el tablero.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
-    "segundosReloj": 90
+    "segundosReloj": 120
   },
   "ordenar": {
     "capacidad": 8,
     "umbralDeValor": 0.75,
     "peticion": "Marisol pregunta si también te da tiempo a poner los colores de la marca del concurso.",
+    "tarjetaPedida": "t4",
     "tarjetas": [
-      {
-        "id": "t1",
-        "titulo": "Formulario de inscripción",
-        "valor": 5,
-        "esfuerzo": 3
-      },
-      {
-        "id": "t2",
-        "titulo": "Guardar a los concursantes",
-        "valor": 6,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t1"
-        ]
-      },
-      {
-        "id": "t3",
-        "titulo": "Pantalla del jurado",
-        "valor": 4,
-        "esfuerzo": 3,
-        "dependeDe": [
-          "t2"
-        ]
-      },
-      {
-        "id": "t4",
-        "titulo": "Colores de la marca",
-        "valor": 1,
-        "esfuerzo": 2
-      },
-      {
-        "id": "t5",
-        "titulo": "Exportar a hoja de cálculo",
-        "valor": 2,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t2"
-        ]
-      }
+      { "id": "t1", "titulo": "Formulario de inscripción", "valor": 5, "esfuerzo": 3 },
+      { "id": "t2", "titulo": "Guardar a los concursantes", "valor": 6, "esfuerzo": 2, "dependeDe": ["t1"] },
+      { "id": "t3", "titulo": "Pantalla del jurado", "valor": 4, "esfuerzo": 3, "dependeDe": ["t2"] },
+      { "id": "t4", "titulo": "Colores de la marca", "valor": 1, "esfuerzo": 2 },
+      { "id": "t5", "titulo": "Exportar a hoja de cálculo", "valor": 2, "esfuerzo": 2, "dependeDe": ["t2"] }
     ],
     "respuestas": {
       "obedecer": {
         "texto": "Le dices que sí, que cabe todo.",
+        "replica": "¡Genial! Entonces pon los colores primero, que es lo que se ve.",
+        "efectoEnBacklog": "forzar-arriba",
         "consecuencia": {
-          "efectosInmediatos": {},
+          "efectosInmediatos": { "Cansancio": 3 },
           "efectosDiferidos": [],
           "hallazgos": [],
           "rubrica": {
             "veredicto": "incorrecta",
             "oa": "OA-SCRUM-01",
-            "razon": "Decir que cabe lo que no cabe no lo hace caber."
+            "razon": "Decir que cabe lo que no cabe no lo hace caber: los colores subieron arriba y empujaron fuera la pantalla del jurado, que valía mucho más."
           }
         }
       },
       "rechazar": {
         "texto": "Le dices que no, sin más.",
+        "replica": "Ah… vale. No entiendo bien por qué, pero vale.",
+        "efectoEnBacklog": "ninguno",
         "consecuencia": {
-          "efectosInmediatos": {},
+          "efectosInmediatos": { "SatisfaccionCliente": -2 },
           "efectosDiferidos": [],
           "hallazgos": [],
           "rubrica": {
             "veredicto": "aceptable",
             "oa": "OA-SCRUM-01",
-            "razon": "Proteges el tiempo, pero ella no sabe por qué."
+            "razon": "Proteges el tiempo, pero ella no sabe por qué. Un «no» sin explicación cansa la confianza."
           }
         }
       },
       "negociar": {
         "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
+        "replica": "Uy, si los colores dejan fuera la pantalla del jurado, mejor mañana. ¡Gracias por explicármelo!",
+        "efectoEnBacklog": "ninguno",
         "consecuencia": {
-          "efectosInmediatos": {},
+          "efectosInmediatos": { "SatisfaccionCliente": 2 },
           "efectosDiferidos": [],
           "hallazgos": [],
           "rubrica": {
             "veredicto": "correcta",
             "oa": "OA-SCRUM-01",
-            "razon": "Enseñar lo que cuesta y dejar elegir es negociar."
+            "razon": "Enseñar lo que cuesta y dejar elegir es negociar. Marisol eligió ella misma dejar los colores para después."
           }
         }
       }
@@ -106,7 +79,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-SCRUM-01",
-        "razon": "Lo importante primero, y cada cosa después de lo que necesita."
+        "razon": "Lo importante primero, y cada cosa después de lo que necesita: formulario → guardar → jurado."
       }
     },
     "parcial": {
@@ -116,7 +89,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-SCRUM-01",
-        "razon": "Entró poco de lo que más valía."
+        "razon": "Entró poco de lo que más valía, o la respuesta a Marisol empujó fuera algo importante. Mira la pastilla «valor»: lo que más vale va arriba."
       }
     },
     "falsoPositivo": {
@@ -126,7 +99,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir."
+        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir. Primero los cimientos, luego lo de encima."
       }
     },
     "omitido": {
@@ -141,6 +114,6 @@
     }
   },
   "cierre": {
-    "texto": "Práctica terminada."
+    "texto": "Priorizar es decidir qué se queda fuera hoy. Lo que quedó bajo la línea no se pierde: espera al siguiente turno."
   }
 }

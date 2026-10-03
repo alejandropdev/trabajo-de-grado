@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Nexus.Core.Minijuegos;
 using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Guia;
@@ -28,7 +30,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private enum Fase { Receta, Jugando, Cierre }
 
         private Fase _fase = Fase.Receta;
-        private float _restante;
+        private float _restante, _total;
         private DialView _dial;
         private RectTransform _cuerpo;
         private bool _recetaInicialPendiente = true;
@@ -38,6 +40,25 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         public override bool PuedeVolver { get { return false; } }
 
         protected float Segundo { get { return Def.Presentacion.SegundosReloj - _restante; } }
+
+        /// <summary>
+        /// El modo guiado: Marisol lleva paso a paso por todo el reto (null si se juega libre). Las subclases le
+        /// preguntan Permite() antes de cada accion del jugador y le avisan con Hecho() cuando se hizo.
+        /// </summary>
+        protected GuiaDelMinijuego Guia { get; private set; }
+
+        protected bool Guiado { get { return Guia != null; } }
+
+        /// <summary>El andamiaje del nivel; sin pendiente (banco de pruebas), el de tutorial.</summary>
+        protected int Andamiaje { get { return Pendiente != null ? Pendiente.NivelAndamiaje : 3; } }
+
+        /// <summary>"detectar", "ordenar", "repartir": la parte del disparador de la guia que cambia con el verbo.</summary>
+        private string VerboCorto {
+            get {
+                var v = Verbos.Normalizar(Def.Verbo) ?? Verbos.Detectar;
+                return v.Substring(v.IndexOf('_') + 1).ToLowerInvariant();
+            }
+        }
 
         protected override void Construir() {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 0.75f));
@@ -50,17 +71,24 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             Ui.Texto(titulos, Def.Presentacion.Titulo ?? Def.Id, EstiloTexto.Titulo);
             Ui.Boton(cabecera, "Receta", () => AbrirReceta(false));
             GuiaView.BotonDeAyuda(App, cabecera);
+            Ui.Boton(cabecera, "Menú", AbrirPausa, VarianteBoton.Fantasma);
 
             _restante = Math.Max(10, Def.Presentacion.SegundosReloj);
+            _total = _restante;
             _dial = Ui.Dial(cabecera, 1, "", Tema.cian, 112);
-            var total = _restante;
-            _dial.Formato = v => { var s = Mathf.CeilToInt(v * total); return $"{s / 60}:{s % 60:00}"; };
+            _dial.Formato = v => { var s = Mathf.CeilToInt(v * _total); return $"{s / 60}:{s % 60:00}"; };
             _dial.Valor = 1;
             GuiaView.Registrar("mj.reloj", _dial);
 
             _cuerpo = Ui.Fila(marco, "Cuerpo", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(_cuerpo, flexAncho: 1, flexAlto: 1);
             GuiaView.Registrar("mj.tablero", _cuerpo);
+
+            // El panel de Marisol va entre la cabecera y el tablero: se ve a la vez que la pieza que señala.
+            if (Pendiente != null && Pendiente.Guiado) {
+                Guia = new GuiaDelMinijuego(App, marco, _cuerpo.GetSiblingIndex(), PiezaGuiada, _ => Repintar());
+                _dial.gameObject.SetActive(false);   // guiado = sin prisa: el reloj no corre
+            }
 
             // Detras de la receta: por si alguien la cierra sin empezar, un boton para verla otra vez.
             var espera = Ui.PanelColumna(_cuerpo, "Espera", Tema.margen * 1.5f, Tema.espacio);
@@ -69,7 +97,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (!string.IsNullOrEmpty(Def.Presentacion.ComoSeJuega)) hoja.Parrafo(Def.Presentacion.ComoSeJuega);
             var fila = hoja.Fila();
             Ui.Boton(fila, "Ver la receta", () => AbrirReceta(true));
-            Ui.Boton(fila, "Empezar", Empezar, VarianteBoton.Primario);
+            Ui.Boton(fila, "¡A jugar!", Empezar, VarianteBoton.Primario);
         }
 
         private void AbrirReceta(bool inicio) {
@@ -78,6 +106,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             App.Router.Apilar<PantallaDeReceta>(p => {
                 p.Def = Def;
                 p.Inicio = inicio && _fase == Fase.Receta;
+                p.Ayudas = p.Inicio ? AyudasUtiles() : new List<string>();
+                p.AlUsarAyuda = UsarAyuda;
                 p.AlCerrar = () => {
                     _recetaAbierta = false;
                     if (p.Inicio) Empezar();
@@ -85,13 +115,76 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             });
         }
 
+        /// <summary>
+        /// La pausa tambien dentro de un reto. El reloj del reto espera. Salir entrega lo que haya en el tablero
+        /// (como si se acabara el tiempo): un reto no puede quedarse a medias en el guardado.
+        /// </summary>
+        private void AbrirPausa() {
+            App.Router.Apilar<PantallaDePausa>(p => {
+                p.Aviso = _fase == Fase.Cierre ? null : "Si sales ahora, el reto se entrega tal y como esté.";
+                p.AntesDeSalir = () => {
+                    if (_fase == Fase.Cierre) { AlTerminar?.Invoke(Resultado); return; }
+                    _fase = Fase.Cierre;
+                    Resultado = Evaluar();
+                    AlTerminar?.Invoke(Resultado);
+                };
+            });
+        }
+
+        /// <summary>Las ayudas de compañeros que sirven para ESTE reto y que el jugador todavia tiene.</summary>
+        private List<string> AyudasUtiles() {
+            var s = App.Sesion;
+            if (s == null || Pendiente == null || !s.Fase1Cerrada) return new List<string>();
+            return s.AyudasDisponibles().Keys
+                    .Where(t => Nexus.Core.Relaciones.TiposDeAyuda.EsDeMinijuego(t) &&
+                                Nexus.Core.Relaciones.TiposDeAyuda.SirvePara(t, Def.Verbo) && !Pendiente.TieneAyuda(t))
+                    .ToList();
+        }
+
+        /// <summary>Gasta una ayuda en este reto. Las que cambian el tablero se aplican al construirlo, al empezar.</summary>
+        private bool UsarAyuda(string tipo) {
+            if (Pendiente == null || _fase != Fase.Receta || App.Sesion == null || !App.Sesion.UsarAyuda(tipo)) return false;
+            Pendiente.Ayudas.Add(tipo);
+            if (tipo == Nexus.Core.Relaciones.TiposDeAyuda.MinutosExtra) { _restante += 45; _total += 45; }
+            return true;
+        }
+
         private void Empezar() {
             if (_fase != Fase.Receta) return;
             _fase = Fase.Jugando;
             UiKit.Vaciar(_cuerpo);
-            ConstruirJuego(_cuerpo);
-            GuiaView.Avisar(App, "minijuego.jugando");
+            try {
+                ConstruirJuego(_cuerpo);
+                if (Guia != null) {
+                    Guia.Empezar(RecorridoGuiado.Para(Def));
+                    Repintar();
+                }
+            } catch (Exception e) {
+                // Un tablero a medio construir deja la pantalla colgada y sin clics: mejor cerrarlo con orden.
+                Debug.LogException(e);
+                AbandonarPorFallo();
+                return;
+            }
+            GuiaView.Avisar(App, "minijuego.jugando." + VerboCorto);
         }
+
+        /// <summary>El reto no se pudo montar: se entrega como omitido (o con lo que haya) y se vuelve a la jornada.</summary>
+        private void AbandonarPorFallo() {
+            _fase = Fase.Cierre;
+            Guia?.Cerrar();
+            try { Resultado = Evaluar(); } catch (Exception e) { Debug.LogException(e); Resultado = null; }
+            if (Resultado == null)
+                Resultado = PuenteDelMotor.Omitido(Def.Id, Pendiente != null ? Pendiente.ObjetivoAprendizaje : null, null);
+            UiKit.Vaciar(_cuerpo);
+            var panel = Ui.PanelColumna(_cuerpo, "Fallo", Tema.margen * 1.5f, Tema.espacio);
+            UiKit.Tamano(panel, flexAncho: 1);
+            Ui.Texto(panel, "No se pudo abrir el reto", EstiloTexto.Subtitulo, Tema.amarillo);
+            Ui.Texto(panel, "Algo falló al montar el tablero. El reto se da por omitido y la jornada sigue.", EstiloTexto.Cuerpo);
+            Ui.Boton(panel, "Volver a la jornada", () => AlTerminar?.Invoke(Resultado), VarianteBoton.Primario);
+        }
+
+        /// <summary>La pieza de la pantalla de la que habla un paso guiado (para señalarla). null = ninguna.</summary>
+        protected virtual RectTransform PiezaGuiada(PasoGuiado paso) { return null; }
 
         private void Update() {
             if (_recetaInicialPendiente) {
@@ -101,9 +194,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 GuiaView.Avisar(App, "minijuego.presentacion");
                 return;
             }
-            if (_fase != Fase.Jugando || _recetaAbierta || GuiaView.PausaActiva) return;
+            if (_fase != Fase.Jugando || _recetaAbierta || GuiaView.PausaActiva || PantallaDePausa.Abierta || Guia != null) return;
             _restante -= Time.unscaledDeltaTime;
-            var f = Mathf.Max(0, _restante) / Math.Max(10, Def.Presentacion.SegundosReloj);
+            var f = Mathf.Max(0, _restante) / Math.Max(10f, _total);
             _dial.Valor = f;
             _dial.Color = f < 0.15f ? Tema.rojo : f < 0.3f ? Tema.amarillo : Tema.cian;
             if (_restante <= 0) Entregar();
@@ -112,8 +205,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// <summary>Lo llaman las subclases (boton «Entregar») y el reloj al llegar a cero.</summary>
         protected void Entregar() {
             if (_fase != Fase.Jugando) return;
+            if (Guia != null && !Guia.Permite(AccionGuiada.Entregar)) { Guia.Rechazar(); return; }
             _fase = Fase.Cierre;
             Resultado = Evaluar();
+            Guia?.Cerrar();
             PintarCierre();
         }
 
@@ -133,23 +228,60 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var scroll = Ui.Desplazable(panel, out contenido);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
             var hoja = new Hoja(Ui, contenido);
-            hoja.Etiqueta("Resultado");
-            hoja.Subtitulo(TituloDelResultado(Resultado.Resultado),
+            hoja.Etiqueta(Guia != null ? "Resultado · hecho con la ayuda de Marisol" : "Resultado");
+            hoja.Subtitulo(TituloDelResultado(Resultado.Resultado, Def.Verbo),
                            Resultado.Resultado == ResultadosDeMinijuego.Todos ? Tema.cian : Tema.amarillo);
-            foreach (var linea in Resultado.Detalle) hoja.Nota("· " + linea, Tema.texto);
+            // Lo que deja el modo guiado: que mirar para hacerlo solo la proxima vez.
+            if (Guia != null) {
+                var t = hoja.Tarjeta("La próxima vez lo harás tú: esto es lo que tienes que mirar", Tema.mostaza);
+                foreach (var leccion in RecorridoGuiado.Lecciones(Guia.Pasos)) Ui.Texto(t, "· " + leccion, EstiloTexto.Pequeno, Tema.texto);
+            }
+            // El porque, primero: es lo que se aprende. Antes solo lo veia el docente en el Dashboard.
+            if (Resultado.Rubrica != null && !string.IsNullOrEmpty(Resultado.Rubrica.Razon))
+                hoja.Parrafo(Resultado.Rubrica.Razon, Tema.texto);
+            if (Resultado.Detalle.Count > 0) {
+                hoja.Etiqueta("Qué pasó, pieza a pieza");
+                foreach (var linea in Resultado.Detalle) hoja.Nota("· " + linea, Tema.texto);
+            }
+            var solucion = Guia != null ? new List<string>() : SolucionEnTexto().ToList();
+            if (solucion.Count > 0 && Resultado.Resultado != ResultadosDeMinijuego.Todos) {
+                hoja.Etiqueta("Cómo se podía hacer");
+                foreach (var linea in solucion) hoja.Nota("· " + linea, Tema.cianClaro);
+            }
             if (!string.IsNullOrEmpty(Resultado.TextoCierre)) hoja.Parrafo(Resultado.TextoCierre, Tema.cianClaro);
             hoja.Nota(Practica ? "Era práctica: lo que ganes va al proyecto, pero no cuenta para tu evaluación."
-                               : "Cómo se valora lo que hiciste, lo verás en el Dashboard de Lecciones al cerrar el nivel.");
+                               : "Esto queda en tu evaluación. El resumen de todo, en Lecciones al cerrar el nivel.");
             Ui.Boton(lado, "Volver a la jornada", () => AlTerminar?.Invoke(Resultado), VarianteBoton.Primario);
             GuiaView.Avisar(App, "minijuego.cierre");
         }
 
-        public static string TituloDelResultado(string resultado) {
-            switch (resultado) {
-                case ResultadosDeMinijuego.Todos: return "Lo encontraste";
-                case ResultadosDeMinijuego.Parcial: return "Se te escapó algo";
-                case ResultadosDeMinijuego.FalsoPositivo: return "Señalaste lo que no era";
-                default: return "No entregaste nada";
+        /// <summary>Lineas que explican una solucion buena, para enseñarlas si no se acerto. Cada verbo la suya.</summary>
+        protected virtual IEnumerable<string> SolucionEnTexto() { yield break; }
+
+        /// <summary>El titulo del cierre, en el idioma del verbo: en un backlog no se «señala» nada.</summary>
+        public static string TituloDelResultado(string resultado, string verbo = null) {
+            switch (Verbos.Normalizar(verbo)) {
+                case Verbos.Ordenar:
+                    switch (resultado) {
+                        case ResultadosDeMinijuego.Todos: return "Buen orden";
+                        case ResultadosDeMinijuego.Parcial: return "Quedó fuera algo valioso";
+                        case ResultadosDeMinijuego.FalsoPositivo: return "Algo va antes de lo que necesita";
+                        default: return "No entregaste el orden";
+                    }
+                case Verbos.Repartir:
+                    switch (resultado) {
+                        case ResultadosDeMinijuego.Todos: return "Buen reparto";
+                        case ResultadosDeMinijuego.Parcial: return "Se escaparon errores";
+                        case ResultadosDeMinijuego.FalsoPositivo: return "Horas de más en un tipo, cero en otro";
+                        default: return "No repartiste nada";
+                    }
+                default:
+                    switch (resultado) {
+                        case ResultadosDeMinijuego.Todos: return "Lo encontraste";
+                        case ResultadosDeMinijuego.Parcial: return "Se te escapó algo";
+                        case ResultadosDeMinijuego.FalsoPositivo: return "Señalaste lo que no era";
+                        default: return "No entregaste nada";
+                    }
             }
         }
 

@@ -6,7 +6,7 @@
   "objetivoAprendizaje": "OA-DIS-01",
   "presentacion": {
     "titulo": "Práctica: el diagrama de las reservas",
-    "comoSeJuega": "El diagrama del módulo de reservas de ascensores. Encuentra las piezas o flechas con problemas y ponles nombre. No todo lo raro está mal.",
+    "comoSeJuega": "El diagrama del módulo de reservas. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -95,7 +95,8 @@
         "turnos"
       ],
       "defecto": "elemento_sin_especificar",
-      "explicacion": "El calendario de turnos decide quién va primero, pero nadie escribió con qué regla. Una pieza que decide algo sin regla escrita es una pieza sin especificar."
+      "explicacion": "El calendario de turnos decide quién va primero, pero nadie escribió con qué regla. Una pieza que decide algo sin regla escrita es una pieza sin especificar.",
+      "pista": "Esta pieza decide quién va primero en el ascensor. ¿Dice en algún sitio con qué regla lo decide?"
     },
     {
       "id": "Z2",
@@ -104,7 +105,8 @@
         "r5"
       ],
       "defecto": "acoplamiento_indebido",
-      "explicacion": "El controlador del fabricante escribe directo en nuestras tablas. Si cambiamos una tabla, rompemos el ascensor; si el fabricante cambia algo, rompe las reservas."
+      "explicacion": "El controlador del fabricante escribe directo en nuestras tablas. Si cambiamos una tabla, rompemos el ascensor; si el fabricante cambia algo, rompe las reservas.",
+      "pista": "Mira hacia dónde escribe el controlador del fabricante. ¿Entra por la puerta del módulo de reservas o directo a sus tablas?"
     }
   ],
   "senuelos": [
@@ -199,6 +201,6 @@
     }
   },
   "cierre": {
-    "texto": "Práctica terminada."
+    "texto": "Una pieza sin regla escrita y una pieza metida en las tripas de otra: dos formas de que el sistema haga algo que nadie decidió."
   }
 }

@@ -97,8 +97,21 @@ namespace Nexus.Core.Minijuegos
         public double UmbralDeValor = 0.7;
         /// <summary>Lo que pide el cliente, con su nombre: "La Ministra quiere todo para el dia 10".</summary>
         public string Peticion;
+        /// <summary>La tarjeta que pide el cliente. Las respuestas la mueven en el tablero (ver Respuesta.EfectoEnBacklog).</summary>
+        public string TarjetaPedida;
         /// <summary>obedecer | rechazar | negociar -> lo que pasa con cada respuesta.</summary>
         public Dictionary<string, Respuesta> Respuestas = new Dictionary<string, Respuesta>();
+    }
+
+    /// <summary>Lo que una respuesta al cliente le hace al tablero, para que se VEA el efecto de negociar.</summary>
+    public static class EfectosEnBacklog
+    {
+        /// <summary>La tarjeta pedida sube arriba del todo, empuje a quien empuje por debajo de la linea.</summary>
+        public const string ForzarArriba = "forzar-arriba";
+        /// <summary>La tarjeta pedida entra a cambio de la de menos valor que estaba dentro (la elige el cliente contigo).</summary>
+        public const string Intercambiar = "intercambiar";
+        /// <summary>La tarjeta pedida se queda donde la pusiste.</summary>
+        public const string Ninguno = "ninguno";
     }
 
     public sealed class Tarjeta
@@ -109,11 +122,17 @@ namespace Nexus.Core.Minijuegos
         public int Esfuerzo;
         /// <summary>Tarjetas que tienen que ir ANTES. No se enseñan hasta que el jugador choca con ellas.</summary>
         public List<string> DependeDe = new List<string>();
+        /// <summary>Por que va donde va (opcional). El modo guiado lo dice al colocarla; si falta, lo deduce.</summary>
+        public string Porque;
     }
 
     public sealed class Respuesta
     {
         public string Texto;
+        /// <summary>Lo que contesta el cliente al oirla. Sale en un globo nada mas elegir.</summary>
+        public string Replica;
+        /// <summary>forzar-arriba | intercambiar | ninguno (EfectosEnBacklog). Vacio = ninguno.</summary>
+        public string EfectoEnBacklog;
         public Consecuencia Consecuencia = new Consecuencia();
     }
 
@@ -125,6 +144,8 @@ namespace Nexus.Core.Minijuegos
         public List<Deposito> Depositos = new List<Deposito>();
         /// <summary>Cuantos defectos escapan como maximo para considerar el reparto bueno.</summary>
         public int ToleranciaDeEscapes = 1;
+        /// <summary>De cuanto en cuanto suben y bajan los botones +/-. El validador lo usa para comprobar que se puede ganar.</summary>
+        public int Paso = 1;
     }
 
     public sealed class Deposito
@@ -136,6 +157,8 @@ namespace Nexus.Core.Minijuegos
         public int CostePorDefecto;
         /// <summary>Los defectos de este tipo que hay de verdad. El jugador no lo ve: lo descubre despues.</summary>
         public int DefectosOcultos;
+        /// <summary>Lo que un probador con experiencia esperaria encontrar aqui ("suele haber 3 o 4"). Solo se ve con andamiaje alto.</summary>
+        public string Pista;
     }
 
     public sealed class Rama
@@ -175,6 +198,8 @@ namespace Nexus.Core.Minijuegos
         public List<string> Commits = new List<string>();
         public string Defecto;               // debe existir en PaletaEtiquetas
         public string Explicacion;
+        /// <summary>Lo que hay que preguntarse para encontrarla, sin decir la respuesta. Lo usa el modo guiado.</summary>
+        public string Pista;
     }
 
     public sealed class Senuelo

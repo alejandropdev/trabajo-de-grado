@@ -22,18 +22,18 @@
         {
           "id": "escribirlo",
           "texto": "Escribirlo como requisito, con su criterio de aceptación: un visitante sin cita queda registrado y se avisa a la persona a la que viene a ver.",
-          "efectosInmediatos": { "Alcance": 2, "Documentacion": 5 },
+          "efectosInmediatos": { "Alcance": 1, "Documentacion": 5, "Cobertura": 3, "SatisfaccionCliente": 4 },
           "rubrica": {
             "veredicto": "correcta",
             "oa": "OA-DOC-01",
-            "razon": "Una pregunta sin contestar en un ticket es un requisito sin escribir. Escribirlo con su criterio de aceptación convierte una suposición en algo que se puede comprobar el viernes."
+            "razon": "Una pregunta sin contestar en un ticket es un requisito sin escribir. Escribirlo con su criterio de aceptación convierte una suposición en algo que se puede comprobar el viernes. Cuesta un poco de alcance hoy; no escribirlo cuesta mucho más después."
           }
         },
         {
           "id": "suponerlo",
           "texto": "Suponer que no hace falta y seguir con lo que había.",
           "efectosInmediatos": { "Avance": 1 },
-          "efectosDiferidos": [ { "enDias": 2, "efectos": { "SatisfaccionCliente": -6, "DeudaTecnica": 3 } } ],
+          "efectosDiferidos": [ { "enDias": 2, "efectos": { "Alcance": 3, "SatisfaccionCliente": -8, "DeudaTecnica": 5 } } ],
           "rubrica": {
             "veredicto": "incorrecta",
             "oa": "OA-DOC-01",

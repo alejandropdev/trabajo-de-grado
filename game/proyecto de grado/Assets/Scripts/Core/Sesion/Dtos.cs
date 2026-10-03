@@ -28,6 +28,9 @@ namespace Nexus.Core.Sesion {
 
         public Derived Derivadas;
 
+        /// <summary>Lo que hoy pasa por como esta el proyecto (la deuda, la cobertura…). null = nada.</summary>
+        public Nexus.Core.Simulacion.IncidenciaDeHoy Incidencia;
+
         /// <summary>burndown | curvaS | cfd. Lo decide la metodologia.</summary>
         public string Tablero;
 
@@ -108,11 +111,21 @@ namespace Nexus.Core.Sesion {
 
     /// <summary>El resultado del deploy (§4.9.3).</summary>
     public sealed class LaunchResult {
+        /// <summary>Salio BIEN. «Con problemas» no es exito: el nivel no se da por superado.</summary>
         public bool Exito;
+        /// <summary>bien | con-problemas | mal (NivelesDeLanzamiento).</summary>
+        public string Nivel;
+        public double Puntaje;
         public double RiesgoDeLanzamiento;
         public double AlcanceEntregado;
         public double AlcanceComprometido;
         public int DefectosEscapados;
+        public double SatisfaccionCliente;
+
+        /// <summary>El desglose: que se midio, cuanto dio y por que importa.</summary>
+        public List<Nexus.Core.Evaluacion.FactorDeLanzamiento> Factores = new List<Nexus.Core.Evaluacion.FactorDeLanzamiento>();
+        /// <summary>Las decisiones que mas pesaron en contra, para enseñarlas junto al resultado.</summary>
+        public List<string> DecisionesQuePesaron = new List<string>();
 
         public string Texto;
         public string TextoMetodologia;

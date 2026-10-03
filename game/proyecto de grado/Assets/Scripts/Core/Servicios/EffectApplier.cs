@@ -22,6 +22,13 @@ namespace Nexus.Core.Servicios {
     public static class EffectApplier {
         public const string PrefijoFlagProhibido = "FLG_";
 
+        /// <summary>
+        /// Lo que vale un dia de proyecto, en puntos de avance (la velocidad base de los niveles). Un efecto
+        /// "Dias": 1 es un dia perdido: antes solo movia el contador de dias, que nadie lee para el resultado, y
+        /// el coste de tiempo de muchas decisiones no se notaba. Ahora se cobra en el avance que ese dia habria dado.
+        /// </summary>
+        public const double PuntosPorDia = 3.0;
+
         private const NumberStyles Estilos = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint;
 
         /// <summary>
@@ -41,9 +48,22 @@ namespace Nexus.Core.Servicios {
                 double valor;
                 if (EsPorcentaje(kv.Value, kv.Key, null, out valor))
                     w.Set(kv.Key, actual * (1.0 + valor * mult));
-                else
+                else {
                     w.Set(kv.Key, actual + valor * mult);
+                    if (string.Equals(kv.Key.Trim(), "Dias", StringComparison.OrdinalIgnoreCase)) CobrarDias(w, valor * mult, false);
+                }
             }
+        }
+
+        /// <summary>
+        /// Un tiempo perdido (dias &gt; 0) cuesta el avance que habria dado; uno ganado (dias &lt; 0) lo devuelve.
+        /// 'tambienElContador' suma ademas los dias al contador (las ceremonias, que no pasan por Aplicar).
+        /// </summary>
+        public static void CobrarDias(WorldState w, double dias, bool tambienElContador = true) {
+            if (w == null || Math.Abs(dias) < 1e-9) return;
+            if (tambienElContador) w.Set("Dias", w.Dias + dias);
+            var velocidad = w.VelocidadMod > 0 ? w.VelocidadMod : 1.0;
+            w.Set("Avance", Math.Max(0, w.Avance - dias * PuntosPorDia * velocidad));
         }
 
         /// <summary>
@@ -94,7 +114,11 @@ namespace Nexus.Core.Servicios {
             var copia = w.Clone();
             Aplicar(copia, efectos, mult);
 
-            foreach (var clave in efectos.Keys) {
+            var claves = new List<string>(efectos.Keys);
+            // Un coste en dias se paga en avance: que la previsualizacion lo enseñe, no que lo esconda.
+            if (claves.Exists(k => string.Equals(k, "Dias", StringComparison.OrdinalIgnoreCase)) && !claves.Contains("Avance"))
+                claves.Add("Avance");
+            foreach (var clave in claves) {
                 double antes, despues;
                 w.TryGet(clave, out antes);
                 copia.TryGet(clave, out despues);

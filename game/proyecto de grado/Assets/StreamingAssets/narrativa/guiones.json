@@ -60,10 +60,11 @@
       "id": "GUIA-0.F1", "titulo": "Antes de empezar", "nivel": "nivel-00", "momento": "fase1", "orden": 1,
       "variantes": {
         "default": [
-          { "quien": "Marisol Andrade", "texto": "Antes de la primera línea de código hay tres decisiones, y las tres se registran." },
-          { "quien": "Marisol Andrade", "texto": "Primero, cómo va a trabajar: por etapas, con sprints cerrados o con un flujo continuo. Le pedirán que diga por qué. El porqué cuenta tanto como la elección." },
-          { "quien": "Marisol Andrade", "texto": "Segundo, a qué dedica su cuidado. Tiene cuatro fichas y tres cosas que proteger. Lo que deje sin fichas es lo que el jurado va a probar." },
-          { "quien": "Marisol Andrade", "texto": "Tercero, la forma de lo que va a construir. Vuelva a leer la restricción del ticket antes de elegir." }
+          { "quien": "Marisol Andrade", "texto": "Antes de escribir una sola línea de código, todo proyecto toma tres decisiones. Las tres quedan registradas, y de ellas depende cómo te va a ir los cinco días." },
+          { "quien": "Marisol Andrade", "texto": "Una: CÓMO va a trabajar tu equipo. Eso se llama metodología. Puede ser por etapas, una detrás de otra (cascada); por vueltas cortas de una semana que se revisan al final (Scrum); o como un tablero por el que el trabajo va pasando (Kanban)." },
+          { "quien": "Marisol Andrade", "texto": "Dos: QUÉ vas a cuidar más. Es la calidad. Tienes cuatro fichas para repartir entre tres cosas: que haga lo que se pidió, que sea fácil de usar y que no se caiga. Lo que dejes sin fichas es justo lo que el jurado va a probar." },
+          { "quien": "Marisol Andrade", "texto": "Tres: QUÉ FORMA tiene lo que construyes. Es la arquitectura, como el plano de una casa: una web sencilla, una app para el móvil… La pista está en las restricciones del encargo." },
+          { "quien": "Marisol Andrade", "texto": "En las tres te pediré POR QUÉ. Elegir bien por un mal motivo también cuenta en contra: la suerte no se repite. Si te pierdes, pulsa «¿Qué hago ahora?»." }
         ]
       }
     },
@@ -72,10 +73,10 @@
       "id": "TUT-0.1", "titulo": "Aquí el día corre", "nivel": "nivel-00", "momento": "dia",
       "variantes": {
         "default": [
-          { "quien": "Marisol Andrade", "texto": "Una cosa antes de que empiece. Aquí el día no salta de hora en hora: corre. Mire el reloj de la pared." },
-          { "quien": "Marisol Andrade", "texto": "Cuando algo le necesite, le llegará un aviso a su puesto. Tendrá unas horas para atenderlo, y solo puede hacerlo desde aquí, desde su puesto." },
-          { "quien": "Marisol Andrade", "texto": "Si no llega a tiempo, alguien decidirá por usted. Y casi nunca decide bien." },
-          { "quien": "Marisol Andrade", "texto": "A las cinco se cierra la sala. Puede irse, o quedarse hasta las siete. Las dos cosas tienen un precio." }
+          { "quien": "Marisol Andrade", "texto": "Una cosa antes de que empieces. Aquí el día no salta de hora en hora: corre. Mira el reloj de la pared." },
+          { "quien": "Marisol Andrade", "texto": "Cuando algo te necesite, te llegará un aviso a tu puesto. Tendrás unas horas para atenderlo, y solo puedes hacerlo desde aquí, desde tu puesto." },
+          { "quien": "Marisol Andrade", "texto": "Si no llegas a tiempo, alguien decidirá por ti. Y casi nunca decide bien." },
+          { "quien": "Marisol Andrade", "texto": "A las cinco se cierra la sala. Puedes irte, o quedarte hasta las siete. Las dos cosas tienen un precio." }
         ]
       }
     },
@@ -101,8 +102,8 @@
       "variantes": {
         "default": [
           { "quien": "Marisol Andrade", "texto": "Desde hoy el auditorio está abierto: allí está la clasificación provisional." },
-          { "quien": "Marisol Andrade", "texto": "Puede moverse por la planta cuando quiera. Tenga en cuenta que ir y volver cuesta tiempo, y que los avisos solo se atienden desde su puesto." },
-          { "quien": "Marisol Andrade", "texto": "Y fíjese en las paredes. En este edificio la gente deja cosas pegadas. Algunas valen la pena." }
+          { "quien": "Marisol Andrade", "texto": "Puedes moverte por la planta cuando quieras. Ten en cuenta que ir y volver cuesta tiempo, y que los avisos solo se atienden desde tu puesto. Y habla con la gente: quien confía en ti, te echa una mano." },
+          { "quien": "Marisol Andrade", "texto": "Y fíjate en las paredes. En este edificio la gente deja cosas pegadas. Algunas valen la pena." }
         ]
       }
     },
@@ -123,7 +124,7 @@
       "variantes": {
         "default": [
           { "quien": "Megafonía", "texto": "Último día del concurso. Las entregas se cierran a las cinco en punto. No se admitirán prórrogas." },
-          { "quien": "Marisol Andrade", "texto": "Lo que tenga a las cinco es lo que se evalúa. No lo que iba a tener." },
+          { "quien": "Marisol Andrade", "texto": "Lo que tengas a las cinco es lo que llega al jurado. No lo que ibas a tener." },
           { "quien": "narrador", "texto": "A las cinco menos cuarto, la barra de subida de tu entrega se detiene seis segundos. Después sigue." }
         ]
       }
@@ -137,6 +138,30 @@
           { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es el concursante del puesto siete." },
           { "quien": "narrador", "texto": "Alguien te pone un badge gris en la mano. En el escenario, un holograma: el hombre del traje verde de la entrevista. Aplaude." },
           { "quien": "narrador", "texto": "Aplaude con la muñeca, porque en los dedos está girando algo pequeño y antiguo. Dos segundos. Nadie lo señala." },
+          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+        ],
+        "lanzamiento-bien": [
+          { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
+          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es el concursante del puesto siete." },
+          { "quien": "narrador", "texto": "Tu puesto. Marisol te mira desde un lateral y asiente una sola vez: el sistema funcionó el viernes, y el jurado lo probó sin encontrar casi nada." },
+          { "quien": "narrador", "texto": "Alguien te pone un badge gris en la mano. En el escenario, un holograma: el hombre del traje verde de la entrevista. Aplaude." },
+          { "quien": "narrador", "texto": "Aplaude con la muñeca, porque en los dedos está girando algo pequeño y antiguo. Dos segundos. Nadie lo señala." },
+          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+        ],
+        "lanzamiento-con-problemas": [
+          { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
+          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es… el concursante del puesto tres." },
+          { "quien": "narrador", "texto": "No eres tú. El jurado encontró errores en tu entrega, y tu cliente no quedó del todo contento. Marisol se acerca al terminar." },
+          { "quien": "Marisol Andrade", "texto": "No ganaste, pero entraste: Nexus admite a los tres primeros. Lo que funcionó, funcionó. Lo que no, léelo en tus lecciones antes del lunes." },
+          { "quien": "narrador", "texto": "Alguien te pone un badge gris en la mano. En el escenario, un holograma: el hombre del traje verde de la entrevista. Mira hacia tu fila un segundo de más." },
+          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+        ],
+        "lanzamiento-mal": [
+          { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
+          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es el concursante del puesto tres." },
+          { "quien": "narrador", "texto": "Tu entrega se cayó dos veces durante la prueba del jurado. La recepcionista volvió al cuaderno a las nueve y cuarto." },
+          { "quien": "Marisol Andrade", "texto": "Entras a prueba. No porque lo hicieras bien, sino porque alguien arriba quiere verte de cerca. No desperdicies la segunda oportunidad: mira qué decisiones te trajeron aquí." },
+          { "quien": "narrador", "texto": "En el escenario, un holograma: el hombre del traje verde de la entrevista. No aplaude. Toma una nota." },
           { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
         ]
       }
@@ -211,6 +236,20 @@
         "default": [
           { "quien": "narrador", "texto": "La barrera de los patios se levanta. Un carro entra. La barrera baja. Otro carro." },
           { "quien": "narrador", "texto": "Nadie aplaude, porque no pasa nada. Todo sale bien. Es la única vez." }
+        ],
+        "lanzamiento-bien": [
+          { "quien": "narrador", "texto": "La barrera de los patios se levanta. Un carro entra. La barrera baja. Otro carro." },
+          { "quien": "narrador", "texto": "Nadie aplaude, porque no pasa nada. Todo sale bien. Es la única vez." }
+        ],
+        "lanzamiento-con-problemas": [
+          { "quien": "narrador", "texto": "La barrera de los patios se levanta. Un carro entra. La barrera baja. Otro carro." },
+          { "quien": "narrador", "texto": "A las ocho y diez la barrera se queda abierta dos minutos sin que nadie la pida. Óscar la reinicia a mano sin decir nada." },
+          { "quien": "narrador", "texto": "Facilities manda un correo con tres «pequeños detalles». Funciona. Casi siempre." }
+        ],
+        "lanzamiento-mal": [
+          { "quien": "narrador", "texto": "La barrera de los patios se levanta. Un carro entra. La barrera no baja." },
+          { "quien": "narrador", "texto": "A media mañana hay doce carros en fila y un guardia con un cuaderno, como antes. Facilities pide una reunión para mañana a primera hora." },
+          { "quien": "Óscar Rendón", "texto": "No es la primera vez que veo esto. Casi nunca es un error de código: es una decisión de hace tres semanas que nadie revisó." }
         ]
       }
     },

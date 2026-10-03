@@ -6,7 +6,7 @@
   "objetivoAprendizaje": "OA-DIS-01",
   "presentacion": {
     "titulo": "Práctica: el diagrama de las inscripciones",
-    "comoSeJuega": "Es el diagrama del sistema de inscripciones del concurso. Cada caja es una pieza y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí y dile qué problema tiene.",
+    "comoSeJuega": "Un diagrama de componentes: cada caja es una pieza del sistema y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí, púlsala y elige a la derecha qué problema tiene. Como es práctica, te digo al momento si acertaste.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 90
@@ -95,7 +95,8 @@
         "c5"
       ],
       "defecto": "acoplamiento_indebido",
-      "explicacion": "La pantalla del jurado lee directamente del formulario, a medio escribir y sin validar. Si cambia el formulario, se rompe la pantalla: están pegadas. Lo correcto es que lea de la lista, como ya hace."
+      "explicacion": "La pantalla del jurado lee directamente del formulario, a medio escribir y sin validar. Si cambia el formulario, se rompe la pantalla: están pegadas. Lo correcto es que lea de la lista, como ya hace.",
+      "pista": "Sigue las flechas que llegan a la pantalla del jurado. ¿De dónde debería sacar los datos: de la lista ya guardada o de un formulario a medio escribir?"
     }
   ],
   "senuelos": [
@@ -187,6 +188,6 @@
     }
   },
   "cierre": {
-    "texto": "Práctica terminada."
+    "texto": "Una pieza solo debería hablar con otra por su puerta de entrada. Si se mete en sus tripas, quedan pegadas: cambiar una rompe la otra."
   }
 }

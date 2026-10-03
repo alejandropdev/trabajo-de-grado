@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Minijuegos.Repartir;
+using Nexus.Core.Relaciones;
+using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Nexus.Unity.Pantallas.Minijuegos {
     /// <summary>
@@ -21,24 +25,43 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private Lamina _lamina;
 
         private RepartirCfg Cfg { get { return Def.Repartir; } }
-        private int Paso { get { return Cfg.Presupuesto >= 20 ? 2 : 1; } }
+        private int Paso { get { return Math.Max(1, Cfg.Paso); } }
         private int Usado { get { return _asignacion.Values.Sum(); } }
+
+        /// <summary>Se ve cuantos errores hay de verdad: ayuda de un compañero.</summary>
+        private bool Revelado { get { return Pendiente != null && Pendiente.TieneAyuda(TiposDeAyuda.RevelarDefectos); } }
+
+        /// <summary>Lo que atrapa cada pila se ve mientras juegas: modo guiado, o si un compañero te lo chivo.</summary>
+        private bool VerAtrapados { get { return Guiado || Revelado; } }
+
+        private readonly Dictionary<string, RectTransform> _mas = new Dictionary<string, RectTransform>();
+        private readonly Dictionary<string, RectTransform> _tipos = new Dictionary<string, RectTransform>();
+        private Button _entregar;
 
         private static readonly Color Relleno = new Color32(0xBF, 0xEF, 0xFF, 0xFF);
         private const float AltoPila = 540, AnchoPila = 170, Arriba = 150;
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
             foreach (var d in Cfg.Depositos) _asignacion[d.Id] = 0;
-            _lamina = NuevoLienzo(cuerpo, "Las horas de pruebas · una pila por tipo · se llena con las horas que le des", 1330, 820);
+            _lamina = NuevoLienzo(cuerpo, "Las horas de pruebas · una pila por tipo · súbelas y bájalas con + y −", 1330, 820);
+            GuiaView.Registrar("mj.repartir.pilas", _lamina.Raiz);
 
             var lado = Ui.Columna(cuerpo, "Tipos", Tema.espacio);
             UiKit.Tamano(lado, ancho: 460, flexAlto: 1);
+            GuiaView.Registrar("mj.repartir.tipos", lado);
             foreach (var d in Cfg.Depositos) {
-                var t = Ui.Tarjeta(lado, d.Nombre);
+                var t = Ui.Tarjeta(lado, $"{d.Nombre} · {d.CostePorDefecto} {Cfg.Unidad} por error");
+                _tipos[d.Id] = t;
                 Ui.Texto(t, d.Descripcion ?? "", EstiloTexto.Pequeno, Tema.texto);
+                if (Revelado)
+                    Ui.Texto(t, $"Te lo chivaron: aquí hay {d.DefectosOcultos} error(es).", EstiloTexto.Pequeno, Tema.mostazaClara);
+                else if (Andamiaje >= 2 && !string.IsNullOrEmpty(d.Pista))
+                    Ui.Texto(t, "Pista: " + d.Pista, EstiloTexto.Pequeno, Tema.cianClaro);
             }
+            Ui.Texto(lado, $"Ganas si se escapan como mucho {Cfg.ToleranciaDeEscapes} error(es).", EstiloTexto.Pequeno, Tema.mostazaClara);
             Ui.Resorte(lado);
-            Ui.Boton(lado, "Entregar el reparto", Entregar, VarianteBoton.Primario);
+            _entregar = Ui.Boton(lado, "Entregar el reparto", Entregar, VarianteBoton.Primario);
+            GuiaView.Registrar("mj.entregar", _entregar);
             Repintar();
         }
 
@@ -90,7 +113,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     var mas = Ui.Boton(l.Raiz, "+" + Paso, () => Sumar(id, Paso));
                     Lamina.Colocar((RectTransform)mas.transform, x + AnchoPila - 76, Arriba + AltoPila + 16, 70, 46);
                     mas.interactable = libres > 0;
+                    if (i == 0) GuiaView.Registrar("mj.repartir.mas", mas);
+                    _mas[d.Id] = (RectTransform)mas.transform;
                     l.Texto(x - 20, Arriba + AltoPila + 70, AnchoPila + 40, 24, $"{d.CostePorDefecto} {Cfg.Unidad} por error", 15, Tema.textoTenue, TextAlignmentOptions.Center);
+                    if (VerAtrapados) {
+                        // Guiado: cuantos atrapa ya esta pila, y si ya no queda nada que atrapar en ella.
+                        var atrapa = Math.Min(d.DefectosOcultos, h / d.CostePorDefecto);
+                        var lleno = atrapa >= d.DefectosOcultos;
+                        var texto = lleno ? (h > d.CostePorDefecto * d.DefectosOcultos ? "ya no queda nada: sobran horas" : "atrapa todo lo que hay")
+                                          : $"atraparía {atrapa}";
+                        l.Texto(x - 20, Arriba + AltoPila + 96, AnchoPila + 40, 24, texto, 15, lleno ? Tema.cian : Tema.mostazaClara, TextAlignmentOptions.Center);
+                    }
                 } else {
                     var r = resultado.First(x2 => x2.DepositoId == d.Id);
                     for (var k = 0; k < r.Encontrados; k++)
@@ -112,8 +145,28 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private void Sumar(string id, int delta) {
             var libres = Cfg.Presupuesto - Usado;
+            if (Guiado) {
+                // Guiado: solo la pila del paso, y solo hasta las horas que dice Marisol.
+                var p = Guia.Actual;
+                if (!Guia.Permite(AccionGuiada.Asignar, id) || p == null) { Guia.Rechazar(); return; }
+                _asignacion[id] = Mathf.Clamp(_asignacion[id] + Mathf.Min(delta, libres), 0, p.Valor);
+                if (_asignacion[id] == p.Valor) Guia.Hecho(AccionGuiada.Asignar, id);
+                Repintar();
+                return;
+            }
             _asignacion[id] = Mathf.Clamp(_asignacion[id] + Mathf.Min(delta, libres), 0, Cfg.Presupuesto);
             Repintar();
+        }
+
+        protected override RectTransform PiezaGuiada(PasoGuiado paso) {
+            RectTransform rt;
+            switch (paso.Accion) {
+                case AccionGuiada.Asignar: return _mas.TryGetValue(paso.Objetivo ?? "", out rt) ? rt : null;
+                case AccionGuiada.Entregar: return _entregar != null ? (RectTransform)_entregar.transform : null;
+                default:
+                    if (!string.IsNullOrEmpty(paso.Objetivo) && _tipos.TryGetValue(paso.Objetivo, out rt)) return rt;
+                    return _lamina != null ? _lamina.Raiz : null;
+            }
         }
 
         protected override ResultadoMinijuego Evaluar() {
@@ -123,6 +176,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         protected override void PintarResultado(RectTransform zona) {
             var l = NuevoLienzo(zona, "Lo que atrapó cada pila · y lo que se escapó al cliente", 1330, 820);
             Pintar(l, RepartirEvaluador.Calcular(Cfg, _asignacion));
+        }
+
+        protected override IEnumerable<string> SolucionEnTexto() {
+            var ganador = RepartirEvaluador.RepartosGanadores(Cfg).OrderBy(g => g.Values.Sum()).FirstOrDefault();
+            if (ganador == null) yield break;
+            yield return "Un reparto que ganaba: " + string.Join(" · ", Cfg.Depositos.Select(d => $"{d.Nombre} {ganador[d.Id]} {Cfg.Unidad}")) + ".";
+            yield return "Había " + string.Join(", ", Cfg.Depositos.Select(d => $"{d.DefectosOcultos} en {d.Nombre.ToLowerInvariant()}")) + ".";
         }
     }
 }

@@ -21,19 +21,30 @@ namespace Nexus.Unity.Pantallas {
     public sealed class PantallaDeLecciones : Pantalla {
         public DebriefReport Reporte;
         public Action AlSeguir;
+        /// <summary>Volver a jugar el nivel (solo se ofrece si no salio bien). null = no se ofrece.</summary>
+        public Action AlRepetir;
 
         public override bool PuedeVolver { get { return false; } }
 
         protected override void Construir() {
             var r = Reporte;
+            var superado = r.CumpleUmbralesDeExito;
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 0.75f));
             var cabecera = Ui.Fila(marco);
             var titulos = Ui.Columna(cabecera, espacio: 0);
             UiKit.Tamano(titulos, flexAncho: 1);
-            Ui.Texto(titulos, "DASHBOARD DE LECCIONES · " + (r.NivelNombre ?? r.NivelId).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cian);
-            Ui.Texto(titulos, r.CumpleUmbralesDeExito ? "Nivel superado" : "Nivel no superado", EstiloTexto.Titulo);
+            Ui.Texto(titulos, "LECCIONES · " + (r.NivelNombre ?? r.NivelId).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cian);
+            Ui.Texto(titulos, superado ? "Nivel superado" : "Nivel no superado", EstiloTexto.Titulo);
+            if (!superado)
+                Ui.Texto(titulos, "Puedes repetirlo para que salga bien, o seguir adelante: la historia recordará cómo salió.",
+                         EstiloTexto.Pequeno, Tema.amarillo);
             GuiaView.BotonDeAyuda(App, cabecera);
-            Ui.Boton(cabecera, "Continuar", () => AlSeguir?.Invoke(), VarianteBoton.Primario);
+            if (!superado && AlRepetir != null) {
+                Ui.Boton(cabecera, "Repetir el nivel", () => AlRepetir(), VarianteBoton.Primario);
+                Ui.Boton(cabecera, "Seguir de todos modos", () => AlSeguir?.Invoke());
+            } else {
+                Ui.Boton(cabecera, "Continuar", () => AlSeguir?.Invoke(), VarianteBoton.Primario);
+            }
 
             RectTransform contenido;
             var scroll = Ui.Desplazable(marco, out contenido);
@@ -58,9 +69,13 @@ namespace Nexus.Unity.Pantallas {
             var t = Ui.Tarjeta(padre, "1 · El resultado");
             var l = r.Lanzamiento;
             if (l != null) {
-                Ui.Texto(t, l.Exito ? "El lanzamiento salió bien." : "El lanzamiento falló.", EstiloTexto.Cuerpo, l.Exito ? Tema.cian : Tema.rojo);
-                Ui.Texto(t, $"Entregado {l.AlcanceEntregado:0} de {l.AlcanceComprometido:0} puntos · {l.DefectosEscapados} defectos llegaron al cliente.",
-                         EstiloTexto.Pequeno, Tema.texto);
+                var nivel = l.Nivel ?? (l.Exito ? NivelesDeLanzamiento.Bien : NivelesDeLanzamiento.Mal);
+                var color = nivel == NivelesDeLanzamiento.Bien ? Tema.cian : nivel == NivelesDeLanzamiento.Mal ? Tema.rojo : Tema.amarillo;
+                Ui.Texto(t, $"Lanzamiento: {NivelesDeLanzamiento.Titulo(nivel).ToLowerInvariant()} ({l.Puntaje:0}/100).", EstiloTexto.Cuerpo, color);
+                Ui.Texto(t, $"Entregado {l.AlcanceEntregado:0} de {l.AlcanceComprometido:0} puntos · {l.DefectosEscapados} defectos llegaron al cliente · " +
+                            $"satisfacción {l.SatisfaccionCliente:0}.", EstiloTexto.Pequeno, Tema.texto);
+                foreach (var f in l.Factores.Where(x => x.Estado != "bien"))
+                    Ui.Texto(t, $"· {f.Nombre}: {f.Valor} — {f.Explicacion}", EstiloTexto.Pequeno, f.Estado == "mal" ? Tema.rojo : Tema.amarillo);
             }
             if (r.CumpleUmbralesDeExito) Ui.Texto(t, "Cumple todos los umbrales de éxito del nivel.", EstiloTexto.Pequeno, Tema.texto);
             foreach (var u in r.UmbralesFallados) Ui.Texto(t, "· " + u, EstiloTexto.Pequeno, Tema.amarillo);

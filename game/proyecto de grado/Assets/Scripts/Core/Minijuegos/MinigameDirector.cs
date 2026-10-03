@@ -132,6 +132,7 @@ namespace Nexus.Core.Minijuegos {
                 PresionDiegetica = minijuego.PresionDiegetica,
                 Segundos = minijuego.Reloj,
                 NivelAndamiaje = _perfil.NivelAndamiaje,
+                Guiado = _perfil.MinijuegosGuiados,
                 ObjetivoAprendizaje = minijuego.ObjetivoAprendizaje
             };
         }

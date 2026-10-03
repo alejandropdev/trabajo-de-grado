@@ -6,7 +6,7 @@
   "objetivoAprendizaje": "OA-GIT-01",
   "presentacion": {
     "titulo": "La auditoría del grafo de commits",
-    "comoSeJuega": "Reescribir la historia de un repositorio compartido borra a personas.",
+    "comoSeJuega": "Esto es el historial de git: cada punto es un commit (una versión guardada) y cada columna, una rama. Alguien reescribió la historia compartida. Pincha los commits afectados y di qué pasó: ¿se reescribió la historia? ¿cambió el autor de un trabajo? Cuidado: una rama abandonada o una fusión sin revisar no son lo mismo.",
     "quienEspera": "Javier",
     "textoPresion": "Javier necesita esto antes de las 10:00",
     "segundosReloj": 90
@@ -357,7 +357,8 @@
         "x06"
       ],
       "defecto": "historia_reescrita",
-      "explicacion": "Cuatro commits con fechas identicas a los originales y padres distintos. La rama fue reescrita y vuelta a publicar sobre una historia que ya era compartida."
+      "explicacion": "Cuatro commits con fechas idénticas a los originales y padres distintos. La rama se reescribió y se volvió a publicar sobre una historia que ya era compartida: quien tenía la versión anterior perdió su base.",
+      "pista": "Compara las fechas de estos commits con los de la otra rama. ¿Son nuevos, o son copias reescritas de los de antes?"
     },
     {
       "id": "Z2",
@@ -366,7 +367,8 @@
         "x04"
       ],
       "defecto": "autoria_perdida",
-      "explicacion": "El contenido de x04 es identico al de r04, firmado por LC. Tras la reescritura, ese trabajo aparece firmado por DH."
+      "explicacion": "El contenido de x04 es idéntico al de r04, firmado por LC. Tras la reescritura, ese trabajo aparece firmado por DH: la autoría se perdió.",
+      "pista": "Mira quién firma este commit y compáralo con el original del que es copia. ¿Es la misma persona?"
     }
   ],
   "senuelos": [
@@ -375,14 +377,14 @@
       "commits": [
         "mrg"
       ],
-      "razonNoEsDefecto": "Es una fusion sin revisar. Es mala practica, pero no reescribe la historia ni cambia la autoria de nadie."
+      "razonNoEsDefecto": "Es una fusión sin revisar. Es mala práctica, pero no reescribe la historia ni cambia la autoría de nadie."
     },
     {
       "id": "S2",
       "commits": [
         "s01"
       ],
-      "razonNoEsDefecto": "spike/cache es una rama de exploracion abandonada a proposito. Una rama sin fusionar no es una rama huerfana."
+      "razonNoEsDefecto": "spike/cache es una rama de exploración abandonada a propósito. Una rama sin fusionar no es una rama huérfana."
     }
   ],
   "paletaEtiquetas": [
@@ -487,6 +489,6 @@
     }
   },
   "cierre": {
-    "texto": "El registro dice que este trabajo lo hizo otra persona."
+    "texto": "El registro dice que este trabajo lo hizo otra persona. En una rama compartida, la historia no se reescribe: se añade."
   }
 }

@@ -195,6 +195,20 @@
       "dinero": 0
     }
   },
+  "lanzamiento": {
+    "riesgoBien": 40,
+    "riesgoMal": 60,
+    "defectosBien": 5,
+    "defectosMal": 9,
+    "entregaBien": 0.85,
+    "entregaMal": 0.65,
+    "satisfaccionBien": 50,
+    "satisfaccionMal": 35,
+    "decisionesBien": 0.6,
+    "decisionesMal": 0.35,
+    "puntajeBien": 70,
+    "puntajeMal": 45
+  },
   "metodologiasPermitidas": [
     "scrum",
     "kanban",
@@ -280,6 +294,26 @@
       {
         "id": "lo_mas_rapido",
         "texto": "Es lo más rápido para empezar mañana."
+      },
+      {
+        "id": "mono_sin_modulos",
+        "texto": "Así no hace falta separar nada por dentro."
+      },
+      {
+        "id": "micro_por_separado",
+        "texto": "Cada parte se puede desplegar por separado."
+      },
+      {
+        "id": "micro_un_equipo_cada_uno",
+        "texto": "Cada servicio lo puede llevar un equipo distinto."
+      },
+      {
+        "id": "parche_sin_codigo",
+        "texto": "Así nadie tiene que entender el código de la barrera."
+      },
+      {
+        "id": "parche_ya_probado",
+        "texto": "La barrera actual ya está probada: es segura."
       }
     ],
     "arquitecturas": [
@@ -292,6 +326,14 @@
         "efectos": {
           "Documentacion": 5
         },
+        "razones": [
+          "equipo_pequeno",
+          "despliegue_simple",
+          "un_solo_edificio",
+          "plazo_corto",
+          "lo_mas_rapido",
+          "mono_sin_modulos"
+        ],
         "razonesValidas": [
           "equipo_pequeno",
           "despliegue_simple",
@@ -302,7 +344,8 @@
           "FLG_VOSS_AFINIDAD": 1
         },
         "razonesTrampa": [
-          "lo_mas_rapido"
+          "lo_mas_rapido",
+          "mono_sin_modulos"
         ]
       },
       {
@@ -317,10 +360,17 @@
         "modificadoresModelo": {
           "gamma": 1.15
         },
+        "razones": [
+          "escala_mejor",
+          "esta_de_moda",
+          "micro_por_separado",
+          "micro_un_equipo_cada_uno"
+        ],
         "razonesValidas": [],
         "razonesTrampa": [
           "esta_de_moda",
-          "escala_mejor"
+          "escala_mejor",
+          "micro_un_equipo_cada_uno"
         ],
         "flagsAlCerrar": {
           "FLG_VOSS_AFINIDAD": -1
@@ -338,12 +388,21 @@
         "modificadoresModelo": {
           "alpha": 1.1
         },
+        "razones": [
+          "plazo_corto",
+          "ya_existe",
+          "lo_mas_rapido",
+          "parche_sin_codigo",
+          "parche_ya_probado"
+        ],
         "razonesValidas": [
           "plazo_corto",
           "ya_existe"
         ],
         "razonesTrampa": [
-          "lo_mas_rapido"
+          "lo_mas_rapido",
+          "parche_sin_codigo",
+          "parche_ya_probado"
         ]
       }
     ],
@@ -532,5 +591,73 @@
         }
       }
     ]
-  }
+  },
+  "incidencias": [
+    {
+      "id": "INC-DEUDA",
+      "estadistica": "DeudaTecnica",
+      "comparador": ">=",
+      "umbral": 50,
+      "desdeDia": 2,
+      "titulo": "Algo que funcionaba se rompió",
+      "texto": "Con la deuda técnica en {valor}, un atajo de hace días ha roto algo que ya funcionaba. Hoy se pierde tiempo arreglándolo.",
+      "efectos": {
+        "Dias": 0.4,
+        "Cansancio": 3
+      }
+    },
+    {
+      "id": "INC-COBERTURA",
+      "estadistica": "Cobertura",
+      "comparador": "<=",
+      "umbral": 30,
+      "desdeDia": 3,
+      "titulo": "Facilities encontró un error",
+      "texto": "Con la cobertura de pruebas en {valor}, facilities encontró un error que nadie había probado. Su confianza baja.",
+      "efectos": {
+        "SatisfaccionCliente": -5,
+        "DeudaTecnica": 2
+      }
+    },
+    {
+      "id": "INC-CANSANCIO",
+      "estadistica": "Cansancio",
+      "comparador": ">=",
+      "umbral": 60,
+      "desdeDia": 2,
+      "titulo": "El equipo está agotado",
+      "texto": "Con el cansancio en {valor}, hoy el equipo rinde menos y se equivoca más.",
+      "efectos": {
+        "Dias": 0.3,
+        "DeudaTecnica": 3,
+        "MoralEquipo": -3
+      }
+    },
+    {
+      "id": "INC-MORAL",
+      "estadistica": "MoralEquipo",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "Roces en el equipo",
+      "texto": "Con la moral en {valor}, una discusión tonta se come media mañana.",
+      "efectos": {
+        "Dias": 0.3,
+        "Cansancio": 4
+      }
+    },
+    {
+      "id": "INC-SATISFACCION",
+      "estadistica": "SatisfaccionCliente",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "Facilities pide una reunión urgente",
+      "texto": "Con la satisfacción del cliente en {valor}, piden explicaciones. Hoy se va una hora en una reunión.",
+      "efectos": {
+        "Dias": 0.25,
+        "Cansancio": 2
+      }
+    }
+  ]
 }

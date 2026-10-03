@@ -142,7 +142,18 @@ namespace Nexus.Core.Minijuegos {
         /// <summary>0..3, del LevelProfile. Con 3 se resaltan las zonas candidatas; con 0 hay etiquetas trampa.</summary>
         public int NivelAndamiaje;
 
+        /// <summary>
+        /// Modo guiado: Marisol lleva paso a paso por todo el minijuego hasta hacerlo bien (RecorridoGuiado).
+        /// Lo pide el nivel (el tutorial, siempre) o la UI, la primera vez que el perfil juega ese minijuego.
+        /// </summary>
+        public bool Guiado;
+
+        /// <summary>Ayudas de compañeros que el jugador decidio gastar en este minijuego (TiposDeAyuda).</summary>
+        public List<string> Ayudas = new List<string>();
+
         public string ObjetivoAprendizaje;
+
+        public bool TieneAyuda(string tipo) { return Ayudas != null && Ayudas.Contains(tipo); }
     }
 
     /// <summary>Por que el director de minijuegos hizo lo que hizo, un dia por entrada.</summary>

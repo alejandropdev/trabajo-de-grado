@@ -165,8 +165,13 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Destruye todos los hijos. Para repintar una lista.</summary>
         public static void Vaciar(Transform contenedor) {
-            for (var i = contenedor.childCount - 1; i >= 0; i--)
-                UnityEngine.Object.Destroy(contenedor.GetChild(i).gameObject);
+            for (var i = contenedor.childCount - 1; i >= 0; i--) {
+                var hijo = contenedor.GetChild(i).gameObject;
+                // Destroy espera al final del frame: apagado ya, para que el layout no lo cuente mientras tanto
+                // (si no, la lista vieja y la nueva se suman un frame y la pantalla «crece» y salta).
+                hijo.SetActive(false);
+                UnityEngine.Object.Destroy(hijo);
+            }
         }
 
         // ================================================================ texto
@@ -292,8 +297,20 @@ namespace Nexus.Unity.Tema {
             campo.placeholder = marcador;
             campo.fontAsset = texto.font;
             campo.pointSize = texto.fontSize;
+            // Sin customCaretColor, TMP ignora caretColor: el cursor salia casi invisible y nadie sabia que el campo
+            // ya estaba escribiendo (feedback beta #2). Cursor ancho, que parpadea, y un borde al enfocar.
+            campo.customCaretColor = true;
             campo.caretColor = Tema.cian;
+            campo.caretWidth = 3;
+            campo.caretBlinkRate = 0.85f;
             campo.selectionColor = new Color(Tema.cian.r, Tema.cian.g, Tema.cian.b, 0.35f);
+            var borde = rt.gameObject.AddComponent<Outline>();
+            borde.effectColor = Tema.cian;
+            borde.effectDistance = new Vector2(2, -2);
+            borde.enabled = false;
+            // La indicacion se va en cuanto se pulsa el campo, aunque todavia no se haya escrito nada.
+            campo.onSelect.AddListener(_ => { marcador.alpha = 0; borde.enabled = true; });
+            campo.onDeselect.AddListener(_ => { marcador.alpha = 1; borde.enabled = false; });
             campo.text = valor ?? "";
             return campo;
         }

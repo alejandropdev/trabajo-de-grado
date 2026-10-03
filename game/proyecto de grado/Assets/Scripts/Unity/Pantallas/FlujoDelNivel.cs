@@ -28,9 +28,17 @@ namespace Nexus.Unity.Pantallas {
         public static void Continuar(AppRoot app) {
             var s = app.Sesion;
             if (s == null) { FinDeLaVersion(app); return; }
+            // La entrevista y las escenas de apertura ya se vieron: se vuelve a la planificacion, donde se dejo.
+            if (!s.Fase1Cerrada && s.R.IntroVista) { app.Router.IrA<PantallaDeFase1>(); return; }
             if (!s.Fase1Cerrada) { EmpezarNivel(app); return; }
             if (s.R.Fase == 2) { app.Router.IrA<PantallaDelDia>(); return; }
             Lanzar(app);
+        }
+
+        /// <summary>«Repetir el nivel» desde las Lecciones: otra vez su Fase 1, sin la intro.</summary>
+        public static void RepetirNivel(AppRoot app) {
+            app.RepetirNivel();
+            app.Router.IrA<PantallaDeFase1>();
         }
 
         public static void EmpezarNivel(AppRoot app) {
@@ -47,7 +55,10 @@ namespace Nexus.Unity.Pantallas {
                 var g = guion;
                 pasos.Add(siguiente => Reproducir(app, g, NarrativeBeat.VarianteDefecto, false, siguiente));
             }
-            pasos.Add(_ => app.Router.IrA<PantallaDeFase1>());
+            pasos.Add(_ => {
+                app.Sesion.R.IntroVista = true;
+                app.Router.IrA<PantallaDeFase1>();
+            });
             Ejecutar(app, pasos);
         }
 
@@ -63,30 +74,40 @@ namespace Nexus.Unity.Pantallas {
             var nivel = s.NivelId;
             var pasos = new List<Action<Action>>();
 
-            foreach (var guion in Guiones(app, nivel, MomentosDeGuion.Lanzamiento)) {
-                var g = guion;
-                pasos.Add(siguiente => Reproducir(app, g, NarrativeBeat.VarianteDefecto, false, siguiente));
-            }
+            // El resultado se calcula ANTES de la escena del lanzamiento: la escena cuenta como salio.
             pasos.Add(siguiente => {
                 if (s.Lanzamiento == null) s.EjecutarLanzamiento();
+                siguiente();
+            });
+            foreach (var guion in Guiones(app, nivel, MomentosDeGuion.Lanzamiento)) {
+                var g = guion;
+                pasos.Add(siguiente => Reproducir(app, g, VarianteDelLanzamiento(s), false, siguiente));
+            }
+            pasos.Add(siguiente => {
                 app.Guardar(AutoGuardado.Motivos.TrasLanzamiento);
                 app.Router.IrA<PantallaDeLanzamiento>(p => p.AlSeguir = siguiente);
             });
             // El cierre va ANTES de Cerrar(): sus elecciones (abrir el log de CIN-1.4) escriben flags, y los
             // flags solo se escriben en Cerrar (INV-6).
+            // Las escenas de cierre cambian con como salio: «lanzamiento-bien», «lanzamiento-con-problemas»,
+            // «lanzamiento-mal». Si un guion no tiene esa variante, sale la de por defecto.
             foreach (var guion in Guiones(app, nivel, MomentosDeGuion.Cierre)) {
                 var g = guion;
-                pasos.Add(siguiente => Reproducir(app, g, NarrativeBeat.VarianteDefecto, false, siguiente));
+                pasos.Add(siguiente => Reproducir(app, g, VarianteDelLanzamiento(s), false, siguiente));
             }
             pasos.Add(siguiente => {
                 var reporte = s.Cerrar();
                 app.UltimoCierre = reporte;
                 app.Guardar(AutoGuardado.Motivos.CierreDeNivel);
-                app.Router.IrA<PantallaDeLecciones>(p => { p.Reporte = reporte; p.AlSeguir = siguiente; });
+                app.Router.IrA<PantallaDeLecciones>(p => {
+                    p.Reporte = reporte;
+                    p.AlSeguir = siguiente;
+                    p.AlRepetir = () => RepetirNivel(app);
+                });
             });
             foreach (var guion in Guiones(app, nivel, MomentosDeGuion.DespuesDelNivel)) {
                 var g = guion;
-                pasos.Add(siguiente => Reproducir(app, g, NarrativeBeat.VarianteDefecto, false, siguiente));
+                pasos.Add(siguiente => Reproducir(app, g, VarianteDelLanzamiento(s), false, siguiente));
             }
             pasos.Add(_ => {
                 var siguienteNivel = app.PasarAlSiguienteNivel();
@@ -94,6 +115,12 @@ namespace Nexus.Unity.Pantallas {
                 else EmpezarNivel(app);
             });
             Ejecutar(app, pasos);
+        }
+
+        /// <summary>La variante de guion que toca tras el lanzamiento: «lanzamiento-bien», «-con-problemas» o «-mal».</summary>
+        public static string VarianteDelLanzamiento(Nexus.Core.Sesion.GameSession s) {
+            var nivel = s != null && s.Lanzamiento != null ? s.Lanzamiento.Nivel : null;
+            return string.IsNullOrEmpty(nivel) ? NarrativeBeat.VarianteDefecto : "lanzamiento-" + nivel;
         }
 
         public static void FinDeLaVersion(AppRoot app) {

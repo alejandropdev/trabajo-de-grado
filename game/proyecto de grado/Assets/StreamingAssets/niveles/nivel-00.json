@@ -74,6 +74,9 @@
         "nombre": "La terminal pública",
         "descripcion": "Un equipo viejo junto a la escalera, con un cartel de «solo consultas». Nadie lo ha apagado en años.",
         "minutosDeVisita": 20,
+        "quienEsta": [
+          "Iván Cárdenas, el técnico del concurso"
+        ],
         "coleccionables": [
           "COL-COD-01"
         ],
@@ -115,12 +118,27 @@
     },
     "fallo": {}
   },
+  "lanzamiento": {
+    "riesgoBien": 40,
+    "riesgoMal": 60,
+    "defectosBien": 5,
+    "defectosMal": 8,
+    "entregaBien": 0.85,
+    "entregaMal": 0.6,
+    "satisfaccionBien": 50,
+    "satisfaccionMal": 35,
+    "decisionesBien": 0.6,
+    "decisionesMal": 0.35,
+    "puntajeBien": 68,
+    "puntajeMal": 45
+  },
   "metodologiasPermitidas": [
     "scrum",
     "cascada",
     "kanban"
   ],
   "nivelAndamiaje": 3,
+  "minijuegosGuiados": true,
   "volatilidadReal": 55,
   "fase1": {
     "calidad": {
@@ -169,6 +187,18 @@
       {
         "id": "todo_el_mundo_tiene_movil",
         "texto": "Todo el mundo tiene móvil."
+      },
+      {
+        "id": "web_es_gratis",
+        "texto": "Hacer una web no cuesta nada."
+      },
+      {
+        "id": "movil_avisa",
+        "texto": "Al visitante le llega un aviso al móvil cuando le toca."
+      },
+      {
+        "id": "movil_sin_recepcion",
+        "texto": "Así la recepción ya no tiene que hacer nada."
       }
     ],
     "arquitecturas": [
@@ -181,13 +211,21 @@
         "efectos": {
           "Documentacion": 3
         },
+        "razones": [
+          "un_solo_equipo",
+          "nadie_instala_nada",
+          "cinco_dias",
+          "queda_mas_moderno",
+          "web_es_gratis"
+        ],
         "razonesValidas": [
           "un_solo_equipo",
           "nadie_instala_nada",
           "cinco_dias"
         ],
         "razonesTrampa": [
-          "queda_mas_moderno"
+          "queda_mas_moderno",
+          "web_es_gratis"
         ]
       },
       {
@@ -199,10 +237,17 @@
           "DeudaTecnica": 8,
           "Cansancio": 5
         },
+        "razones": [
+          "todo_el_mundo_tiene_movil",
+          "movil_avisa",
+          "movil_sin_recepcion",
+          "queda_mas_moderno"
+        ],
         "razonesValidas": [],
         "razonesTrampa": [
           "todo_el_mundo_tiene_movil",
-          "queda_mas_moderno"
+          "queda_mas_moderno",
+          "movil_sin_recepcion"
         ]
       }
     ],
@@ -289,7 +334,7 @@
             "Documentacion": 2
           },
           "falsoPositivo": {
-            "Dias": 0.1
+            "Cansancio": 2
           },
           "omitido": {}
         }
@@ -341,5 +386,73 @@
         }
       }
     ]
-  }
+  },
+  "incidencias": [
+    {
+      "id": "INC-DEUDA",
+      "estadistica": "DeudaTecnica",
+      "comparador": ">=",
+      "umbral": 50,
+      "desdeDia": 2,
+      "titulo": "Algo que funcionaba se rompió",
+      "texto": "Con la deuda técnica en {valor}, un atajo de hace días ha roto algo que ya funcionaba. Hoy se pierde tiempo arreglándolo.",
+      "efectos": {
+        "Dias": 0.4,
+        "Cansancio": 3
+      }
+    },
+    {
+      "id": "INC-COBERTURA",
+      "estadistica": "Cobertura",
+      "comparador": "<=",
+      "umbral": 22,
+      "desdeDia": 3,
+      "titulo": "El jurado encontró un error",
+      "texto": "Con la cobertura de pruebas en {valor}, el jurado encontró un error que nadie había probado. Su confianza baja.",
+      "efectos": {
+        "SatisfaccionCliente": -5,
+        "DeudaTecnica": 2
+      }
+    },
+    {
+      "id": "INC-CANSANCIO",
+      "estadistica": "Cansancio",
+      "comparador": ">=",
+      "umbral": 60,
+      "desdeDia": 2,
+      "titulo": "El equipo está agotado",
+      "texto": "Con el cansancio en {valor}, hoy el equipo rinde menos y se equivoca más.",
+      "efectos": {
+        "Dias": 0.3,
+        "DeudaTecnica": 3,
+        "MoralEquipo": -3
+      }
+    },
+    {
+      "id": "INC-MORAL",
+      "estadistica": "MoralEquipo",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "Roces en el equipo",
+      "texto": "Con la moral en {valor}, una discusión tonta se come media mañana.",
+      "efectos": {
+        "Dias": 0.3,
+        "Cansancio": 4
+      }
+    },
+    {
+      "id": "INC-SATISFACCION",
+      "estadistica": "SatisfaccionCliente",
+      "comparador": "<=",
+      "umbral": 35,
+      "desdeDia": 2,
+      "titulo": "El jurado pide una reunión urgente",
+      "texto": "Con la satisfacción del cliente en {valor}, piden explicaciones. Hoy se va una hora en una reunión.",
+      "efectos": {
+        "Dias": 0.25,
+        "Cansancio": 2
+      }
+    }
+  ]
 }

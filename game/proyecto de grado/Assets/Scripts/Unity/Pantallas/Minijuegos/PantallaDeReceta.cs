@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Minijuegos;
 using Nexus.Unity.Aplicacion;
+using Nexus.Unity.Pantallas;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -107,6 +108,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             { "rama_huerfana", "Un commit que no sale de nada" }, { "fusion_sin_revisar", "Se unió sin revisión" },
         };
 
+        /// <summary>Que significa una etiqueta, en una linea. null si no hay texto para ella.</summary>
+        public static string Significado(string etiqueta) {
+            string que;
+            return etiqueta != null && QueEs.TryGetValue(etiqueta, out que) ? que : null;
+        }
+
         public static readonly Dictionary<string, Action<Tizador>> Dibujos = new Dictionary<string, Action<Tizador>> {
             { "requisito_ambiguo", p => {
                 p.Caja(20, 70, 150, 64, "Pedidos");
@@ -165,6 +172,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         public MinijuegoDef Def;
         public bool Inicio;
         public Action AlCerrar;
+        /// <summary>Las ayudas de compañeros que sirven para este reto (tipos). Solo se ofrecen antes de empezar.</summary>
+        public List<string> Ayudas = new List<string>();
+        /// <summary>Gasta una ayuda; true si se pudo.</summary>
+        public Func<string, bool> AlUsarAyuda;
 
         public override bool EsModal { get { return true; } }
         public override bool PuedeVolver { get { return false; } }
@@ -172,44 +183,45 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private const float W = 1612, H = 932;
 
         protected override void Construir() {
-            var velo = Raiz.gameObject.AddComponent<Image>();
-            velo.color = new Color(0, 0, 0, 0.66f);
-
-            var marco = Ui.Nodo(Raiz, "Marco");
-            marco.anchorMin = marco.anchorMax = marco.pivot = new Vector2(0.5f, 0.5f);
-            marco.sizeDelta = new Vector2(W + 28, H + 28);
-            var madera = marco.gameObject.AddComponent<Image>();
-            madera.sprite = Ui.SpriteRedondeado(); madera.type = Image.Type.Sliced;
-            madera.color = new Color32(0x3A, 0x2E, 0x22, 0xFF);
-
-            var tabla = Ui.Nodo(marco, "Pizarra");
-            UiKit.Rellenar(tabla, 14);
-            var fondo = tabla.gameObject.AddComponent<Image>();
-            fondo.color = Tizador.Pizarra;
-
-            var lamina = new Lamina(Ui, tabla, W, H);
-            UiKit.Rellenar(lamina.Raiz);
-            lamina.Dibujo.Tiza = true;
+            Lamina lamina;
+            var marco = MarcoDePizarra.Construir(Ui, Raiz, Inicio ? "¡NUEVO RETO!" : "RECETA", out lamina);
             var t = new Tizador(lamina, Ui.FuenteTiza);
             Pintar(t);
-
-            // la nota pegada en la esquina
-            var nota = Ui.Nodo(marco, "Nota");
-            nota.anchorMin = nota.anchorMax = new Vector2(1, 1);
-            nota.pivot = new Vector2(0.5f, 0.5f);
-            nota.anchoredPosition = new Vector2(-70, -50);
-            nota.sizeDelta = new Vector2(230, 56);
-            nota.localRotation = Quaternion.Euler(0, 0, -9);
-            nota.gameObject.AddComponent<Image>().color = new Color32(0xE7, 0xEE, 0xF0, 0xFF);
-            var tn = Ui.Texto(nota, Inicio ? "¡NUEVO RETO!" : "RECETA", EstiloTexto.Subtitulo, new Color32(0x2E, 0x4A, 0x52, 0xFF), TextAlignmentOptions.Center);
-            tn.font = Ui.FuenteTiza;
-            UiKit.Rellenar((RectTransform)tn.transform);
 
             var boton = Ui.Boton(marco, Inicio ? "¡A jugar!" : "Volver al reto", Cerrar, VarianteBoton.Primario);
             var rb = (RectTransform)boton.transform;
             rb.anchorMin = rb.anchorMax = rb.pivot = new Vector2(1, 0);
             rb.anchoredPosition = new Vector2(-52, 44);
             rb.sizeDelta = new Vector2(220, 60);
+
+            // Las ayudas de los compañeros que confian en ti: se eligen aqui, antes de empezar.
+            if (Inicio && Ayudas != null && Ayudas.Count > 0 && AlUsarAyuda != null) {
+                var fila = Ui.Fila(marco, "Ayudas", 10);
+                fila.anchorMin = fila.anchorMax = fila.pivot = new Vector2(0, 0);
+                fila.anchoredPosition = new Vector2(52, 44);
+                fila.sizeDelta = new Vector2(1240, 60);
+                var titulo = Ui.Texto(fila, "Te ofrecen ayuda:", EstiloTexto.Cuerpo, Tema.mostazaClara);
+                titulo.font = Ui.FuenteTiza;
+                foreach (var tipo in Ayudas) {
+                    var ayuda = tipo;
+                    Button b = null;
+                    b = Ui.Boton(fila, "Usar: " + NombreCorto(ayuda), () => {
+                        if (!AlUsarAyuda(ayuda)) return;
+                        b.interactable = false;
+                        b.GetComponentInChildren<TMPro.TMP_Text>().text = "√ " + NombreCorto(ayuda);
+                    });
+                }
+            }
+        }
+
+        private static string NombreCorto(string tipo) {
+            switch (tipo) {
+                case Nexus.Core.Relaciones.TiposDeAyuda.RevelarDefectos: return "cuántos errores hay";
+                case Nexus.Core.Relaciones.TiposDeAyuda.MostrarDependencias: return "ver dependencias";
+                case Nexus.Core.Relaciones.TiposDeAyuda.PistaDetectar: return "una pista";
+                case Nexus.Core.Relaciones.TiposDeAyuda.MinutosExtra: return "+45 s de reloj";
+                default: return tipo;
+            }
         }
 
         private void Cerrar() {
@@ -258,8 +270,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             } else if (verbo == Verbos.Repartir) {
                 pie = "REPARTE LAS HORAS ENTRE LAS PILAS: CADA UNA ATRAPA SOLO SUS ERRORES.";
                 t.Texto(60, yL, "EL TRUCO", 26, Tizador.Cian);
-                t.Texto(60, yL + 50, "No alcanza para todo. Mira la descripción de cada tipo: ¿dónde es más probable que haya errores?", 26);
-                t.Texto(60, yL + 96, "Una pila vacía no atrapa nada, por barata que sea.", 26, Tizador.Mostaza);
+                t.Texto(60, yL + 50, "No alcanza para todo. Mira cada tipo: ¿cuántos errores suele haber y cuánto cuesta atrapar cada uno?", 26);
+                t.Texto(60, yL + 96, "Llena primero lo barato con muchos errores. Si no alcanza, deja fuera lo más caro y menos probable.", 26, Tizador.Mostaza);
                 var tr = t.En(260, yL + 150);
                 for (var i = 0; i < 4; i++) {
                     tr.Pila(i * 110, 0, 70, 150, i == 0 ? 1 : 0);
@@ -324,7 +336,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         private static void PasosRepartir(Tizador p) {
-            var a = p.En(0, 0); a.Pila(30, 10, 60, 120, 0.42f); a.Texto(120, 60, "+2", 26, Tizador.Cian); a.Texto(120, 100, "−2", 26);
+            var a = p.En(0, 0); a.Pila(30, 10, 60, 120, 0.42f); a.Texto(120, 60, "+", 30, Tizador.Cian); a.Texto(120, 100, "−", 30);
             a.Texto(70, 170, "1 · Dale horas a cada pila", 22, null, true);
             var b = p.En(360, 0); b.Pila(20, 10, 60, 120, 0); b.Bicho(50, 100, Tizador.Cian); b.Check(110, 100); b.Bicho(160, 100, Tizador.Roja); b.Cruz(160, 60, Tizador.Roja, 10);
             b.Texto(100, 170, "2 · Cada pila atrapa SOLO lo suyo", 22, null, true);

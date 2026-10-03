@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Minijuegos.Ordenar;
+using Nexus.Core.Relaciones;
+using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -14,11 +16,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
     public sealed class TarjetaArrastrable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
         public Action<float> AlSoltar;     // la y (hacia abajo, en coordenadas de la lamina) donde quedo su centro
         private RectTransform _rt;
-        private Vector2 _inicio;
 
         public void OnBeginDrag(PointerEventData e) {
             _rt = (RectTransform)transform;
-            _inicio = _rt.anchoredPosition;
             _rt.SetAsLastSibling();
             _rt.localRotation = Quaternion.Euler(0, 0, 1.2f);
         }
@@ -39,39 +39,71 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
     }
 
     /// <summary>
-    /// V3 · Ordenar. El backlog como un tablero: tarjetas que se arrastran (o se suben y bajan con ▲▼), un medidor
-    /// de esfuerzo a la izquierda que se llena con lo que entra, y la linea de capacidad: lo de abajo se queda fuera.
-    /// Las dependencias no se ven hasta que se rompen: al entregar, cada una rota se dibuja como una flecha roja.
-    /// A la derecha, lo que pide el cliente y las tres respuestas.
+    /// V3 · Ordenar. El backlog como un tablero, en DOS FASES para que nunca se mezcle ordenar con contestar:
+    ///   1 · Ordena   — tarjetas que se arrastran (o se suben y bajan con ▲▼), un medidor de esfuerzo y la linea de
+    ///                  capacidad: lo de abajo se queda fuera. «Listo: enseñárselo al cliente» pasa a la fase 2.
+    ///   2 · Contesta — el tablero queda quieto; el cliente pide algo y cada respuesta lo cambia AL MOMENTO (la
+    ///                  tarjeta pedida sube, o entra a cambio de otra), con la replica del cliente. Se puede cambiar
+    ///                  de respuesta cuantas veces se quiera (cada una parte del orden de la fase 1), y «Volver a
+    ///                  ordenar» deshace la respuesta.
+    ///
+    /// Las dependencias rotas se dicen DENTRO de la tarjeta que va antes de tiempo («Necesita X ANTES · está en
+    /// el puesto 3»), y la tarjeta necesitada dice quien la necesita: nada de flechas debajo que se confundan con
+    /// otra tarjeta. Se ven en el modo guiado, con la ayuda de un compañero y al cerrar.
     /// </summary>
     public sealed class PantallaOrdenar : PantallaDeMinijuego {
         private List<string> _orden;
+        private List<string> _ordenDeLaFase1;
+        private bool _contestando;
         private string _respuesta;
         private Lamina _lamina;
-        private RectTransform _respuestas;
-        private TMP_Text _resumen;
-        private Button _entregar;
+        private RectTransform _respuestas, _globo, _peticion;
+        private TMP_Text _resumen, _ayudaDeps, _faseTexto;
+        private Button _listo, _volver, _entregar;
+        private readonly Dictionary<string, RectTransform> _tarjetas = new Dictionary<string, RectTransform>();
+        private readonly Dictionary<string, Button> _botonesRespuesta = new Dictionary<string, Button>();
 
         private OrdenarCfg Cfg { get { return Def.Ordenar; } }
-        private const float Fila = 70, Y0 = 20, Izq = 130, Ancho = 1180;
+        private const float Fila = 78, Y0 = 20, Izq = 130, Ancho = 1180;
+
+        /// <summary>Se ven las dependencias mientras se juega: modo guiado o ayuda de un compañero.</summary>
+        private bool VerDependencias {
+            get { return Guiado || (Pendiente != null && Pendiente.TieneAyuda(TiposDeAyuda.MostrarDependencias)); }
+        }
+
+        private string QuienPide { get { return string.IsNullOrEmpty(Def.Presentacion.QuienEspera) || Def.Presentacion.QuienEspera == "Tú mismo" ? "el cliente" : Def.Presentacion.QuienEspera; } }
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
             _orden = Cfg.Tarjetas.Select(t => t.Id).ToList();
-            _lamina = NuevoLienzo(cuerpo, "El backlog · arrastra las tarjetas · arriba lo primero", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
+            _lamina = NuevoLienzo(cuerpo, "El backlog · arrastra las tarjetas o usa ▲▼ · arriba lo primero", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
 
             var lado = Ui.Columna(cuerpo, "Cliente", Tema.espacio);
-            UiKit.Tamano(lado, ancho: 460, flexAlto: 1);
-            var peticion = Ui.PanelColumna(lado, "Peticion", Tema.margen * 0.75f, Tema.espacio);
-            peticion.gameObject.AddComponent<Outline>().effectColor = Tema.mostaza;
-            Ui.Texto(peticion, ("Lo que pide " + (Def.Presentacion.QuienEspera ?? "el cliente")).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.mostaza);
-            Ui.Texto(peticion, "«" + (Cfg.Peticion ?? "") + "»", EstiloTexto.Cuerpo);
-            var r = Ui.Tarjeta(lado, "¿Qué le contestas?");
-            UiKit.Tamano(r, flexAlto: 1);
-            _respuestas = Ui.Columna(r, "Respuestas", 8);
-            var sprint = Ui.Tarjeta(lado, "En el sprint");
+            UiKit.Tamano(lado, ancho: 480, flexAlto: 1);
+
+            var sprint = Ui.Tarjeta(lado, "1 · Ordena el sprint");
+            _faseTexto = Ui.Texto(sprint, "", EstiloTexto.Pequeno, Tema.mostazaClara);
             _resumen = Ui.Texto(sprint, "", EstiloTexto.Cuerpo);
-            Ui.Texto(sprint, "Algunas tarjetas necesitan otra antes. Si las pones al revés, lo verás al entregar.", EstiloTexto.Pequeno);
+            _ayudaDeps = Ui.Texto(sprint, "", EstiloTexto.Pequeno);
+            _listo = Ui.Boton(sprint, "Listo: enseñárselo al cliente  ►", PasarAContestar, VarianteBoton.Primario);
+            GuiaView.Registrar("mj.ordenar.resumen", sprint);
+
+            _peticion = Ui.PanelColumna(lado, "Peticion", Tema.margen * 0.75f, Tema.espacio);
+            _peticion.gameObject.AddComponent<Outline>().effectColor = Tema.mostaza;
+            _peticion.gameObject.AddComponent<CanvasGroup>();
+            Ui.Texto(_peticion, ("2 · Lo que pide " + QuienPide).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.mostaza);
+            Ui.Texto(_peticion, "«" + (Cfg.Peticion ?? "") + "»", EstiloTexto.Cuerpo);
+            if (!string.IsNullOrEmpty(Cfg.TarjetaPedida))
+                Ui.Texto(_peticion, "Es la tarjeta con borde amarillo. Cada respuesta la mueve en el tablero: pruébalas.", EstiloTexto.Pequeno, Tema.mostazaClara);
+            _respuestas = Ui.Columna(_peticion, "Respuestas", 8);
+            _volver = Ui.Boton(_peticion, "◄ Volver a ordenar", VolverAOrdenar, VarianteBoton.Fantasma);
+            GuiaView.Registrar("mj.ordenar.respuestas", _peticion);
+
+            _globo = Ui.PanelColumna(lado, "Replica", Tema.margen * 0.75f, 4, Tema.fondoSecundario);
+            _globo.gameObject.AddComponent<Outline>().effectColor = Tema.cian;
+
+            Ui.Resorte(lado);
             _entregar = Ui.Boton(lado, "Entregar el orden y la respuesta", Entregar, VarianteBoton.Primario);
+            GuiaView.Registrar("mj.entregar", _entregar);
             Repintar();
         }
 
@@ -81,18 +113,119 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
             var entran = OrdenarEvaluador.Entran(Cfg, _orden);
             var porId = Cfg.Tarjetas.ToDictionary(t => t.Id);
-            _resumen.text = $"Esfuerzo {entran.Sum(id => porId[id].Esfuerzo)} de {Cfg.Capacidad} · valor {entran.Sum(id => porId[id].Valor)}";
+            _resumen.text = $"Ocupas {entran.Sum(id => porId[id].Esfuerzo)} de {Cfg.Capacidad} de esfuerzo · valor dentro: {entran.Sum(id => porId[id].Valor)}";
+            _faseTexto.text = _contestando ? "Orden cerrado. Ahora contesta al cliente →" : "Ordena el tablero. Cuando lo tengas, pulsa «Listo».";
+            var rotas = Rotas();
+            _ayudaDeps.text = VerDependencias
+                ? (rotas.Count == 0 ? "<color=#7FD8E8>Ninguna tarjeta va antes de lo que necesita.</color>"
+                                    : $"<color=#E0705A>{rotas.Count} tarjeta(s) van antes de lo que necesitan: lo dice dentro de cada una.</color>")
+                : "Algunas tarjetas necesitan otra antes. Si las pones al revés, lo verás al entregar.";
+            _listo.gameObject.SetActive(!_contestando);
 
+            // Fase 2: el panel del cliente; en la fase 1 se ve apagado, para que se sepa lo que viene.
             UiKit.Vaciar(_respuestas);
+            _botonesRespuesta.Clear();
             foreach (var clave in new[] { "obedecer", "rechazar", "negociar" }) {
                 Respuesta resp;
                 if (!Cfg.Respuestas.TryGetValue(clave, out resp)) continue;
                 var c = clave;
-                var boton = Ui.BotonDeOpcion(_respuestas, resp.Texto, Textos.Humanizar(c), () => { _respuesta = c; Repintar(); });
+                var boton = Ui.BotonDeOpcion(_respuestas, resp.Texto, Textos.Humanizar(c), () => Responder(c));
+                boton.interactable = _contestando;
                 Ui.Resaltar(boton, _respuesta == c);
+                _botonesRespuesta[c] = boton;
             }
-            _entregar.interactable = _respuesta != null;
+            _volver.gameObject.SetActive(_contestando);
+            SetAlfa(_peticion, _contestando ? 1f : 0.45f, _contestando);
+
+            UiKit.Vaciar(_globo);
+            Respuesta elegida = null;
+            if (_respuesta != null) Cfg.Respuestas.TryGetValue(_respuesta, out elegida);
+            _globo.gameObject.SetActive(elegida != null);
+            if (elegida != null) {
+                Ui.Texto(_globo, QuienPide.ToUpperInvariant() + " RESPONDE", EstiloTexto.Pequeno, Tema.cian);
+                if (!string.IsNullOrEmpty(elegida.Replica)) Ui.Texto(_globo, "«" + elegida.Replica + "»", EstiloTexto.Cuerpo);
+                var efecto = QueCambio();
+                if (!string.IsNullOrEmpty(efecto)) Ui.Texto(_globo, "En el tablero: " + efecto, EstiloTexto.Pequeno, Tema.mostazaClara);
+            }
+            _entregar.interactable = _contestando && _respuesta != null;
         }
+
+        /// <summary>Nada de '??' con componentes de Unity: el «null falso» del editor no lo detecta.</summary>
+        private static void SetAlfa(Component c, float alfa, bool interactuable) {
+            var g = c.GetComponent<CanvasGroup>();
+            if (g == null) g = c.gameObject.AddComponent<CanvasGroup>();
+            g.alpha = alfa;
+            g.interactable = interactuable;
+        }
+
+        /// <summary>Lo que la respuesta elegida le hizo al tablero, en una frase.</summary>
+        private string QueCambio() {
+            if (_ordenDeLaFase1 == null || string.IsNullOrEmpty(Cfg.TarjetaPedida)) return null;
+            var porId = Cfg.Tarjetas.ToDictionary(t => t.Id);
+            var antes = OrdenarEvaluador.Entran(Cfg, _ordenDeLaFase1);
+            var ahora = OrdenarEvaluador.Entran(Cfg, _orden);
+            var entraron = ahora.Except(antes).Select(id => "«" + porId[id].Titulo + "»").ToList();
+            var salieron = antes.Except(ahora).Select(id => "«" + porId[id].Titulo + "»").ToList();
+            if (entraron.Count == 0 && salieron.Count == 0) {
+                var subio = _orden.IndexOf(Cfg.TarjetaPedida) < _ordenDeLaFase1.IndexOf(Cfg.TarjetaPedida);
+                return subio ? $"«{porId[Cfg.TarjetaPedida].Titulo}» subió al puesto {_orden.IndexOf(Cfg.TarjetaPedida) + 1}." : "no cambia nada: el orden se queda como lo dejaste.";
+            }
+            var partes = new List<string>();
+            if (entraron.Count > 0) partes.Add("entra " + string.Join(", ", entraron));
+            if (salieron.Count > 0) partes.Add("se queda fuera " + string.Join(", ", salieron));
+            return string.Join(" y ", partes) + ".";
+        }
+
+        // ==================================================================== las dos fases
+
+        private void PasarAContestar() {
+            if (_contestando) return;
+            if (Guiado && !Guia.Permite(AccionGuiada.Listo)) { Guia.Rechazar(); return; }
+            _ordenDeLaFase1 = _orden.ToList();
+            _contestando = true;
+            Guia?.Hecho(AccionGuiada.Listo);
+            Repintar();
+        }
+
+        /// <summary>Contestar: siempre a partir del orden de la fase 1, asi cambiar de respuesta no acumula efectos.</summary>
+        private void Responder(string clave) {
+            if (!_contestando) return;
+            if (Guiado && !Guia.Permite(AccionGuiada.Responder, clave)) { Guia.Rechazar(); return; }
+            _respuesta = clave;
+            Respuesta r;
+            _orden = Cfg.Respuestas.TryGetValue(clave, out r)
+                ? OrdenarEvaluador.AplicarRespuesta(Cfg, _ordenDeLaFase1, r)
+                : _ordenDeLaFase1.ToList();
+            Guia?.Hecho(AccionGuiada.Responder, clave);
+            Repintar();
+        }
+
+        private void VolverAOrdenar() {
+            if (Guiado) { Guia.Rechazar(); return; }
+            if (_ordenDeLaFase1 != null) _orden = _ordenDeLaFase1.ToList();
+            _respuesta = null;
+            _contestando = false;
+            Repintar();
+        }
+
+        /// <summary>La etiqueta de la tarjeta pedida (y de la que sale por ella), segun lo contestado.</summary>
+        private string EtiquetaDeNegociacion(string id, HashSet<string> entran) {
+            if (string.IsNullOrEmpty(Cfg.TarjetaPedida)) return null;
+            if (id == Cfg.TarjetaPedida) {
+                if (_respuesta == null) return _contestando ? "la pide " + QuienPide : null;
+                switch (_respuesta) {
+                    case "obedecer": return "prometida";
+                    case "rechazar": return "rechazada";
+                    default: return entran.Contains(id) ? "entra (acordado)" : "para después (acordado)";
+                }
+            }
+            if (_respuesta != null && _ordenDeLaFase1 != null && !entran.Contains(id) &&
+                OrdenarEvaluador.Entran(Cfg, _ordenDeLaFase1).Contains(id))
+                return "sale por la pedida";
+            return null;
+        }
+
+        // ==================================================================== el tablero
 
         private float YDe(int indice, int linea) { return Y0 + indice * Fila + (indice >= linea ? 44 : 0); }
 
@@ -100,6 +233,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             for (var i = l.Raiz.childCount - 1; i >= 0; i--)
                 if (l.Raiz.GetChild(i).gameObject != l.Dibujo.gameObject) Destroy(l.Raiz.GetChild(i).gameObject);
             l.Dibujo.Limpiar();
+            if (!resultado) _tarjetas.Clear();
 
             var porId = Cfg.Tarjetas.ToDictionary(t => t.Id);
             var entran = OrdenarEvaluador.Entran(Cfg, _orden);
@@ -126,49 +260,79 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             l.Dibujo.Linea(Izq, yLinea, Izq + Ancho, yLinea, Tema.mostaza, 4, true);
             l.Texto(Izq, yLinea + 4, 700, 22, "CAPACIDAD DEL SPRINT · lo de abajo se queda fuera", 16, Tema.mostazaClara);
 
-            var rotas = resultado ? Rotas() : new List<KeyValuePair<string, string>>();
+            var ver = resultado || VerDependencias;
+            var rotas = ver ? Rotas() : new List<KeyValuePair<string, string>>();
+            var pasoGuiado = Guiado ? Guia.Actual : null;
             for (var i = 0; i < _orden.Count; i++) {
                 var t = porId[_orden[i]];
                 var dentro = i < linea;
                 var y = YDe(i, linea);
+                var rota = rotas.Where(p => p.Key == t.Id).Select(p => p.Value).ToList();
+                var laNecesitan = rotas.Where(p => p.Value == t.Id).Select(p => p.Key).ToList();
+
                 var tarjeta = Ui.Nodo(l.Raiz, "Tarjeta " + t.Id);
                 Lamina.Colocar(tarjeta, Izq, y, Ancho, Fila - 10);
+                if (!resultado) _tarjetas[t.Id] = tarjeta;
                 var img = tarjeta.gameObject.AddComponent<Image>();
                 img.sprite = Ui.SpriteRedondeado(); img.type = Image.Type.Sliced;
-                img.color = dentro ? (Color)Tema.pared : new Color32(0x1F, 0x31, 0x37, 0xFF);
-                var franja = Ui.Nodo(tarjeta, "Franja");
-                Lamina.Colocar(franja, 0, 0, 6, Fila - 10);
-                franja.gameObject.AddComponent<Image>().color = dentro ? Tema.cian : Tema.hormigon;
+                img.color = rota.Count > 0 ? new Color(0.36f, 0.16f, 0.14f, 1f) : dentro ? (Color)Tema.pared : new Color32(0x1F, 0x31, 0x37, 0xFF);
+                if (rota.Count > 0) { var o = tarjeta.gameObject.AddComponent<Outline>(); o.effectColor = Tema.rojo; o.effectDistance = new Vector2(3, -3); }
+                else if (t.Id == Cfg.TarjetaPedida && (_contestando || resultado)) tarjeta.gameObject.AddComponent<Outline>().effectColor = Tema.mostaza;
+                if (i == 0) GuiaView.Registrar("mj.ordenar.tarjeta", tarjeta);
 
                 var tenue = dentro ? 1f : 0.55f;
                 var fila = new Lamina(Ui, tarjeta, Ancho, Fila - 10, "Contenido");
                 UiKit.Rellenar(fila.Raiz);
-                fila.Texto(18, 0, 30, Fila - 10, "≡", 22, Tema.textoTenue, TextAlignmentOptions.Center);
-                fila.Texto(56, 0, 40, Fila - 10, (i + 1).ToString(), 20, Tema.textoTenue, TextAlignmentOptions.Center, null, true);
-                fila.Texto(104, 0, 640, Fila - 10, t.Titulo, 20, WithAlpha(Tema.texto, tenue), TextAlignmentOptions.MidlineLeft, null, true);
-                fila.Pastilla(820, (Fila - 10) / 2, "valor " + t.Valor, 16, WithAlpha(Tema.cian, tenue), Tema.textoSobreCian);
-                fila.Pastilla(940, (Fila - 10) / 2, "esfuerzo " + t.Esfuerzo, 16, Tema.hormigon, Tema.texto);
-                if (!resultado) {
-                    var indice = i;
-                    var sube = Ui.Boton(tarjeta, "▲", () => Mover(indice, indice - 1));
-                    Lamina.Colocar((RectTransform)sube.transform, Ancho - 124, 8, 52, Fila - 26);
-                    sube.interactable = i > 0;
-                    var baja = Ui.Boton(tarjeta, "▼", () => Mover(indice, indice + 1));
-                    Lamina.Colocar((RectTransform)baja.transform, Ancho - 64, 8, 52, Fila - 26);
-                    baja.interactable = i < _orden.Count - 1;
-                    tarjeta.gameObject.AddComponent<TarjetaArrastrable>().AlSoltar = yCentro => Soltar(indice, yCentro, linea);
-                } else if (!dentro) {
-                    fila.Texto(Ancho - 200, 0, 180, Fila - 10, "no entró", 16, Tema.textoTenue, TextAlignmentOptions.MidlineRight);
-                }
-            }
+                // el puesto, grande: es lo que se ordena
+                fila.Texto(10, 0, 60, Fila - 10, (i + 1).ToString(), 30, dentro ? Tema.cian : Tema.textoTenue, TextAlignmentOptions.Center, null, true);
+                fila.Texto(66, 0, 26, Fila - 10, "≡", 20, Tema.textoTenue, TextAlignmentOptions.Center);
 
-            // al entregar: cada dependencia rota, una flecha roja de la tarjeta a la que necesitaba
-            foreach (var par in rotas) {
-                var i1 = _orden.IndexOf(par.Key); var i2 = _orden.IndexOf(par.Value);
-                var ya = YDe(i1, linea) + (Fila - 10) / 2; var yb2 = YDe(i2, linea) + (Fila - 10) / 2;
-                var x = Izq + Ancho - 150;
-                l.Dibujo.Curva(new Vector2(x, ya), new Vector2(x + 90, (ya + yb2) / 2), new Vector2(x, yb2), Tema.rojo, 4);
-                l.Texto(x + 60, (ya + yb2) / 2 - 12, 160, 24, "necesita esta antes", 15, Tema.rojo);
+                string aviso = null;
+                Color colorAviso = Tema.textoTenue;
+                if (rota.Count > 0) {
+                    aviso = "¡Ojo! Necesita " + string.Join(" y ", rota.Select(d =>
+                                $"«{porId[d].Titulo}» ANTES · " + (entran.Contains(d) ? $"está en el puesto {_orden.IndexOf(d) + 1}" : "y no entró"))) + ": súbela por encima.";
+                    colorAviso = Tema.rojo;
+                } else if (laNecesitan.Count > 0) {
+                    aviso = "la necesita " + string.Join(", ", laNecesitan.Select(k => $"«{porId[k].Titulo}» (puesto {_orden.IndexOf(k) + 1})")) + ": tiene que ir encima";
+                    colorAviso = Tema.mostazaClara;
+                } else if (ver && t.DependeDe.Count > 0) {
+                    aviso = "necesita: " + string.Join(", ", t.DependeDe.Select(d => "«" + porId[d].Titulo + "»")) + " · bien colocada";
+                    colorAviso = Tema.cianClaro;
+                }
+                if (aviso != null) {
+                    fila.Texto(104, 4, 600, 32, t.Titulo, 19, WithAlpha(Tema.texto, tenue), TextAlignmentOptions.MidlineLeft, null, true);
+                    fila.Texto(104, 36, 690, 28, aviso, 14, colorAviso, TextAlignmentOptions.MidlineLeft);
+                } else {
+                    fila.Texto(104, 0, 600, Fila - 10, t.Titulo, 20, WithAlpha(Tema.texto, tenue), TextAlignmentOptions.MidlineLeft, null, true);
+                }
+                var etiqueta = EtiquetaDeNegociacion(t.Id, entran);
+                if (etiqueta != null) fila.Pastilla(720, 20, etiqueta, 14, Tema.mostaza, Tema.fondo);
+                fila.Pastilla(830, (Fila - 10) / 2, "valor " + t.Valor, 16, WithAlpha(Tema.cian, tenue), Tema.textoSobreCian);
+                fila.Pastilla(950, (Fila - 10) / 2, "esfuerzo " + t.Esfuerzo, 16, Tema.hormigon, Tema.texto);
+
+                if (resultado) {
+                    if (!dentro) fila.Texto(Ancho - 200, 0, 180, Fila - 10, "no entró", 16, Tema.textoTenue, TextAlignmentOptions.MidlineRight);
+                    continue;
+                }
+                if (_contestando) continue;   // en la fase 2 el tablero no se toca
+                var indice = i;
+                if (Guiado) {
+                    // Guiado: solo se mueve la tarjeta del paso, con un boton que dice a donde.
+                    if (pasoGuiado != null && pasoGuiado.Accion == AccionGuiada.Mover && pasoGuiado.Objetivo == t.Id) {
+                        var destino = pasoGuiado.Valor;
+                        var poner = Ui.Boton(tarjeta, $"Ponla en el puesto {destino + 1}", () => MoverGuiado(t.Id, destino), VarianteBoton.Primario);
+                        Lamina.Colocar((RectTransform)poner.transform, Ancho - 250, 8, 238, Fila - 26);
+                    }
+                    continue;
+                }
+                var sube = Ui.Boton(tarjeta, "▲", () => Mover(indice, indice - 1));
+                Lamina.Colocar((RectTransform)sube.transform, Ancho - 124, 8, 52, Fila - 26);
+                sube.interactable = i > 0;
+                var baja = Ui.Boton(tarjeta, "▼", () => Mover(indice, indice + 1));
+                Lamina.Colocar((RectTransform)baja.transform, Ancho - 64, 8, 52, Fila - 26);
+                baja.interactable = i < _orden.Count - 1;
+                tarjeta.gameObject.AddComponent<TarjetaArrastrable>().AlSoltar = yCentro => Soltar(indice, yCentro, linea);
             }
         }
 
@@ -194,6 +358,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         private void Mover(int desde, int hasta) {
+            if (_contestando) return;
             if (hasta < 0 || hasta >= _orden.Count) { Repintar(); return; }
             var id = _orden[desde];
             _orden.RemoveAt(desde);
@@ -201,14 +366,45 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             Repintar();
         }
 
+        private void MoverGuiado(string id, int destino) {
+            if (!Guia.Permite(AccionGuiada.Mover, id)) { Guia.Rechazar(); return; }
+            _orden.Remove(id);
+            _orden.Insert(Math.Min(destino, _orden.Count), id);
+            Guia.Hecho(AccionGuiada.Mover, id);
+            Repintar();
+        }
+
+        protected override RectTransform PiezaGuiada(PasoGuiado paso) {
+            RectTransform rt;
+            switch (paso.Accion) {
+                case AccionGuiada.Mover: return _tarjetas.TryGetValue(paso.Objetivo ?? "", out rt) ? rt : null;
+                case AccionGuiada.Listo: return _listo != null ? (RectTransform)_listo.transform : null;
+                case AccionGuiada.Responder:
+                    Button b;
+                    return _botonesRespuesta.TryGetValue(paso.Objetivo ?? "", out b) ? (RectTransform)b.transform : _peticion;
+                case AccionGuiada.Entregar: return _entregar != null ? (RectTransform)_entregar.transform : null;
+                default: return _lamina != null ? _lamina.Raiz : null;
+            }
+        }
+
         protected override ResultadoMinijuego Evaluar() {
             // Sin respuesta al cliente, el evaluador lo da por omitido: no contestar tambien es contestar.
+            // El tablero ya lleva la respuesta aplicada; aplicarla otra vez no cambia nada.
             return OrdenarEvaluador.Evaluar(Def, _orden, _respuesta);
         }
 
         protected override void PintarResultado(RectTransform zona) {
-            var l = NuevoLienzo(zona, "Tu orden · en rojo, lo que necesitaba otra tarjeta antes", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
+            var l = NuevoLienzo(zona, "Tu orden · en rojo, lo que iba antes de lo que necesita", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
             PintarBacklog(l, true);
+        }
+
+        /// <summary>Un orden que da el mejor valor respetando dependencias: lo que se enseña al cerrar.</summary>
+        protected override IEnumerable<string> SolucionEnTexto() {
+            var porId = Cfg.Tarjetas.ToDictionary(t => t.Id);
+            var mejor = OrdenarEvaluador.MejorOrden(Cfg);
+            if (mejor.Count == 0) yield break;
+            yield return "Un orden que habría dado el máximo valor (" + mejor.Sum(id => porId[id].Valor) + "): " +
+                         string.Join(" → ", mejor.Select(id => porId[id].Titulo)) + ".";
         }
     }
 }

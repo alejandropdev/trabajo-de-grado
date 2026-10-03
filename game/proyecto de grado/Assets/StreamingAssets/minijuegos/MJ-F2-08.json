@@ -6,24 +6,29 @@
   "objetivoAprendizaje": "OA-TEST-01",
   "presentacion": {
     "titulo": "Las horas de pruebas",
-    "comoSeJuega": "Tienes 40 horas de pruebas para el release. Repártelas entre los cuatro tipos. Cada tipo solo encuentra los defectos de su clase; lo que no encuentres, lo encontrará el cliente.",
+    "comoSeJuega": "Es el plan de pruebas (PTP) del release: cuántas horas va a cada tipo de prueba. Tienes 42 horas; súbelas o bájalas con + y −. Cada tipo solo encuentra los errores de su clase, y cada error cuesta las horas que dice su tarjeta. Lo que no encuentres, lo encontrará el cliente. Ganas si se escapa como mucho 1 error.",
     "quienEspera": "Óscar",
     "textoPresion": "El release candidato sale el viernes",
     "segundosReloj": 120
   },
   "repartir": {
-    "presupuesto": 40,
+    "presupuesto": 42,
+    "paso": 2,
     "unidad": "horas",
     "toleranciaDeEscapes": 1,
     "depositos": [
       { "id": "unitarias", "nombre": "Unitarias", "costePorDefecto": 2, "defectosOcultos": 5,
-        "descripcion": "Cada función por separado. Baratas. El módulo de reservas tiene mucha lógica de fechas y turnos." },
+        "descripcion": "Cada función por separado. Baratas. El módulo de reservas tiene mucha lógica de fechas y turnos.",
+        "pista": "Mucha lógica nueva: suele haber 4 o 5 errores." },
       { "id": "integracion", "nombre": "Integración", "costePorDefecto": 4, "defectosOcultos": 4,
-        "descripcion": "Que las piezas hablen entre sí: el lector con el módulo de acceso, el módulo con la barrera y con la base de datos." },
+        "descripcion": "Que las piezas hablen entre sí: el lector con el módulo de acceso, el módulo con la barrera y con la base de datos.",
+        "pista": "Tres conexiones nuevas: suele haber 3 o 4 errores." },
       { "id": "e2e", "nombre": "De extremo a extremo", "costePorDefecto": 6, "defectosOcultos": 2,
-        "descripcion": "Un carro de verdad entrando y saliendo. Caras, pero son las únicas que ven el sistema como lo ve el guardia." },
+        "descripcion": "Un carro de verdad entrando y saliendo. Caras, pero son las únicas que ven el sistema como lo ve el guardia.",
+        "pista": "Flujo completo nuevo: suele haber 1 o 2 errores." },
       { "id": "regresion", "nombre": "Regresión", "costePorDefecto": 3, "defectosOcultos": 3,
-        "descripcion": "Que lo que ya funcionaba siga funcionando. Este sprint se tocó el registro de accesos, que ya estaba en producción." }
+        "descripcion": "Que lo que ya funcionaba siga funcionando. Este sprint se tocó el registro de accesos, que ya estaba en producción.",
+        "pista": "Se tocó código en producción: suele haber 2 o 3 errores." }
     ]
   },
   "consecuencias": {
@@ -37,20 +42,20 @@
       "efectosInmediatos": { "Cobertura": 4 },
       "efectosDiferidos": [ { "enDias": 5, "efectos": { "SatisfaccionCliente": -5, "DeudaTecnica": 4 } } ],
       "hallazgos": [],
-      "rubrica": { "veredicto": "aceptable", "oa": "OA-TEST-01", "razon": "Varios defectos escaparon, y escaparon justo del tipo en el que invertiste poco. Lo que no se prueba no desaparece: lo prueba el cliente." }
+      "rubrica": { "veredicto": "aceptable", "oa": "OA-TEST-01", "razon": "Varios errores escaparon, y escaparon justo del tipo en el que invertiste poco. Lo que no se prueba no desaparece: lo prueba el cliente." }
     },
     "falsoPositivo": {
       "efectosInmediatos": { "Cobertura": 6 },
       "efectosDiferidos": [ { "enDias": 5, "efectos": { "SatisfaccionCliente": -7, "DeudaTecnica": 5 } } ],
       "hallazgos": [],
-      "rubrica": { "veredicto": "incorrecta", "oa": "OA-TEST-01", "razon": "Pusiste horas de sobra en un tipo de prueba mientras otro, con defectos, se quedaba a cero. La cobertura del informe sube y el cliente encuentra el error igual." }
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-TEST-01", "razon": "Pusiste horas de sobra en un tipo de prueba mientras otro, con errores, se quedaba en cero. La cobertura del informe sube y el cliente encuentra el error igual." }
     },
     "omitido": {
       "efectosInmediatos": { "DeudaTecnica": 6, "Cobertura": -4 },
       "efectosDiferidos": [],
       "hallazgos": [],
-      "rubrica": { "veredicto": "incorrecta", "oa": "OA-TEST-01", "razon": "El release salió sin plan de pruebas. Todos los defectos que había los va a encontrar el cliente." }
+      "rubrica": { "veredicto": "incorrecta", "oa": "OA-TEST-01", "razon": "El release salió sin plan de pruebas. Todos los errores que había los va a encontrar el cliente." }
     }
   },
-  "cierre": { "texto": "Semanas después, los defectos que escaparon son exactamente del tipo que no compraste." }
+  "cierre": { "texto": "Semanas después, los errores que escaparon son exactamente del tipo en el que invertiste poco." }
 }

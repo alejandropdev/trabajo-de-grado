@@ -27,8 +27,8 @@
         }
       ],
       "correcta": "C",
-      "susurroSiAcierta": "Anótalo con una marca.",
-      "susurroSiFalla": "Ese no distingue programar de construir. Como casi todos."
+      "susurroSiAcierta": "Anótalo con una marca. Sabe que la ingeniería es el proceso, no la herramienta: medir, planificar, mantener.",
+      "susurroSiFalla": "Ese no distingue programar de construir. Como casi todos. La clave está en el proceso y en lo que se puede medir."
     },
     {
       "numero": 2,
@@ -71,8 +71,8 @@
         }
       ],
       "correcta": "B",
-      "susurroSiAcierta": "Correcta. Siguiente.",
-      "susurroSiFalla": "Confunde quién prioriza con quién ejecuta. Común."
+      "susurroSiAcierta": "Correcta. Sabe que el Product Owner ordena el backlog por valor; el Scrum Master cuida el proceso, no el producto.",
+      "susurroSiFalla": "Confunde quién prioriza con quién ejecuta. Común. Pregúntate quién decide qué vale más para el cliente."
     },
     {
       "numero": 4,
@@ -115,8 +115,8 @@
         }
       ],
       "correcta": "A",
-      "susurroSiAcierta": "Anótalo.",
-      "susurroSiFalla": "No sabe para qué se integra seguido. Va a integrar al final, como todos."
+      "susurroSiAcierta": "Anótalo. Integrar poco y seguido para que los conflictos salgan pequeños y pronto: eso es CI.",
+      "susurroSiFalla": "No sabe para qué se integra seguido. Va a integrar al final, como todos, y los conflictos le llegarán todos juntos."
     },
     {
       "numero": 6,
@@ -159,8 +159,8 @@
         }
       ],
       "correcta": "C",
-      "susurroSiAcierta": "Correcta.",
-      "susurroSiFalla": "No sabe qué es el acoplamiento. Se lo va a explicar Voss, sin querer."
+      "susurroSiAcierta": "Correcta. Bajo acoplamiento: cambiar uno no obliga a tocar el otro. Por eso se pueden mantener por separado.",
+      "susurroSiFalla": "No sabe qué es el acoplamiento. Se lo va a explicar Voss, sin querer. Piensa en cuánto depende una pieza de las tripas de otra."
     },
     {
       "numero": 8,
@@ -225,8 +225,8 @@
         }
       ],
       "correcta": "B",
-      "susurroSiAcierta": "Anótalo.",
-      "susurroSiFalla": "No sabe qué hace un merge. Lo va a aprender un viernes, a las malas."
+      "susurroSiAcierta": "Anótalo. Un merge une dos historias sin borrar ninguna; la que se pierde es la que se reescribe.",
+      "susurroSiFalla": "No sabe qué hace un merge. Lo va a aprender un viernes, a las malas. Piensa en juntar dos líneas de trabajo, no en sustituir una."
     },
     {
       "numero": 11,
@@ -269,8 +269,8 @@
         }
       ],
       "correcta": "C",
-      "susurroSiAcierta": "Correcta.",
-      "susurroSiFalla": "Cree que un patrón es una librería. Va a copiar mal uno, seguro."
+      "susurroSiAcierta": "Correcta. Un patrón es una idea con nombre (Observer, Strategy), no un código que se instala.",
+      "susurroSiFalla": "Cree que un patrón es una librería. Va a copiar mal uno, seguro. Un patrón se explica con palabras antes que con código."
     },
     {
       "numero": 13,
@@ -313,8 +313,8 @@
         }
       ],
       "correcta": "A",
-      "susurroSiAcierta": "Correcta.",
-      "susurroSiFalla": "No distingue los niveles de prueba. Va a probar mal, y no va a saber qué probó."
+      "susurroSiAcierta": "Correcta. Unitaria: una pieza sola, rápida y barata. Integración: varias piezas hablando entre sí.",
+      "susurroSiFalla": "No distingue los niveles de prueba. Va a probar mal. Piensa en el tamaño de lo que se prueba: una pieza o varias juntas."
     },
     {
       "numero": 15,

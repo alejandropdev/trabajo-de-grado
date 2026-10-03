@@ -672,7 +672,11 @@ namespace Nexus.Tests {
             var resultado = s.EjecutarLanzamiento();
 
             Assert.IsFalse(resultado.Exito);
-            Assert.AreEqual(moralAntes - 8, s.W.MoralEquipo, Tol);
+            // Sin alcance imposible ya no basta para fallar: el umbral de avance no es parte del lanzamiento.
+            // Lo que cuesta moral es el nivel del lanzamiento: -10 si sale mal, -4 si sale con problemas.
+            var esperado = resultado.Nivel == Nexus.Core.Evaluacion.NivelesDeLanzamiento.Mal ? 10
+                         : resultado.Nivel == Nexus.Core.Evaluacion.NivelesDeLanzamiento.ConProblemas ? 4 : 0;
+            Assert.AreEqual(moralAntes - esperado, s.W.MoralEquipo, Tol);
         }
 
         [Test]

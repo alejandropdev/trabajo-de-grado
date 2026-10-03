@@ -127,6 +127,18 @@ namespace Nexus.Core.Datos
             foreach (var clave in new[] { "obedecer", "rechazar", "negociar" })
                 if (!o.Respuestas.ContainsKey(clave))
                     e.Add($"Falta la respuesta '{clave}' al cliente. Las tres opciones tienen que existir desde el principio.");
+
+            if (!string.IsNullOrEmpty(o.TarjetaPedida) && !ids.Contains(o.TarjetaPedida))
+                e.Add($"'ordenar.tarjetaPedida' apunta a la tarjeta inexistente '{o.TarjetaPedida}'.");
+            foreach (var kv in o.Respuestas)
+            {
+                var ef = kv.Value?.EfectoEnBacklog;
+                if (string.IsNullOrEmpty(ef)) continue;
+                if (ef != EfectosEnBacklog.ForzarArriba && ef != EfectosEnBacklog.Intercambiar && ef != EfectosEnBacklog.Ninguno)
+                    e.Add($"La respuesta '{kv.Key}' tiene un efectoEnBacklog desconocido: '{ef}'.");
+                else if (ef != EfectosEnBacklog.Ninguno && string.IsNullOrEmpty(o.TarjetaPedida))
+                    e.Add($"La respuesta '{kv.Key}' mueve la tarjeta pedida, pero 'ordenar.tarjetaPedida' esta vacio.");
+            }
         }
 
         /// <summary>V2 · repartir un presupuesto escaso. Tiene que ser escaso de verdad.</summary>
@@ -147,6 +159,10 @@ namespace Nexus.Core.Datos
             var necesario = r.Depositos.Sum(d => d.CostePorDefecto * d.DefectosOcultos);
             if (r.Presupuesto >= necesario)
                 e.Add("El presupuesto alcanza para encontrarlo todo: repartir no obligaria a renunciar a nada.");
+            if (r.Paso <= 0) e.Add("'repartir.paso' tiene que ser positivo.");
+            else if (r.Presupuesto > 0 && r.Depositos.All(d => d.CostePorDefecto > 0) &&
+                     Nexus.Core.Minijuegos.Repartir.RepartirEvaluador.RepartosGanadores(r).Count == 0)
+                e.Add($"Con {r.Presupuesto} {r.Unidad} (de {r.Paso} en {r.Paso}) no existe ningun reparto que gane: la escena es imposible.");
         }
     }
 

@@ -331,7 +331,26 @@ namespace Nexus.Tests {
 
             var otraPartida = new GuiaDelTutorial(Catalogo().Guia, "nivel-00", vistos);
             Assert.AreEqual("DIA-ANTES-2", otraPartida.Siguiente("dia.antes").Id, "lo visto no se repite en otra partida del perfil");
-            Assert.IsFalse(new GuiaDelTutorial(Catalogo().Guia, "nivel-01", vistos).Activa, "en N1 nadie explica nada");
+            Assert.AreEqual(2, otraPartida.Pasos("dia.antes").Count(p => p.Id == "DIA-ANTES-1" || p.Id == "DIA-ANTES-2"),
+                            "para releer salen todos, vistos o no");
+
+            var n0 = Catalogo().Guia.Count(p => p.Nivel == "nivel-00");
+            var n1 = Catalogo().Guia.Count(p => p.Nivel == "nivel-01");
+            Assert.Greater(n1, 0, "N1 tiene unas pocas burbujas para lo nuevo");
+            Assert.Less(n1 * 4, n0, "pero N1 es mas libre: mucha menos guia que el tutorial");
+        }
+
+        [Test]
+        public void Ningun_paso_de_la_guia_espera_algo_imposible() {
+            var c = Catalogo();
+            foreach (var p in c.Guia.Where(x => !string.IsNullOrEmpty(x.EsperaAccion))) {
+                Assert.IsFalse(p.PausaElReloj, p.Id + ": espera una accion con el reloj parado");
+                // un coleccionable puede estar en cualquier zona: pedir ir a una zona concreta tras recoger uno
+                // puede pedir ir a donde ya estas (el MAPA-2 original se quedaba colgado asi)
+                if (p.Disparador == "coleccionable") StringAssert.DoesNotStartWith("ir-a-zona:", p.EsperaAccion, p.Id);
+            }
+            foreach (var p in c.Guia.Where(x => x.Nivel == PasoDeGuia.TodosLosNiveles))
+                StringAssert.StartsWith("ayuda.", p.Disparador, p.Id + ": lo comun a todos los niveles es solo la ayuda");
         }
 
         [Test]
@@ -339,9 +358,9 @@ namespace Nexus.Tests {
             var usados = new HashSet<string>(Catalogo().Guia.Where(p => p.Nivel == "nivel-00").Select(p => p.Disparador));
             foreach (var d in new[] { "fase1.encargo", "fase1.recoleccion", "fase1.metodologia", "fase1.calidad", "fase1.arquitectura",
                                       "fase1.resumen", "dia.antes", "dia.1", "mapa.zona", "alerta.suena", "alerta.lejos",
-                                      "decision.abierta", "decision.hecha", "minijuego.presentacion", "minijuego.jugando",
+                                      "decision.abierta", "decision.hecha", "minijuego.presentacion",
                                       "minijuego.cierre", "oficina.disponible", "coleccionable", "cierre", "resumen",
-                                      "lanzamiento", "lecciones" })
+                                      "lanzamiento", "lecciones", "conversacion" })
                 CollectionAssert.Contains(usados, d, "el tutorial no explica '" + d + "'");
             var textos = string.Join(" ", Catalogo().Guia.Select(p => p.Texto));
             foreach (var met in new[] { "Scrum", "Cascada", "Kanban" })

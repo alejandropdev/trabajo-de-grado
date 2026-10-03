@@ -20,6 +20,22 @@ namespace Nexus.Core.Modelo {
         /// </summary>
         public Nexus.Core.Fase1.RecoleccionConfig Recoleccion;
 
+        /// <summary>
+        /// Las razones que se le ofrecen al jugador para ESA arquitectura: las suyas si las tiene (ids del menu),
+        /// todo el menu si no. Elegir «app móvil» no puede ofrecer las mismas razones que «web»: cada forma se
+        /// defiende (o se defiende mal) con argumentos distintos.
+        /// </summary>
+        public List<RazonOpcion> RazonesDe(ArquitecturaOpcion opcion) {
+            var todas = RazonesDisponibles ?? new List<RazonOpcion>();
+            if (opcion == null || opcion.Razones == null || opcion.Razones.Count == 0) return new List<RazonOpcion>(todas);
+            var lista = new List<RazonOpcion>();
+            foreach (var id in opcion.Razones) {
+                var r = todas.Find(x => x != null && x.Id == id);
+                if (r != null) lista.Add(r);
+            }
+            return lista;
+        }
+
         public Fase1Config Clone() {
             var c = new Fase1Config();
             c.Recoleccion = Recoleccion == null ? null : Recoleccion.Clone();
@@ -105,6 +121,9 @@ namespace Nexus.Core.Modelo {
         public List<string> RazonesValidas = new List<string>();
         public List<string> RazonesTrampa = new List<string>();
 
+        /// <summary>Ids del menu de razones que se ofrecen con ESTA opcion. Vacia = todo el menu.</summary>
+        public List<string> Razones = new List<string>();
+
         /// <summary>La que el briefing sostiene. Todo nivel debe tener exactamente una, y el validador lo exige.</summary>
         public bool EsLaAdecuada;
 
@@ -125,6 +144,7 @@ namespace Nexus.Core.Modelo {
                 : new Dictionary<string, double>(ModificadoresModelo, StringComparer.OrdinalIgnoreCase);
             c.RazonesValidas = RazonesValidas == null ? null : new List<string>(RazonesValidas);
             c.RazonesTrampa = RazonesTrampa == null ? null : new List<string>(RazonesTrampa);
+            c.Razones = Razones == null ? null : new List<string>(Razones);
             c.FlagsAlCerrar = FlagsAlCerrar == null ? null : new Dictionary<string, double>(FlagsAlCerrar, StringComparer.Ordinal);
             return c;
         }

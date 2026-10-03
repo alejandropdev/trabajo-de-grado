@@ -117,7 +117,10 @@ namespace Nexus.Unity.Pantallas {
         }
     }
 
-    /// <summary>Lo que se acaba de encontrar, en grande, antes de guardarlo en el diario. El reloj espera.</summary>
+    /// <summary>
+    /// Lo que se acaba de encontrar, en grande. Ya esta guardado en el diario (se guarda solo al recogerlo): aqui
+    /// solo se lee, y se puede ir directamente al diario a verlo con lo demas. El reloj espera.
+    /// </summary>
     public sealed class PantallaDeColeccionable : PantallaModal {
         public Coleccionable Coleccionable;
         public Action AlCerrar;
@@ -128,9 +131,15 @@ namespace Nexus.Unity.Pantallas {
         protected override void Rellenar() {
             Hoja.Etiqueta("Encontraste " + PantallaDelDiario.NombreDeSerie(Coleccionable.Serie, true), Tema.mostaza);
             PantallaDelDiario.Tarjeta(Ui, Hoja.Raiz, Coleccionable);
-            Hoja.Accion("Guardarlo en el diario", () => {
+            Hoja.Nota("√ Guardado en tu diario de campo.", Tema.cian);
+            var fila = Hoja.Fila();
+            Ui.Boton(fila, "Seguir", () => {
                 App.Router.Volver();
                 AlCerrar?.Invoke();
+            }, VarianteBoton.Primario);
+            Ui.Boton(fila, "Revisar el diario", () => {
+                App.Router.Volver();
+                App.Router.Apilar<PantallaDelDiario>(p => p.AlCerrar = AlCerrar);
             });
         }
     }

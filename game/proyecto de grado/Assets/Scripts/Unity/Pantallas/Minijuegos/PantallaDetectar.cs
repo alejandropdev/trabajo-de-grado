@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Minijuegos.Detectar;
 using Nexus.Core.Minijuegos.Grafo;
+using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -32,13 +33,20 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private RectTransform _marcas, _detalle;
         private TMP_Text _seleccion, _aviso;
         private Func<string, EstadoPieza> _estadoDe;
+        private string _pista;
+        private readonly Dictionary<string, RectTransform> _piezas = new Dictionary<string, RectTransform>();
+        private readonly Dictionary<string, Button> _botonesEtiqueta = new Dictionary<string, Button>();
+        private Button _entregar, _limpiar;
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
             _estado = new DetectarState(Def.Presentacion.SegundosReloj);
             AndamiajeCfg cfg;
             _andamiaje = Def.Andamiaje != null && Def.Andamiaje.TryGetValue(Pendiente.NivelAndamiaje.ToString(), out cfg) ? cfg : null;
             if (_andamiaje != null && _andamiaje.ResaltarZonasCandidatas)
-                _candidatas = new HashSet<string>(Def.Zonas.SelectMany(z => z.Commits).Concat(Def.Senuelos.SelectMany(s => s.Commits)));
+                _candidatas = new HashSet<string>(Def.Zonas.SelectMany(z => z.Commits));
+            // La ayuda de un compañero: una pieza con un problema de verdad, señalada.
+            if (Pendiente != null && Pendiente.TieneAyuda(Nexus.Core.Relaciones.TiposDeAyuda.PistaDetectar) && Def.Zonas.Count > 0)
+                _pista = Def.Zonas[0].Commits.FirstOrDefault();
             foreach (var e in Def.Artefacto.Elementos) _nombres[e.Id] = e.Texto;
             foreach (var c in Def.Artefacto.Commits) _nombres[c.Id] = c.Id + " · " + c.Mensaje;
             foreach (var c in Def.Artefacto.Conexiones) _nombres[c.Id] = "flecha: " + c.Texto;
@@ -50,6 +58,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         private void ConstruirLienzos(RectTransform cuerpo) {
+            GuiaView.Registrar("mj.detectar.tablero", cuerpo);
             switch (Def.Lienzo) {
                 case "grafo_commits": {
                     var l = NuevoLienzo(cuerpo, "El histórico · cada columna es una rama, cada punto un commit", 1335, 90 + Def.Artefacto.Commits.Count * 62);
@@ -76,7 +85,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private EstadoPieza EstadoEnJuego(string id) {
             if (_estado.Seleccion.Contains(id)) return EstadoPieza.Seleccionada;
             if (_estado.Marcas.Any(m => m.Commits.Contains(id))) return EstadoPieza.Marcada;
-            if (_candidatas.Contains(id)) return EstadoPieza.Candidata;
+            if (_candidatas.Contains(id) || id == _pista) return EstadoPieza.Candidata;
             return EstadoPieza.Normal;
         }
 
@@ -129,10 +138,24 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             l.Texto(x - 15, y - 15, 30, 30, s, 20, Tema.textoSobreCian, TextAlignmentOptions.Center, null, true);
         }
 
+        /// <summary>
+        /// Pinchar una pieza la mira y la selecciona. En un diagrama o una secuencia, pinchar OTRA cambia la selección
+        /// a esa sola: antes se acumulaban, y una marca podía llevar a la vez el problema y un señuelo (y salir mal
+        /// aunque el jugador creyera haberlo hecho bien). Solo el grafo de git selecciona varias, porque un problema
+        /// puede ser un tramo de commits.
+        /// </summary>
         private void Pinchar(string id, Action alMirar) {
             if (Resultado != null) return;
-            _estado.Alternar(id);
             alMirar?.Invoke();
+            if (Guiado) {
+                if (!Guia.Permite(AccionGuiada.Seleccionar, id)) { Guia.Rechazar(); Repintar(); return; }
+                if (!_estado.Seleccion.Contains(id)) _estado.Alternar(id);
+                Guia.Hecho(AccionGuiada.Seleccionar, id);
+                Repintar();
+                return;
+            }
+            if (Def.Lienzo == "grafo_commits" || _estado.Seleccion.Contains(id)) _estado.Alternar(id);
+            else { _estado.Seleccion.Clear(); _estado.Alternar(id); }
             Repintar();
         }
 
@@ -180,7 +203,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 l.Texto(W - 260, y - 13, 200, 26, $"{c.Autor} · {(c.Fecha ?? "").Replace('T', ' ').Substring(Math.Min(5, (c.Fecha ?? "").Length))}", 16,
                         Tema.textoTenue, TextAlignmentOptions.MidlineRight);
                 var id = c.Id;
-                l.Zona(20, y - 26, W - 40, 52, () => Pinchar(id, () => MostrarCommit(c)));
+                _piezas[id] = (RectTransform)l.Zona(20, y - 26, W - 40, 52, () => Pinchar(id, () => MostrarCommit(c))).transform;
             }
         }
 
@@ -224,7 +247,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     else if (e == EstadoPieza.Marcada) fondo = Tema.mostazaEnvejecida;
                     else if (e != EstadoPieza.Normal && e != EstadoPieza.Candidata) { fondo = ColorDe(e, Tema.pared); texto = Tema.textoSobreCian; }
                     l.Pastilla(hueco.x, hueco.y, con.Texto, 16, fondo, texto);
-                    l.Zona(hueco.x - ancho / 2, hueco.y - 15, ancho, 30, () => Pinchar(con.Id, () => MostrarTexto("Flecha", con.Texto)));
+                    _piezas[con.Id] = (RectTransform)l.Zona(hueco.x - ancho / 2, hueco.y - 15, ancho, 30, () => Pinchar(con.Id, () => MostrarTexto("Flecha", con.Texto))).transform;
                 });
             }
             foreach (var p in pastillas) p();
@@ -243,7 +266,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 l.Texto(p.x + 16, p.y + (db ? 50 : 38), BW - 30, 50, el.Texto, 20, Tema.texto, TextAlignmentOptions.TopLeft, null, true);
                 Chapita(l, p.x + BW - 6, p.y, e);
                 var elem = el;
-                l.Zona(p.x, p.y, BW, BH, () => Pinchar(elem.Id, () => MostrarTexto(elem.Texto, elem.Detalle)));
+                _piezas[elem.Id] = (RectTransform)l.Zona(p.x, p.y, BW, BH, () => Pinchar(elem.Id, () => MostrarTexto(elem.Texto, elem.Detalle))).transform;
             }
         }
 
@@ -316,7 +339,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 l.Texto(Mathf.Min(X(a), X(b)) - 40, y - 32, Mathf.Abs(X(b) - X(a)) + 80, 22, m.Orden + ". " + m.Texto, 15, Tema.texto, TextAlignmentOptions.Center);
                 Chapita(l, 596, y - 8, e);
                 var men = m;
-                l.Zona(10, y - 34, 600, 52, () => Pinchar(men.Id, () => MostrarTexto($"Paso {men.Orden} del diseño", men.Texto)));
+                _piezas[men.Id] = (RectTransform)l.Zona(10, y - 34, 600, 52, () => Pinchar(men.Id, () => MostrarTexto($"Paso {men.Orden} del diseño", men.Texto))).transform;
             }
         }
 
@@ -345,7 +368,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var etiqueta = EtiquetaDe(f.Id);
                 if (etiqueta != null && Resultado == null) l.Pastilla(600, y + 52, etiqueta, 13, Tema.mostaza, Tema.textoSobreCian);
                 var fila = f;
-                l.Zona(0, y, 710, 66, () => Pinchar(fila.Id, () => MostrarTexto($"Fila {fila.N} · {fila.Hora}", fila.Que)));
+                _piezas[fila.Id] = (RectTransform)l.Zona(0, y, 710, 66, () => Pinchar(fila.Id, () => MostrarTexto($"Fila {fila.N} · {fila.Hora}", fila.Que))).transform;
             }
         }
 
@@ -370,19 +393,24 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var panel = Ui.Columna(padre, "Marcas", Tema.espacio);
             UiKit.Tamano(panel, ancho: 460, flexAlto: 1);
 
-            var marcar = Ui.Tarjeta(panel, "Marcar lo seleccionado como…");
+            var marcar = Ui.Tarjeta(panel, "2 · ¿Qué problema tiene? Elige el nombre");
+            GuiaView.Registrar("mj.detectar.etiquetas", marcar);
             _seleccion = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.texto);
             var etiquetas = _andamiaje != null && _andamiaje.Etiquetas != null && _andamiaje.Etiquetas.Count > 0
                 ? _andamiaje.Etiquetas : Def.PaletaEtiquetas;
             foreach (var etiqueta in etiquetas) {
                 var e = etiqueta;
-                Ui.Boton(marcar, Textos.Humanizar(e), () => Marcar(e));
+                _botonesEtiqueta[e] = Ui.Boton(marcar, Textos.Humanizar(e), () => Marcar(e));
+                // Guiado: cada nombre dice que significa: no se puede elegir bien lo que no se conoce.
+                if (Guiado && !string.IsNullOrEmpty(Recetas.Significado(e)))
+                    Ui.Texto(marcar, Recetas.Significado(e), EstiloTexto.Pequeno, Tema.textoTenue);
             }
+            _limpiar = Ui.Boton(marcar, "Limpiar la selección", () => { _estado.Seleccion.Clear(); Repintar(); }, VarianteBoton.Fantasma);
             _aviso = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.amarillo);
 
             var lista = Ui.PanelColumna(panel, "Lista", Tema.margen * 0.75f, Tema.espacio);
             UiKit.Tamano(lista, flexAlto: 1);
-            var titulo = "LO QUE HAS MARCADO" + (_andamiaje != null && _andamiaje.ContadorRestantes ? $" · {Def.Zonas.Count} problemas" : "");
+            var titulo = "LO QUE HAS MARCADO" + (_andamiaje != null && _andamiaje.ContadorRestantes ? $" · hay {Def.Zonas.Count} problema(s) en total" : "");
             Ui.Texto(lista, titulo, EstiloTexto.Pequeno, Tema.cian);
             var scroll = Ui.Desplazable(lista, out _marcas);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
@@ -391,25 +419,40 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _detalle = Ui.Columna(detalle, "Contenido", 4);
             Ui.Texto(_detalle, "Pincha una pieza para verla de cerca.", EstiloTexto.Pequeno);
 
-            Ui.Boton(panel, "Entregar", Entregar, VarianteBoton.Primario);
+            _entregar = Ui.Boton(panel, "Entregar", Entregar, VarianteBoton.Primario);
+            GuiaView.Registrar("mj.entregar", _entregar);
         }
 
         private void Marcar(string etiqueta) {
             if (_estado.Seleccion.Count == 0) {
-                _aviso.text = "Primero pincha en el tablero lo que tiene el problema.";
+                _aviso.text = "Primero pincha en el tablero (paso 1) lo que tiene el problema.";
                 return;
             }
+            if (Guiado && !Guia.Permite(AccionGuiada.Etiquetar, etiqueta)) { Guia.Rechazar(); return; }
             _estado.Marcar(etiqueta, Segundo);
             _aviso.text = "";
+            Guia?.Hecho(AccionGuiada.Etiquetar, etiqueta);
             Repintar();
+        }
+
+        protected override RectTransform PiezaGuiada(PasoGuiado paso) {
+            RectTransform rt;
+            switch (paso.Accion) {
+                case AccionGuiada.Etiquetar:
+                    Button b;
+                    return _botonesEtiqueta.TryGetValue(paso.Objetivo ?? "", out b) ? (RectTransform)b.transform : null;
+                case AccionGuiada.Entregar: return _entregar != null ? (RectTransform)_entregar.transform : null;
+                default: return _piezas.TryGetValue(paso.Objetivo ?? "", out rt) ? rt : null;
+            }
         }
 
         public override void Repintar() {
             if (_estado == null || Resultado != null) return;
             _repintarLienzo?.Invoke();
             _seleccion.text = _estado.Seleccion.Count == 0
-                ? "Pincha una o varias piezas del tablero y dile qué problema tienen."
-                : "Seleccionado: " + string.Join(", ", _estado.Seleccion.Select(Nombre));
+                ? "Paso 1: pincha en el tablero una caja o una flecha que creas que está mal. Paso 2: pulsa aquí el nombre de su problema."
+                : "Seleccionado: " + string.Join(", ", _estado.Seleccion.Select(Nombre)) + ". Ahora elige qué problema tiene.";
+            _limpiar.gameObject.SetActive(!Guiado && _estado.Seleccion.Count > 0);
 
             UiKit.Vaciar(_marcas);
             for (var i = 0; i < _estado.Marcas.Count; i++) {
