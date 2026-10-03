@@ -4,6 +4,8 @@
   "lienzo": "backlog",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
+  "modulo": "reservas",
+  "enElProyecto": "Es el backlog del módulo de reservas de los ascensores de carga.",
   "presentacion": {
     "titulo": "Práctica: el backlog de las reservas",
     "comoSeJuega": "Ordena el backlog del sprint: arrastra las tarjetas, lo más valioso arriba. Entra lo que cabe sobre la línea (la capacidad). Algunas dependen de otras. Después, Facilities te pedirá algo más: tu respuesta mueve el tablero.",

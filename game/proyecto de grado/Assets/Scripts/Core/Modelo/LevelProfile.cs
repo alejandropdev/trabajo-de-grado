@@ -26,6 +26,12 @@ namespace Nexus.Core.Modelo {
         /// </summary>
         public string[] Briefing = new string[0];
 
+        /// <summary>
+        /// El expediente del proyecto: cliente, sector, modulos, diagrama de contexto, vocabulario, documentos y lo
+        /// que cambia respecto al nivel anterior. null = el nivel no lo tiene (y no se enseña).
+        /// </summary>
+        public Nexus.Core.Proyecto.FichaDelProyecto Proyecto;
+
         // --- Grupo 1 · condiciones iniciales ---
         public int DiasTotales;
         public double PresupuestoInicial;
@@ -112,6 +118,7 @@ namespace Nexus.Core.Modelo {
             c.Incidencias = Incidencias == null ? null : Incidencias.ConvertAll(i => i == null ? null : i.Clone());
             c.Fase1 = Fase1 == null ? null : Fase1.Clone();
             c.Oficina = Oficina == null ? null : Oficina.Clone();
+            c.Proyecto = Proyecto == null ? null : Proyecto.Clone();
             return c;
         }
     }

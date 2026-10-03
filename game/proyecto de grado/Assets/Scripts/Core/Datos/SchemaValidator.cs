@@ -232,6 +232,7 @@ namespace Nexus.Core.Datos {
             ValidarJornada(id, p.Jornada, e);
             ValidarMapa(id, p.Mapa, e);
             ValidarFase1(id, p.Fase1, e);
+            ValidarProyecto(id, p.Proyecto, e);
             return e;
         }
 
@@ -239,6 +240,26 @@ namespace Nexus.Core.Datos {
         /// El mapa recorrible (§3.6). Un nivel puede no tener mapa — entonces no hay exploracion y
         /// todo ocurre en el escritorio — pero si lo tiene, tiene que sostenerse.
         /// </summary>
+        /// <summary>El expediente es opcional; si esta, tiene que ser coherente (sus flujos apuntan a piezas que existen).</summary>
+        private static void ValidarProyecto(string id, Nexus.Core.Proyecto.FichaDelProyecto f, List<string> e) {
+            if (f == null) return;
+            if (string.IsNullOrEmpty(f.Nombre)) e.Add($"{id}: el 'proyecto' no tiene 'nombre'.");
+            if (f.Modulos == null || f.Modulos.Count == 0) { e.Add($"{id}: el 'proyecto' no tiene 'modulos'."); return; }
+            var ids = new HashSet<string>();
+            foreach (var m in f.Modulos) {
+                if (string.IsNullOrEmpty(m.Id) || !ids.Add(m.Id)) e.Add($"{id}: modulo sin id o con id repetido ('{m.Id}').");
+                if (m.AvanceInicial < 0 || m.AvanceInicial > 100) e.Add($"{id}: el modulo '{m.Id}' tiene 'avanceInicial' fuera de 0-100.");
+                if (m.Peso <= 0) e.Add($"{id}: el modulo '{m.Id}' tiene 'peso' {m.Peso}; tiene que ser positivo.");
+            }
+            if (f.Contexto != null)
+                foreach (var fl in f.Contexto.Flujos)
+                    if (f.NombreDePieza(fl.Desde) == null || f.NombreDePieza(fl.Hasta) == null)
+                        e.Add($"{id}: el flujo '{fl.Desde}' -> '{fl.Hasta}' del contexto apunta a algo que no es ni actor ni modulo.");
+            foreach (var u in f.Usuarios)
+                if (!string.IsNullOrEmpty(u.Modulo) && f.Modulo(u.Modulo) == null)
+                    e.Add($"{id}: el usuario '{u.Nombre}' apunta al modulo '{u.Modulo}', que no existe.");
+        }
+
         private static void ValidarMapa(string id, MapaDeZonas mapa, List<string> e) {
             if (mapa == null || mapa.Vacio) return;
 

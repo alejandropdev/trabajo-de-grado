@@ -4,6 +4,8 @@
   "lienzo": "diagrama",
   "temaPrincipal": "SSD / SDD",
   "objetivoAprendizaje": "OA-DOC-01",
+  "modulo": "acceso",
+  "enElProyecto": "Es el diagrama de todo el sistema de los patios: la garita, el control de acceso, las reservas y los informes. Javier va a programar el control de acceso encima de él.",
   "presentacion": {
     "titulo": "La revisión del diagrama",
     "comoSeJuega": "Revisa el diseño antes de que Javier empiece a programar sobre él. Pincha cada caja o flecha con un problema y ponle nombre a la derecha (ambigüedad, acoplamiento, seguridad…). Hay tres problemas reales y algunas cosas raras que están bien: marcar lo que está bien también cuenta en contra.",

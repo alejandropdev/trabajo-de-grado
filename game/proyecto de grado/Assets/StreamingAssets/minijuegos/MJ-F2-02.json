@@ -4,6 +4,8 @@
   "lienzo": "grafo_commits",
   "temaPrincipal": "Git",
   "objetivoAprendizaje": "OA-GIT-01",
+  "modulo": "acceso",
+  "enElProyecto": "Es el historial de git del repositorio del sistema de los patios: ahí está guardado el trabajo de todo el equipo, módulo a módulo.",
   "presentacion": {
     "titulo": "La auditoría del grafo de commits",
     "comoSeJuega": "Esto es el historial de git: cada punto es un commit (una versión guardada) y cada columna, una rama. Alguien reescribió la historia compartida. Pincha los commits afectados y di qué pasó: ¿se reescribió la historia? ¿cambió el autor de un trabajo? Cuidado: una rama abandonada o una fusión sin revisar no son lo mismo.",

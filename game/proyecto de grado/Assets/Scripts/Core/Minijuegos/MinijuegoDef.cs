@@ -16,6 +16,11 @@ namespace Nexus.Core.Minijuegos
         public string TemaPrincipal;
         public string ObjetivoAprendizaje;
 
+        /// <summary>El modulo del proyecto del nivel al que pertenece este reto (id de FichaDelProyecto.Modulos).</summary>
+        public string Modulo;
+        /// <summary>Donde estamos en el proyecto, en una frase: «Este es el diagrama del módulo de reservas: …».</summary>
+        public string EnElProyecto;
+
         public Presentacion Presentacion = new Presentacion();
         public Artefacto Artefacto = new Artefacto();
 

@@ -4,6 +4,8 @@
   "lienzo": "diagrama",
   "temaPrincipal": "SAD",
   "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "reservas",
+  "enElProyecto": "Es el diagrama del módulo de reservas: cómo se pide un ascensor de carga, cómo se decide quién va primero y cómo se bloquea el ascensor a su hora.",
   "presentacion": {
     "titulo": "Práctica: el diagrama de las reservas",
     "comoSeJuega": "El diagrama del módulo de reservas. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",

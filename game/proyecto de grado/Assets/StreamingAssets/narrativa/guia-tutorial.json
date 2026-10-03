@@ -2,12 +2,50 @@
   "version": 2,
   "pasos": [
     {
+      "id": "F1-PROYECTO-1",
+      "nivel": "nivel-00",
+      "disparador": "fase1.encargo",
+      "orden": 11,
+      "titulo": "El sistema en una imagen",
+      "texto": "Este dibujo es el diagrama de contexto: fuera, las personas y sistemas que usan el tuyo; dentro, sus partes (los módulos). Cada reto que juegues es una de estas partes, y arriba del reto verás cuál.",
+      "mas": "En un proyecto real este diagrama es lo primero que se dibuja: deja claro qué es tu sistema y qué no, y con quién tiene que hablar. Forma parte del SRS y del SAD.",
+      "resaltar": "fase1.expediente"
+    },
+    {
+      "id": "F1-PROYECTO-2",
+      "nivel": "nivel-00",
+      "disparador": "fase1.encargo",
+      "orden": 12,
+      "titulo": "Las palabras del oficio",
+      "texto": "Cada cliente trabaja en un sector con sus propias palabras: anfitrión, credencial, aforo… Son las que verás en los diagramas y en las tarjetas. Pulsa cualquiera para ver qué significa.",
+      "mas": "Hablar el idioma del cliente es parte del trabajo de un ingeniero de software: los requisitos se escriben con sus palabras, no con las nuestras.",
+      "resaltar": "fase1.vocabulario"
+    },
+    {
+      "id": "F1-PROYECTO-3",
+      "nivel": "nivel-00",
+      "disparador": "fase1.encargo",
+      "orden": 25,
+      "titulo": "Comprueba que lo entendiste",
+      "texto": "Al final hay tres preguntas cortas sobre el proyecto. No restan: si fallas, te explico por qué y lo vuelves a intentar. Las tienes que contestar para pasar a las decisiones.",
+      "resaltar": "fase1.comprobacion"
+    },
+    {
+      "id": "N1-F1-PROYECTO",
+      "nivel": "nivel-01",
+      "disparador": "fase1.encargo",
+      "orden": 12,
+      "titulo": "Qué cambia en este proyecto",
+      "texto": "Otro cliente, otro sector y otro tamaño: mira «Qué tiene de distinto este proyecto», el sistema en una imagen y las palabras del oficio antes de decidir. Las preguntas del final te dirán si lo tienes claro.",
+      "resaltar": "fase1.distinto"
+    },
+    {
       "id": "F1-ENCARGO-1",
       "nivel": "nivel-00",
       "disparador": "fase1.encargo",
       "orden": 10,
-      "titulo": "Esto es el encargo",
-      "texto": "Aquí está lo que necesita el cliente. Léelo con calma, como un problema de matemáticas: todas las pistas están en el texto, también en las restricciones y en los comentarios del final.",
+      "titulo": "Esto es el proyecto",
+      "texto": "Antes de decidir nada, entiende QUÉ vas a construir y PARA QUIÉN: el cliente, lo que le duele, su sector y quién usará el sistema. Léelo con calma, como un problema de matemáticas: todas las pistas están aquí, también en el ticket original del final.",
       "mas": "En los equipos de software el encargo suele llegar como un «ticket»: un resumen, una descripción, las restricciones (lo que NO se puede hacer) y comentarios. Lo que más se olvida leer son las restricciones, y son las que más deciden.",
       "resaltar": "fase1.contenido"
     },
@@ -36,7 +74,7 @@
       "disparador": "fase1.encargo",
       "orden": 30,
       "titulo": "Para seguir",
-      "texto": "Cuando termines de leer, pulsa «Siguiente», abajo a la derecha. Si te pierdes en cualquier momento, «¿Qué hago ahora?» te lo vuelve a explicar, y «Apuntes» resume todo lo que tienes que saber del nivel: el encargo, tus decisiones, cómo se mide y tu equipo.",
+      "texto": "Cuando termines de leer y contestes las preguntas, pulsa «Siguiente», abajo a la derecha. Si te pierdes en cualquier momento, «¿Qué hago ahora?» te lo vuelve a explicar, y «Apuntes» resume todo lo que tienes que saber del nivel: el encargo, tus decisiones, cómo se mide y tu equipo.",
       "resaltar": "fase1.navegacion"
     },
     {

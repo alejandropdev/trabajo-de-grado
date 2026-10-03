@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Narrativa;
 using Nexus.Unity.Aplicacion;
+using Nexus.Unity.Pantallas.Minijuegos;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>
@@ -17,14 +18,17 @@ namespace Nexus.Unity.Pantallas {
         public static void Abrir(AppRoot app) {
             var s = app.Sesion;
             if (s == null) return;
-            var paginas = new List<PaginaDePizarra>();
             var perfil = s.Perfil;
 
-            // 1 · el encargo
+            // 0 · el expediente del proyecto: que se construye, para quien, sus partes y sus palabras (ronda 4)
+            var dibujos = new Dictionary<PaginaDePizarra, System.Action<Tizador, float>>();
+            var paginas = ExpedienteView.Paginas(app, perfil, s.W, dibujos, Anadir);
+
+            // 1 · el encargo (el ticket original)
             var encargo = string.Join("\n", (perfil.Briefing ?? new string[0]).Select(l => "· " + l));
             var pistas = s.PistasEncontradas();
             if (pistas.Count > 0) encargo += "\nLo que averiguaste en el recorrido:\n" + string.Join("\n", pistas.Select(p => "· " + p));
-            Anadir(paginas, "El encargo: " + perfil.Nombre, encargo);
+            Anadir(paginas, (perfil.Proyecto != null ? "El ticket original: " : "El encargo: ") + perfil.Nombre, encargo);
 
             // 2 · las tres decisiones: que son
             var explicacion = app.Catalogo.Guiones
@@ -77,6 +81,7 @@ namespace Nexus.Unity.Pantallas {
                 p.Etiqueta = "APUNTES";
                 p.Tema = "Apuntes del proyecto · " + perfil.Nombre;
                 p.Paginas = paginas;
+                p.Dibujos = dibujos;
             });
         }
 

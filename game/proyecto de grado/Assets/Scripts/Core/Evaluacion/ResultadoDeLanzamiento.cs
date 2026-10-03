@@ -138,7 +138,8 @@ namespace Nexus.Core.Evaluacion {
             return traza == null ? 0 : traza.Entradas.Count(EsDecision);
         }
 
-        private static bool EsDecision(EntradaTraza x) { return x != null && x.Origen != "LANZAMIENTO"; }
+        /// <summary>El lanzamiento no se juzga a si mismo, y la comprobacion del expediente no penaliza: no son decisiones.</summary>
+        private static bool EsDecision(EntradaTraza x) { return x != null && x.Origen != "LANZAMIENTO" && x.Origen != "COMPRENSION"; }
 
         /// <param name="masEsMejor">true si un valor alto es bueno (entrega, satisfaccion); false si es malo (riesgo, errores).</param>
         private static string Estado(double valor, double bien, double mal, bool masEsMejor) {

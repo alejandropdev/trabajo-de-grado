@@ -4,6 +4,8 @@
   "lienzo": "depositos",
   "temaPrincipal": "PTP",
   "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "reservas",
+  "enElProyecto": "Es el plan de pruebas del módulo de reservas: fechas, franjas y choques, que es donde más se equivoca un programa.",
   "presentacion": {
     "titulo": "Práctica: probar las reservas",
     "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 32 horas para el módulo de reservas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. Ganas si al cliente le llega como mucho 1 error.",

@@ -69,6 +69,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                                  : $"TICKET · {(Def.Presentacion.QuienEspera ?? "").ToUpperInvariant()} · {Def.Presentacion.TextoPresion}";
             Ui.Texto(titulos, quien, EstiloTexto.Pequeno, Practica ? Tema.cianClaro : Tema.mostaza);
             Ui.Texto(titulos, Def.Presentacion.Titulo ?? Def.Id, EstiloTexto.Titulo);
+            // Donde estamos en el proyecto: sin esto, las piezas del reto son nombres sueltos (ronda 4).
+            var dondeEstamos = DondeEstamos();
+            if (dondeEstamos != null) {
+                var linea = Ui.Texto(titulos, dondeEstamos, EstiloTexto.Pequeno, Tema.cianClaro);
+                GuiaView.Registrar("mj.proyecto", linea);
+            }
             Ui.Boton(cabecera, "Receta", () => AbrirReceta(false));
             GuiaView.BotonDeAyuda(App, cabecera);
             Ui.Boton(cabecera, "Menú", AbrirPausa, VarianteBoton.Fantasma);
@@ -98,6 +104,19 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var fila = hoja.Fila();
             Ui.Boton(fila, "Ver la receta", () => AbrirReceta(true));
             Ui.Boton(fila, "¡A jugar!", Empezar, VarianteBoton.Primario);
+        }
+
+        /// <summary>El expediente del proyecto del nivel en curso (null en el banco de pruebas o si el nivel no lo tiene).</summary>
+        protected Nexus.Core.Proyecto.FichaDelProyecto Proyecto {
+            get { return App.Sesion != null && App.Sesion.Perfil != null ? App.Sesion.Perfil.Proyecto : null; }
+        }
+
+        /// <summary>«MÓDULO: Reservas · Es el diagrama del módulo…». null si no hay nada que decir.</summary>
+        private string DondeEstamos() {
+            var modulo = Proyecto == null ? null : Proyecto.Modulo(Def.Modulo);
+            if (modulo == null && string.IsNullOrEmpty(Def.EnElProyecto)) return null;
+            return (modulo != null ? $"<b>{Proyecto.Nombre.ToUpperInvariant()} · MÓDULO: {modulo.Nombre.ToUpperInvariant()}</b>" : "") +
+                   (modulo != null && !string.IsNullOrEmpty(Def.EnElProyecto) ? "  ·  " : "") + (Def.EnElProyecto ?? "");
         }
 
         private void AbrirReceta(bool inicio) {
@@ -249,10 +268,24 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 foreach (var linea in solucion) hoja.Nota("· " + linea, Tema.cianClaro);
             }
             if (!string.IsNullOrEmpty(Resultado.TextoCierre)) hoja.Parrafo(Resultado.TextoCierre, Tema.cianClaro);
+            // Lo que el resultado significa para el proyecto y su cliente.
+            var modulo = Proyecto == null ? null : Proyecto.Modulo(Def.Modulo);
+            if (modulo != null) {
+                var bien = Resultado.Resultado == ResultadosDeMinijuego.Todos;
+                var t = hoja.Tarjeta("Qué significa para " + Proyecto.Cliente.Nombre, Tema.cian);
+                Ui.Texto(t, bien
+                    ? $"«{modulo.Nombre}» sigue adelante sin sorpresas: {Minuscula(modulo.QueHace)}"
+                    : $"Lo que se escapó aquí lo acabará notando {Proyecto.Cliente.Nombre} en «{modulo.Nombre}», la parte que {Minuscula(modulo.QueHace)}",
+                    EstiloTexto.Pequeno, Tema.texto);
+            }
             hoja.Nota(Practica ? "Era práctica: lo que ganes va al proyecto, pero no cuenta para tu evaluación."
                                : "Esto queda en tu evaluación. El resumen de todo, en Lecciones al cerrar el nivel.");
             Ui.Boton(lado, "Volver a la jornada", () => AlTerminar?.Invoke(Resultado), VarianteBoton.Primario);
             GuiaView.Avisar(App, "minijuego.cierre");
+        }
+
+        private static string Minuscula(string s) {
+            return string.IsNullOrEmpty(s) ? "" : char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
         /// <summary>Lineas que explican una solucion buena, para enseñarlas si no se acerto. Cada verbo la suya.</summary>

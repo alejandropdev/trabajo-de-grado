@@ -285,6 +285,30 @@ namespace Nexus.Unity.Tema {
             return b;
         }
 
+        /// <summary>
+        /// Un circulo macizo con un numero, ENCIMA del dibujo. Tiene que ser una pieza de interfaz y no un relleno del
+        /// DibujoUI: el DibujoUI pinta todos los rellenos primero y los trazos despues, asi que una linea que pase por
+        /// debajo atravesaria el numero.
+        /// </summary>
+        public RectTransform Insignia(float cx, float cy, float radio, string texto, Color fondo, Color colorTexto, Color borde) {
+            var rt = _ui.Nodo(Raiz, "Insignia " + texto);
+            Colocar(rt, cx - radio, cy - radio, radio * 2, radio * 2);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = _ui.SpriteCircular();
+            img.color = fondo;
+            img.raycastTarget = false;
+            var o = rt.gameObject.AddComponent<Outline>();
+            o.effectColor = borde;
+            o.effectDistance = new Vector2(2, -2);
+            var t = _ui.Texto(rt, texto, EstiloTexto.Pequeno, colorTexto, TextAlignmentOptions.Center);
+            t.fontSize = radio * 1.2f;
+            t.fontStyle = FontStyles.Bold;
+            t.textWrappingMode = TextWrappingModes.NoWrap;
+            t.raycastTarget = false;
+            UiKit.Rellenar((RectTransform)t.transform);
+            return rt;
+        }
+
         /// <summary>Una pastilla de color con texto (etiqueta de flecha, chip de valor, marca).</summary>
         public RectTransform Pastilla(float cx, float cy, string texto, float tam, Color fondo, Color colorTexto, Color? borde = null) {
             var ancho = texto.Length * tam * 0.55f + 26;

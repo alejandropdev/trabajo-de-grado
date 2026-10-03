@@ -4,6 +4,8 @@
   "lienzo": "depositos",
   "temaPrincipal": "PTP",
   "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "registro",
+  "enElProyecto": "Es el plan de pruebas del registro de visitas: qué se prueba antes de que el jurado lo use en la recepción.",
   "presentacion": {
     "titulo": "Práctica: las horas de pruebas",
     "comoSeJuega": "Probar es buscar errores antes que el cliente. Tienes 12 horas y tres tipos de prueba: súbelas o bájalas con + y −. Cada tipo solo atrapa sus propios errores, y cada error cuesta las horas que dice su tarjeta. Las horas no alcanzan para todo: ganas si se escapa como mucho 1 error.",

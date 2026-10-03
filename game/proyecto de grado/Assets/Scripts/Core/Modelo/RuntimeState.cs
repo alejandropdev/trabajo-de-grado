@@ -241,6 +241,10 @@ namespace Nexus.Core.Modelo {
         public string Arquitectura;
         public string RazonArquitectura;
         public Dictionary<string, int> Fichas = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>«Comprueba que lo entendiste»: pregunta -> opcion acertada (solo las ya acertadas).</summary>
+        public Dictionary<string, int> Comprobacion = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>Las preguntas que se fallaron alguna vez (no cuentan como acierto a la primera).</summary>
+        public List<string> FalladasAlguna = new List<string>();
     }
 
     /// <summary>Una estimacion del jugador frente a lo que costo de verdad (verbo V5).</summary>

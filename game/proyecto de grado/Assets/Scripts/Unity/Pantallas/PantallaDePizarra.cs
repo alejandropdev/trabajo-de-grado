@@ -137,6 +137,8 @@ namespace Nexus.Unity.Pantallas {
         public string Etiqueta = "CONCEPTO";
         public string Tema;
         public List<PaginaDePizarra> Paginas = new List<PaginaDePizarra>();
+        /// <summary>Dibujos a medida para algunas paginas (el diagrama del proyecto): reciben el tizador y la y libre.</summary>
+        public Dictionary<PaginaDePizarra, Action<Tizador, float>> Dibujos = new Dictionary<PaginaDePizarra, Action<Tizador, float>>();
 
         public override bool EsModal { get { return true; } }
         public override bool PuedeVolver { get { return true; } }
@@ -203,6 +205,8 @@ namespace Nexus.Unity.Pantallas {
                     t.Texto(60, y, linea, conDibujos ? 28 : 32, Tizador.Tiza, false, W - 120);
                 }
             }
+            Action<Tizador, float> dibujo;
+            if (Dibujos != null && Dibujos.TryGetValue(p, out dibujo)) dibujo(t, y);
             if (!conDibujos) return;
 
             // Las viñetas, en fila y unidas con curvas de tiza, como los pasos de la receta.

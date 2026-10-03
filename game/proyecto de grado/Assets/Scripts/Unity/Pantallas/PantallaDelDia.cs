@@ -46,6 +46,8 @@ namespace Nexus.Unity.Pantallas {
         private readonly TMP_Text[] _efectos = new TMP_Text[5];
         private TMP_Text _pronosticoTitulo, _pronosticoDetalle;
         private BarraView _pronosticoBarra;
+        /// <summary>Por modulo del proyecto: el texto del porcentaje y su barra.</summary>
+        private readonly List<KeyValuePair<TMP_Text, BarraView>> _modulos = new List<KeyValuePair<TMP_Text, BarraView>>();
         private float _siguientePronostico;
         private readonly BarraView[] _barras = new BarraView[5];
         private readonly List<KeyValuePair<Alerta, TMP_Text>> _cuentasAtras = new List<KeyValuePair<Alerta, TMP_Text>>();
@@ -189,6 +191,21 @@ namespace Nexus.Unity.Pantallas {
             PantallaDeGlosario.Chip(App, filaRiesgo, "riesgo");
             _satisfaccion = Ui.Texto(proyecto, "", EstiloTexto.Pequeno);
 
+            // El avance, parte por parte del sistema: que se construye de verdad cada dia (ronda 4).
+            var ficha = S.Perfil.Proyecto;
+            if (ficha != null && ficha.Modulos.Count > 0) {
+                var modulos = Ui.Tarjeta(tarjetas, "Las partes de " + ficha.Nombre);
+                GuiaView.Registrar("dia.modulos", modulos);
+                foreach (var m in ficha.Modulos) {
+                    var fila = Ui.Fila(modulos);
+                    var nombre = Ui.Texto(fila, m.Nombre, EstiloTexto.Pequeno, Tema.texto);
+                    UiKit.Tamano(nombre, flexAncho: 1);
+                    var pct = Ui.Texto(fila, "", EstiloTexto.Pequeno, Tema.texto, TextAlignmentOptions.Right);
+                    UiKit.Tamano(pct, ancho: 70);
+                    _modulos.Add(new KeyValuePair<TMP_Text, BarraView>(pct, Ui.Barra(modulos, 0, Tema.cianClaro)));
+                }
+            }
+
             // Con quien te llevas bien y que ayudas tienes guardadas.
             var equipo = Ui.Tarjeta(tarjetas, "Tu equipo");
             GuiaView.Registrar("dia.equipo", equipo);
@@ -294,6 +311,13 @@ namespace Nexus.Unity.Pantallas {
             _satisfaccion.text = $"Satisfacción del cliente: {w.SatisfaccionCliente:0} / 100 · pesa 15 de 100 en el lanzamiento" +
                                  (w.SatisfaccionCliente <= 35 ? " · <color=#E0705A>tan baja que pedirán explicaciones</color>" : "");
             PintarEfectos();
+            if (_modulos.Count > 0) {
+                var porModulo = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(S.Perfil.Proyecto, w.Avance, w.Alcance);
+                for (var i = 0; i < _modulos.Count && i < porModulo.Count; i++) {
+                    _modulos[i].Key.text = $"{porModulo[i].Value:0} %";
+                    _modulos[i].Value.Valor = (float)(porModulo[i].Value / 100.0);
+                }
+            }
             if (Time.unscaledTime >= _siguientePronostico) {
                 _siguientePronostico = Time.unscaledTime + 1f;
                 PintarPronostico();
@@ -626,10 +650,23 @@ namespace Nexus.Unity.Pantallas {
                            $"moral {Textos.Cambio(w.MoralEquipo - _alEmpezarElDia[2])} · cobertura {Textos.Cambio(w.Cobertura - _alEmpezarElDia[3])} · " +
                            $"cansancio {Textos.Cambio(w.Cansancio - _alEmpezarElDia[4])}.");
             if (_tengoElInicioDelDia) PintarPorQueAvanzaste(w.Avance - _alEmpezarElDia[0]);
+            if (_tengoElInicioDelDia) PintarQueSeConstruyo(_alEmpezarElDia[0], w.Avance, w.Alcance);
             if (_tengoElInicioDelDia) _ahora.Parrafo(_decisionesDeHoy == 0 ? "Hoy no tomaste ninguna decisión." :
                            _decisionesDeHoy == 1 ? "Hoy tomaste 1 decisión." : $"Hoy tomaste {_decisionesDeHoy} decisiones.");
             _ahora.Nota("La partida se ha guardado.");
             _ahora.Accion($"Empezar el día {S.R.DiaActual + 1}", EmpezarDia);
+        }
+
+        /// <summary>Que partes del sistema avanzaron hoy, y cuanto: el avance en puntos traducido a lo que se construye.</summary>
+        private void PintarQueSeConstruyo(double avanceAntes, double avanceAhora, double alcance) {
+            var f = S.Perfil.Proyecto;
+            if (f == null || f.Modulos.Count == 0) return;
+            var antes = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, avanceAntes, alcance);
+            var ahora = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, avanceAhora, alcance);
+            var cambios = Enumerable.Range(0, ahora.Count).Where(i => ahora[i].Value - antes[i].Value >= 0.5)
+                .Select(i => $"{ahora[i].Key.Nombre} ({antes[i].Value:0} → {ahora[i].Value:0} %)").ToList();
+            _ahora.Parrafo(cambios.Count == 0 ? "Hoy no avanzó ninguna parte del sistema."
+                                              : "Hoy se construyó: " + string.Join(" · ", cambios) + ".", Tema.cianClaro);
         }
 
         /// <summary>

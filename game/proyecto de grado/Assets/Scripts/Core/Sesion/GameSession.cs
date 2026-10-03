@@ -658,6 +658,24 @@ namespace Nexus.Core.Sesion {
                       "OA-ARQ-01", opcion.Razon, antes);
         }
 
+        /// <summary>
+        /// «Comprueba que lo entendiste» (el expediente del proyecto): cuantas preguntas acerto a la primera. Queda en la
+        /// traza para el docente y cada acierto suma 1 de documentacion: entender el problema es parte del trabajo.
+        /// </summary>
+        public void RegistrarComprensionDelProyecto(int aciertosALaPrimera, int preguntas) {
+            ExigirFase1Abierta();
+            if (preguntas <= 0) return;
+            aciertosALaPrimera = Math.Max(0, Math.Min(preguntas, aciertosALaPrimera));
+            var antes = W.ToString();
+            if (aciertosALaPrimera > 0)
+                EffectApplier.Aplicar(W, new Dictionary<string, object>(StringComparer.Ordinal) { { "Documentacion", (double)aciertosALaPrimera } });
+            var veredicto = aciertosALaPrimera == preguntas ? Veredictos.Correcta
+                          : aciertosALaPrimera * 2 >= preguntas ? Veredictos.Aceptable : Veredictos.Incorrecta;
+            // Origen propio: queda para el docente, pero no cuenta en «cómo decidiste» del lanzamiento (no penaliza).
+            Registrar("COMPRENSION", "Comprensión del proyecto", "comprension", null, veredicto, "OA-INTRO-01",
+                      $"Acertó {aciertosALaPrimera} de {preguntas} preguntas sobre el proyecto a la primera.", antes);
+        }
+
         /// <summary>Cierra la planificacion y arranca el bucle diario. El director ya puede agendar.</summary>
         public void CerrarFase1() {
             ExigirFase1Abierta();

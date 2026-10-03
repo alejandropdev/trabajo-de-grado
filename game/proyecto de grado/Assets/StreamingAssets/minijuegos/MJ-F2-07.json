@@ -4,6 +4,8 @@
   "lienzo": "secuencia",
   "temaPrincipal": "SSD / SDD",
   "objetivoAprendizaje": "OA-DOC-01",
+  "modulo": "acceso",
+  "enElProyecto": "Es lo que pasa cuando un carro llega a la garita: la cámara lee la matrícula, el control de acceso consulta el permiso y abre (o no) la barrera.",
   "presentacion": {
     "titulo": "El diagrama de secuencia contra la realidad",
     "comoSeJuega": "Un diagrama de secuencia dice en qué orden se hablan las piezas. A la izquierda, lo que se diseñó; a la derecha, lo que pasó de verdad esta mañana en la garita (el log). Pincha las filas del log que no coinciden con el diseño y di qué tipo de diferencia es: otro orden, algo repetido o algo que el diseño no tenía.",

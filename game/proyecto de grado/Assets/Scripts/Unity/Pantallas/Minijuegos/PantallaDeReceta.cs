@@ -54,6 +54,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
         public void Cilindro(float x, float y, float w, float h, Color? c = null) { D.Cilindro(X(x), Y(y), w * _k, h * _k, c ?? Tiza, 3 * _k); }
         public void Circulo(float x, float y, float r, Color? c = null, bool disc = false, float g = 3) { D.Circulo(X(x), Y(y), r * _k, c ?? Tiza, g * _k, null, disc); }
+        /// <summary>Un circulo macizo con su numero, por ENCIMA de las lineas del dibujo (tapa la flecha que pasa debajo).</summary>
+        public void Insignia(float x, float y, float r, string numero, Color fondo, Color colorTexto) {
+            _l.Insignia(X(x), Y(y), r * _k, numero, fondo, colorTexto, Pizarra);
+        }
         public void Nodo(float x, float y, Color c, string t = null) {
             D.Circulo(X(x), Y(y), 12 * _k, c, 3.5f * _k, Pizarra);
             if (t != null) Texto(x + 20, y + 7, t, 16, c);
@@ -182,11 +186,26 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private const float W = 1612, H = 932;
 
+        private Lamina _lamina;
+        private bool _viendoProyecto;
+        private TMPro.TMP_Text _textoCambiar;
+
+        /// <summary>El expediente del nivel y el modulo de este reto, si los hay (para la pagina «Dónde estamos»).</summary>
+        private Nexus.Core.Proyecto.FichaDelProyecto Proyecto {
+            get { return App.Sesion != null && App.Sesion.Perfil != null ? App.Sesion.Perfil.Proyecto : null; }
+        }
+
+        private bool HayDondeEstamos { get { return Proyecto != null && Proyecto.Modulo(Def.Modulo) != null; } }
+
         protected override void Construir() {
-            Lamina lamina;
-            var marco = MarcoDePizarra.Construir(Ui, Raiz, Inicio ? "¡NUEVO RETO!" : "RECETA", out lamina);
-            var t = new Tizador(lamina, Ui.FuenteTiza);
-            Pintar(t);
+            var marco = MarcoDePizarra.Construir(Ui, Raiz, Inicio ? "¡NUEVO RETO!" : "RECETA", out _lamina);
+            // Al empezar un reto, lo primero es saber en qué parte del proyecto estamos (ronda 4); después, cómo se juega.
+            _viendoProyecto = Inicio && HayDondeEstamos;
+            if (HayDondeEstamos) {
+                var cambiar = MarcoDePizarra.Boton(Ui, marco, "", CambiarPagina, new Vector2(0, 1), new Vector2(52, -40), 300, VarianteBoton.Secundario);
+                _textoCambiar = cambiar.GetComponentInChildren<TMPro.TMP_Text>();
+            }
+            PintarPagina();
 
             var boton = Ui.Boton(marco, Inicio ? "¡A jugar!" : "Volver al reto", Cerrar, VarianteBoton.Primario);
             var rb = (RectTransform)boton.transform;
@@ -227,6 +246,30 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private void Cerrar() {
             App.Router.Volver();
             AlCerrar?.Invoke();
+        }
+
+        private void CambiarPagina() {
+            _viendoProyecto = !_viendoProyecto;
+            PintarPagina();
+        }
+
+        private void PintarPagina() {
+            MarcoDePizarra.Limpiar(_lamina);
+            var t = new Tizador(_lamina, Ui.FuenteTiza);
+            if (_viendoProyecto) PintarDondeEstamos(t); else Pintar(t);
+            if (_textoCambiar != null) _textoCambiar.text = _viendoProyecto ? "Cómo se juega  ►" : "◄  Dónde estamos";
+        }
+
+        /// <summary>El sistema del proyecto, con la parte de este reto en mostaza.</summary>
+        private void PintarDondeEstamos(Tizador t) {
+            var f = Proyecto;
+            var modulo = f.Modulo(Def.Modulo);
+            t.Texto(W / 2, 70, "DÓNDE ESTAMOS EN EL PROYECTO", 46, null, true);
+            t.Linea(420, 88, 1190, 88, null, 2);
+            t.Texto(60, 140, $"{f.Nombre} · para {f.Cliente.Nombre}", 26, Tizador.Gris);
+            if (!string.IsNullOrEmpty(Def.EnElProyecto)) t.Texto(60, 182, Def.EnElProyecto, 26, Tizador.Tiza, false, W - 120);
+            ExpedienteView.DibujarContexto(t, f, 60, 250, W - 120, 600, Def.Modulo);
+            t.Texto(W / 2, 912, $"EN MOSTAZA, LA PARTE DE ESTE RETO: «{modulo.Nombre.ToUpperInvariant()}»", 26, Tizador.Mostaza, true);
         }
 
         private void Pintar(Tizador t) {

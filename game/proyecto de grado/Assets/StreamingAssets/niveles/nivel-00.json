@@ -8,6 +8,198 @@
     "Restricción: la recepción tiene un solo equipo con un navegador y nadie de sistemas. Ningún visitante va a instalar nada en su móvil para una visita de una hora.",
     "Comentario de Marisol Andrade: «El jurado valorará que funcione el viernes. No que sea bonito el lunes.»"
   ],
+  "proyecto": {
+    "nombre": "Registro de visitantes",
+    "sector": {
+      "nombre": "Recepción corporativa y control de visitas",
+      "comoTrabaja": "En la recepción de un edificio de oficinas se decide quién entra, se avisa a la persona que lo espera y, al cerrar, se comprueba que no queda nadie dentro. Se trabaja de pie, en un mostrador y con prisa: lo que no se hace en segundos acaba haciéndose a mano."
+    },
+    "cliente": {
+      "nombre": "La recepción de N1",
+      "queHace": "Atiende a todas las visitas del edificio N1 de Nexus, con una sola recepcionista y un único equipo con navegador.",
+      "queLeDuele": "Los visitantes esperan hasta cuarenta minutos porque se registran a mano en un cuaderno, y al final del día nadie sabe quién sigue dentro.",
+      "distractores": [
+        "Necesita una app móvil para que los visitantes se registren solos desde casa.",
+        "Quiere cambiar los ascensores del edificio por otros más rápidos."
+      ]
+    },
+    "usuarios": [
+      {
+        "nombre": "La recepcionista",
+        "queNecesita": "Registrar a un visitante en segundos, sin cuaderno.",
+        "modulo": "registro"
+      },
+      {
+        "nombre": "El anfitrión",
+        "queNecesita": "Enterarse de que su visita ha llegado sin bajar a preguntar.",
+        "modulo": "aviso"
+      },
+      {
+        "nombre": "El vigilante de noche",
+        "queNecesita": "Saber, al cerrar, si queda algún visitante dentro del edificio.",
+        "modulo": "dentro"
+      }
+    ],
+    "enUnaFrase": "Una aplicación web, en el único equipo de la recepción, que registra a cada visitante, avisa a quien lo espera y sabe quién sigue dentro.",
+    "modulos": [
+      {
+        "id": "recepcion",
+        "nombre": "Pantalla de recepción",
+        "queHace": "Lo que ve la recepcionista en el navegador: el formulario de visita y los botones de entrada y salida.",
+        "peso": 1
+      },
+      {
+        "id": "registro",
+        "nombre": "Registro de visitas",
+        "queHace": "Guarda cada visita: quién es, a qué hora entra, a quién viene a ver y cuándo sale.",
+        "peso": 1.5
+      },
+      {
+        "id": "aviso",
+        "nombre": "Aviso al anfitrión",
+        "queHace": "Manda un correo a la persona a la que viene a ver el visitante.",
+        "peso": 1
+      },
+      {
+        "id": "dentro",
+        "nombre": "Quién sigue dentro",
+        "queHace": "La lista de visitas que entraron y aún no han salido, para el vigilante al cerrar.",
+        "peso": 1
+      }
+    ],
+    "contexto": {
+      "actores": [
+        {
+          "id": "visitante",
+          "nombre": "Visitante",
+          "tipo": "persona"
+        },
+        {
+          "id": "recepcionista",
+          "nombre": "Recepcionista",
+          "tipo": "persona"
+        },
+        {
+          "id": "anfitrion",
+          "nombre": "Anfitrión",
+          "tipo": "persona"
+        },
+        {
+          "id": "vigilante",
+          "nombre": "Vigilante",
+          "tipo": "persona"
+        },
+        {
+          "id": "correo",
+          "nombre": "Correo de Nexus",
+          "tipo": "sistema"
+        }
+      ],
+      "flujos": [
+        {
+          "desde": "recepcionista",
+          "hasta": "recepcion",
+          "texto": "escribe los datos del visitante"
+        },
+        {
+          "desde": "recepcion",
+          "hasta": "registro",
+          "texto": "guarda la visita"
+        },
+        {
+          "desde": "registro",
+          "hasta": "aviso",
+          "texto": "visita registrada"
+        },
+        {
+          "desde": "aviso",
+          "hasta": "correo",
+          "texto": "envía el aviso"
+        },
+        {
+          "desde": "correo",
+          "hasta": "anfitrion",
+          "texto": "«tu visita ha llegado»"
+        },
+        {
+          "desde": "registro",
+          "hasta": "dentro",
+          "texto": "entradas y salidas"
+        },
+        {
+          "desde": "dentro",
+          "hasta": "vigilante",
+          "texto": "quién queda al cerrar"
+        }
+      ]
+    },
+    "vocabulario": [
+      {
+        "termino": "Visitante",
+        "definicion": "Persona de fuera de la empresa que entra al edificio un rato, con cita o sin ella.",
+        "dondeLoVeras": "el formulario de visita y el registro."
+      },
+      {
+        "termino": "Anfitrión",
+        "definicion": "La persona de la empresa a la que viene a ver el visitante: es quien recibe el aviso.",
+        "dondeLoVeras": "el módulo «Aviso al anfitrión» y el diagrama de tu propuesta."
+      },
+      {
+        "termino": "Cita",
+        "definicion": "Una visita acordada de antemano. El visitante sin cita también existe, y alguien tiene que decidir qué se hace con él.",
+        "dondeLoVeras": "el registro de visitas y los comentarios del ticket."
+      },
+      {
+        "termino": "Registro de entrada y salida",
+        "definicion": "Anotar a qué hora entra y sale cada persona. Sin la salida, no se puede saber quién sigue dentro.",
+        "dondeLoVeras": "el backlog y la lista «Quién sigue dentro»."
+      },
+      {
+        "termino": "Credencial",
+        "definicion": "La tarjeta o pegatina que se da al visitante para que se vea que está autorizado a estar dentro.",
+        "dondeLoVeras": "las charlas de la recepción."
+      },
+      {
+        "termino": "Aforo",
+        "definicion": "El número máximo de personas que puede haber a la vez en el edificio. Por seguridad hay que saber cuántas hay.",
+        "dondeLoVeras": "la lista «Quién sigue dentro»."
+      },
+      {
+        "termino": "MVP",
+        "definicion": "Producto mínimo viable: la versión más pequeña que ya resuelve el problema de verdad. Aquí, registrar, avisar y saber quién sigue dentro, sin adornos.",
+        "dondeLoVeras": "el comentario de Marisol: «que funcione el viernes»."
+      }
+    ],
+    "artefactos": [
+      {
+        "id": "SRS",
+        "glosario": "srs",
+        "paraQueAqui": "Dice qué tiene que hacer el registro: registrar, avisar al anfitrión y saber quién sigue dentro. Lo que no esté ahí, nadie lo construirá."
+      },
+      {
+        "id": "SAD",
+        "glosario": "sad",
+        "paraQueAqui": "El diagrama de componentes de tu propuesta. Es lo que se revisa en «La revisión de tu propuesta»."
+      },
+      {
+        "id": "PTP",
+        "glosario": "ptp",
+        "paraQueAqui": "Las horas de pruebas: qué se prueba antes de que lo pruebe el jurado."
+      }
+    ],
+    "loNuevo": [
+      "Es tu primer proyecto: un sistema pequeño, para un solo cliente, en cinco días.",
+      "Todo va guiado: Marisol te acompaña en cada reto para que aprendas qué mirar.",
+      "Lo que cuenta no es que sea bonito, sino que funcione el viernes: aquí aprendes qué es un MVP."
+    ],
+    "temasDelNivel": [
+      "Introducción a la IS",
+      "Requisitos y SRS",
+      "Diagramas de componentes (SAD)",
+      "Scrum y Kanban",
+      "git"
+    ]
+  },
   "diasTotales": 5,
   "presupuestoInicial": 3000,
   "alcanceInicial": 12,

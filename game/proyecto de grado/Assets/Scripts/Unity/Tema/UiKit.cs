@@ -116,7 +116,79 @@ namespace Nexus.Unity.Tema {
 
             scroll.viewport = visor;
             scroll.content = contenido;
+            IndicarScroll(scroll, rt);
             return scroll;
+        }
+
+        /// <summary>
+        /// Que se vea que se puede desplazar (feedback: «el jugador nunca supo que se podía»): una barra de scroll visible
+        /// cuando hay mas contenido del que cabe, y un aviso «▼ Hay más abajo» (o «Hay más ►») que late suave y que,
+        /// al pulsarlo, baja un trozo. Ambos desaparecen solos cuando todo cabe o se llega al final.
+        /// </summary>
+        private void IndicarScroll(ScrollRect scroll, RectTransform raiz) {
+            scroll.verticalScrollbar = Barra(raiz, true);
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+            scroll.verticalScrollbarSpacing = 4;
+            scroll.horizontalScrollbar = Barra(raiz, false);
+            scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+            scroll.horizontalScrollbarSpacing = 4;
+
+            var indicador = raiz.gameObject.AddComponent<IndicadorDeScroll>();
+            indicador.Scroll = scroll;
+            indicador.Abajo = Aviso(raiz, "▼  Hay más abajo", new Vector2(0.5f, 0), new Vector2(0, 14), () => indicador.Avanzar(true));
+            indicador.Derecha = Aviso(raiz, "Hay más  ►", new Vector2(1, 0.5f), new Vector2(-22, 0), () => indicador.Avanzar(false));
+        }
+
+        private Scrollbar Barra(RectTransform raiz, bool vertical) {
+            const float Grosor = 10;
+            var rt = Nodo(raiz, vertical ? "Barra vertical" : "Barra horizontal");
+            if (vertical) {
+                rt.anchorMin = new Vector2(1, 0); rt.anchorMax = Vector2.one; rt.pivot = new Vector2(1, 1);
+                rt.sizeDelta = new Vector2(Grosor, 0);
+            } else {
+                rt.anchorMin = Vector2.zero; rt.anchorMax = new Vector2(1, 0); rt.pivot = Vector2.zero;
+                rt.sizeDelta = new Vector2(0, Grosor);
+            }
+            var pista = rt.gameObject.AddComponent<Image>();
+            pista.sprite = SpriteRedondeado(); pista.type = Image.Type.Sliced;
+            pista.color = new Color(1, 1, 1, 0.08f);
+            var mango = Nodo(rt, "Mango");
+            Rellenar(mango);
+            var img = mango.gameObject.AddComponent<Image>();
+            img.sprite = SpriteRedondeado(); img.type = Image.Type.Sliced;
+            img.color = new Color(Tema.cian.r, Tema.cian.g, Tema.cian.b, 0.75f);
+            var barra = rt.gameObject.AddComponent<Scrollbar>();
+            barra.handleRect = mango;
+            barra.targetGraphic = img;
+            barra.direction = vertical ? Scrollbar.Direction.BottomToTop : Scrollbar.Direction.LeftToRight;
+            var colores = ColorBlock.defaultColorBlock;
+            colores.highlightedColor = new Color(1, 1, 1, 1);
+            colores.normalColor = new Color(0.9f, 0.9f, 0.9f, 1);
+            barra.colors = colores;
+            return barra;
+        }
+
+        /// <summary>La pastilla de «hay más»: pequeña, flotando sobre el borde del area, pulsable.</summary>
+        private RectTransform Aviso(RectTransform raiz, string texto, Vector2 ancla, Vector2 posicion, Action alPulsar) {
+            var rt = Nodo(raiz, "Hay mas");
+            rt.anchorMin = rt.anchorMax = rt.pivot = ancla;
+            rt.anchoredPosition = posicion;
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = SpriteRedondeado(); img.type = Image.Type.Sliced;
+            img.color = new Color(Tema.fondoSecundario.r, Tema.fondoSecundario.g, Tema.fondoSecundario.b, 0.94f);
+            var borde = rt.gameObject.AddComponent<Outline>();
+            borde.effectColor = Tema.cian;
+            borde.effectDistance = new Vector2(1.5f, -1.5f);
+            var boton = rt.gameObject.AddComponent<Button>();
+            boton.targetGraphic = img;
+            boton.onClick.AddListener(new UnityAction(alPulsar));
+            var t = Texto(rt, texto, EstiloTexto.Pequeno, Tema.cianClaro, TextAlignmentOptions.Center);
+            t.textWrappingMode = TextWrappingModes.NoWrap;
+            t.fontStyle = FontStyles.Bold;
+            Rellenar((RectTransform)t.transform);
+            rt.sizeDelta = new Vector2(t.GetPreferredValues(texto).x + 28, t.GetPreferredValues(texto).y + 10);
+            rt.gameObject.SetActive(false);
+            return rt;
         }
 
         /// <summary>Hueco fijo dentro de una fila o columna.</summary>

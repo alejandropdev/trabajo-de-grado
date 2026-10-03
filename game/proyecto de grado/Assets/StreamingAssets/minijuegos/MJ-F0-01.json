@@ -4,6 +4,8 @@
   "lienzo": "diagrama",
   "temaPrincipal": "SRS",
   "objetivoAprendizaje": "OA-DOC-01",
+  "modulo": "registro",
+  "enElProyecto": "Es el diagrama de tu propuesta para la recepción: cómo pasa un visitante del formulario al registro y cómo se avisa a su anfitrión.",
   "presentacion": {
     "titulo": "La revisión de tu propuesta",
     "comoSeJuega": "Esto es una revisión: buscar errores en un diseño ANTES de construirlo, cuando arreglarlos es barato. Es el diagrama de tu propuesta. Paso 1: pincha la caja o la flecha que tenga un problema. Paso 2: elige a la derecha qué problema es. Ganas si encuentras el problema real sin marcar nada que esté bien.",

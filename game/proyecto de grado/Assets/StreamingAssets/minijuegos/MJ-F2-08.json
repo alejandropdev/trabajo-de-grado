@@ -4,6 +4,8 @@
   "lienzo": "depositos",
   "temaPrincipal": "PTP",
   "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "reservas",
+  "enElProyecto": "Es el plan de pruebas (PTP) de la versión que sale el viernes, sobre todo del módulo de reservas de los ascensores de carga.",
   "presentacion": {
     "titulo": "Las horas de pruebas",
     "comoSeJuega": "Es el plan de pruebas (PTP) del release: cuántas horas va a cada tipo de prueba. Tienes 42 horas; súbelas o bájalas con + y −. Cada tipo solo encuentra los errores de su clase, y cada error cuesta las horas que dice su tarjeta. Lo que no encuentres, lo encontrará el cliente. Ganas si se escapa como mucho 1 error.",

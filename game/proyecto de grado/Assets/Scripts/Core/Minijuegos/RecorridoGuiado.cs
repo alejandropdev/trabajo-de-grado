@@ -49,11 +49,20 @@ namespace Nexus.Core.Minijuegos {
     public static class RecorridoGuiado {
         public static List<PasoGuiado> Para(MinijuegoDef def) {
             if (def == null) throw new ArgumentNullException(nameof(def));
+            List<PasoGuiado> pasos;
             switch (Verbos.Normalizar(def.Verbo)) {
-                case Verbos.Ordenar: return Ordenar(def);
-                case Verbos.Repartir: return Repartir(def);
-                default: return Detectar(def);
+                case Verbos.Ordenar: pasos = Ordenar(def); break;
+                case Verbos.Repartir: pasos = Repartir(def); break;
+                default: pasos = Detectar(def); break;
             }
+            // Lo primero: en que parte del proyecto estamos. Sin eso, las piezas son nombres sueltos.
+            if (!string.IsNullOrEmpty(def.EnElProyecto))
+                pasos.Insert(0, new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Primero, dónde estamos en el proyecto.",
+                    Porque = def.EnElProyecto + " Antes de tocar nada, lee qué es cada pieza o tarjeta: todas son partes de ese sistema.",
+                    EsLeccion = false
+                });
+            return pasos;
         }
 
         /// <summary>Lo esencial del recorrido, para el cierre: «la próxima vez, mira esto».</summary>

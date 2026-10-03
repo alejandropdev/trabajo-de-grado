@@ -227,7 +227,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var cols = els.Max(e => e.Columna) + 1;
             var gx = (W - cols * BW) / (cols + 1);
             var pos = els.ToDictionary(e => e.Id, e => new Vector2(gx + e.Columna * (BW + gx), 70 + e.Fila * 250));
-            var ocupados = els.Select(e => new Rect(pos[e.Id].x, pos[e.Id].y, BW, BH)).ToList();
+            // Cada caja lleva debajo lo que hace (su «detalle»), a la vista: antes solo se leia pinchandola, y las
+            // cajas eran nombres sueltos (ronda 4). Las etiquetas de las flechas esquivan tambien ese texto.
+            const float AltoDetalle = 64;
+            var ocupados = els.Select(e => new Rect(pos[e.Id].x, pos[e.Id].y, BW, BH + (string.IsNullOrEmpty(e.Detalle) ? 0 : AltoDetalle))).ToList();
 
             var pastillas = new List<Action>();
             foreach (var c in Def.Artefacto.Conexiones) {
@@ -264,6 +267,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var db = el.Tipo == "baseDeDatos";
                 l.Texto(p.x + 16, p.y + (db ? 30 : 12), BW - 30, 20, TipoDe(el.Tipo), 13, Tema.textoTenue);
                 l.Texto(p.x + 16, p.y + (db ? 50 : 38), BW - 30, 50, el.Texto, 20, Tema.texto, TextAlignmentOptions.TopLeft, null, true);
+                if (!string.IsNullOrEmpty(el.Detalle))
+                    l.Texto(p.x + 4, p.y + BH + 6, BW - 8, AltoDetalle, el.Detalle, 14, Tema.textoTenue, TextAlignmentOptions.TopLeft);
                 Chapita(l, p.x + BW - 6, p.y, e);
                 var elem = el;
                 _piezas[elem.Id] = (RectTransform)l.Zona(p.x, p.y, BW, BH, () => Pinchar(elem.Id, () => MostrarTexto(elem.Texto, elem.Detalle))).transform;
