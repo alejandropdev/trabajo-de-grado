@@ -40,7 +40,7 @@ namespace Nexus.EditorTools {
             camara.tag = "MainCamera";
             var cam = camara.GetComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = tema.fondo;
+            cam.backgroundColor = tema.bg900;
             cam.orthographic = true;
 
             var app = new GameObject("AppRoot");

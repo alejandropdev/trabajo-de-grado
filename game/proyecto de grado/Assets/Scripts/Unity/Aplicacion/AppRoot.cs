@@ -128,7 +128,7 @@ namespace Nexus.Unity.Aplicacion {
 
             var fondo = UiKit.Rellenar(Ui.Nodo(go.transform, "Fondo"));
             var img = fondo.gameObject.AddComponent<Image>();
-            img.color = Ui.Tema.fondo;
+            img.color = Ui.Tema.bg900;
             img.raycastTarget = false;
 
             var pantallas = UiKit.Rellenar(Ui.Nodo(go.transform, "Pantallas"));
