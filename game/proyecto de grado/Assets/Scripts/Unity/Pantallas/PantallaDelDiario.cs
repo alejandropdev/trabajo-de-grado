@@ -32,7 +32,7 @@ namespace Nexus.Unity.Pantallas {
             var titulos = Ui.Columna(cabecera, espacio: 0);
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "DIARIO DE CAMPO · " + (App.PerfilActivo != null ? App.PerfilActivo.nombreEstudiante.ToUpperInvariant() : ""),
-                     EstiloTexto.Pequeno, Tema.cian);
+                     EstiloTexto.Leyenda, Tema.cyan);
             Ui.Texto(titulos, "Lo que has encontrado", EstiloTexto.Titulo);
             Ui.Boton(cabecera, "Cerrar", Cerrar, VarianteBoton.Primario);
 
@@ -67,7 +67,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Vaciar(_lista);
             var deLaSerie = App.Catalogo.Coleccionables.Where(c => c.Serie == _serie).OrderBy(c => c.Id).ToList();
             if (deLaSerie.Count == 0) {
-                Ui.Texto(_lista, "Esta serie todavía no tiene piezas en esta versión.", EstiloTexto.Cuerpo, Tema.textoTenue);
+                Ui.Texto(_lista, "Esta serie todavía no tiene piezas en esta versión.", EstiloTexto.Cuerpo, Tema.inkMuted);
                 return;
             }
             foreach (var col in deLaSerie) {
@@ -77,8 +77,8 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void Hueco(Coleccionable col) {
-            var t = Ui.PanelColumna(_lista, "Hueco", Tema.espacio, 4, Tema.fondo);
-            Ui.Texto(t, "???", EstiloTexto.Subtitulo, Tema.textoTenue);
+            var t = Ui.PanelColumna(_lista, "Hueco", Tema.espacio, 4, Tema.surfaceSunken);
+            Ui.Texto(t, "???", EstiloTexto.Subtitulo, Tema.inkFaint);
             Ui.Texto(t, "Todavía no lo has encontrado.", EstiloTexto.Pequeno);
         }
 
@@ -86,13 +86,13 @@ namespace Nexus.Unity.Pantallas {
         public static RectTransform Tarjeta(UiKit ui, Transform padre, Coleccionable col) {
             var tema = ui.Tema;
             var t = ui.Tarjeta(padre, NombreDeSerie(col.Serie, false) + (string.IsNullOrEmpty(col.Palo) ? "" : " · " + Textos.Humanizar(col.Palo)));
-            ui.Texto(t, col.Titulo, EstiloTexto.Subtitulo, tema.texto);
-            if (!string.IsNullOrEmpty(col.Nicho)) ui.Texto(t, "Nicho: " + col.Nicho, EstiloTexto.Pequeno, tema.cianClaro);
+            ui.Texto(t, col.Titulo, EstiloTexto.Encabezado);
+            if (!string.IsNullOrEmpty(col.Nicho)) ui.Badge(ui.Fila(t), "Nicho: " + col.Nicho, Tono.Cyan);
             if (!string.IsNullOrEmpty(col.Texto)) ui.Texto(t, col.Texto, EstiloTexto.Cuerpo);
-            if (!string.IsNullOrEmpty(col.Causa)) ui.Texto(t, "Por qué fracasó: " + col.Causa, EstiloTexto.Cuerpo, tema.amarillo);
+            if (!string.IsNullOrEmpty(col.Causa)) ui.Texto(t, "Por qué fracasó: " + col.Causa, EstiloTexto.Cuerpo, tema.warning);
             if (!string.IsNullOrEmpty(col.Comando)) ui.Texto(t, "> " + col.Comando, EstiloTexto.Mono);
-            if (!string.IsNullOrEmpty(col.Revela)) ui.Texto(t, col.Revela, EstiloTexto.Cuerpo, tema.cianClaro);
-            if (!string.IsNullOrEmpty(col.PreguntaDeAplicacion)) ui.Texto(t, "Para pensar: " + col.PreguntaDeAplicacion, EstiloTexto.Pequeno, tema.texto);
+            if (!string.IsNullOrEmpty(col.Revela)) ui.Texto(t, col.Revela, EstiloTexto.Cuerpo, tema.cyan);
+            if (!string.IsNullOrEmpty(col.PreguntaDeAplicacion)) ui.Texto(t, "Para pensar: " + col.PreguntaDeAplicacion, EstiloTexto.Pequeno, tema.ink);
             if (!string.IsNullOrEmpty(col.Fuente)) ui.Texto(t, "Fuente: " + col.Fuente, EstiloTexto.Pequeno);
             return t;
         }
@@ -129,9 +129,9 @@ namespace Nexus.Unity.Pantallas {
         protected override float Ancho { get { return 900; } }
 
         protected override void Rellenar() {
-            Hoja.Etiqueta("Encontraste " + PantallaDelDiario.NombreDeSerie(Coleccionable.Serie, true), Tema.mostaza);
+            Hoja.Etiqueta("Encontraste " + PantallaDelDiario.NombreDeSerie(Coleccionable.Serie, true), Tema.violet);
             PantallaDelDiario.Tarjeta(Ui, Hoja.Raiz, Coleccionable);
-            Hoja.Nota("√ Guardado en tu diario de campo.", Tema.cian);
+            Hoja.Nota("√ Guardado en tu diario de campo.", Tema.success);
             var fila = Hoja.Fila();
             Ui.Boton(fila, "Seguir", () => {
                 App.Router.Volver();

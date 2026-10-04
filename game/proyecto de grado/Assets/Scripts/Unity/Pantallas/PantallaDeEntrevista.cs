@@ -37,8 +37,10 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(ficha, ancho: 440);
             var e = _prueba.Entrevistadora;
             if (e != null) {
-                Ui.Texto(ficha, e.Nombre, EstiloTexto.Subtitulo, Tema.texto);
-                if (!string.IsNullOrEmpty(e.Rol)) Ui.Texto(ficha, e.Rol, EstiloTexto.Pequeno, Tema.cianClaro);
+                var quien = Ui.Fila(ficha, "Entrevistadora", Tema.Espacio(3));
+                Ui.Retrato(quien, e.Nombre.Length > 0 ? e.Nombre.Substring(0, 1) : "", Tono.Cyan);
+                UiKit.Tamano(Ui.Texto(quien, e.Nombre, EstiloTexto.Encabezado), flexAncho: 1);
+                if (!string.IsNullOrEmpty(e.Rol)) Ui.Texto(ficha, e.Rol, EstiloTexto.Pequeno, Tema.cyan);
                 if (!string.IsNullOrEmpty(e.Descripcion)) Ui.Texto(ficha, e.Descripcion, EstiloTexto.Pequeno);
             }
             Ui.Separador(ficha);
@@ -58,7 +60,7 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Vaciar();
             var p = _preguntas[_indice];
             _hoja.Etiqueta($"Pregunta {_indice + 1} de {_preguntas.Count}");
-            _hoja.Subtitulo(p.Enunciado, Tema.texto);
+            Ui.Texto(_hoja.Raiz, p.Enunciado, EstiloTexto.Encabezado);
             _hoja.Espacio();
 
             string elegida;
@@ -78,8 +80,8 @@ namespace Nexus.Unity.Pantallas {
             }
 
             _hoja.Espacio();
-            _hoja.Nota("El hombre del traje verde se inclina hacia Marisol:", Tema.textoTenue);
-            var susurro = _hoja.Parrafo("«" + _susurro + "»", Tema.mostazaClara);
+            _hoja.Nota("El hombre del traje verde se inclina hacia Marisol:", Tema.inkMuted);
+            var susurro = _hoja.Parrafo("«" + _susurro + "»", Tema.violet);   // un momento de historia, no un aviso
             susurro.fontStyle = TMPro.FontStyles.Italic;
             var ultima = _indice == _preguntas.Count - 1;
             _hoja.Accion(ultima ? "Terminar la entrevista" : "Siguiente pregunta", Siguiente);

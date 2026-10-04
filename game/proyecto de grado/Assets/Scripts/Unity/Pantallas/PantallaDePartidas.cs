@@ -29,7 +29,7 @@ namespace Nexus.Unity.Pantallas {
             var cabecera = Ui.Fila(marco);
             var titulos = Ui.Columna(cabecera, espacio: 2);
             UiKit.Tamano(titulos, flexAncho: 1);
-            Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Pequeno, Tema.cian);
+            Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Hero);   // el logotipo: una sola vez por pantalla
             Ui.Texto(titulos, "Hola, " + App.PerfilActivo.nombreEstudiante, EstiloTexto.Titulo);
             // El diario aparece cuando ya hay algo que leer en el: antes de la primera partida solo confunde.
             if (App.PerfilActivo.coleccionablesGlobales != null && App.PerfilActivo.coleccionablesGlobales.Count > 0)
@@ -46,9 +46,8 @@ namespace Nexus.Unity.Pantallas {
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);
 
-            var guardadas = Ui.PanelColumna(cuerpo, "Partidas", Tema.margen, Tema.espacio);
+            var guardadas = Ui.Tarjeta(cuerpo, "Tus partidas");
             UiKit.Tamano(guardadas, flexAncho: 1, flexAlto: 1);
-            Ui.Texto(guardadas, "TUS PARTIDAS", EstiloTexto.Pequeno, Tema.cian);
             var scroll = Ui.Desplazable(guardadas, out _lista);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
 
@@ -74,7 +73,7 @@ namespace Nexus.Unity.Pantallas {
             _semilla.contentType = TMP_InputField.ContentType.IntegerNumber;
             _filaSemilla.SetActive(false);
 
-            _aviso = Ui.Texto(nueva, "", EstiloTexto.Pequeno, Tema.mostaza);
+            _aviso = Ui.Texto(nueva, "", EstiloTexto.Pequeno, Tema.warning);
             Ui.Boton(Ui.Fila(nueva), "Empezar", Empezar, VarianteBoton.Primario);
         }
 
@@ -82,27 +81,27 @@ namespace Nexus.Unity.Pantallas {
             _modoAula = !_modoAula;
             _filaSemilla.SetActive(_modoAula);
             _botonAula.GetComponentInChildren<TMP_Text>().text = _modoAula ? "Modo aula: sí" : "Modo aula: no";
-            Ui.Resaltar(_botonAula, _modoAula);
+            Ui.Resaltar(_botonAula, _modoAula, Tono.Violeta);   // el Modo Aula es violet en el design system
         }
 
         public override void Repintar() {
             UiKit.Vaciar(_lista);
             var partidas = App.Partidas.Listar(App.PerfilActivo.idPerfil);
             if (partidas.Count == 0) {
-                Ui.Texto(_lista, "Todavía no tienes partidas. Empieza una a la derecha.", EstiloTexto.Cuerpo, Tema.textoTenue);
+                Ui.Texto(_lista, "Todavía no tienes partidas. Empieza una a la derecha.", EstiloTexto.Cuerpo, Tema.inkMuted);
                 return;
             }
             foreach (var r in partidas) Fila(r);
         }
 
         private void Fila(ResumenDePartida r) {
-            var fila = Ui.PanelColumna(_lista, "Partida", Tema.espacio, 6, Tema.pared);
+            var fila = Ui.PanelColumna(_lista, "Partida", Tema.Espacio(4), 6, Tema.surfaceRaised);
             var linea = Ui.Fila(fila);
             var datos = Ui.Columna(linea, espacio: 2);
             UiKit.Tamano(datos, flexAncho: 1);
-            Ui.Texto(datos, r.Nombre, EstiloTexto.Subtitulo, r.Danada ? Tema.rojo : Tema.texto);
+            Ui.Texto(datos, r.Nombre, EstiloTexto.Encabezado, r.Danada ? Tema.danger : Tema.ink);
             if (r.Danada) {
-                Ui.Texto(datos, "No se puede abrir: " + r.Error, EstiloTexto.Pequeno, Tema.rojo);
+                Ui.Texto(datos, "No se puede abrir: " + r.Error, EstiloTexto.Pequeno, Tema.danger);
             } else {
                 var nivel = r.NivelActualId != null && App.Catalogo.Niveles.ContainsKey(r.NivelActualId)
                     ? App.Catalogo.Niveles[r.NivelActualId].Nombre : r.NivelActualId;

@@ -29,30 +29,30 @@ namespace Nexus.Unity.Pantallas {
             var hoja = new Hoja(Ui, centro);
 
             var nivel = l.Nivel ?? (l.Exito ? NivelesDeLanzamiento.Bien : NivelesDeLanzamiento.Mal);
-            var color = nivel == NivelesDeLanzamiento.Bien ? Tema.cian : nivel == NivelesDeLanzamiento.Mal ? Tema.rojo : Tema.amarillo;
             hoja.Etiqueta("Fase 3 · el lanzamiento · " + s.Perfil.Nombre);
             hoja.Titulo(NivelesDeLanzamiento.Titulo(nivel));
-            hoja.Subtitulo($"Puntaje del lanzamiento: {l.Puntaje:0} / 100", color);
+            var tono = nivel == NivelesDeLanzamiento.Bien ? Tono.Exito : nivel == NivelesDeLanzamiento.Mal ? Tono.Peligro : Tono.Aviso;
+            UiKit.Tamano(Ui.Cifra(hoja.Fila(), $"{l.Puntaje:0} / 100", "Puntaje del lanzamiento", null, tono).transform.parent, ancho: 320);
             hoja.Parrafo(nivel == NivelesDeLanzamiento.Bien
                 ? "El cliente recibió lo que esperaba y casi sin sorpresas. Así se ve un proyecto bien llevado."
                 : nivel == NivelesDeLanzamiento.ConProblemas
                     ? "Se entregó, pero el cliente notó cosas. No es un desastre, pero tampoco es lo que se buscaba: mira abajo qué falló."
                     : "El cliente no quedó contento. Abajo está qué falló y qué decisiones lo provocaron: es justo lo que hay que aprender.");
             if (!string.IsNullOrEmpty(l.Texto)) hoja.Parrafo(l.Texto);
-            if (!string.IsNullOrEmpty(l.TextoMetodologia)) hoja.Parrafo(l.TextoMetodologia, Tema.cianClaro);
+            if (!string.IsNullOrEmpty(l.TextoMetodologia)) hoja.Parrafo(l.TextoMetodologia, Tema.inkMuted);
 
             var datos = hoja.Tarjeta("Lo que se midió");
             foreach (var f in l.Factores) {
-                var c = f.Estado == "bien" ? Tema.cian : f.Estado == "mal" ? Tema.rojo : Tema.amarillo;
+                var c = f.Estado == "bien" ? Tema.success : f.Estado == "mal" ? Tema.danger : Tema.warning;
                 var marca = f.Estado == "bien" ? "√" : f.Estado == "mal" ? "×" : "~";
                 Ui.Texto(datos, $"<b>{marca} {f.Nombre}:</b> {f.Valor}   <size=80%>({f.Puntos:0}/{f.Maximo:0} pts)</size>", EstiloTexto.Cuerpo, c);
                 Ui.Barra(datos, f.Maximo > 0 ? (float)(f.Puntos / f.Maximo) : 0, c);
-                Ui.Texto(datos, f.Explicacion, EstiloTexto.Pequeno, Tema.textoTenue);
+                Ui.Texto(datos, f.Explicacion, EstiloTexto.Pequeno, Tema.inkMuted);
             }
 
             if (l.DecisionesQuePesaron.Count > 0) {
-                var pesaron = hoja.Tarjeta("Las decisiones que más pesaron en contra", Tema.mostaza);
-                foreach (var d in l.DecisionesQuePesaron) Ui.Texto(pesaron, "· " + d, EstiloTexto.Pequeno, Tema.texto);
+                var pesaron = hoja.Tarjeta("Las decisiones que más pesaron en contra", Tono.Aviso);
+                foreach (var d in l.DecisionesQuePesaron) Ui.Notificacion(pesaron, d, Tono.Aviso);
             }
 
             hoja.Nota(nivel == NivelesDeLanzamiento.Bien
