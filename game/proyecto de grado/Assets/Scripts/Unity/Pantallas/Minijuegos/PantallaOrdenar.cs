@@ -78,7 +78,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _lamina = NuevoLienzo(cuerpo, "El backlog · arrastra las tarjetas o usa ▲▼ · arriba lo primero", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
 
             RectTransform pie;
-            var lado = ColumnaLateral(cuerpo, "Cliente", 480, out pie);
+            var lado = ColumnaLateral(cuerpo, "Cliente", 440, out pie);
 
             var sprint = Ui.Tarjeta(lado, "1 · Ordena el sprint");
             _faseTexto = Ui.Texto(sprint, "", EstiloTexto.Leyenda, Tema.cyan);
@@ -243,21 +243,21 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var total = Cfg.Tarjetas.Sum(t => t.Esfuerzo);
             var alto = _orden.Count * Fila + 44;
             var escala = alto / total;
-            l.Dibujo.Rect(40, Y0, 44, alto, Tema.line, 0, Tema.line, false, 8);
+            l.Dibujo.Rect(40, Y0, 44, alto, Tema.paperLine, 0, Tema.paperLine, false, 8);
             var yb = Y0;
             foreach (var id in _orden.Where(entran.Contains)) {
                 var h = porId[id].Esfuerzo * escala;
-                l.Dibujo.Rect(40, yb, 44, h - 3, Tema.cyan, 0, Tema.cyan, false, 6);
+                l.Dibujo.Rect(40, yb, 44, h - 3, Tema.papelCyan, 0, Tema.papelCyan, false, 6);
                 yb += h;
             }
             var yCap = Y0 + Cfg.Capacidad * escala;
-            l.Dibujo.Linea(24, yCap, 100, yCap, Tema.warning, 4, true);
-            l.Texto(20, yCap + 6, 90, 24, $"{entran.Sum(id => porId[id].Esfuerzo)}/{Cfg.Capacidad}", 16, Tema.warning, TextAlignmentOptions.Center);
+            l.Dibujo.Linea(24, yCap, 100, yCap, Tema.papelAviso, 4, true);
+            l.Texto(20, yCap + 6, 90, 24, $"{entran.Sum(id => porId[id].Esfuerzo)}/{Cfg.Capacidad}", 16, Tema.papelAviso, TextAlignmentOptions.Center);
 
             // la linea de capacidad entre las tarjetas
             var yLinea = YDe(linea, linea) - 30;
-            l.Dibujo.Linea(Izq, yLinea, Izq + Ancho, yLinea, Tema.warning, 4, true);
-            l.Texto(Izq, yLinea + 4, 700, 22, "CAPACIDAD DEL SPRINT · lo de abajo se queda fuera", 16, Tema.warning);
+            l.Dibujo.Linea(Izq, yLinea, Izq + Ancho, yLinea, Tema.papelAviso, 4, true);
+            l.Texto(Izq, yLinea + 4, 700, 22, "CAPACIDAD DEL SPRINT · lo de abajo se queda fuera", 16, Tema.papelAviso);
 
             var ver = resultado || VerDependencias;
             var rotas = ver ? Rotas() : new List<KeyValuePair<string, string>>();
@@ -275,49 +275,52 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 // Como TaskCard/BacklogRow: el color vive en el borde izquierdo; bloqueada = danger con glow-danger, la
                 // pedida por el cliente = borde amarillo (warning), dentro del sprint = cyan.
                 var pedida = t.Id == Cfg.TarjetaPedida && (_contestando || resultado);
-                Ui.Fondo(tarjeta.gameObject.AddComponent<Image>(),
-                         rota.Count > 0 ? Tema.dangerSoft : dentro ? Tema.surfaceRaised : Tema.surface, NexusTheme.RadioSm);
-                if (rota.Count > 0) Ui.Halo(tarjeta, Tema.danger, NexusTheme.RadioSm);
-                Ui.Borde(tarjeta, rota.Count > 0 ? Tema.danger : pedida ? Tema.warning : Tema.line, NexusTheme.RadioSm, pedida ? 2 : 1);
+                // Una ficha de papel sobre la hoja: crema dentro del sprint, gris fuera, rosada si esta mal colocada.
+                var ficha = tarjeta.gameObject.AddComponent<Image>();
+                var tinte = rota.Count > 0 ? Color.Lerp(Tema.etiquetaRoja, Color.white, 0.45f) : dentro ? Color.white : new Color(0.82f, 0.82f, 0.82f, 1);
+                if (!Ui.Material(ficha, MaterialesNexus.Etiqueta, 6, tinte))
+                    Ui.Fondo(ficha, rota.Count > 0 ? NexusTheme.Alfa(Tema.papelPeligro, 0.16f) : Tema.papelCaja, NexusTheme.RadioSm);
+                if (rota.Count > 0) Ui.Halo(tarjeta, Tema.papelPeligro, NexusTheme.RadioSm);
+                Ui.Borde(tarjeta, rota.Count > 0 ? Tema.papelPeligro : pedida ? Tema.papelAviso : Tema.paperLine, NexusTheme.RadioSm, pedida ? 2 : 1);
                 var franja = Ui.Nodo(tarjeta, "Franja");
                 franja.anchorMin = Vector2.zero; franja.anchorMax = new Vector2(0, 1); franja.pivot = new Vector2(0, 0.5f);
                 franja.sizeDelta = new Vector2(Tema.Px(3), 0);
-                franja.gameObject.AddComponent<Image>().color = rota.Count > 0 ? Tema.danger : pedida ? Tema.warning : dentro ? Tema.cyan : Tema.lineStrong;
+                franja.gameObject.AddComponent<Image>().color = rota.Count > 0 ? Tema.papelPeligro : pedida ? Tema.papelAviso : dentro ? Tema.papelCyan : Tema.papelTrazo;
                 if (i == 0) GuiaView.Registrar("mj.ordenar.tarjeta", tarjeta);
 
                 var tenue = dentro ? 1f : 0.55f;
                 var fila = new Lamina(Ui, tarjeta, Ancho, Fila - 10, "Contenido");
                 UiKit.Rellenar(fila.Raiz);
                 // el puesto, grande: es lo que se ordena
-                fila.Texto(10, 0, 60, Fila - 10, (i + 1).ToString(), 26, dentro ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Center, Tema.FuenteDisplay);
-                fila.Texto(66, 0, 26, Fila - 10, "≡", 20, Tema.inkMuted, TextAlignmentOptions.Center);
+                fila.Texto(10, 0, 60, Fila - 10, (i + 1).ToString(), 26, dentro ? Tema.papelCyan : Tema.paperMuted, TextAlignmentOptions.Center, Tema.FuenteInterfazNegrita);
+                fila.Texto(66, 0, 26, Fila - 10, "≡", 20, Tema.paperMuted, TextAlignmentOptions.Center);
 
                 string aviso = null;
-                Color colorAviso = Tema.inkMuted;
+                Color colorAviso = Tema.paperMuted;
                 if (rota.Count > 0) {
                     aviso = "¡Ojo! Necesita " + string.Join(" y ", rota.Select(d =>
                                 $"«{porId[d].Titulo}» ANTES · " + (entran.Contains(d) ? $"está en el puesto {_orden.IndexOf(d) + 1}" : "y no entró"))) + ": súbela por encima.";
-                    colorAviso = Tema.danger;
+                    colorAviso = Tema.papelPeligro;
                 } else if (laNecesitan.Count > 0) {
                     aviso = "la necesita " + string.Join(", ", laNecesitan.Select(k => $"«{porId[k].Titulo}» (puesto {_orden.IndexOf(k) + 1})")) + ": tiene que ir encima";
-                    colorAviso = Tema.warning;
+                    colorAviso = Tema.papelAviso;
                 } else if (ver && t.DependeDe.Count > 0) {
                     aviso = "necesita: " + string.Join(", ", t.DependeDe.Select(d => "«" + porId[d].Titulo + "»")) + " · bien colocada";
-                    colorAviso = Tema.cyan;
+                    colorAviso = Tema.papelCyan;
                 }
                 if (aviso != null) {
-                    fila.Texto(104, 4, 600, 32, t.Titulo, 19, WithAlpha(Tema.ink, tenue), TextAlignmentOptions.MidlineLeft, null, true);
+                    fila.Texto(104, 4, 600, 32, t.Titulo, 19, WithAlpha(Tema.paperInk, tenue), TextAlignmentOptions.MidlineLeft, null, true);
                     fila.Texto(104, 36, 690, 28, aviso, 14, colorAviso, TextAlignmentOptions.MidlineLeft);
                 } else {
-                    fila.Texto(104, 0, 600, Fila - 10, t.Titulo, 20, WithAlpha(Tema.ink, tenue), TextAlignmentOptions.MidlineLeft, null, true);
+                    fila.Texto(104, 0, 600, Fila - 10, t.Titulo, 20, WithAlpha(Tema.paperInk, tenue), TextAlignmentOptions.MidlineLeft, null, true);
                 }
                 var etiqueta = EtiquetaDeNegociacion(t.Id, entran);
-                if (etiqueta != null) fila.Pastilla(720, 20, etiqueta, 14, Tema.warning, Tema.onWarning);
-                fila.Pastilla(830, (Fila - 10) / 2, "valor " + t.Valor, 16, WithAlpha(Tema.cyan, tenue), Tema.onCyan);
-                fila.Pastilla(950, (Fila - 10) / 2, "esfuerzo " + t.Esfuerzo, 16, Tema.line, Tema.ink);
+                if (etiqueta != null) fila.Pastilla(720, 20, etiqueta, 14, Tema.papelAviso, Color.white);
+                fila.Pastilla(830, (Fila - 10) / 2, "valor " + t.Valor, 16, WithAlpha(Tema.papelCyan, tenue), Color.white);
+                fila.Pastilla(950, (Fila - 10) / 2, "esfuerzo " + t.Esfuerzo, 16, Tema.paperLine, Tema.paperInk);
 
                 if (resultado) {
-                    if (!dentro) fila.Texto(Ancho - 200, 0, 180, Fila - 10, "no entró", 16, Tema.inkMuted, TextAlignmentOptions.MidlineRight);
+                    if (!dentro) fila.Texto(Ancho - 200, 0, 180, Fila - 10, "no entró", 16, Tema.paperMuted, TextAlignmentOptions.MidlineRight);
                     continue;
                 }
                 if (_contestando) continue;   // en la fase 2 el tablero no se toca

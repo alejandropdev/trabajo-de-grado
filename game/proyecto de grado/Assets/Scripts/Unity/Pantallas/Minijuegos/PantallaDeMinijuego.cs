@@ -61,49 +61,67 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         protected override void Construir() {
-            var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 0.75f));
+            var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.espacio, Tema.margen * 0.75f));
+
+            // Cabecera fina: de quien es el ticket, las herramientas y el reloj (LCD). El titulo va en el briefing.
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
-            UiKit.Tamano(titulos, flexAncho: 1);
             var quien = Practica ? "PRÁCTICA EN TU ESCRITORIO · NO CUENTA PARA TU EVALUACIÓN"
                                  : $"TICKET · {(Def.Presentacion.QuienEspera ?? "").ToUpperInvariant()} · {Def.Presentacion.TextoPresion}";
-            Ui.Texto(titulos, quien, EstiloTexto.Leyenda, Practica ? Tema.cyan : Tema.warning);
-            Ui.Texto(titulos, Def.Presentacion.Titulo ?? Def.Id, EstiloTexto.Titulo);
-            // Donde estamos en el proyecto: sin esto, las piezas del reto son nombres sueltos (ronda 4).
-            var dondeEstamos = DondeEstamos();
-            if (dondeEstamos != null) {
-                var linea = Ui.Texto(titulos, dondeEstamos, EstiloTexto.Pequeno, Tema.cyan);
-                GuiaView.Registrar("mj.proyecto", linea);
-            }
+            UiKit.Tamano(Ui.Texto(cabecera, quien, EstiloTexto.Leyenda, Practica ? Tema.cyan : Tema.warning), flexAncho: 1);
             Ui.Boton(cabecera, "Receta", () => AbrirReceta(false));
             GuiaView.BotonDeAyuda(App, cabecera);
             Ui.Boton(cabecera, "Menú", AbrirPausa, VarianteBoton.Fantasma);
 
             _restante = Math.Max(10, Def.Presentacion.SegundosReloj);
             _total = _restante;
-            // TimerChip: cyan con tiempo, warning al final, danger (con resplandor) cuando agotarlo entrega el reto.
+            // El reloj del reto: cyan con tiempo, warning al final, danger cuando agotarlo entrega el reto.
             _reloj = Ui.Temporizador(cabecera, Reloj(_total), Tono.Cyan);
             GuiaView.Registrar("mj.reloj", _reloj);
 
-            _cuerpo = Ui.Fila(marco, "Cuerpo", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            var area = Ui.Fila(marco, "Area", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            UiKit.Tamano(area, flexAncho: 1, flexAlto: 1);
+            ConstruirBriefing(area);
+            _cuerpo = Ui.Fila(area, "Cuerpo", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(_cuerpo, flexAncho: 1, flexAlto: 1);
             GuiaView.Registrar("mj.tablero", _cuerpo);
 
             // El panel de Marisol va entre la cabecera y el tablero: se ve a la vez que la pieza que señala.
             if (Pendiente != null && Pendiente.Guiado) {
-                Guia = new GuiaDelMinijuego(App, marco, _cuerpo.GetSiblingIndex(), PiezaGuiada, _ => Repintar());
+                Guia = new GuiaDelMinijuego(App, marco, area.GetSiblingIndex(), PiezaGuiada, _ => Repintar());
                 _reloj.gameObject.SetActive(false);   // guiado = sin prisa: el reloj no corre
             }
 
-            // Detras de la receta: por si alguien la cierra sin empezar, un boton para verla otra vez.
-            var espera = Ui.PanelColumna(_cuerpo, "Espera", Tema.margen * 1.5f, Tema.espacio);
-            Ui.Esquinas(espera);
-            UiKit.Tamano(espera, flexAncho: 1);
-            var hoja = new Hoja(Ui, espera);
-            if (!string.IsNullOrEmpty(Def.Presentacion.ComoSeJuega)) hoja.Parrafo(Def.Presentacion.ComoSeJuega);
-            var fila = hoja.Fila();
+            // Detras de la receta: quien espera el trabajo y, por si alguien la cierra sin empezar, volver a verla.
+            var espera = Ui.Ventana(_cuerpo, "Espera");
+            UiKit.Tamano(espera, flexAncho: 1, flexAlto: 1);
+            var personaje = Def.Presentacion.QuienEspera;
+            if (!string.IsNullOrEmpty(personaje) && personaje != "Tú mismo")
+                Ui.Ilustracion(espera, Nexus.Unity.Tema.MaterialesNexus.IdDePersonaje(personaje), personaje, alto: 420);
+            var fila = Ui.Fila(espera);
             Ui.Boton(fila, "Ver la receta", () => AbrirReceta(true));
             Ui.Boton(fila, "¡A jugar!", Empezar, VarianteBoton.Primario);
+        }
+
+        /// <summary>
+        /// La columna de papel de la izquierda (las referencias de los minijuegos): el titulo del reto, donde estamos en
+        /// el proyecto, que hay que hacer y quien lo espera. Todo sale del JSON del reto; no se inventa nada.
+        /// </summary>
+        private void ConstruirBriefing(Transform padre) {
+            var hoja = Ui.Hoja(padre, "Briefing", Tema.Espacio(5));
+            UiKit.Tamano(hoja, ancho: 300, flexAlto: 1);
+            RectTransform contenido;
+            var scroll = Ui.Desplazable(hoja, out contenido, "Briefing (scroll)");
+            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
+            Ui.Texto(contenido, Def.Presentacion.Titulo ?? Def.Id, EstiloTexto.Titulo, Tema.paperInk);
+            var renglones = new List<RenglonDeBriefing>();
+            var dondeEstamos = DondeEstamos();
+            if (dondeEstamos != null) renglones.Add(new RenglonDeBriefing("•", "Dónde estamos", dondeEstamos));
+            if (!string.IsNullOrEmpty(Def.Presentacion.ComoSeJuega))
+                renglones.Add(new RenglonDeBriefing("→", "Lo que haces", Def.Presentacion.ComoSeJuega));
+            if (!Practica && !string.IsNullOrEmpty(Def.Presentacion.TextoPresion))
+                renglones.Add(new RenglonDeBriefing("!", "Quién lo espera", Def.Presentacion.TextoPresion));
+            var briefing = Ui.Briefing(contenido, renglones, true);
+            GuiaView.Registrar("mj.proyecto", briefing);
         }
 
         private static string Reloj(float segundos) {
@@ -300,12 +318,27 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         protected RectTransform ColumnaLateral(RectTransform cuerpo, string nombre, float ancho, out RectTransform pie) {
             var columna = Ui.Columna(cuerpo, nombre, Tema.espacio);
             UiKit.Tamano(columna, ancho: ancho, flexAlto: 1);
+            TarjetaDeQuienEspera(columna);
             RectTransform contenido;
             var scroll = Ui.Desplazable(columna, out contenido, nombre + " (scroll)");
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
             contenido.GetComponent<UnityEngine.UI.VerticalLayoutGroup>().padding = new RectOffset(4, 18, 4, 4);   // aire para la barra y las esquinas
             pie = Ui.Columna(columna, "Pie", Tema.espacio);
             return contenido;
+        }
+
+        /// <summary>La ficha de quien espera el trabajo (Javier, la ministra…): su retrato y lo que te ha dicho.</summary>
+        protected void TarjetaDeQuienEspera(Transform padre) {
+            var personaje = Def.Presentacion.QuienEspera;
+            if (string.IsNullOrEmpty(personaje) || personaje == "Tú mismo") return;
+            var ficha = Ui.PanelColumna(padre, "Quien espera", Tema.espacio, Tema.espacio);
+            var fila = Ui.Fila(ficha, "Retrato", Tema.espacio, alineacion: TextAnchor.UpperLeft);
+            Ui.Ilustracion(fila, Nexus.Unity.Tema.MaterialesNexus.IdDePersonaje(personaje), null, 110, 130);
+            var textos = Ui.Columna(fila, "Texto", 4);
+            UiKit.Tamano(textos, flexAncho: 1);
+            Ui.Texto(textos, personaje, EstiloTexto.Subtitulo);
+            if (!string.IsNullOrEmpty(Def.Presentacion.TextoPresion))
+                Ui.Texto(textos, "«" + Def.Presentacion.TextoPresion + "»", EstiloTexto.Dialogo).fontStyle = TMPro.FontStyles.Italic;
         }
 
         /// <summary>Lineas que explican una solucion buena, para enseñarlas si no se acerto. Cada verbo la suya.</summary>
@@ -349,10 +382,11 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         /// <summary>Un panel de lienzo que ocupa lo que le den, con una lamina de tamaño fijo dentro (con scroll si no cabe).</summary>
         protected Lamina NuevoLienzo(Transform padre, string rotulo, float ancho, float alto, float? anchoFijo = null) {
-            var panel = Ui.PanelColumna(padre, "Lienzo", 18, 8);
+            // El tablero es un documento: una hoja de papel dentro de una ventana de metal, con su titulo en tinta.
+            var panel = Ui.Ventana(padre, "Lienzo", true);
             if (anchoFijo.HasValue) UiKit.Tamano(panel, ancho: anchoFijo.Value, flexAlto: 1);
             else UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
-            if (!string.IsNullOrEmpty(rotulo)) Ui.Texto(panel, rotulo.ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cyan);
+            if (!string.IsNullOrEmpty(rotulo)) Ui.Texto(panel, rotulo, EstiloTexto.Subtitulo, Tema.paperInk);
             RectTransform contenido;
             var scroll = Ui.Desplazable(panel, out contenido);
             scroll.horizontal = true;
@@ -362,7 +396,41 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             contenido.pivot = new Vector2(0, 1);       // y empieza a la izquierda, no centrada
             var ajuste = contenido.GetComponent<UnityEngine.UI.ContentSizeFitter>();
             ajuste.horizontalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
-            return new Lamina(Ui, contenido, ancho, alto);
+            // La lamina mide lo que su dibujo (1330 px en un diagrama); la ventana, lo que deje la pantalla. Se escala
+            // para caber de ancho, sin bajar del 55 % (por debajo ya no se lee: entonces, scroll horizontal).
+            var caja = Ui.Nodo(contenido, "Caja de la lamina");
+            var lamina = new Lamina(Ui, caja, ancho, alto);
+            var rt = lamina.Raiz;
+            rt.GetComponent<UnityEngine.UI.LayoutElement>().ignoreLayout = true;
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0, 1);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = new Vector2(ancho, alto);
+            var ajustar = caja.gameObject.AddComponent<AjustarLaminaAlVisor>();
+            ajustar.Visor = scroll.viewport;
+            ajustar.Lamina = rt;
+            ajustar.Ancho = ancho;
+            ajustar.Alto = alto;
+            return lamina;
+        }
+    }
+
+    /// <summary>Escala una lamina para que quepa de ancho en su visor (entre el 55 % y el 100 %) y reserva su sitio.</summary>
+    public sealed class AjustarLaminaAlVisor : MonoBehaviour {
+        public RectTransform Visor, Lamina;
+        public float Ancho, Alto;
+        private UnityEngine.UI.LayoutElement _le;
+        private float _ultimo = -1;
+
+        private void LateUpdate() {
+            if (Visor == null || Lamina == null) return;
+            var disponible = Visor.rect.width - 24;   // lo que ocupa la barra de scroll vertical
+            if (disponible <= 1 || Mathf.Abs(disponible - _ultimo) < 0.5f) return;
+            _ultimo = disponible;
+            var k = Mathf.Clamp(disponible / Ancho, 0.55f, 1f);
+            Lamina.localScale = new Vector3(k, k, 1);
+            if (_le == null) _le = UiKit.Tamano(transform);
+            _le.minWidth = _le.preferredWidth = Ancho * k;
+            _le.minHeight = _le.preferredHeight = Alto * k;
         }
     }
 }

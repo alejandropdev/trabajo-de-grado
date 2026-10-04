@@ -38,7 +38,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private readonly Dictionary<string, RectTransform> _tipos = new Dictionary<string, RectTransform>();
         private Button _entregar;
 
-        private Color Relleno { get { return NexusTheme.Alfa(Tema.cyan, 0.85f); } }
+        private Color Relleno { get { return NexusTheme.Alfa(Tema.papelCyan, 0.85f); } }
         private const float AltoPila = 540, AnchoPila = 170, Arriba = 150;
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
@@ -47,7 +47,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             GuiaView.Registrar("mj.repartir.pilas", _lamina.Raiz);
 
             RectTransform pie;
-            var lado = ColumnaLateral(cuerpo, "Tipos", 460, out pie);
+            var lado = ColumnaLateral(cuerpo, "Tipos", 420, out pie);
             GuiaView.Registrar("mj.repartir.tipos", lado);
             foreach (var d in Cfg.Depositos) {
                 var t = Ui.Tarjeta(lado, $"{d.Nombre} · {d.CostePorDefecto} {Cfg.Unidad} por error");
@@ -80,27 +80,27 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var x0 = resultado == null ? 250f : 80f;
 
             if (resultado == null) {
-                l.Texto(60, 16, 800, 34, $"{libres} de {Cfg.Presupuesto} {Cfg.Unidad} sin repartir", 22, libres > 0 ? Tema.warning : Tema.success,
+                l.Texto(60, 16, 800, 34, $"{libres} de {Cfg.Presupuesto} {Cfg.Unidad} sin repartir", 22, libres > 0 ? Tema.papelAviso : Tema.papelExito,
                         TextAlignmentOptions.MidlineLeft, null, true);
-                l.Dibujo.Rect(60, Arriba, 110, AltoPila, Tema.warning, 2, null, true, 12);
+                l.Dibujo.Rect(60, Arriba, 110, AltoPila, Tema.papelAviso, 2, null, true, 12);
                 var hL = AltoPila * libres / Cfg.Presupuesto;
-                if (hL > 0) l.Dibujo.Rect(64, Arriba + AltoPila - hL - 4, 102, hL, Tema.warning, 0, NexusTheme.Alfa(Tema.warning, 0.85f), false, 9);
-                l.Texto(40, Arriba + AltoPila + 14, 150, 26, "Sin repartir", 17, Tema.warning, TextAlignmentOptions.Center);
+                if (hL > 0) l.Dibujo.Rect(64, Arriba + AltoPila - hL - 4, 102, hL, Tema.papelAviso, 0, NexusTheme.Alfa(Tema.papelAviso, 0.85f), false, 9);
+                l.Texto(40, Arriba + AltoPila + 14, 150, 26, "Sin repartir", 17, Tema.papelAviso, TextAlignmentOptions.Center);
             }
 
             for (var i = 0; i < n; i++) {
                 var d = Cfg.Depositos[i];
                 var h = _asignacion[d.Id];
                 var x = x0 + i * sep;
-                l.Texto(x - 40, Arriba - 76, AnchoPila + 80, 28, d.Nombre, 21, Tema.ink, TextAlignmentOptions.Center, null, true);
-                l.Texto(x, Arriba - 44, AnchoPila, 26, $"{h} {Cfg.Unidad}", 19, Tema.cyan, TextAlignmentOptions.Center);
-                l.Dibujo.Rect(x, Arriba, AnchoPila, AltoPila, Tema.cyan, 3, Tema.surfaceSunken, false, 14);
+                l.Texto(x - 40, Arriba - 76, AnchoPila + 80, 28, d.Nombre, 21, Tema.paperInk, TextAlignmentOptions.Center, null, true);
+                l.Texto(x, Arriba - 44, AnchoPila, 26, $"{h} {Cfg.Unidad}", 19, Tema.papelCyan, TextAlignmentOptions.Center);
+                l.Dibujo.Rect(x, Arriba, AnchoPila, AltoPila, Tema.papelCyan, 3, Tema.papelCaja, false, 14);
                 var hh = AltoPila * h / Cfg.Presupuesto;
                 if (hh > 0) {
                     l.Dibujo.Rect(x + 5, Arriba + AltoPila - hh - 5, AnchoPila - 10, hh, Relleno, 0, Relleno, false, 10);
                     for (var k = Paso; k < h; k += Paso) {
                         var y = Arriba + AltoPila - 5 - AltoPila * k / Cfg.Presupuesto;
-                        l.Dibujo.Linea(x + 6, y, x + AnchoPila - 6, y, NexusTheme.Alfa(Tema.onCyan, 0.35f), 1.5f);
+                        l.Dibujo.Linea(x + 6, y, x + AnchoPila - 6, y, NexusTheme.Alfa(Color.white, 0.35f), 1.5f);
                     }
                 }
 
@@ -114,31 +114,31 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     mas.interactable = libres > 0;
                     if (i == 0) GuiaView.Registrar("mj.repartir.mas", mas);
                     _mas[d.Id] = (RectTransform)mas.transform;
-                    l.Texto(x - 20, Arriba + AltoPila + 70, AnchoPila + 40, 24, $"{d.CostePorDefecto} {Cfg.Unidad} por error", 15, Tema.inkMuted, TextAlignmentOptions.Center);
+                    l.Texto(x - 20, Arriba + AltoPila + 70, AnchoPila + 40, 24, $"{d.CostePorDefecto} {Cfg.Unidad} por error", 15, Tema.paperMuted, TextAlignmentOptions.Center);
                     if (VerAtrapados) {
                         // Guiado: cuantos atrapa ya esta pila, y si ya no queda nada que atrapar en ella.
                         var atrapa = Math.Min(d.DefectosOcultos, h / d.CostePorDefecto);
                         var lleno = atrapa >= d.DefectosOcultos;
                         var texto = lleno ? (h > d.CostePorDefecto * d.DefectosOcultos ? "ya no queda nada: sobran horas" : "atrapa todo lo que hay")
                                           : $"atraparía {atrapa}";
-                        l.Texto(x - 20, Arriba + AltoPila + 96, AnchoPila + 40, 24, texto, 15, lleno ? Tema.success : Tema.warning, TextAlignmentOptions.Center);
+                        l.Texto(x - 20, Arriba + AltoPila + 96, AnchoPila + 40, 24, texto, 15, lleno ? Tema.papelExito : Tema.papelAviso, TextAlignmentOptions.Center);
                     }
                 } else {
                     var r = resultado.First(x2 => x2.DepositoId == d.Id);
                     for (var k = 0; k < r.Encontrados; k++)
-                        l.Dibujo.Bicho(x + 30 + (k % 4) * 38, Arriba + AltoPila - 26 - (k / 4) * 40, Tema.bg900);
-                    l.Texto(x - 20, Arriba + AltoPila + 14, AnchoPila + 40, 24, $"atrapados {r.Encontrados}", 17, Tema.success, TextAlignmentOptions.Center);
+                        l.Dibujo.Bicho(x + 30 + (k % 4) * 38, Arriba + AltoPila - 26 - (k / 4) * 40, Tema.paperInk);
+                    l.Texto(x - 20, Arriba + AltoPila + 14, AnchoPila + 40, 24, $"atrapados {r.Encontrados}", 17, Tema.papelExito, TextAlignmentOptions.Center);
                     if (r.Escapan > 0) {
-                        l.Texto(x - 20, Arriba + AltoPila + 40, AnchoPila + 40, 24, $"se escapan {r.Escapan}", 17, Tema.danger, TextAlignmentOptions.Center);
+                        l.Texto(x - 20, Arriba + AltoPila + 40, AnchoPila + 40, 24, $"se escapan {r.Escapan}", 17, Tema.papelPeligro, TextAlignmentOptions.Center);
                         var by = Arriba + 60 + i * 130;
-                        l.Dibujo.Curva(new Vector2(x + AnchoPila, Arriba + 30), new Vector2(x + AnchoPila + 120, Arriba - 20), new Vector2(1080, by), Tema.danger, 2, false, true);
-                        for (var k = 0; k < r.Escapan; k++) l.Dibujo.Bicho(1100 + (k % 3) * 40, by + (k / 3) * 40, Tema.danger);
+                        l.Dibujo.Curva(new Vector2(x + AnchoPila, Arriba + 30), new Vector2(x + AnchoPila + 120, Arriba - 20), new Vector2(1080, by), Tema.papelPeligro, 2, false, true);
+                        for (var k = 0; k < r.Escapan; k++) l.Dibujo.Bicho(1100 + (k % 3) * 40, by + (k / 3) * 40, Tema.papelPeligro);
                     }
                 }
             }
             if (resultado != null) {
-                l.Dibujo.Rect(1060, Arriba - 40, 230, AltoPila + 80, Tema.danger, 2, Tema.dangerSoft, false, 12);
-                l.Texto(1060, Arriba - 30, 230, 30, "EL CLIENTE", 20, Tema.danger, TextAlignmentOptions.Center, null, true);
+                l.Dibujo.Rect(1060, Arriba - 40, 230, AltoPila + 80, Tema.papelPeligro, 2, NexusTheme.Alfa(Tema.papelPeligro, 0.16f), false, 12);
+                l.Texto(1060, Arriba - 30, 230, 30, "EL CLIENTE", 20, Tema.papelPeligro, TextAlignmentOptions.Center, null, true);
             }
         }
 
