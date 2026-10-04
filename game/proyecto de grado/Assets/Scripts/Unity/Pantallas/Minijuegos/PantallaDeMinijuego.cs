@@ -63,7 +63,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         protected override void Construir() {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 0.75f));
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 0);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             var quien = Practica ? "PRÁCTICA EN TU ESCRITORIO · NO CUENTA PARA TU EVALUACIÓN"
                                  : $"TICKET · {(Def.Presentacion.QuienEspera ?? "").ToUpperInvariant()} · {Def.Presentacion.TextoPresion}";
@@ -290,6 +290,22 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private static string Minuscula(string s) {
             return string.IsNullOrEmpty(s) ? "" : char.ToLowerInvariant(s[0]) + s.Substring(1);
+        }
+
+        /// <summary>
+        /// La columna de la derecha de un tablero: su contenido va en un scroll (con la letra del design system no
+        /// siempre cabe en 1080 de alto, y una columna sin sitio montaba un texto sobre otro) y debajo, fijo, el pie
+        /// para el boton de entregar, que asi nunca queda fuera de la pantalla.
+        /// </summary>
+        protected RectTransform ColumnaLateral(RectTransform cuerpo, string nombre, float ancho, out RectTransform pie) {
+            var columna = Ui.Columna(cuerpo, nombre, Tema.espacio);
+            UiKit.Tamano(columna, ancho: ancho, flexAlto: 1);
+            RectTransform contenido;
+            var scroll = Ui.Desplazable(columna, out contenido, nombre + " (scroll)");
+            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
+            contenido.GetComponent<UnityEngine.UI.VerticalLayoutGroup>().padding = new RectOffset(4, 18, 4, 4);   // aire para la barra y las esquinas
+            pie = Ui.Columna(columna, "Pie", Tema.espacio);
+            return contenido;
         }
 
         /// <summary>Lineas que explican una solucion buena, para enseñarlas si no se acerto. Cada verbo la suya.</summary>

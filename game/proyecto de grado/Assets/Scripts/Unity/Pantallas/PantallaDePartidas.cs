@@ -27,7 +27,7 @@ namespace Nexus.Unity.Pantallas {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 1.5f));
 
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 2);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Hero);   // el logotipo: una sola vez por pantalla
             Ui.Texto(titulos, "Hola, " + App.PerfilActivo.nombreEstudiante, EstiloTexto.Titulo);

@@ -60,6 +60,13 @@ namespace Nexus.Unity.Tema {
 
         private Sprite _circulo;
 
+        // Las medidas de antes del design system, fijas: la receta y las pizarras no se mueven aunque el tema cambie
+        // sus espacios. El kit del design system usa las del tema.
+        private float EspacioBase { get { return Clasico ? 12 : Tema.espacio; } }
+        private float MargenBase { get { return Clasico ? 24 : Tema.margen; } }
+        private float AltoBotonBase { get { return Clasico ? 56 : Tema.altoBoton; } }
+        private float AltoBarraBase { get { return Clasico ? 18 : Tema.altoBarra; } }
+
         public UiKit(NexusTheme tema, bool clasico = false) {
             Tema = tema != null ? tema : NexusTheme.PorDefecto();
             Clasico = clasico;
@@ -105,7 +112,7 @@ namespace Nexus.Unity.Tema {
                                           float? espacio = null, Color? color = null) {
             var rt = Panel(padre, nombre, color);
             var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            Configurar(grupo, espacio ?? Tema.espacio, relleno ?? Tema.espacio, TextAnchor.UpperLeft);
+            Configurar(grupo, espacio ?? EspacioBase, relleno ?? EspacioBase, TextAnchor.UpperLeft);
             return rt;
         }
 
@@ -114,7 +121,7 @@ namespace Nexus.Unity.Tema {
                                     float relleno = 0, TextAnchor alineacion = TextAnchor.UpperLeft) {
             var rt = Nodo(padre, nombre);
             var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            Configurar(grupo, espacio ?? Tema.espacio, relleno, alineacion);
+            Configurar(grupo, espacio ?? EspacioBase, relleno, alineacion);
             return rt;
         }
 
@@ -123,7 +130,7 @@ namespace Nexus.Unity.Tema {
                                  float relleno = 0, TextAnchor alineacion = TextAnchor.MiddleLeft) {
             var rt = Nodo(padre, nombre);
             var grupo = rt.gameObject.AddComponent<HorizontalLayoutGroup>();
-            Configurar(grupo, espacio ?? Tema.espacio, relleno, alineacion);
+            Configurar(grupo, espacio ?? EspacioBase, relleno, alineacion);
             return rt;
         }
 
@@ -147,6 +154,9 @@ namespace Nexus.Unity.Tema {
             contenido.pivot = new Vector2(0.5f, 1);
             contenido.offsetMin = contenido.offsetMax = Vector2.zero;
             contenido.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            // Con el design system, un poco de aire dentro del visor: las esquinas en L y el resplandor de las piezas
+            // salen unos pixeles por fuera y el recorte del scroll se los comia.
+            if (!Clasico) contenido.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(4, 4, 4, 4);
 
             scroll.viewport = visor;
             scroll.content = contenido;
@@ -301,6 +311,9 @@ namespace Nexus.Unity.Tema {
             tmp.richText = true;
             tmp.raycastTarget = false;
             Estilizar(tmp, estilo);
+            // Un texto nunca se aplasta por debajo de su alto: si no cabe, la columna crece (o hace scroll) en vez de
+            // montar un texto encima de otro.
+            if (!Clasico) rt.gameObject.AddComponent<AltoDeTexto>();
             if (color.HasValue) tmp.color = color.Value;
             return tmp;
         }
@@ -355,12 +368,12 @@ namespace Nexus.Unity.Tema {
             var etiqueta = Texto(rt, texto, EstiloTexto.Cuerpo, colorTexto, TextAlignmentOptions.Center);
             etiqueta.fontStyle = FontStyles.Bold;
             etiqueta.textWrappingMode = TextWrappingModes.NoWrap;
-            etiqueta.margin = new Vector4(Tema.espacio * 1.5f, 0, Tema.espacio * 1.5f, 0);
+            etiqueta.margin = new Vector4(EspacioBase * 1.5f, 0, EspacioBase * 1.5f, 0);
             Rellenar((RectTransform)etiqueta.transform);
 
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.minHeight = le.preferredHeight = Tema.altoBoton;
-            le.preferredWidth = Mathf.Max(160, etiqueta.GetPreferredValues(texto).x + Tema.espacio * 3);
+            le.minHeight = le.preferredHeight = AltoBotonBase;
+            le.preferredWidth = Mathf.Max(160, etiqueta.GetPreferredValues(texto).x + EspacioBase * 3);
 
             if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
             return boton;
@@ -384,8 +397,8 @@ namespace Nexus.Unity.Tema {
             boton.colors = Colores(Tema.pared);
 
             var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            Configurar(grupo, 4, Tema.espacio * 1.5f, TextAnchor.MiddleLeft);
-            Tamano(rt, alto: null).minHeight = Tema.altoBoton;
+            Configurar(grupo, 4, EspacioBase * 1.5f, TextAnchor.MiddleLeft);
+            Tamano(rt, alto: null).minHeight = AltoBotonBase;
 
             var t = Texto(rt, texto, EstiloTexto.Cuerpo);
             t.fontStyle = FontStyles.Bold;
@@ -407,11 +420,11 @@ namespace Nexus.Unity.Tema {
             var campo = rt.gameObject.AddComponent<TMP_InputField>();
             campo.targetGraphic = fondo;
             campo.colors = Colores(Tema.fondo);
-            Tamano(rt, ancho, Tema.altoBoton);
+            Tamano(rt, ancho, AltoBotonBase);
 
             var area = Rellenar(Nodo(rt, "Area"));
-            area.offsetMin = new Vector2(Tema.espacio, 6);
-            area.offsetMax = new Vector2(-Tema.espacio, -6);
+            area.offsetMin = new Vector2(EspacioBase, 6);
+            area.offsetMax = new Vector2(-EspacioBase, -6);
             area.gameObject.AddComponent<RectMask2D>();
 
             var marcador = Texto(area, indicacion, EstiloTexto.Cuerpo, Tema.textoTenue, TextAlignmentOptions.MidlineLeft);
@@ -458,7 +471,7 @@ namespace Nexus.Unity.Tema {
         /// <summary>Una tarjeta: un panel con titulo cuyo alto sale de su contenido. Devuelve donde meter las cosas.</summary>
         public RectTransform Tarjeta(Transform padre, string titulo, Color? colorTitulo = null) {
             if (!Clasico) return TarjetaNexus(padre, titulo, colorTitulo ?? Tema.cyan, false);
-            var panel = PanelColumna(padre, "Tarjeta " + titulo, Tema.margen * 0.75f, Tema.espacio);
+            var panel = PanelColumna(padre, "Tarjeta " + titulo, MargenBase * 0.75f, EspacioBase);
             if (!string.IsNullOrEmpty(titulo)) Texto(panel, titulo.ToUpperInvariant(), EstiloTexto.Pequeno, colorTitulo ?? Tema.cian);
             return panel;
         }
@@ -494,7 +507,7 @@ namespace Nexus.Unity.Tema {
             var rt = Nodo(padre, nombre);
             Vestir(rt.gameObject.AddComponent<Image>(), Tema.spriteBarraFondo, Tema.hormigon);
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.minHeight = le.preferredHeight = Tema.altoBarra;
+            le.minHeight = le.preferredHeight = AltoBarraBase;
             le.flexibleWidth = 1;
 
             var relleno = Nodo(rt, "Relleno");

@@ -31,7 +31,7 @@ namespace Nexus.Unity.Pantallas {
             var superado = r.CumpleUmbralesDeExito;
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 0.75f));
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 0);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "LECCIONES · " + (r.NivelNombre ?? r.NivelId).ToUpperInvariant(), EstiloTexto.Leyenda, Tema.cyan);
             Ui.Texto(titulos, superado ? "Nivel superado" : "Nivel no superado", EstiloTexto.Titulo);
@@ -120,6 +120,7 @@ namespace Nexus.Unity.Pantallas {
                 return t;
             }
             if (oas.Count >= 3) {
+                Ui.Espaciador(t, 36);   // las etiquetas del radar salen por fuera de su caja: aire arriba y abajo
                 var centro = Ui.Fila(t, alineacion: TextAnchor.MiddleCenter);
                 Ui.Radar(centro, oas.Select(o => (float)r.Competencia.PuntuacionDe(o)).ToArray(),
                          oas.Select(o => o.Replace("OA-", "")).ToArray(), 260);

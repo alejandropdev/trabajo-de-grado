@@ -16,7 +16,7 @@ namespace Nexus.Unity.Aplicacion {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", relleno: Tema.margen));
 
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 0);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "Design system · tema Núcleo", EstiloTexto.Leyenda, Tema.cyan).fontStyle |= FontStyles.UpperCase;
             Ui.Texto(titulos, "El tema", EstiloTexto.Titulo);

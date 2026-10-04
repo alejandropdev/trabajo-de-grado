@@ -77,8 +77,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _orden = Cfg.Tarjetas.Select(t => t.Id).ToList();
             _lamina = NuevoLienzo(cuerpo, "El backlog · arrastra las tarjetas o usa ▲▼ · arriba lo primero", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
 
-            var lado = Ui.Columna(cuerpo, "Cliente", Tema.espacio);
-            UiKit.Tamano(lado, ancho: 480, flexAlto: 1);
+            RectTransform pie;
+            var lado = ColumnaLateral(cuerpo, "Cliente", 480, out pie);
 
             var sprint = Ui.Tarjeta(lado, "1 · Ordena el sprint");
             _faseTexto = Ui.Texto(sprint, "", EstiloTexto.Leyenda, Tema.cyan);
@@ -101,8 +101,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _globo = Ui.PanelColumna(lado, "Replica", Tema.margen * 0.75f, 4, Tema.surfaceRaised);
             UiKit.ColorDeBorde(_globo, Tema.cyan);
 
-            Ui.Resorte(lado);
-            _entregar = Ui.Boton(lado, "Entregar el orden y la respuesta", Entregar, VarianteBoton.Primario);
+            _entregar = Ui.Boton(pie, "Entregar el orden y la respuesta", Entregar, VarianteBoton.Primario);
             GuiaView.Registrar("mj.entregar", _entregar);
             Repintar();
         }

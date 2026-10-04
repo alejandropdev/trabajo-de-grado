@@ -46,8 +46,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _lamina = NuevoLienzo(cuerpo, "Las horas de pruebas · una pila por tipo · súbelas y bájalas con + y −", 1330, 820);
             GuiaView.Registrar("mj.repartir.pilas", _lamina.Raiz);
 
-            var lado = Ui.Columna(cuerpo, "Tipos", Tema.espacio);
-            UiKit.Tamano(lado, ancho: 460, flexAlto: 1);
+            RectTransform pie;
+            var lado = ColumnaLateral(cuerpo, "Tipos", 460, out pie);
             GuiaView.Registrar("mj.repartir.tipos", lado);
             foreach (var d in Cfg.Depositos) {
                 var t = Ui.Tarjeta(lado, $"{d.Nombre} · {d.CostePorDefecto} {Cfg.Unidad} por error");
@@ -59,8 +59,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     Ui.Texto(t, "Pista: " + d.Pista, EstiloTexto.Pequeno, Tema.cyan);
             }
             Ui.Texto(lado, $"Ganas si se escapan como mucho {Cfg.ToleranciaDeEscapes} error(es).", EstiloTexto.Pequeno, Tema.warning);
-            Ui.Resorte(lado);
-            _entregar = Ui.Boton(lado, "Entregar el reparto", Entregar, VarianteBoton.Primario);
+            _entregar = Ui.Boton(pie, "Entregar el reparto", Entregar, VarianteBoton.Primario);
             GuiaView.Registrar("mj.entregar", _entregar);
             Repintar();
         }

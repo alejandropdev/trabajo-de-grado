@@ -115,8 +115,8 @@ namespace Nexus.Unity.Tema {
         public Sprite spriteDial;
 
         [Header("Medidas de layout (compartidas)")]
-        public float margen = 24;
-        public float espacio = 12;
+        public float margen = 32;
+        public float espacio = 16;
         public float altoBoton = 56;
         public float altoBarra = 18;
 

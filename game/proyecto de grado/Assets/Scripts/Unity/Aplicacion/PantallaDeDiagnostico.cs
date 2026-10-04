@@ -60,7 +60,7 @@ namespace Nexus.Unity.Aplicacion {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", relleno: Tema.margen, espacio: Tema.margen * 0.75f));
 
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 2);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             Ui.Texto(titulos, "Prueba del motor", EstiloTexto.Titulo);
             Ui.Texto(titulos, "Un nivel real, jugado de principio a fin, sin guardar nada. Todavía no son las pantallas del juego: " +
                               "es la forma de ver el flujo mientras se construyen.", EstiloTexto.Pequeno);

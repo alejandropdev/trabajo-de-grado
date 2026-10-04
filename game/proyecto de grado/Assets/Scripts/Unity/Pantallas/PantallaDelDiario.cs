@@ -29,7 +29,7 @@ namespace Nexus.Unity.Pantallas {
         protected override void Construir() {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 0.75f));
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 0);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "DIARIO DE CAMPO · " + (App.PerfilActivo != null ? App.PerfilActivo.nombreEstudiante.ToUpperInvariant() : ""),
                      EstiloTexto.Leyenda, Tema.cyan);

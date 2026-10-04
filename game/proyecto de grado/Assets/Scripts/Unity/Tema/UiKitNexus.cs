@@ -110,10 +110,10 @@ namespace Nexus.Unity.Tema {
             switch (estilo) {
                 case EstiloTexto.Hero:
                     Fuente(tmp, Tema.FuenteDisplay, 64, Tema.ink, 2); tmp.fontWeight = FontWeight.Heavy; break;
-                case EstiloTexto.Titulo:   // phase
-                    Fuente(tmp, Tema.FuenteDisplay, 36, Tema.ink, 1); break;
-                case EstiloTexto.Subtitulo:   // panel-title
-                    Fuente(tmp, Tema.FuenteDisplay, 20, Tema.ink, 4); tmp.fontStyle = FontStyles.UpperCase; break;
+                case EstiloTexto.Titulo:   // phase, un punto menos: aqui titula pantallas, no transiciones a pantalla completa
+                    Fuente(tmp, Tema.FuenteDisplay, 30, Tema.ink, 1); break;
+                case EstiloTexto.Subtitulo:   // panel-title, ajustado a las columnas estrechas del HUD
+                    Fuente(tmp, Tema.FuenteDisplay, 17, Tema.ink, 4); tmp.fontStyle = FontStyles.UpperCase; break;
                 case EstiloTexto.Encabezado:
                     Fuente(tmp, Tema.FuenteInterfaz, 17, Tema.ink); tmp.fontWeight = FontWeight.SemiBold; break;
                 case EstiloTexto.Dialogo:
@@ -270,7 +270,8 @@ namespace Nexus.Unity.Tema {
 
             var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
             Configurar(grupo, Tema.Px(4), Tema.Espacio(4), TextAnchor.MiddleLeft);
-            Tamano(rt, alto: null).minHeight = Tema.altoBoton;
+            // Sin alto minimo fijo: el del grupo ya suma el de sus textos. Fijarlo dejaba que una columna apretada
+            // encogiera la opcion por debajo de su texto (las respuestas al cliente se montaban unas sobre otras).
 
             var t = Texto(rt, texto, EstiloTexto.Encabezado);
             if (!string.IsNullOrEmpty(detalle)) Texto(rt, detalle, EstiloTexto.Pequeno);

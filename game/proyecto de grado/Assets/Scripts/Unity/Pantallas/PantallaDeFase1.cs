@@ -49,7 +49,7 @@ namespace Nexus.Unity.Pantallas {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 0.75f));
 
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 2);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "FASE 1 · PLANIFICACIÓN", EstiloTexto.Leyenda, Tema.cyan);
             Ui.Texto(titulos, Perfil.Nombre, EstiloTexto.Titulo);

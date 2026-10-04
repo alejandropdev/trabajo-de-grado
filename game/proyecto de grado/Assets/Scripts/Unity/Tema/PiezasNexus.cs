@@ -123,4 +123,23 @@ namespace Nexus.Unity.Tema {
             if (Halo != null && Halo.gameObject.activeSelf != e.Halo) Halo.gameObject.SetActive(e.Halo);
         }
     }
+
+    /// <summary>
+    /// El alto minimo de un texto es su alto real. TMP dice que su minimo es 0, y un VerticalLayoutGroup sin sitio
+    /// encoge a sus hijos hacia el minimo: los textos se montaban unos sobre otros. Con esto, la columna crece (o su
+    /// scroll se alarga) en vez de aplastar texto.
+    /// </summary>
+    public sealed class AltoDeTexto : UIBehaviour, ILayoutElement {
+        private TMP_Text _texto;
+        protected override void Awake() { _texto = GetComponent<TMP_Text>(); }
+        public void CalculateLayoutInputHorizontal() { }
+        public void CalculateLayoutInputVertical() { }
+        public float minWidth { get { return -1; } }
+        public float preferredWidth { get { return -1; } }
+        public float flexibleWidth { get { return -1; } }
+        public float minHeight { get { return _texto != null && isActiveAndEnabled ? _texto.preferredHeight : -1; } }
+        public float preferredHeight { get { return -1; } }
+        public float flexibleHeight { get { return -1; } }
+        public int layoutPriority { get { return 1; } }
+    }
 }

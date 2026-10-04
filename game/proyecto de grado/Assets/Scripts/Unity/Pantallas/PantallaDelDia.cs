@@ -120,7 +120,7 @@ namespace Nexus.Unity.Pantallas {
 
         private void ConstruirCabecera(Transform padre) {
             var cabecera = Ui.Fila(padre, "Cabecera");
-            var titulos = Ui.Columna(cabecera, espacio: 0);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             _etiqueta = Ui.Texto(titulos, "", EstiloTexto.Leyenda, Tema.cyan);
             _titulo = Ui.Texto(titulos, "", EstiloTexto.Subtitulo, Tema.ink);
