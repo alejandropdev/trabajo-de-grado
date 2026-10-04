@@ -37,9 +37,9 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(ficha, ancho: 440);
             var e = _prueba.Entrevistadora;
             if (e != null) {
-                var quien = Ui.Fila(ficha, "Entrevistadora", Tema.Espacio(3));
-                Ui.Retrato(quien, e.Nombre.Length > 0 ? e.Nombre.Substring(0, 1) : "", Tono.Cyan);
-                UiKit.Tamano(Ui.Texto(quien, e.Nombre, EstiloTexto.Encabezado), flexAncho: 1);
+                // Quien entrevista, con su retrato (o su silueta mientras no haya arte).
+                Ui.Ilustracion(ficha, MaterialesNexus.IdDePersonaje(e.Nombre), null, alto: 300);
+                Ui.Texto(ficha, e.Nombre, EstiloTexto.Encabezado);
                 if (!string.IsNullOrEmpty(e.Rol)) Ui.Texto(ficha, e.Rol, EstiloTexto.Pequeno, Tema.cyan);
                 if (!string.IsNullOrEmpty(e.Descripcion)) Ui.Texto(ficha, e.Descripcion, EstiloTexto.Pequeno);
             }
@@ -47,7 +47,7 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(ficha, "Quince preguntas. Si no sabes una, dilo: no se descuenta nada. La entrevista no cambia nada de la partida; " +
                             "sirve para saber de dónde partes.", EstiloTexto.Pequeno);
 
-            var centro = Ui.PanelColumna(marco, "Pregunta", Tema.margen * 1.25f, Tema.espacio);
+            var centro = Ui.Ventana(marco, "Pregunta");
             UiKit.Tamano(centro, flexAncho: 1, flexAlto: 1);
             RectTransform contenido;
             var scroll = Ui.Desplazable(centro, out contenido);
