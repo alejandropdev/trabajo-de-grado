@@ -24,8 +24,11 @@ namespace Nexus.Unity.Pantallas {
 
         public void Vaciar() { UiKit.Vaciar(Raiz); }
 
+        /// <summary>La micro-etiqueta sobre un titulo (caption en cyan, mayusculas por estilo).</summary>
         public TMP_Text Etiqueta(string texto, Color? color = null) {
-            return _ui.Texto(Raiz, texto.ToUpperInvariant(), EstiloTexto.Pequeno, color ?? Tema.cian);
+            var t = _ui.Texto(Raiz, texto, EstiloTexto.Leyenda, color ?? Tema.cyan);
+            t.fontStyle |= FontStyles.UpperCase;
+            return t;
         }
 
         public TMP_Text Titulo(string texto) { return _ui.Texto(Raiz, texto, EstiloTexto.Titulo); }
@@ -50,6 +53,14 @@ namespace Nexus.Unity.Pantallas {
         }
 
         public RectTransform Tarjeta(string titulo, Color? color = null) { return _ui.Tarjeta(Raiz, titulo, color); }
+        public RectTransform Tarjeta(string titulo, Tono tono) { return _ui.Tarjeta(Raiz, titulo, tono); }
+
+        /// <summary>Una linea de un personaje (DialogueBox). quien null o «narrador» = sin retrato.</summary>
+        public TMP_Text Dialogo(string quien, string texto, Tono retrato = Tono.Cyan) {
+            TMP_Text linea;
+            _ui.Dialogo(Raiz, Textos.Hablante(quien), texto, out linea, retrato);
+            return linea;
+        }
     }
 
     /// <summary>Lo que varias pantallas necesitan decir igual: veredictos, cambios de estado, etiquetas.</summary>
@@ -64,11 +75,17 @@ namespace Nexus.Unity.Pantallas {
         }
 
         public static Color ColorDe(NexusTheme tema, string veredicto) {
+            var tono = TonoDe(veredicto);
+            return tono == Tono.Neutro ? tema.inkMuted : tema.ColorDe(tono);
+        }
+
+        /// <summary>Correcta = hecho (success), aceptable = aviso, incorrecta = danger.</summary>
+        public static Tono TonoDe(string veredicto) {
             switch (veredicto) {
-                case "correcta": return tema.cian;
-                case "aceptable": return tema.amarillo;
-                case "incorrecta": return tema.rojo;
-                default: return tema.textoTenue;
+                case "correcta": return Tono.Exito;
+                case "aceptable": return Tono.Aviso;
+                case "incorrecta": return Tono.Peligro;
+                default: return Tono.Neutro;
             }
         }
 

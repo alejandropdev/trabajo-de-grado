@@ -37,9 +37,11 @@ namespace Nexus.Unity.Pantallas {
         protected override void Construir() {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 1.5f));
             var cabecera = Ui.Fila(marco);
-            Ui.Texto(cabecera, "ESCENA · " + (Guion.Titulo ?? Guion.Id).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cian);
+            // Una escena es un momento narrativo: su etiqueta va en violet, el acento reservado a la historia.
+            var etiqueta = Ui.Texto(cabecera, "Escena · " + (Guion.Titulo ?? Guion.Id), EstiloTexto.Leyenda, Tema.violet);
+            etiqueta.fontStyle |= FontStyles.UpperCase;
             Ui.Resorte(cabecera);
-            _progreso = Ui.Texto(cabecera, "", EstiloTexto.Pequeno);
+            _progreso = Ui.Texto(cabecera, "", EstiloTexto.Leyenda);
             Ui.Boton(cabecera, "Saltar", Saltar, VarianteBoton.Fantasma);
 
             // El texto va en una columna estrecha y centrada: una escena se lee, no se escanea.
@@ -78,19 +80,24 @@ namespace Nexus.Unity.Pantallas {
             _scroll.verticalNormalizedPosition = 0;   // la ultima linea, abajo, siempre a la vista
         }
 
+        /// <summary>
+        /// Cada linea con su forma del design system: un personaje habla en un DialogueBox, el narrador va suelto y en
+        /// cursiva, y un «log» es una linea de consola (LogPanel). Las lineas ya leidas se apagan a ink-muted.
+        /// </summary>
         private void PintarLinea(LineaDeGuion linea, bool actual) {
-            var bloque = Ui.Columna(_historial, "Linea", 4);
             var hablante = Textos.Hablante(linea.Quien);
             TMP_Text texto;
             if (linea.Quien == "log") {
-                texto = Ui.Texto(bloque, linea.Texto, EstiloTexto.Mono);
+                var registro = Ui.Registro(_historial, new[] {
+                    new KeyValuePair<NivelDeLog, string>(NivelDeLog.Info, linea.Texto) });
+                texto = registro.GetComponentInChildren<TMP_Text>();
+            } else if (hablante == null) {
+                texto = Ui.Texto(_historial, linea.Texto, EstiloTexto.Dialogo);
+                texto.fontStyle = FontStyles.Italic;
             } else {
-                if (hablante != null) Ui.Texto(bloque, hablante, EstiloTexto.Pequeno, actual ? Tema.cianClaro : Tema.textoTenue);
-                texto = Ui.Texto(bloque, linea.Texto, EstiloTexto.Cuerpo);
-                texto.fontSize = Tema.tamCuerpo * 1.15f;
-                if (hablante == null) texto.fontStyle = FontStyles.Italic;
+                Ui.Dialogo(_historial, hablante, linea.Texto, out texto, Tono.Cyan, actual && !EnLaUltima);
             }
-            if (!actual) texto.color = Tema.textoTenue;
+            if (!actual) texto.color = Tema.inkMuted;
         }
 
         private void Update() {
