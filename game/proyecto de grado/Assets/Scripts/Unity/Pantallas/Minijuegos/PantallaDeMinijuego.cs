@@ -108,7 +108,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// </summary>
         private void ConstruirBriefing(Transform padre) {
             var hoja = Ui.Hoja(padre, "Briefing", Tema.Espacio(5));
-            UiKit.Tamano(hoja, ancho: 300, flexAlto: 1);
+            UiKit.Tamano(hoja, ancho: 380, flexAlto: 1);   // +25 %: el briefing se lee de corrido, no a pedazos
             RectTransform contenido;
             var scroll = Ui.Desplazable(hoja, out contenido, "Briefing (scroll)");
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
