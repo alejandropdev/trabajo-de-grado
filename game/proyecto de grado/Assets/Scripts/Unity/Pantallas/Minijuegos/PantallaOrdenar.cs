@@ -81,25 +81,25 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             UiKit.Tamano(lado, ancho: 480, flexAlto: 1);
 
             var sprint = Ui.Tarjeta(lado, "1 · Ordena el sprint");
-            _faseTexto = Ui.Texto(sprint, "", EstiloTexto.Pequeno, Tema.mostazaClara);
+            _faseTexto = Ui.Texto(sprint, "", EstiloTexto.Leyenda, Tema.cyan);
             _resumen = Ui.Texto(sprint, "", EstiloTexto.Cuerpo);
             _ayudaDeps = Ui.Texto(sprint, "", EstiloTexto.Pequeno);
             _listo = Ui.Boton(sprint, "Listo: enseñárselo al cliente  ►", PasarAContestar, VarianteBoton.Primario);
             GuiaView.Registrar("mj.ordenar.resumen", sprint);
 
             _peticion = Ui.PanelColumna(lado, "Peticion", Tema.margen * 0.75f, Tema.espacio);
-            _peticion.gameObject.AddComponent<Outline>().effectColor = Tema.mostaza;
+            UiKit.ColorDeBorde(_peticion, Tema.warning);
             _peticion.gameObject.AddComponent<CanvasGroup>();
-            Ui.Texto(_peticion, ("2 · Lo que pide " + QuienPide).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.mostaza);
-            Ui.Texto(_peticion, "«" + (Cfg.Peticion ?? "") + "»", EstiloTexto.Cuerpo);
+            Ui.Texto(_peticion, ("2 · Lo que pide " + QuienPide).ToUpperInvariant(), EstiloTexto.Leyenda, Tema.warning);
+            Ui.Texto(_peticion, "«" + (Cfg.Peticion ?? "") + "»", EstiloTexto.Dialogo);
             if (!string.IsNullOrEmpty(Cfg.TarjetaPedida))
-                Ui.Texto(_peticion, "Es la tarjeta con borde amarillo. Cada respuesta la mueve en el tablero: pruébalas.", EstiloTexto.Pequeno, Tema.mostazaClara);
+                Ui.Texto(_peticion, "Es la tarjeta con borde amarillo. Cada respuesta la mueve en el tablero: pruébalas.", EstiloTexto.Pequeno, Tema.warning);
             _respuestas = Ui.Columna(_peticion, "Respuestas", 8);
             _volver = Ui.Boton(_peticion, "◄ Volver a ordenar", VolverAOrdenar, VarianteBoton.Fantasma);
             GuiaView.Registrar("mj.ordenar.respuestas", _peticion);
 
-            _globo = Ui.PanelColumna(lado, "Replica", Tema.margen * 0.75f, 4, Tema.fondoSecundario);
-            _globo.gameObject.AddComponent<Outline>().effectColor = Tema.cian;
+            _globo = Ui.PanelColumna(lado, "Replica", Tema.margen * 0.75f, 4, Tema.surfaceRaised);
+            UiKit.ColorDeBorde(_globo, Tema.cyan);
 
             Ui.Resorte(lado);
             _entregar = Ui.Boton(lado, "Entregar el orden y la respuesta", Entregar, VarianteBoton.Primario);
@@ -117,8 +117,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _faseTexto.text = _contestando ? "Orden cerrado. Ahora contesta al cliente →" : "Ordena el tablero. Cuando lo tengas, pulsa «Listo».";
             var rotas = Rotas();
             _ayudaDeps.text = VerDependencias
-                ? (rotas.Count == 0 ? "<color=#7FD8E8>Ninguna tarjeta va antes de lo que necesita.</color>"
-                                    : $"<color=#E0705A>{rotas.Count} tarjeta(s) van antes de lo que necesitan: lo dice dentro de cada una.</color>")
+                ? (rotas.Count == 0 ? $"<color={NexusTheme.Html(Tema.success)}>Ninguna tarjeta va antes de lo que necesita.</color>"
+                                    : $"<color={NexusTheme.Html(Tema.danger)}>{rotas.Count} tarjeta(s) van antes de lo que necesitan: lo dice dentro de cada una.</color>")
                 : "Algunas tarjetas necesitan otra antes. Si las pones al revés, lo verás al entregar.";
             _listo.gameObject.SetActive(!_contestando);
 
@@ -142,10 +142,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (_respuesta != null) Cfg.Respuestas.TryGetValue(_respuesta, out elegida);
             _globo.gameObject.SetActive(elegida != null);
             if (elegida != null) {
-                Ui.Texto(_globo, QuienPide.ToUpperInvariant() + " RESPONDE", EstiloTexto.Pequeno, Tema.cian);
-                if (!string.IsNullOrEmpty(elegida.Replica)) Ui.Texto(_globo, "«" + elegida.Replica + "»", EstiloTexto.Cuerpo);
+                Ui.Texto(_globo, QuienPide.ToUpperInvariant() + " RESPONDE", EstiloTexto.Leyenda, Tema.cyan);
+                if (!string.IsNullOrEmpty(elegida.Replica)) Ui.Texto(_globo, "«" + elegida.Replica + "»", EstiloTexto.Dialogo);
                 var efecto = QueCambio();
-                if (!string.IsNullOrEmpty(efecto)) Ui.Texto(_globo, "En el tablero: " + efecto, EstiloTexto.Pequeno, Tema.mostazaClara);
+                if (!string.IsNullOrEmpty(efecto)) Ui.Texto(_globo, "En el tablero: " + efecto, EstiloTexto.Pequeno, Tema.warning);
             }
             _entregar.interactable = _contestando && _respuesta != null;
         }
@@ -244,21 +244,21 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var total = Cfg.Tarjetas.Sum(t => t.Esfuerzo);
             var alto = _orden.Count * Fila + 44;
             var escala = alto / total;
-            l.Dibujo.Rect(40, Y0, 44, alto, Tema.hormigon, 0, Tema.hormigon, false, 8);
+            l.Dibujo.Rect(40, Y0, 44, alto, Tema.line, 0, Tema.line, false, 8);
             var yb = Y0;
             foreach (var id in _orden.Where(entran.Contains)) {
                 var h = porId[id].Esfuerzo * escala;
-                l.Dibujo.Rect(40, yb, 44, h - 3, Tema.cian, 0, Tema.cian, false, 6);
+                l.Dibujo.Rect(40, yb, 44, h - 3, Tema.cyan, 0, Tema.cyan, false, 6);
                 yb += h;
             }
             var yCap = Y0 + Cfg.Capacidad * escala;
-            l.Dibujo.Linea(24, yCap, 100, yCap, Tema.mostaza, 4, true);
-            l.Texto(20, yCap + 6, 90, 24, $"{entran.Sum(id => porId[id].Esfuerzo)}/{Cfg.Capacidad}", 16, Tema.mostazaClara, TextAlignmentOptions.Center);
+            l.Dibujo.Linea(24, yCap, 100, yCap, Tema.warning, 4, true);
+            l.Texto(20, yCap + 6, 90, 24, $"{entran.Sum(id => porId[id].Esfuerzo)}/{Cfg.Capacidad}", 16, Tema.warning, TextAlignmentOptions.Center);
 
             // la linea de capacidad entre las tarjetas
             var yLinea = YDe(linea, linea) - 30;
-            l.Dibujo.Linea(Izq, yLinea, Izq + Ancho, yLinea, Tema.mostaza, 4, true);
-            l.Texto(Izq, yLinea + 4, 700, 22, "CAPACIDAD DEL SPRINT · lo de abajo se queda fuera", 16, Tema.mostazaClara);
+            l.Dibujo.Linea(Izq, yLinea, Izq + Ancho, yLinea, Tema.warning, 4, true);
+            l.Texto(Izq, yLinea + 4, 700, 22, "CAPACIDAD DEL SPRINT · lo de abajo se queda fuera", 16, Tema.warning);
 
             var ver = resultado || VerDependencias;
             var rotas = ver ? Rotas() : new List<KeyValuePair<string, string>>();
@@ -273,46 +273,52 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var tarjeta = Ui.Nodo(l.Raiz, "Tarjeta " + t.Id);
                 Lamina.Colocar(tarjeta, Izq, y, Ancho, Fila - 10);
                 if (!resultado) _tarjetas[t.Id] = tarjeta;
-                var img = tarjeta.gameObject.AddComponent<Image>();
-                img.sprite = Ui.SpriteRedondeado(); img.type = Image.Type.Sliced;
-                img.color = rota.Count > 0 ? new Color(0.36f, 0.16f, 0.14f, 1f) : dentro ? (Color)Tema.pared : new Color32(0x1F, 0x31, 0x37, 0xFF);
-                if (rota.Count > 0) { var o = tarjeta.gameObject.AddComponent<Outline>(); o.effectColor = Tema.rojo; o.effectDistance = new Vector2(3, -3); }
-                else if (t.Id == Cfg.TarjetaPedida && (_contestando || resultado)) tarjeta.gameObject.AddComponent<Outline>().effectColor = Tema.mostaza;
+                // Como TaskCard/BacklogRow: el color vive en el borde izquierdo; bloqueada = danger con glow-danger, la
+                // pedida por el cliente = borde amarillo (warning), dentro del sprint = cyan.
+                var pedida = t.Id == Cfg.TarjetaPedida && (_contestando || resultado);
+                Ui.Fondo(tarjeta.gameObject.AddComponent<Image>(),
+                         rota.Count > 0 ? Tema.dangerSoft : dentro ? Tema.surfaceRaised : Tema.surface, NexusTheme.RadioSm);
+                if (rota.Count > 0) Ui.Halo(tarjeta, Tema.danger, NexusTheme.RadioSm);
+                Ui.Borde(tarjeta, rota.Count > 0 ? Tema.danger : pedida ? Tema.warning : Tema.line, NexusTheme.RadioSm, pedida ? 2 : 1);
+                var franja = Ui.Nodo(tarjeta, "Franja");
+                franja.anchorMin = Vector2.zero; franja.anchorMax = new Vector2(0, 1); franja.pivot = new Vector2(0, 0.5f);
+                franja.sizeDelta = new Vector2(Tema.Px(3), 0);
+                franja.gameObject.AddComponent<Image>().color = rota.Count > 0 ? Tema.danger : pedida ? Tema.warning : dentro ? Tema.cyan : Tema.lineStrong;
                 if (i == 0) GuiaView.Registrar("mj.ordenar.tarjeta", tarjeta);
 
                 var tenue = dentro ? 1f : 0.55f;
                 var fila = new Lamina(Ui, tarjeta, Ancho, Fila - 10, "Contenido");
                 UiKit.Rellenar(fila.Raiz);
                 // el puesto, grande: es lo que se ordena
-                fila.Texto(10, 0, 60, Fila - 10, (i + 1).ToString(), 30, dentro ? Tema.cian : Tema.textoTenue, TextAlignmentOptions.Center, null, true);
-                fila.Texto(66, 0, 26, Fila - 10, "≡", 20, Tema.textoTenue, TextAlignmentOptions.Center);
+                fila.Texto(10, 0, 60, Fila - 10, (i + 1).ToString(), 26, dentro ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Center, Tema.FuenteDisplay);
+                fila.Texto(66, 0, 26, Fila - 10, "≡", 20, Tema.inkMuted, TextAlignmentOptions.Center);
 
                 string aviso = null;
-                Color colorAviso = Tema.textoTenue;
+                Color colorAviso = Tema.inkMuted;
                 if (rota.Count > 0) {
                     aviso = "¡Ojo! Necesita " + string.Join(" y ", rota.Select(d =>
                                 $"«{porId[d].Titulo}» ANTES · " + (entran.Contains(d) ? $"está en el puesto {_orden.IndexOf(d) + 1}" : "y no entró"))) + ": súbela por encima.";
-                    colorAviso = Tema.rojo;
+                    colorAviso = Tema.danger;
                 } else if (laNecesitan.Count > 0) {
                     aviso = "la necesita " + string.Join(", ", laNecesitan.Select(k => $"«{porId[k].Titulo}» (puesto {_orden.IndexOf(k) + 1})")) + ": tiene que ir encima";
-                    colorAviso = Tema.mostazaClara;
+                    colorAviso = Tema.warning;
                 } else if (ver && t.DependeDe.Count > 0) {
                     aviso = "necesita: " + string.Join(", ", t.DependeDe.Select(d => "«" + porId[d].Titulo + "»")) + " · bien colocada";
-                    colorAviso = Tema.cianClaro;
+                    colorAviso = Tema.cyan;
                 }
                 if (aviso != null) {
-                    fila.Texto(104, 4, 600, 32, t.Titulo, 19, WithAlpha(Tema.texto, tenue), TextAlignmentOptions.MidlineLeft, null, true);
+                    fila.Texto(104, 4, 600, 32, t.Titulo, 19, WithAlpha(Tema.ink, tenue), TextAlignmentOptions.MidlineLeft, null, true);
                     fila.Texto(104, 36, 690, 28, aviso, 14, colorAviso, TextAlignmentOptions.MidlineLeft);
                 } else {
-                    fila.Texto(104, 0, 600, Fila - 10, t.Titulo, 20, WithAlpha(Tema.texto, tenue), TextAlignmentOptions.MidlineLeft, null, true);
+                    fila.Texto(104, 0, 600, Fila - 10, t.Titulo, 20, WithAlpha(Tema.ink, tenue), TextAlignmentOptions.MidlineLeft, null, true);
                 }
                 var etiqueta = EtiquetaDeNegociacion(t.Id, entran);
-                if (etiqueta != null) fila.Pastilla(720, 20, etiqueta, 14, Tema.mostaza, Tema.fondo);
-                fila.Pastilla(830, (Fila - 10) / 2, "valor " + t.Valor, 16, WithAlpha(Tema.cian, tenue), Tema.textoSobreCian);
-                fila.Pastilla(950, (Fila - 10) / 2, "esfuerzo " + t.Esfuerzo, 16, Tema.hormigon, Tema.texto);
+                if (etiqueta != null) fila.Pastilla(720, 20, etiqueta, 14, Tema.warning, Tema.onWarning);
+                fila.Pastilla(830, (Fila - 10) / 2, "valor " + t.Valor, 16, WithAlpha(Tema.cyan, tenue), Tema.onCyan);
+                fila.Pastilla(950, (Fila - 10) / 2, "esfuerzo " + t.Esfuerzo, 16, Tema.line, Tema.ink);
 
                 if (resultado) {
-                    if (!dentro) fila.Texto(Ancho - 200, 0, 180, Fila - 10, "no entró", 16, Tema.textoTenue, TextAlignmentOptions.MidlineRight);
+                    if (!dentro) fila.Texto(Ancho - 200, 0, 180, Fila - 10, "no entró", 16, Tema.inkMuted, TextAlignmentOptions.MidlineRight);
                     continue;
                 }
                 if (_contestando) continue;   // en la fase 2 el tablero no se toca

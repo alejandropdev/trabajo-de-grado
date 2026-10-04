@@ -104,23 +104,23 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private Color ColorDe(EstadoPieza e, Color normal) {
             switch (e) {
-                case EstadoPieza.Seleccionada: return Tema.cianClaro;
-                case EstadoPieza.Marcada: return Tema.mostaza;
-                case EstadoPieza.Candidata: return Color.Lerp(normal, Tema.mostaza, 0.45f);
-                case EstadoPieza.Acertada: return Tema.cian;
-                case EstadoPieza.Fallada: return Tema.rojo;
-                case EstadoPieza.Senuelo: return Tema.textoTenue;
+                case EstadoPieza.Seleccionada: return Tema.cyan;
+                case EstadoPieza.Marcada: return Tema.warning;
+                case EstadoPieza.Candidata: return Color.Lerp(normal, Tema.warning, 0.45f);
+                case EstadoPieza.Acertada: return Tema.success;
+                case EstadoPieza.Fallada: return Tema.danger;
+                case EstadoPieza.Senuelo: return Tema.inkMuted;
                 default: return normal;
             }
         }
 
         private Color? FondoDeFila(EstadoPieza e) {
             switch (e) {
-                case EstadoPieza.Seleccionada: return new Color(0.37f, 0.85f, 0.96f, 0.18f);
-                case EstadoPieza.Marcada: return new Color(0.79f, 0.64f, 0.15f, 0.14f);
-                case EstadoPieza.Acertada: return new Color(0.37f, 0.85f, 0.96f, 0.14f);
-                case EstadoPieza.Fallada: return new Color(0.79f, 0.31f, 0.24f, 0.18f);
-                case EstadoPieza.Senuelo: return new Color(1, 1, 1, 0.05f);
+                case EstadoPieza.Seleccionada: return Tema.cyanSoft;
+                case EstadoPieza.Marcada: return Tema.warningSoft;
+                case EstadoPieza.Acertada: return Tema.successSoft;
+                case EstadoPieza.Fallada: return Tema.dangerSoft;
+                case EstadoPieza.Senuelo: return NexusTheme.Alfa(Tema.ink, 0.05f);
                 default: return null;
             }
         }
@@ -129,13 +129,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private void Chapita(Lamina l, float x, float y, EstadoPieza e) {
             string s; Color c;
             switch (e) {
-                case EstadoPieza.Marcada: s = "!"; c = Tema.mostaza; break;
-                case EstadoPieza.Acertada: s = "√"; c = Tema.cian; break;
-                case EstadoPieza.Fallada: s = "×"; c = Tema.rojo; break;
+                case EstadoPieza.Marcada: s = "!"; c = Tema.warning; break;
+                case EstadoPieza.Acertada: s = "√"; c = Tema.success; break;
+                case EstadoPieza.Fallada: s = "×"; c = Tema.danger; break;
                 default: return;
             }
             l.Dibujo.Circulo(x, y, 15, c, 0, c);
-            l.Texto(x - 15, y - 15, 30, 30, s, 20, Tema.textoSobreCian, TextAlignmentOptions.Center, null, true);
+            l.Texto(x - 15, y - 15, 30, 30, s, 20, Tema.onCyan, TextAlignmentOptions.Center, null, true);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             }
             Func<string, Color> colorDe = id => {
                 var c = art.Commits.First(x => x.Id == id);
-                Color col; return colorDeRama.TryGetValue(c.Rama ?? "", out col) ? col : Tema.cianClaro;
+                Color col; return colorDeRama.TryGetValue(c.Rama ?? "", out col) ? col : Tema.cyan;
             };
 
             foreach (var n in layout.Nodos) {
@@ -194,14 +194,14 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var c = art.Commits.First(x => x.Id == n.CommitId);
                 var e = _estadoDe(c.Id);
                 var x = X(n.Carril); var y = Y(n.Fila);
-                l.Dibujo.Circulo(x, y, 13, e == EstadoPieza.Seleccionada ? Tema.cianClaro : colorDe(c.Id), e == EstadoPieza.Seleccionada ? 6 : 4, Tema.fondoSecundario);
-                if (c.Huerfano) l.Texto(x - 10, y - 12, 20, 24, "!", 18, Tema.rojo, TextAlignmentOptions.Center, null, true);
+                l.Dibujo.Circulo(x, y, 13, e == EstadoPieza.Seleccionada ? Tema.cyan : colorDe(c.Id), e == EstadoPieza.Seleccionada ? 6 : 4, Tema.surface);
+                if (c.Huerfano) l.Texto(x - 10, y - 12, 20, 24, "!", 18, Tema.danger, TextAlignmentOptions.Center, null, true);
                 Chapita(l, 460, y, e);
-                var mono = l.Texto(520, y - 14, 70, 28, c.Id, 18, Tema.cianClaro);
+                var mono = l.Texto(520, y - 14, 70, 28, c.Id, 18, Tema.cyan);
                 mono.font = Tema.FuenteMono;
-                l.Texto(590, y - 14, 520, 28, c.Mensaje, 19, Tema.texto);
+                l.Texto(590, y - 14, 520, 28, c.Mensaje, 19, Tema.ink);
                 l.Texto(W - 260, y - 13, 200, 26, $"{c.Autor} · {(c.Fecha ?? "").Replace('T', ' ').Substring(Math.Min(5, (c.Fecha ?? "").Length))}", 16,
-                        Tema.textoTenue, TextAlignmentOptions.MidlineRight);
+                        Tema.inkMuted, TextAlignmentOptions.MidlineRight);
                 var id = c.Id;
                 _piezas[id] = (RectTransform)l.Zona(20, y - 26, W - 40, 52, () => Pinchar(id, () => MostrarCommit(c))).transform;
             }
@@ -209,11 +209,11 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private Color ColorDeRama(string nombre) {
             switch (nombre) {
-                case "canal": return Tema.cian;
-                case "verde": return new Color32(0x7F, 0xD8, 0xA6, 0xFF);
-                case "mostaza": return Tema.mostaza;
-                case "gris": return Tema.textoTenue;
-                default: return Tema.cianClaro;
+                case "canal": return Tema.cyan;
+                case "verde": return Tema.success;
+                case "mostaza": return Tema.warning;
+                case "gris": return Tema.inkMuted;
+                default: return Tema.cyan;
             }
         }
 
@@ -239,16 +239,16 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var a = pa + new Vector2(BW / 2, BH / 2); var b = pb + new Vector2(BW / 2, BH / 2);
                 var p1 = Corte(a, b); var p2 = Corte(b, a);
                 var e = _estadoDe(c.Id);
-                var col = e == EstadoPieza.Normal ? Tema.textoTenue : ColorDe(e, Tema.textoTenue);
+                var col = e == EstadoPieza.Normal ? Tema.inkMuted : ColorDe(e, Tema.inkMuted);
                 l.Dibujo.Flecha(p1.x, p1.y, p2.x, p2.y, col, e == EstadoPieza.Normal ? 3 : 4);
                 var ancho = c.Texto.Length * 16 * 0.55f + 26;
                 var hueco = Hueco(p1, p2, ancho, ocupados);
                 var con = c;
                 pastillas.Add(() => {
-                    Color fondo = Tema.pared, texto = Tema.texto;
-                    if (e == EstadoPieza.Seleccionada) { fondo = Tema.cian; texto = Tema.textoSobreCian; }
-                    else if (e == EstadoPieza.Marcada) fondo = Tema.mostazaEnvejecida;
-                    else if (e != EstadoPieza.Normal && e != EstadoPieza.Candidata) { fondo = ColorDe(e, Tema.pared); texto = Tema.textoSobreCian; }
+                    Color fondo = Tema.surfaceRaised, texto = Tema.ink;
+                    if (e == EstadoPieza.Seleccionada) { fondo = Tema.cyan; texto = Tema.onCyan; }
+                    else if (e == EstadoPieza.Marcada) { fondo = Tema.warning; texto = Tema.onWarning; }
+                    else if (e != EstadoPieza.Normal && e != EstadoPieza.Candidata) { fondo = ColorDe(e, Tema.surfaceRaised); texto = Tema.onCyan; }
                     l.Pastilla(hueco.x, hueco.y, con.Texto, 16, fondo, texto);
                     _piezas[con.Id] = (RectTransform)l.Zona(hueco.x - ancho / 2, hueco.y - 15, ancho, 30, () => Pinchar(con.Id, () => MostrarTexto("Flecha", con.Texto))).transform;
                 });
@@ -258,17 +258,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             foreach (var el in els) {
                 var p = pos[el.Id];
                 var e = _estadoDe(el.Id);
-                var normal = el.Tipo == "externo" ? Tema.textoTenue : Tema.cian;
+                var normal = el.Tipo == "externo" ? Tema.inkMuted : Tema.cyan;
                 var borde = ColorDe(e, normal);
                 var grosor = e == EstadoPieza.Seleccionada ? 5 : 3;
-                var fondo = e == EstadoPieza.Seleccionada ? new Color(0.37f, 0.85f, 0.96f, 0.2f) : (Color)Tema.pared;
-                if (el.Tipo == "baseDeDatos") l.Dibujo.Cilindro(p.x, p.y, BW, BH, borde, grosor, Tema.pared);
+                var fondo = e == EstadoPieza.Seleccionada ? Tema.cyanSoft : Tema.surfaceRaised;
+                if (el.Tipo == "baseDeDatos") l.Dibujo.Cilindro(p.x, p.y, BW, BH, borde, grosor, Tema.surfaceRaised);
                 else l.Dibujo.Rect(p.x, p.y, BW, BH, borde, grosor, fondo, el.Tipo == "externo", 10);
                 var db = el.Tipo == "baseDeDatos";
-                l.Texto(p.x + 16, p.y + (db ? 30 : 12), BW - 30, 20, TipoDe(el.Tipo), 13, Tema.textoTenue);
-                l.Texto(p.x + 16, p.y + (db ? 50 : 38), BW - 30, 50, el.Texto, 20, Tema.texto, TextAlignmentOptions.TopLeft, null, true);
+                l.Texto(p.x + 16, p.y + (db ? 30 : 12), BW - 30, 20, TipoDe(el.Tipo), 13, Tema.inkMuted);
+                l.Texto(p.x + 16, p.y + (db ? 50 : 38), BW - 30, 50, el.Texto, 20, Tema.ink, TextAlignmentOptions.TopLeft, null, true);
                 if (!string.IsNullOrEmpty(el.Detalle))
-                    l.Texto(p.x + 4, p.y + BH + 6, BW - 8, AltoDetalle, el.Detalle, 14, Tema.textoTenue, TextAlignmentOptions.TopLeft);
+                    l.Texto(p.x + 4, p.y + BH + 6, BW - 8, AltoDetalle, el.Detalle, 14, Tema.inkMuted, TextAlignmentOptions.TopLeft);
                 Chapita(l, p.x + BW - 6, p.y, e);
                 var elem = el;
                 _piezas[elem.Id] = (RectTransform)l.Zona(p.x, p.y, BW, BH, () => Pinchar(elem.Id, () => MostrarTexto(elem.Texto, elem.Detalle))).transform;
@@ -326,9 +326,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var col = new Dictionary<string, int>();
             for (var i = 0; i < parts.Count; i++) {
                 col[parts[i].Id] = i;
-                l.Dibujo.Rect(X(i) - 62, 10, 124, 46, Tema.cian, 2, Tema.pared);
-                l.Texto(X(i) - 62, 10, 124, 46, NombreCorto(parts[i].Texto), 17, Tema.texto, TextAlignmentOptions.Center, null, true);
-                l.Dibujo.Linea(X(i), 56, X(i), alto - 10, Tema.hormigon, 2, true);
+                l.Dibujo.Rect(X(i) - 62, 10, 124, 46, Tema.cyan, 2, Tema.surfaceRaised);
+                l.Texto(X(i) - 62, 10, 124, 46, NombreCorto(parts[i].Texto), 17, Tema.ink, TextAlignmentOptions.Center, null, true);
+                l.Dibujo.Linea(X(i), 56, X(i), alto - 10, Tema.line, 2, true);
             }
             var mensajes = Def.Artefacto.Conexiones.Where(c => c.Grupo == "diagrama").OrderBy(c => c.Orden).ToList();
             for (var k = 0; k < mensajes.Count; k++) {
@@ -340,8 +340,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var fondo = FondoDeFila(e);
                 if (fondo.HasValue) l.Dibujo.Rect(10, y - 34, 600, 52, fondo.Value, 0, fondo.Value);
                 var retorno = b < a;
-                l.Dibujo.Flecha(X(a), y, X(b), y, e == EstadoPieza.Normal ? (retorno ? Tema.textoTenue : Tema.cian) : ColorDe(e, Tema.cian), 3, retorno);
-                l.Texto(Mathf.Min(X(a), X(b)) - 40, y - 32, Mathf.Abs(X(b) - X(a)) + 80, 22, m.Orden + ". " + m.Texto, 15, Tema.texto, TextAlignmentOptions.Center);
+                l.Dibujo.Flecha(X(a), y, X(b), y, e == EstadoPieza.Normal ? (retorno ? Tema.inkMuted : Tema.cyan) : ColorDe(e, Tema.cyan), 3, retorno);
+                l.Texto(Mathf.Min(X(a), X(b)) - 40, y - 32, Mathf.Abs(X(b) - X(a)) + 80, 22, m.Orden + ". " + m.Texto, 15, Tema.ink, TextAlignmentOptions.Center);
                 Chapita(l, 596, y - 8, e);
                 var men = m;
                 _piezas[men.Id] = (RectTransform)l.Zona(10, y - 34, 600, 52, () => Pinchar(men.Id, () => MostrarTexto($"Paso {men.Orden} del diseño", men.Texto))).transform;
@@ -352,26 +352,26 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             Limpiar(l);
             var mono = Tema.FuenteMono;
             var cab = new[] { new { t = "#", x = 10f }, new { t = "HORA", x = 44f }, new { t = "QUIÉN", x = 150f }, new { t = "A QUIÉN", x = 290f }, new { t = "QUÉ PASÓ", x = 410f } };
-            foreach (var c in cab) l.Texto(c.x, 8, 140, 22, c.t, 15, Tema.cian);
+            foreach (var c in cab) l.Texto(c.x, 8, 140, 22, c.t, 15, Tema.cyan);
             var filas = FilasDeTraza();
             for (var i = 0; i < filas.Count; i++) {
                 var f = filas[i];
                 var y = 44 + i * 78;
                 var e = _estadoDe(f.Id);
-                var fondo = FondoDeFila(e) ?? (i % 2 == 0 ? new Color(0.12f, 0.21f, 0.24f, 1) : new Color(0, 0, 0, 0));
-                l.Dibujo.Rect(0, y, 710, 66, e == EstadoPieza.Normal ? new Color(0, 0, 0, 0) : ColorDe(e, Tema.cian), e == EstadoPieza.Normal ? 0 : 2, fondo, false, 6);
-                l.Texto(10, y + 20, 30, 26, f.N.ToString(), 18, Tema.textoTenue);
-                l.Texto(44, y + 20, 100, 26, f.Hora ?? "", 17, Tema.cianClaro).font = mono;
+                var fondo = FondoDeFila(e) ?? (i % 2 == 0 ? Tema.surfaceRaised : new Color(0, 0, 0, 0));
+                l.Dibujo.Rect(0, y, 710, 66, e == EstadoPieza.Normal ? new Color(0, 0, 0, 0) : ColorDe(e, Tema.cyan), e == EstadoPieza.Normal ? 0 : 2, fondo, false, 6);
+                l.Texto(10, y + 20, 30, 26, f.N.ToString(), 18, Tema.inkMuted);
+                l.Texto(44, y + 20, 100, 26, f.Hora ?? "", 17, Tema.cyan).font = mono;
                 if (f.De != null) {
-                    l.Pastilla(150 + 50, y + 33, Textos.Humanizar(f.De), 16, Tema.pared, Tema.texto);
-                    l.Texto(252, y + 18, 30, 30, "→", 22, Tema.textoTenue, TextAlignmentOptions.Center);
-                    l.Pastilla(290 + 50, y + 33, Textos.Humanizar(f.A), 16, Tema.pared, Tema.texto);
+                    l.Pastilla(150 + 50, y + 33, Textos.Humanizar(f.De), 16, Tema.surfaceRaised, Tema.ink);
+                    l.Texto(252, y + 18, 30, 30, "→", 22, Tema.inkMuted, TextAlignmentOptions.Center);
+                    l.Pastilla(290 + 50, y + 33, Textos.Humanizar(f.A), 16, Tema.surfaceRaised, Tema.ink);
                 }
-                var que = l.Texto(410, y + 8, 290, 52, f.Que ?? "", 16, Tema.texto, TextAlignmentOptions.MidlineLeft);
+                var que = l.Texto(410, y + 8, 290, 52, f.Que ?? "", 16, Tema.ink, TextAlignmentOptions.MidlineLeft);
                 que.font = mono;
                 Chapita(l, 676, y + 14, e);
                 var etiqueta = EtiquetaDe(f.Id);
-                if (etiqueta != null && Resultado == null) l.Pastilla(600, y + 52, etiqueta, 13, Tema.mostaza, Tema.textoSobreCian);
+                if (etiqueta != null && Resultado == null) l.Pastilla(600, y + 52, etiqueta, 13, Tema.warning, Tema.onWarning);
                 var fila = f;
                 _piezas[fila.Id] = (RectTransform)l.Zona(0, y, 710, 66, () => Pinchar(fila.Id, () => MostrarTexto($"Fila {fila.N} · {fila.Hora}", fila.Que))).transform;
             }
@@ -400,23 +400,22 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
             var marcar = Ui.Tarjeta(panel, "2 · ¿Qué problema tiene? Elige el nombre");
             GuiaView.Registrar("mj.detectar.etiquetas", marcar);
-            _seleccion = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.texto);
+            _seleccion = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.ink);
             var etiquetas = _andamiaje != null && _andamiaje.Etiquetas != null && _andamiaje.Etiquetas.Count > 0
                 ? _andamiaje.Etiquetas : Def.PaletaEtiquetas;
             foreach (var etiqueta in etiquetas) {
                 var e = etiqueta;
-                _botonesEtiqueta[e] = Ui.Boton(marcar, Textos.Humanizar(e), () => Marcar(e));
-                // Guiado: cada nombre dice que significa: no se puede elegir bien lo que no se conoce.
-                if (Guiado && !string.IsNullOrEmpty(Recetas.Significado(e)))
-                    Ui.Texto(marcar, Recetas.Significado(e), EstiloTexto.Pequeno, Tema.textoTenue);
+                // TagOption. Guiado: cada nombre dice que significa: no se puede elegir bien lo que no se conoce.
+                _botonesEtiqueta[e] = Ui.OpcionDeEtiqueta(marcar, Textos.Humanizar(e), Tono.Aviso, () => Marcar(e),
+                                                          Guiado ? Recetas.Significado(e) : null);
             }
             _limpiar = Ui.Boton(marcar, "Limpiar la selección", () => { _estado.Seleccion.Clear(); Repintar(); }, VarianteBoton.Fantasma);
-            _aviso = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.amarillo);
+            _aviso = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.warning);
 
             var lista = Ui.PanelColumna(panel, "Lista", Tema.margen * 0.75f, Tema.espacio);
             UiKit.Tamano(lista, flexAlto: 1);
             var titulo = "LO QUE HAS MARCADO" + (_andamiaje != null && _andamiaje.ContadorRestantes ? $" · hay {Def.Zonas.Count} problema(s) en total" : "");
-            Ui.Texto(lista, titulo, EstiloTexto.Pequeno, Tema.cian);
+            Ui.Texto(lista, titulo, EstiloTexto.Leyenda, Tema.cyan);
             var scroll = Ui.Desplazable(lista, out _marcas);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
 
@@ -463,8 +462,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             for (var i = 0; i < _estado.Marcas.Count; i++) {
                 var indice = i;
                 var m = _estado.Marcas[i];
-                var fila = Ui.PanelColumna(_marcas, "Marca", 8, 4, Tema.pared);
-                Ui.Texto(fila, Textos.Humanizar(m.Etiqueta), EstiloTexto.Cuerpo, Tema.mostazaClara).fontStyle = FontStyles.Bold;
+                var fila = Ui.PanelColumna(_marcas, "Marca", 8, 4, Tema.surfaceRaised);
+                Ui.Texto(fila, Textos.Humanizar(m.Etiqueta), EstiloTexto.Encabezado, Tema.warning);
                 Ui.Texto(fila, string.Join(", ", m.Commits.Select(Nombre)), EstiloTexto.Pequeno);
                 Ui.Boton(Ui.Fila(fila), "Quitar", () => { _estado.Desmarcar(indice); Repintar(); }, VarianteBoton.Fantasma);
             }
@@ -478,7 +477,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private void MostrarTexto(string titulo, string texto) {
             UiKit.Vaciar(_detalle);
             Ui.Texto(_detalle, titulo, EstiloTexto.Cuerpo).fontStyle = FontStyles.Bold;
-            if (!string.IsNullOrEmpty(texto)) Ui.Texto(_detalle, texto, EstiloTexto.Pequeno, Tema.texto);
+            if (!string.IsNullOrEmpty(texto)) Ui.Texto(_detalle, texto, EstiloTexto.Pequeno, Tema.ink);
         }
 
         private void MostrarCommit(Commit c) {
@@ -488,8 +487,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (string.IsNullOrEmpty(c.Diff) || !Def.Artefacto.Diffs.TryGetValue(c.Diff, out diff)) return;
             foreach (var linea in diff.Lineas.Take(10)) {
                 var t = Ui.Texto(_detalle, (linea.Tipo == "add" ? "+ " : linea.Tipo == "del" ? "− " : "  ") + linea.Texto, EstiloTexto.Mono);
-                t.fontSize = Tema.tamPequeno - 2;
-                t.color = linea.Tipo == "add" ? Tema.cian : linea.Tipo == "del" ? Tema.rojo : Tema.textoTenue;
+                t.color = linea.Tipo == "add" ? Tema.success : linea.Tipo == "del" ? Tema.danger : Tema.inkMuted;
             }
         }
 
@@ -508,9 +506,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
             var leyenda = Ui.Tarjeta(zona, "Qué era cada cosa");
             var ley = Ui.Fila(leyenda, espacio: 8);
-            Ui.Chip(ley, "√ lo encontraste", Tema.cian);
-            Ui.Chip(ley, "× se te escapó", Tema.rojo);
-            Ui.Chip(ley, "estaba bien", Tema.textoTenue);
+            Ui.Badge(ley, "√ lo encontraste", Tono.Exito);
+            Ui.Badge(ley, "× se te escapó", Tono.Peligro);
+            Ui.Badge(ley, "estaba bien");
             Ui.Texto(leyenda, "La explicación de cada uno está a la derecha.", EstiloTexto.Pequeno);
         }
     }

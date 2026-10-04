@@ -31,7 +31,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private Fase _fase = Fase.Receta;
         private float _restante, _total;
-        private DialView _dial;
+        private TemporizadorView _reloj;
         private RectTransform _cuerpo;
         private bool _recetaInicialPendiente = true;
         private bool _recetaAbierta;
@@ -67,12 +67,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             UiKit.Tamano(titulos, flexAncho: 1);
             var quien = Practica ? "PRÁCTICA EN TU ESCRITORIO · NO CUENTA PARA TU EVALUACIÓN"
                                  : $"TICKET · {(Def.Presentacion.QuienEspera ?? "").ToUpperInvariant()} · {Def.Presentacion.TextoPresion}";
-            Ui.Texto(titulos, quien, EstiloTexto.Pequeno, Practica ? Tema.cianClaro : Tema.mostaza);
+            Ui.Texto(titulos, quien, EstiloTexto.Leyenda, Practica ? Tema.cyan : Tema.warning);
             Ui.Texto(titulos, Def.Presentacion.Titulo ?? Def.Id, EstiloTexto.Titulo);
             // Donde estamos en el proyecto: sin esto, las piezas del reto son nombres sueltos (ronda 4).
             var dondeEstamos = DondeEstamos();
             if (dondeEstamos != null) {
-                var linea = Ui.Texto(titulos, dondeEstamos, EstiloTexto.Pequeno, Tema.cianClaro);
+                var linea = Ui.Texto(titulos, dondeEstamos, EstiloTexto.Pequeno, Tema.cyan);
                 GuiaView.Registrar("mj.proyecto", linea);
             }
             Ui.Boton(cabecera, "Receta", () => AbrirReceta(false));
@@ -81,10 +81,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
             _restante = Math.Max(10, Def.Presentacion.SegundosReloj);
             _total = _restante;
-            _dial = Ui.Dial(cabecera, 1, "", Tema.cian, 112);
-            _dial.Formato = v => { var s = Mathf.CeilToInt(v * _total); return $"{s / 60}:{s % 60:00}"; };
-            _dial.Valor = 1;
-            GuiaView.Registrar("mj.reloj", _dial);
+            // TimerChip: cyan con tiempo, warning al final, danger (con resplandor) cuando agotarlo entrega el reto.
+            _reloj = Ui.Temporizador(cabecera, Reloj(_total), Tono.Cyan);
+            GuiaView.Registrar("mj.reloj", _reloj);
 
             _cuerpo = Ui.Fila(marco, "Cuerpo", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(_cuerpo, flexAncho: 1, flexAlto: 1);
@@ -93,17 +92,23 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             // El panel de Marisol va entre la cabecera y el tablero: se ve a la vez que la pieza que señala.
             if (Pendiente != null && Pendiente.Guiado) {
                 Guia = new GuiaDelMinijuego(App, marco, _cuerpo.GetSiblingIndex(), PiezaGuiada, _ => Repintar());
-                _dial.gameObject.SetActive(false);   // guiado = sin prisa: el reloj no corre
+                _reloj.gameObject.SetActive(false);   // guiado = sin prisa: el reloj no corre
             }
 
             // Detras de la receta: por si alguien la cierra sin empezar, un boton para verla otra vez.
             var espera = Ui.PanelColumna(_cuerpo, "Espera", Tema.margen * 1.5f, Tema.espacio);
+            Ui.Esquinas(espera);
             UiKit.Tamano(espera, flexAncho: 1);
             var hoja = new Hoja(Ui, espera);
             if (!string.IsNullOrEmpty(Def.Presentacion.ComoSeJuega)) hoja.Parrafo(Def.Presentacion.ComoSeJuega);
             var fila = hoja.Fila();
             Ui.Boton(fila, "Ver la receta", () => AbrirReceta(true));
             Ui.Boton(fila, "¡A jugar!", Empezar, VarianteBoton.Primario);
+        }
+
+        private static string Reloj(float segundos) {
+            var s = Mathf.CeilToInt(segundos);
+            return $"{s / 60}:{s % 60:00}";
         }
 
         /// <summary>El expediente del proyecto del nivel en curso (null en el banco de pruebas o si el nivel no lo tiene).</summary>
@@ -197,7 +202,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             UiKit.Vaciar(_cuerpo);
             var panel = Ui.PanelColumna(_cuerpo, "Fallo", Tema.margen * 1.5f, Tema.espacio);
             UiKit.Tamano(panel, flexAncho: 1);
-            Ui.Texto(panel, "No se pudo abrir el reto", EstiloTexto.Subtitulo, Tema.amarillo);
+            Ui.Texto(panel, "No se pudo abrir el reto", EstiloTexto.Subtitulo, Tema.danger);
             Ui.Texto(panel, "Algo falló al montar el tablero. El reto se da por omitido y la jornada sigue.", EstiloTexto.Cuerpo);
             Ui.Boton(panel, "Volver a la jornada", () => AlTerminar?.Invoke(Resultado), VarianteBoton.Primario);
         }
@@ -216,8 +221,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (_fase != Fase.Jugando || _recetaAbierta || GuiaView.PausaActiva || PantallaDePausa.Abierta || Guia != null) return;
             _restante -= Time.unscaledDeltaTime;
             var f = Mathf.Max(0, _restante) / Math.Max(10f, _total);
-            _dial.Valor = f;
-            _dial.Color = f < 0.15f ? Tema.rojo : f < 0.3f ? Tema.amarillo : Tema.cian;
+            _reloj.Mostrar(Reloj(Mathf.Max(0, _restante)), f < 0.15f ? Tono.Peligro : f < 0.3f ? Tono.Aviso : Tono.Cyan);
             if (_restante <= 0) Entregar();
         }
 
@@ -249,34 +253,34 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var hoja = new Hoja(Ui, contenido);
             hoja.Etiqueta(Guia != null ? "Resultado · hecho con la ayuda de Marisol" : "Resultado");
             hoja.Subtitulo(TituloDelResultado(Resultado.Resultado, Def.Verbo),
-                           Resultado.Resultado == ResultadosDeMinijuego.Todos ? Tema.cian : Tema.amarillo);
+                           Resultado.Resultado == ResultadosDeMinijuego.Todos ? Tema.success : Tema.warning);
             // Lo que deja el modo guiado: que mirar para hacerlo solo la proxima vez.
             if (Guia != null) {
-                var t = hoja.Tarjeta("La próxima vez lo harás tú: esto es lo que tienes que mirar", Tema.mostaza);
-                foreach (var leccion in RecorridoGuiado.Lecciones(Guia.Pasos)) Ui.Texto(t, "· " + leccion, EstiloTexto.Pequeno, Tema.texto);
+                var t = hoja.Tarjeta("La próxima vez lo harás tú: esto es lo que tienes que mirar");
+                foreach (var leccion in RecorridoGuiado.Lecciones(Guia.Pasos)) Ui.Texto(t, "· " + leccion, EstiloTexto.Pequeno, Tema.ink);
             }
             // El porque, primero: es lo que se aprende. Antes solo lo veia el docente en el Dashboard.
             if (Resultado.Rubrica != null && !string.IsNullOrEmpty(Resultado.Rubrica.Razon))
-                hoja.Parrafo(Resultado.Rubrica.Razon, Tema.texto);
+                hoja.Parrafo(Resultado.Rubrica.Razon, Tema.ink);
             if (Resultado.Detalle.Count > 0) {
                 hoja.Etiqueta("Qué pasó, pieza a pieza");
-                foreach (var linea in Resultado.Detalle) hoja.Nota("· " + linea, Tema.texto);
+                foreach (var linea in Resultado.Detalle) hoja.Nota("· " + linea, Tema.ink);
             }
             var solucion = Guia != null ? new List<string>() : SolucionEnTexto().ToList();
             if (solucion.Count > 0 && Resultado.Resultado != ResultadosDeMinijuego.Todos) {
                 hoja.Etiqueta("Cómo se podía hacer");
-                foreach (var linea in solucion) hoja.Nota("· " + linea, Tema.cianClaro);
+                foreach (var linea in solucion) hoja.Nota("· " + linea, Tema.cyan);
             }
-            if (!string.IsNullOrEmpty(Resultado.TextoCierre)) hoja.Parrafo(Resultado.TextoCierre, Tema.cianClaro);
+            if (!string.IsNullOrEmpty(Resultado.TextoCierre)) hoja.Parrafo(Resultado.TextoCierre, Tema.cyan);
             // Lo que el resultado significa para el proyecto y su cliente.
             var modulo = Proyecto == null ? null : Proyecto.Modulo(Def.Modulo);
             if (modulo != null) {
                 var bien = Resultado.Resultado == ResultadosDeMinijuego.Todos;
-                var t = hoja.Tarjeta("Qué significa para " + Proyecto.Cliente.Nombre, Tema.cian);
+                var t = hoja.Tarjeta("Qué significa para " + Proyecto.Cliente.Nombre);
                 Ui.Texto(t, bien
                     ? $"«{modulo.Nombre}» sigue adelante sin sorpresas: {Minuscula(modulo.QueHace)}"
                     : $"Lo que se escapó aquí lo acabará notando {Proyecto.Cliente.Nombre} en «{modulo.Nombre}», la parte que {Minuscula(modulo.QueHace)}",
-                    EstiloTexto.Pequeno, Tema.texto);
+                    EstiloTexto.Pequeno, Tema.ink);
             }
             hoja.Nota(Practica ? "Era práctica: lo que ganes va al proyecto, pero no cuenta para tu evaluación."
                                : "Esto queda en tu evaluación. El resumen de todo, en Lecciones al cerrar el nivel.");
@@ -332,7 +336,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var panel = Ui.PanelColumna(padre, "Lienzo", 18, 8);
             if (anchoFijo.HasValue) UiKit.Tamano(panel, ancho: anchoFijo.Value, flexAlto: 1);
             else UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
-            if (!string.IsNullOrEmpty(rotulo)) Ui.Texto(panel, rotulo.ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cian);
+            if (!string.IsNullOrEmpty(rotulo)) Ui.Texto(panel, rotulo.ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cyan);
             RectTransform contenido;
             var scroll = Ui.Desplazable(panel, out contenido);
             scroll.horizontal = true;
