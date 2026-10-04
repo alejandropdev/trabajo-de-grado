@@ -33,11 +33,11 @@ namespace Nexus.Unity.Pantallas {
             var cabecera = Ui.Fila(marco);
             var titulos = Ui.Columna(cabecera, espacio: 0);
             UiKit.Tamano(titulos, flexAncho: 1);
-            Ui.Texto(titulos, "LECCIONES · " + (r.NivelNombre ?? r.NivelId).ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cian);
+            Ui.Texto(titulos, "LECCIONES · " + (r.NivelNombre ?? r.NivelId).ToUpperInvariant(), EstiloTexto.Leyenda, Tema.cyan);
             Ui.Texto(titulos, superado ? "Nivel superado" : "Nivel no superado", EstiloTexto.Titulo);
             if (!superado)
                 Ui.Texto(titulos, "Puedes repetirlo para que salga bien, o seguir adelante: la historia recordará cómo salió.",
-                         EstiloTexto.Pequeno, Tema.amarillo);
+                         EstiloTexto.Pequeno, Tema.warning);
             GuiaView.BotonDeAyuda(App, cabecera);
             if (!superado && AlRepetir != null) {
                 Ui.Boton(cabecera, "Repetir el nivel", () => AlRepetir(), VarianteBoton.Primario);
@@ -70,15 +70,15 @@ namespace Nexus.Unity.Pantallas {
             var l = r.Lanzamiento;
             if (l != null) {
                 var nivel = l.Nivel ?? (l.Exito ? NivelesDeLanzamiento.Bien : NivelesDeLanzamiento.Mal);
-                var color = nivel == NivelesDeLanzamiento.Bien ? Tema.cian : nivel == NivelesDeLanzamiento.Mal ? Tema.rojo : Tema.amarillo;
-                Ui.Texto(t, $"Lanzamiento: {NivelesDeLanzamiento.Titulo(nivel).ToLowerInvariant()} ({l.Puntaje:0}/100).", EstiloTexto.Cuerpo, color);
+                var tono = nivel == NivelesDeLanzamiento.Bien ? Tono.Exito : nivel == NivelesDeLanzamiento.Mal ? Tono.Peligro : Tono.Aviso;
+                Ui.Cifra(Ui.Fila(t), $"{l.Puntaje:0}/100", "Lanzamiento: " + NivelesDeLanzamiento.Titulo(nivel).ToLowerInvariant(), null, tono);
                 Ui.Texto(t, $"Entregado {l.AlcanceEntregado:0} de {l.AlcanceComprometido:0} puntos · {l.DefectosEscapados} defectos llegaron al cliente · " +
-                            $"satisfacción {l.SatisfaccionCliente:0}.", EstiloTexto.Pequeno, Tema.texto);
+                            $"satisfacción {l.SatisfaccionCliente:0}.", EstiloTexto.Pequeno, Tema.ink);
                 foreach (var f in l.Factores.Where(x => x.Estado != "bien"))
-                    Ui.Texto(t, $"· {f.Nombre}: {f.Valor} — {f.Explicacion}", EstiloTexto.Pequeno, f.Estado == "mal" ? Tema.rojo : Tema.amarillo);
+                    Ui.Notificacion(t, $"{f.Nombre}: {f.Valor} — {f.Explicacion}", f.Estado == "mal" ? Tono.Peligro : Tono.Aviso);
             }
-            if (r.CumpleUmbralesDeExito) Ui.Texto(t, "Cumple todos los umbrales de éxito del nivel.", EstiloTexto.Pequeno, Tema.texto);
-            foreach (var u in r.UmbralesFallados) Ui.Texto(t, "· " + u, EstiloTexto.Pequeno, Tema.amarillo);
+            if (r.CumpleUmbralesDeExito) Ui.Notificacion(t, "Cumple todos los umbrales de éxito del nivel.", Tono.Exito);
+            foreach (var u in r.UmbralesFallados) Ui.Notificacion(t, u, Tono.Aviso);
             return t;
         }
 
@@ -102,10 +102,10 @@ namespace Nexus.Unity.Pantallas {
             var maximo = Math.Max(1.0, partes.Max(p => p.Value));
             foreach (var p in partes) {
                 var fila = Ui.Fila(t);
-                Ui.Texto(fila, p.Key, EstiloTexto.Pequeno, Tema.texto);
+                Ui.Texto(fila, p.Key, EstiloTexto.Pequeno, Tema.ink);
                 Ui.Resorte(fila);
-                Ui.Texto(fila, p.Value.ToString("0.#"), EstiloTexto.Pequeno, Tema.texto);
-                Ui.Barra(t, (float)(p.Value / maximo), p.Value >= maximo - 0.001 ? Tema.mostaza : Tema.cian);
+                Ui.Texto(fila, p.Value.ToString("0.#"), EstiloTexto.Pequeno, Tema.ink);
+                Ui.Barra(t, (float)(p.Value / maximo), p.Value >= maximo - 0.001 ? Tema.warning : Tema.cyan);
             }
             return t;
         }
@@ -127,7 +127,7 @@ namespace Nexus.Unity.Pantallas {
             }
             foreach (var oa in oas) {
                 var c = r.Competencia.PorObjetivo[oa];
-                Ui.Texto(t, $"{oa}: {c.Correctas} bien · {c.Aceptables} regular · {c.Incorrectas} mal", EstiloTexto.Pequeno, Tema.texto);
+                Ui.Texto(t, $"{oa}: {c.Correctas} bien · {c.Aceptables} regular · {c.Incorrectas} mal", EstiloTexto.Pequeno, Tema.ink);
             }
             return t;
         }
@@ -137,22 +137,22 @@ namespace Nexus.Unity.Pantallas {
             var t = Ui.Tarjeta(padre, "4 · La metodología");
             var m = r.Metodologia;
             if (m == null) return t;
-            Ui.Texto(t, m.MetodologiaNombre, EstiloTexto.Subtitulo, Tema.texto);
+            Ui.Texto(t, m.MetodologiaNombre, EstiloTexto.Encabezado);
             Ui.Texto(t, m.EraAdecuada
                 ? "Era una metodología adecuada para este proyecto."
-                : "No era la metodología adecuada para este proyecto.", EstiloTexto.Cuerpo, m.EraAdecuada ? Tema.cian : Tema.amarillo);
+                : "No era la metodología adecuada para este proyecto.", EstiloTexto.Cuerpo, m.EraAdecuada ? Tema.success : Tema.warning);
             var metodologia = App.Catalogo.Metodologias.ContainsKey(m.MetodologiaId ?? "") ? App.Catalogo.Metodologias[m.MetodologiaId] : null;
             var motivo = metodologia != null ? metodologia.TextoDe(m.RazonElegida) : m.RazonElegida;
-            Ui.Texto(t, $"Tu motivo: «{motivo}»", EstiloTexto.Pequeno, Tema.texto);
+            Ui.Texto(t, $"Tu motivo: «{motivo}»", EstiloTexto.Pequeno, Tema.ink);
             Ui.Texto(t, m.RazonValida ? "Es un buen motivo para elegirla."
                       : m.RazonTrampa ? "Es un motivo trampa: se puede acertar por la razón equivocada, y aquí se distingue."
                       : "No es de los motivos que justifican esta metodología.", EstiloTexto.Pequeno,
-                     m.RazonValida ? Tema.cian : m.RazonTrampa ? Tema.rojo : Tema.amarillo);
+                     m.RazonValida ? Tema.success : m.RazonTrampa ? Tema.danger : Tema.warning);
             if (m.Practicas.Count > 0) {
                 Ui.Texto(t, "Sus prácticas, contra lo que pasó:", EstiloTexto.Pequeno);
                 foreach (var p in m.Practicas.Where(x => x.Evaluable))
                     Ui.Texto(t, (p.Cumple ? "√ " : "× ") + p.Descripcion + (string.IsNullOrEmpty(p.Razon) ? "" : " — " + p.Razon),
-                             EstiloTexto.Pequeno, p.Cumple ? Tema.texto : Tema.amarillo);
+                             EstiloTexto.Pequeno, p.Cumple ? Tema.ink : Tema.warning);
             }
             return t;
         }
@@ -162,7 +162,7 @@ namespace Nexus.Unity.Pantallas {
             var t = Ui.Tarjeta(padre, "5 · La arquitectura");
             var perfil = App.Catalogo.Niveles.ContainsKey(r.NivelId) ? App.Catalogo.Niveles[r.NivelId] : null;
             var opcion = perfil == null ? null : perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == r.ArquitecturaElegida);
-            Ui.Texto(t, opcion != null ? opcion.Nombre : r.ArquitecturaElegida, EstiloTexto.Subtitulo, Tema.texto);
+            Ui.Texto(t, opcion != null ? opcion.Nombre : r.ArquitecturaElegida, EstiloTexto.Encabezado);
             Chip(t, r.ArquitecturaVeredicto);
             if (!string.IsNullOrEmpty(r.ArquitecturaRazon)) Ui.Texto(t, r.ArquitecturaRazon, EstiloTexto.Cuerpo);
             return t;
@@ -177,16 +177,15 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
             foreach (var e in r.Traza.Entradas) {
-                var bloque = Ui.PanelColumna(t, "Decision", Tema.espacio, 4, Tema.pared);
+                var bloque = Ui.PanelColumna(t, "Decision", Tema.espacio, 4, Tema.surfaceRaised);
                 var cabecera = Ui.Fila(bloque);
-                var titulo = Ui.Texto(cabecera, (e.Dia > 0 ? $"Día {e.Dia} · " : "") + e.Titulo, EstiloTexto.Cuerpo);
-                titulo.fontStyle = FontStyles.Bold;
+                var titulo = Ui.Texto(cabecera, (e.Dia > 0 ? $"Día {e.Dia} · " : "") + e.Titulo, EstiloTexto.Encabezado);
                 UiKit.Tamano(titulo, flexAncho: 1);
                 Chip(cabecera, e.Veredicto);
                 if (!string.IsNullOrEmpty(e.OpcionTexto) && e.OpcionTexto != e.OpcionId)
-                    Ui.Texto(bloque, "Elegiste: " + e.OpcionTexto, EstiloTexto.Pequeno, Tema.texto);
+                    Ui.Texto(bloque, "Elegiste: " + e.OpcionTexto, EstiloTexto.Pequeno, Tema.ink);
                 if (!string.IsNullOrEmpty(e.Razon)) Ui.Texto(bloque, e.Razon, EstiloTexto.Pequeno);
-                if (!string.IsNullOrEmpty(e.NotaDeMetodologia)) Ui.Texto(bloque, e.NotaDeMetodologia, EstiloTexto.Pequeno, Tema.cianClaro);
+                if (!string.IsNullOrEmpty(e.NotaDeMetodologia)) Ui.Texto(bloque, e.NotaDeMetodologia, EstiloTexto.Pequeno, Tema.cyan);
             }
         }
 
@@ -198,13 +197,13 @@ namespace Nexus.Unity.Pantallas {
             else
                 foreach (var eslabon in r.CadenaCausal) Ui.Texto(t, "· " + eslabon, EstiloTexto.Cuerpo);
             if (r.BeatsPerdidos != null && r.BeatsPerdidos.Count > 0)
-                Ui.Texto(t, "Escenas que no llegaste a ver: " + string.Join(", ", r.BeatsPerdidos), EstiloTexto.Pequeno, Tema.amarillo);
+                Ui.Texto(t, "Escenas que no llegaste a ver: " + string.Join(", ", r.BeatsPerdidos), EstiloTexto.Pequeno, Tema.warning);
         }
 
         private void Chip(Transform padre, string veredicto) {
             if (string.IsNullOrEmpty(veredicto)) return;
             var fila = padre.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>() != null ? padre : Ui.Fila(padre);
-            Ui.Chip(fila, Textos.Veredicto(veredicto), Textos.ColorDe(Tema, veredicto));
+            Ui.Badge(fila, Textos.Veredicto(veredicto), Textos.TonoDe(veredicto));
         }
     }
 }
