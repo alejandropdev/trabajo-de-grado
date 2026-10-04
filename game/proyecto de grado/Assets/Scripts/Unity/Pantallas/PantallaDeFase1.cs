@@ -51,7 +51,7 @@ namespace Nexus.Unity.Pantallas {
             var cabecera = Ui.Fila(marco);
             var titulos = Ui.Columna(cabecera, espacio: 2);
             UiKit.Tamano(titulos, flexAncho: 1);
-            Ui.Texto(titulos, "FASE 1 · PLANIFICACIÓN", EstiloTexto.Pequeno, Tema.cian);
+            Ui.Texto(titulos, "FASE 1 · PLANIFICACIÓN", EstiloTexto.Leyenda, Tema.cyan);
             Ui.Texto(titulos, Perfil.Nombre, EstiloTexto.Titulo);
             GuiaView.BotonDeAyuda(App, cabecera);
             Ui.Boton(cabecera, "Menú", () => App.Router.Apilar<PantallaDePausa>(p => p.AntesDeSalir = GuardarBorrador),
@@ -67,6 +67,7 @@ namespace Nexus.Unity.Pantallas {
             }
 
             var panel = Ui.PanelColumna(marco, "Contenido", Tema.margen * 1.25f, Tema.espacio);
+            Ui.Esquinas(panel);
             UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
             RectTransform contenido;
             _scroll = Ui.Desplazable(panel, out contenido);
@@ -167,7 +168,7 @@ namespace Nexus.Unity.Pantallas {
             GuardarBorrador();
             foreach (var kv in _chips) {
                 var hecho = Completo(kv.Key) && kv.Key != _paso;
-                Ui.Resaltar(kv.Value, kv.Key == _paso, hecho ? Tema.hormigon : Tema.pared);
+                Ui.Resaltar(kv.Value, kv.Key == _paso, hecho ? Tema.successSoft : Tema.surfaceRaised);
                 kv.Value.GetComponentInChildren<TMP_Text>().text = (hecho ? "√ " : "") + NombreDe(kv.Key);
             }
             var posicion = _scroll.content.anchoredPosition;
@@ -240,58 +241,58 @@ namespace Nexus.Unity.Pantallas {
         private void PintarExpediente(Nexus.Core.Proyecto.FichaDelProyecto f) {
             _hoja.Etiqueta("El proyecto");
             _hoja.Titulo(f.Nombre);
-            if (!string.IsNullOrEmpty(f.EnUnaFrase)) _hoja.Parrafo(f.EnUnaFrase, Tema.cianClaro);
+            if (!string.IsNullOrEmpty(f.EnUnaFrase)) _hoja.Parrafo(f.EnUnaFrase, Tema.cyan);
 
-            var cliente = _hoja.Tarjeta("El cliente y su sector", Tema.mostaza);
+            var cliente = _hoja.Tarjeta("El cliente y su sector");
             GuiaView.Registrar("fase1.cliente", cliente);
-            Ui.Texto(cliente, $"<b>{f.Cliente.Nombre}</b>: {f.Cliente.QueHace}", EstiloTexto.Cuerpo, Tema.texto);
-            Ui.Texto(cliente, $"<b>Qué le duele hoy:</b> {f.Cliente.QueLeDuele}", EstiloTexto.Cuerpo, Tema.texto);
-            Ui.Texto(cliente, $"<b>Su sector: {f.Sector.Nombre}.</b> {f.Sector.ComoTrabaja}", EstiloTexto.Pequeno, Tema.texto);
+            Ui.Texto(cliente, $"<b>{f.Cliente.Nombre}</b>: {f.Cliente.QueHace}", EstiloTexto.Cuerpo, Tema.ink);
+            Ui.Texto(cliente, $"<b>Qué le duele hoy:</b> {f.Cliente.QueLeDuele}", EstiloTexto.Cuerpo, Tema.ink);
+            Ui.Texto(cliente, $"<b>Su sector: {f.Sector.Nombre}.</b> {f.Sector.ComoTrabaja}", EstiloTexto.Pequeno, Tema.ink);
             if (f.Usuarios.Count > 0) {
-                Ui.Texto(cliente, "QUIÉN LO VA A USAR", EstiloTexto.Pequeno, Tema.mostazaClara);
-                foreach (var u in f.Usuarios) Ui.Texto(cliente, $"· <b>{u.Nombre}</b>: {u.QueNecesita}", EstiloTexto.Pequeno, Tema.texto);
+                Ui.Texto(cliente, "QUIÉN LO VA A USAR", EstiloTexto.Leyenda, Tema.cyan);
+                foreach (var u in f.Usuarios) Ui.Texto(cliente, $"· <b>{u.Nombre}</b>: {u.QueNecesita}", EstiloTexto.Pequeno, Tema.ink);
             }
 
-            var sistema = _hoja.Tarjeta("El sistema en una imagen", Tema.cian);
+            var sistema = _hoja.Tarjeta("El sistema en una imagen");
             GuiaView.Registrar("fase1.expediente", sistema);
             Ui.Texto(sistema, "Fuera, quién lo usa; dentro, sus partes (los módulos). Las flechas dicen quién le pide qué a quién. " +
-                              "Cada reto de este nivel es una de estas partes: lo verás arriba del reto.", EstiloTexto.Pequeno, Tema.texto);
+                              "Cada reto de este nivel es una de estas partes: lo verás arriba del reto.", EstiloTexto.Pequeno, Tema.ink);
             ExpedienteView.Pizarrita(App.UiClasico, sistema, f);   // la tiza no cambia de kit
 
-            var modulos = _hoja.Tarjeta("Sus partes", Tema.cian);
+            var modulos = _hoja.Tarjeta("Sus partes");
             foreach (var m in f.Modulos) {
                 var fila = Ui.Fila(modulos, espacio: 8);
-                var texto = Ui.Texto(fila, $"<b>{m.Nombre}</b>: {m.QueHace}", EstiloTexto.Pequeno, Tema.texto);
+                var texto = Ui.Texto(fila, $"<b>{m.Nombre}</b>: {m.QueHace}", EstiloTexto.Pequeno, Tema.ink);
                 UiKit.Tamano(texto, flexAncho: 1);
                 var hecho = Ui.Texto(fila, m.AvanceInicial > 0 ? $"{m.AvanceInicial:0} % ya hecho" : "por hacer", EstiloTexto.Pequeno,
-                                     m.AvanceInicial > 0 ? Tema.cian : Tema.textoTenue, TextAlignmentOptions.Right);
+                                     m.AvanceInicial > 0 ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Right);
                 UiKit.Tamano(hecho, ancho: 150);
             }
 
-            var vocabulario = _hoja.Tarjeta("Palabras del oficio", Tema.mostaza);
+            var vocabulario = _hoja.Tarjeta("Palabras del oficio");
             GuiaView.Registrar("fase1.vocabulario", vocabulario);
             Ui.Texto(vocabulario, "Las usa tu cliente y las verás en los diagramas y en las tarjetas. Pulsa cada una para ver qué es.",
-                     EstiloTexto.Pequeno, Tema.texto);
+                     EstiloTexto.Pequeno, Tema.ink);
             ExpedienteView.ChipsDeVocabulario(App, vocabulario, f);
 
             var cambia = _hoja.Tarjeta(ExpedienteView.NivelAnterior(App, Perfil) != null ? "Qué tiene de distinto este proyecto"
-                                                                                        : "Qué tiene de especial este proyecto", Tema.mostaza);
+                                                                                        : "Qué tiene de especial este proyecto");
             GuiaView.Registrar("fase1.distinto", cambia);
-            foreach (var linea in ExpedienteView.QueCambia(App, Perfil)) Ui.Texto(cambia, "· " + linea, EstiloTexto.Pequeno, Tema.texto);
+            foreach (var linea in ExpedienteView.QueCambia(App, Perfil)) Ui.Texto(cambia, "· " + linea, EstiloTexto.Pequeno, Tema.ink);
 
             if (f.Artefactos.Count > 0) {
-                var docs = _hoja.Tarjeta("Los documentos que importan aquí", Tema.cian);
+                var docs = _hoja.Tarjeta("Los documentos que importan aquí");
                 foreach (var a in f.Artefactos) {
                     var fila = Ui.Fila(docs, espacio: 6);
-                    var texto = Ui.Texto(fila, $"<b>{a.Id}</b>: {a.ParaQueAqui}", EstiloTexto.Pequeno, Tema.texto);
+                    var texto = Ui.Texto(fila, $"<b>{a.Id}</b>: {a.ParaQueAqui}", EstiloTexto.Pequeno, Tema.ink);
                     UiKit.Tamano(texto, flexAncho: 1);
                     if (!string.IsNullOrEmpty(a.Glosario)) PantallaDeGlosario.Chip(App, fila, a.Glosario);
                 }
             }
 
             if (Perfil.Briefing != null && Perfil.Briefing.Length > 0) {
-                var ticket = _hoja.Tarjeta("El ticket original", Tema.hormigon);
-                foreach (var linea in Perfil.Briefing) Ui.Texto(ticket, linea, EstiloTexto.Cuerpo, Tema.texto);
+                var ticket = _hoja.Tarjeta("El ticket original");
+                foreach (var linea in Perfil.Briefing) Ui.Texto(ticket, linea, EstiloTexto.Cuerpo, Tema.ink);
             }
         }
 
@@ -316,24 +317,24 @@ namespace Nexus.Unity.Pantallas {
 
         private void PintarComprobacion() {
             if (Preguntas.Count == 0) return;
-            var t = _hoja.Tarjeta("Comprueba que lo entendiste", Tema.cian);
+            var t = _hoja.Tarjeta("Comprueba que lo entendiste");
             GuiaView.Registrar("fase1.comprobacion", t);
             Ui.Texto(t, $"{Preguntas.Count} preguntas cortas sobre el proyecto. No restan: si fallas, te digo por qué y lo vuelves a intentar. " +
-                        "Hay que contestarlas para seguir.", EstiloTexto.Pequeno, Tema.texto);
+                        "Hay que contestarlas para seguir.", EstiloTexto.Pequeno, Tema.ink);
             for (var i = 0; i < Preguntas.Count; i++) {
                 var p = Preguntas[i];
-                var titulo = Ui.Texto(t, $"{i + 1}. {p.Texto}", EstiloTexto.Cuerpo, Tema.texto);
+                var titulo = Ui.Texto(t, $"{i + 1}. {p.Texto}", EstiloTexto.Cuerpo, Tema.ink);
                 titulo.fontStyle = FontStyles.Bold;
                 if (_comprobacion.ContainsKey(p.Id)) {
-                    Ui.Texto(t, "√ " + p.Opciones[p.Correcta], EstiloTexto.Cuerpo, Tema.cian);
-                    Ui.Texto(t, p.Explicacion, EstiloTexto.Pequeno, Tema.textoTenue);
+                    Ui.Texto(t, "√ " + p.Opciones[p.Correcta], EstiloTexto.Cuerpo, Tema.success);
+                    Ui.Texto(t, p.Explicacion, EstiloTexto.Pequeno, Tema.inkMuted);
                     continue;
                 }
                 for (var j = 0; j < p.Opciones.Count; j++) {
                     var opcion = j;
                     Ui.BotonDeOpcion(t, p.Opciones[j], null, () => Contestar(p, opcion));
                 }
-                if (_ultimaFallada == p.Id) Ui.Texto(t, "No es esa. Pista: " + p.Explicacion, EstiloTexto.Pequeno, Tema.amarillo);
+                if (_ultimaFallada == p.Id) Ui.Texto(t, "No es esa. Pista: " + p.Explicacion, EstiloTexto.Pequeno, Tema.warning);
             }
         }
 
@@ -349,10 +350,10 @@ namespace Nexus.Unity.Pantallas {
         /// Cada barra con su «?» y una línea de qué la mueve; abajo, lo que exige el lanzamiento de este nivel.
         /// </summary>
         private void PintarMetricas() {
-            var t = _hoja.Tarjeta("Cómo se mide tu proyecto", Tema.cian);
+            var t = _hoja.Tarjeta("Cómo se mide tu proyecto");
             GuiaView.Registrar("fase1.metricas", t);
             Ui.Texto(t, "Durante los días verás estas barras. Cada decisión las mueve, y con ellas se decide al final si el lanzamiento sale bien.",
-                     EstiloTexto.Pequeno, Tema.texto);
+                     EstiloTexto.Pequeno, Tema.ink);
             var metricas = new[] {
                 new[] { "avance", "Avance", "sube con el trabajo de cada día; las horas extra lo suben más, pero cobran después." },
                 new[] { "alcance", "Alcance", "lo prometido. Si aceptas pedir más, crece y hay más que entregar." },
@@ -365,7 +366,7 @@ namespace Nexus.Unity.Pantallas {
             };
             foreach (var m in metricas) {
                 var fila = Ui.Fila(t, espacio: 6);
-                var texto = Ui.Texto(fila, $"<b>{m[1]}</b>: {m[2]}", EstiloTexto.Pequeno, Tema.texto);
+                var texto = Ui.Texto(fila, $"<b>{m[1]}</b>: {m[2]}", EstiloTexto.Pequeno, Tema.ink);
                 UiKit.Tamano(texto, flexAncho: 1);
                 PantallaDeGlosario.Chip(App, fila, m[0]);
             }
@@ -373,7 +374,7 @@ namespace Nexus.Unity.Pantallas {
             if (u != null)
                 Ui.Texto(t, $"Para que salga BIEN: entregar al menos el {u.EntregaBien * 100:0} % de lo prometido, que el cliente encuentre " +
                             $"como mucho {u.DefectosBien} errores, riesgo por debajo de {u.RiesgoBien:0}, cliente contento ({u.SatisfaccionBien:0} o más) " +
-                            "y decisiones bien justificadas.", EstiloTexto.Pequeno, Tema.mostazaClara);
+                            "y decisiones bien justificadas.", EstiloTexto.Pequeno, Tema.cyan);
         }
 
         /// <summary>
@@ -381,7 +382,7 @@ namespace Nexus.Unity.Pantallas {
         /// </summary>
         private void PintarRazones(IList<KeyValuePair<string, string>> razones, string elegida, System.Action<string> alElegir) {
             var cabecera = _hoja.Fila();
-            var titulo = Ui.Texto(cabecera, $"Elige 1 de estas {razones.Count} razones", EstiloTexto.Cuerpo, Tema.mostazaClara);
+            var titulo = Ui.Texto(cabecera, $"Elige 1 de estas {razones.Count} razones", EstiloTexto.Encabezado, Tema.ink);
             titulo.fontStyle = FontStyles.Bold;
             // Dos columnas que se reparten el ancho REAL (antes, celdas fijas de 760: en ventanas estrechas se salian
             // por la derecha, y el texto largo se salia de su celda de alto fijo).
@@ -400,7 +401,7 @@ namespace Nexus.Unity.Pantallas {
         private void PintarPistas() {
             var pistas = S.PistasEncontradas();
             if (pistas.Count == 0) return;
-            var t = _hoja.Tarjeta("Lo que averiguaste en el recorrido", Tema.mostaza);
+            var t = _hoja.Tarjeta("Lo que averiguaste en el recorrido");
             foreach (var p in pistas) Ui.Texto(t, "· " + p, EstiloTexto.Cuerpo);
         }
 
@@ -413,10 +414,10 @@ namespace Nexus.Unity.Pantallas {
             if (!string.IsNullOrEmpty(cfg.Texto)) _hoja.Parrafo(cfg.Texto);
 
             if (!S.RecoleccionHecha) {
-                var aviso = _hoja.Tarjeta("Esta parte es en 3D", Tema.mostaza);
+                var aviso = _hoja.Tarjeta("Esta parte es en 3D", Tono.Aviso);
                 Ui.Texto(aviso, "El recorrido en 3D lo está construyendo otro equipo. Mientras tanto, se simula: elige cómo de a fondo " +
                                 "quieres recorrerlo. Cuanto más miras, más encuentras… y más tiempo gastas, y más cosas puedes tocar que no debías.",
-                         EstiloTexto.Pequeno, Tema.texto);
+                         EstiloTexto.Pequeno, Tema.ink);
             }
 
             var zonas = _hoja.Tarjeta($"El plano · {cfg.MinutosDisponibles} minutos");
@@ -425,7 +426,7 @@ namespace Nexus.Unity.Pantallas {
                 var cuantos = cfg.Hallazgos.Count(h => h.Zona == z.Id);
                 Ui.Texto(zonas, $"<b>{z.Id} · {z.Nombre}</b>  ({z.MinutosDeVisita} min)  —  {z.Descripcion}  " +
                                 (S.RecoleccionHecha ? "" : new string('?', cuantos)), EstiloTexto.Pequeno,
-                         visitadas.Contains(z.Id) ? Tema.cianClaro : Tema.texto);
+                         visitadas.Contains(z.Id) ? Tema.cyan : Tema.ink);
             }
 
             if (!S.RecoleccionHecha) {
@@ -437,11 +438,11 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
 
-            var resultado = _hoja.Tarjeta($"Lo que encontraste · {S.R.MinutosDeRecoleccion} minutos", Tema.cian);
+            var resultado = _hoja.Tarjeta($"Lo que encontraste · {S.R.MinutosDeRecoleccion} minutos");
             var hallazgos = S.HallazgosRecogidos();
             if (hallazgos.Count == 0) Ui.Texto(resultado, "Nada. A veces el recorrido no da nada.", EstiloTexto.Cuerpo);
             foreach (var h in hallazgos) Ui.Texto(resultado, DescribirHallazgo(h), EstiloTexto.Cuerpo,
-                                                   h.Tipo == TiposDeHallazgo.Riesgo ? Tema.amarillo : Tema.texto);
+                                                   h.Tipo == TiposDeHallazgo.Riesgo ? Tema.warning : Tema.ink);
         }
 
         private string DescribirHallazgo(Hallazgo h) {
@@ -478,7 +479,7 @@ namespace Nexus.Unity.Pantallas {
                           "buenos motivos para elegirla y motivos que suenan bien pero no lo son.");
 
             var palabras = _hoja.Fila();
-            Ui.Texto(palabras, "Palabras que vas a ver:", EstiloTexto.Pequeno, Tema.textoTenue);
+            Ui.Texto(palabras, "Palabras que vas a ver:", EstiloTexto.Pequeno, Tema.inkMuted);
             foreach (var termino in new[] { "ciclo-de-vida", "sprint", "backlog", "ceremonia", "retrospectiva", "wip" }) {
                 var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, termino);
                 if (e == null) continue;
@@ -522,12 +523,12 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Titulo("¿A qué le dedicas tu cuidado?");
             if (!string.IsNullOrEmpty(calidad.TextoPresion)) _hoja.Parrafo(calidad.TextoPresion);
             _hoja.Subtitulo($"Fichas: {calidad.Fichas - usadas} de {calidad.Fichas} sin repartir",
-                            usadas == calidad.Fichas ? Tema.cian : Tema.amarillo);
+                            usadas == calidad.Fichas ? Tema.success : Tema.warning);
 
             foreach (var atributo in calidad.Atributos) {
                 var a = atributo;
                 var fichas = _fichas[a.Id];
-                var tarjeta = Ui.PanelColumna(_hoja.Raiz, a.Nombre, Tema.espacio, 4, Tema.pared);
+                var tarjeta = Ui.PanelColumna(_hoja.Raiz, a.Nombre, Tema.espacio, 4, Tema.surfaceRaised);
                 var linea = Ui.Fila(tarjeta);
                 var nombre = Ui.Texto(linea, a.Nombre, EstiloTexto.Cuerpo);
                 nombre.fontStyle = FontStyles.Bold;
@@ -537,12 +538,12 @@ namespace Nexus.Unity.Pantallas {
                 UiKit.Tamano(menos, ancho: 64);
                 menos.interactable = fichas > 0;
                 UiKit.Tamano(Ui.Texto(linea, new string('●', fichas) + new string('○', Mathf.Max(0, calidad.Fichas / 2 - fichas)),
-                                      EstiloTexto.Subtitulo, fichas > 0 ? Tema.cian : Tema.textoTenue, TextAlignmentOptions.Center), ancho: 180);
+                                      EstiloTexto.Subtitulo, fichas > 0 ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Center), ancho: 180);
                 var mas = Ui.Boton(linea, "+", () => { _fichas[a.Id]++; Repintar(); });
                 UiKit.Tamano(mas, ancho: 64);
                 mas.interactable = usadas < calidad.Fichas;
                 if (fichas == 0 && !string.IsNullOrEmpty(a.TextoSinInversion))
-                    Ui.Texto(tarjeta, "Sin fichas: " + a.TextoSinInversion, EstiloTexto.Pequeno, Tema.mostazaClara);
+                    Ui.Texto(tarjeta, "Sin fichas: " + a.TextoSinInversion, EstiloTexto.Pequeno, Tema.warning);
             }
             if (usadas < calidad.Fichas) _hoja.Nota("Puedes dejar fichas sin usar, pero no se guardan para después.");
         }
@@ -556,7 +557,7 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Parrafo("Vuelve a leer el encargo antes de elegir: la respuesta está ahí.");
             var recordatorio = _hoja.Tarjeta("El encargo, otra vez");
             if (Perfil.Briefing != null) foreach (var linea in Perfil.Briefing) Ui.Texto(recordatorio, "· " + linea, EstiloTexto.Pequeno);
-            foreach (var p in S.PistasEncontradas()) Ui.Texto(recordatorio, "· " + p, EstiloTexto.Pequeno, Tema.mostazaClara);
+            foreach (var p in S.PistasEncontradas()) Ui.Texto(recordatorio, "· " + p, EstiloTexto.Pequeno, Tema.cyan);
 
             _hoja.Espacio();
             var fila = _hoja.Fila();
@@ -609,16 +610,16 @@ namespace Nexus.Unity.Pantallas {
             var confirmar = _hoja.Accion("Confirmar y empezar el nivel", Confirmar);
             GuiaView.Registrar("fase1.confirmar", confirmar);
             confirmar.interactable = listo;
-            if (!listo) _hoja.Nota("Falta algo por decidir: lo que no tiene √ arriba.", Tema.amarillo);
+            if (!listo) _hoja.Nota("Falta algo por decidir: lo que no tiene √ arriba.", Tema.warning);
         }
 
         private void Linea(string que, string valor, Paso paso, bool completo) {
-            var tarjeta = Ui.PanelColumna(_hoja.Raiz, que, Tema.espacio, 4, Tema.pared);
+            var tarjeta = Ui.PanelColumna(_hoja.Raiz, que, Tema.espacio, 4, Tema.surfaceRaised);
             var fila = Ui.Fila(tarjeta);
             var textos = Ui.Columna(fila, espacio: 2);
             UiKit.Tamano(textos, flexAncho: 1);
-            Ui.Texto(textos, que.ToUpperInvariant(), EstiloTexto.Pequeno, Tema.cian);
-            Ui.Texto(textos, valor ?? "Sin decidir", EstiloTexto.Cuerpo, completo ? Tema.texto : Tema.amarillo);
+            Ui.Texto(textos, que.ToUpperInvariant(), EstiloTexto.Leyenda, Tema.cyan);
+            Ui.Texto(textos, valor ?? "Sin decidir", EstiloTexto.Cuerpo, completo ? Tema.ink : Tema.warning);
             Ui.Boton(fila, "Cambiar", () => IrA(paso), VarianteBoton.Fantasma);
         }
 
