@@ -130,6 +130,22 @@ namespace Nexus.Unity.Aplicacion {
             var img = fondo.gameObject.AddComponent<Image>();
             img.color = Ui.Tema.bg900;
             img.raycastTarget = false;
+            // Detras de todo, la oficina ilustrada, cubriendo la pantalla y muy oscurecida: el juego ocurre en un
+            // sitio, no sobre un fondo plano.
+            var oficina = Tema.MaterialesNexus.Sprite(Tema.MaterialesNexus.FondoOficina);
+            if (oficina != null) {
+                var foto = Ui.Nodo(fondo, "Oficina");
+                foto.anchorMin = foto.anchorMax = new Vector2(0.5f, 0.5f);
+                var ajuste = foto.gameObject.AddComponent<AspectRatioFitter>();
+                ajuste.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                ajuste.aspectRatio = oficina.rect.width / oficina.rect.height;
+                var fi = foto.gameObject.AddComponent<Image>();
+                fi.sprite = oficina;
+                fi.raycastTarget = false;
+                var velo = UiKit.Rellenar(Ui.Nodo(fondo, "Velo")).gameObject.AddComponent<Image>();
+                velo.color = NexusTheme.Alfa(Ui.Tema.bg950, 0.72f);
+                velo.raycastTarget = false;
+            }
 
             var pantallas = UiKit.Rellenar(Ui.Nodo(go.transform, "Pantallas"));
             // La guia va en su propia capa, por encima de TODAS las pantallas (tambien de los modales).

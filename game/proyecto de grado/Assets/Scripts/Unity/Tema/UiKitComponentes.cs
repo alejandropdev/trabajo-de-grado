@@ -20,6 +20,118 @@ namespace Nexus.Unity.Tema {
     /// caen en piezas sencillas, pero ninguna pantalla clasica los usa.
     /// </summary>
     public sealed partial class UiKit {
+        // ================================================================ materiales del mundo
+
+        /// <summary>
+        /// Una ventana del juego: marco de metal remachado con escuadras en las esquinas (las referencias de reuniones y
+        /// minijuegos). Dentro, chapa oscura o, con 'papel', una hoja. Es columna: lo que se le meta se apila dentro.
+        /// </summary>
+        public RectTransform Ventana(Transform padre, string nombre, bool papel = false, float? relleno = null) {
+            var grosor = Tema.Px(20);
+            var rt = Nodo(padre, nombre);
+            var fondo = rt.gameObject.AddComponent<Image>();
+            if (!(papel ? Material(fondo, MaterialesNexus.Papel, 12) : Material(fondo, MaterialesNexus.Chapa, 18)))
+                Fondo(fondo, papel ? Tema.paperBg : Tema.surface, NexusTheme.RadioMd);
+            var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
+            Configurar(grupo, Tema.espacio, relleno ?? grosor + Tema.Espacio(3), TextAnchor.UpperLeft);
+
+            var marco = Decoracion(rt, "Marco", grosor * 0.55f).gameObject.AddComponent<Image>();
+            marco.raycastTarget = false;
+            if (Material(marco, MaterialesNexus.Marco, grosor, null, true)) {
+                marco.fillCenter = false;
+                // La escuadra de la textura es la de arriba a la izquierda; las demas, en espejo sobre su centro.
+                var lado = grosor * 3.2f;
+                foreach (var (x, y) in new[] { (0f, 1f), (1f, 1f), (1f, 0f), (0f, 0f) }) {
+                    var e = Decoracion(rt, "Escuadra", 0);
+                    e.anchorMin = e.anchorMax = new Vector2(x, y);
+                    e.pivot = new Vector2(0.5f, 0.5f);
+                    e.sizeDelta = new Vector2(lado, lado);
+                    var hacia = lado * 0.5f - grosor * 0.75f;   // el centro, hacia dentro desde la esquina
+                    e.anchoredPosition = new Vector2(x == 0 ? hacia : -hacia, y == 1 ? -hacia : hacia);
+                    e.localScale = new Vector3(x == 0 ? 1 : -1, y == 1 ? 1 : -1, 1);
+                    var img = e.gameObject.AddComponent<Image>();
+                    img.sprite = MaterialesNexus.Sprite(MaterialesNexus.Esquina);
+                    img.raycastTarget = false;
+                }
+            } else {
+                marco.enabled = false;
+                Borde(rt, Tema.lineStrong, NexusTheme.RadioMd, 2);
+            }
+            return rt;
+        }
+
+        /// <summary>Una hoja de papel (sin marco) para documentos y briefings: el texto que va encima, en tinta.</summary>
+        public RectTransform Hoja(Transform padre, string nombre, float? relleno = null) {
+            var rt = Nodo(padre, nombre);
+            var fondo = rt.gameObject.AddComponent<Image>();
+            if (!Material(fondo, MaterialesNexus.Papel, 12)) Fondo(fondo, Tema.paperBg, NexusTheme.RadioSm);
+            var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
+            Configurar(grupo, Tema.espacio, relleno ?? Tema.Espacio(6), TextAnchor.UpperLeft);
+            return rt;
+        }
+
+        /// <summary>
+        /// El hueco de una ilustracion (personaje, escena, viñeta): pinta Resources/Ilustraciones/&lt;id&gt;.png si existe; si
+        /// no, una silueta con el nombre, para que se vea donde va el arte y cuanto mide. 'silueta' false = escena (sin
+        /// figura). Ancho o alto null = lo decide el layout.
+        /// </summary>
+        public RectTransform Ilustracion(Transform padre, string id, string pie, float? ancho = null, float? alto = null,
+                                         bool silueta = true) {
+            var rt = Nodo(padre, "Ilustracion " + id);
+            Tamano(rt, ancho, alto, ancho.HasValue ? (float?)null : 1, alto.HasValue ? (float?)null : 1);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.raycastTarget = false;
+            var arte = MaterialesNexus.Ilustracion(id);
+            if (arte != null) {
+                img.sprite = arte;
+                img.preserveAspect = true;
+                img.color = Color.white;
+                return rt;
+            }
+            img.color = NexusTheme.Alfa(Tema.bg950, 0.55f);
+            if (silueta) {
+                // Busto de proporcion fija, apoyado abajo: en un hueco alto o ancho no se deforma.
+                var figura = Nodo(rt, "Silueta");
+                figura.pivot = new Vector2(0.5f, 0);
+                var proporcion = figura.gameObject.AddComponent<AspectRatioFitter>();
+                proporcion.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+                proporcion.aspectRatio = 0.85f;
+                var cabeza = Nodo(figura, "Cabeza");
+                cabeza.anchorMin = new Vector2(0.28f, 0.52f); cabeza.anchorMax = new Vector2(0.72f, 0.92f);
+                cabeza.offsetMin = cabeza.offsetMax = Vector2.zero;   // el busto ya tiene proporcion fija: queda redonda
+                var ci = cabeza.gameObject.AddComponent<Image>();
+                ci.sprite = SpriteCircular(); ci.color = NexusTheme.Alfa(Tema.lineStrong, 0.6f); ci.raycastTarget = false;
+                var cuerpo = Nodo(figura, "Hombros");
+                cuerpo.anchorMin = new Vector2(0.05f, 0); cuerpo.anchorMax = new Vector2(0.95f, 0.5f);
+                cuerpo.offsetMin = cuerpo.offsetMax = Vector2.zero;
+                var bi = cuerpo.gameObject.AddComponent<Image>();
+                bi.sprite = Formas.Caja(Tema.Px(40)); bi.type = Image.Type.Sliced;
+                bi.color = NexusTheme.Alfa(Tema.lineStrong, 0.6f); bi.raycastTarget = false;
+            }
+            if (!string.IsNullOrEmpty(pie)) {
+                var t = Texto(rt, pie, EstiloTexto.Leyenda, Tema.inkMuted, TextAlignmentOptions.Bottom);
+                t.fontStyle |= FontStyles.UpperCase;
+                var trt = (RectTransform)t.transform;
+                Rellenar(trt, Tema.Espacio(2));
+                t.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            }
+            return rt;
+        }
+
+        /// <summary>La barra de «ESTADO» del pie de las ventanas de trabajo. Devuelve el texto, para actualizarlo.</summary>
+        public TMP_Text BarraDeEstado(Transform padre, string texto = "") {
+            var rt = Nodo(padre, "Estado");
+            Fondo(rt.gameObject.AddComponent<Image>(), Tema.surfaceSunken, NexusTheme.RadioSm);
+            var col = rt.gameObject.AddComponent<VerticalLayoutGroup>();
+            Configurar(col, 2, 0, TextAnchor.MiddleLeft);
+            col.padding = new RectOffset((int)Tema.Espacio(4), (int)Tema.Espacio(4), (int)Tema.Espacio(2), (int)Tema.Espacio(2));
+            Texto(rt, "ESTADO", EstiloTexto.Leyenda, Tema.cyan);
+            var t = Texto(rt, texto, EstiloTexto.Cuerpo, Tema.warning);
+            Borde(rt, Tema.line, NexusTheme.RadioSm);
+            Tamano(rt, flexAncho: 1);
+            return t;
+        }
+
         // ================================================================ narrativa
 
         /// <summary>
@@ -29,19 +141,20 @@ namespace Nexus.Unity.Tema {
         /// </summary>
         public RectTransform Dialogo(Transform padre, string hablante, string texto, out TMP_Text linea,
                                      Tono retrato = Tono.Cyan, bool continuar = false) {
+            // Como una viñeta de comic: el retrato del personaje en su marco y, al lado, la cartela negra con su linea.
             var rt = Nodo(padre, "Dialogo");
-            Fondo(rt.gameObject.AddComponent<Image>(), Tema.surfaceRaised, NexusTheme.RadioLg);
             var fila = rt.gameObject.AddComponent<HorizontalLayoutGroup>();
-            Configurar(fila, Tema.Espacio(4), Tema.Espacio(5), TextAnchor.UpperLeft);
-            if (!string.IsNullOrEmpty(hablante)) Retrato(rt, Inicial(hablante), retrato);
-
-            var cuerpo = Columna(rt, "Cuerpo", Tema.Espacio(2));
-            Tamano(cuerpo, flexAncho: 1);
+            Configurar(fila, Tema.Espacio(3), 0, TextAnchor.UpperLeft);
             if (!string.IsNullOrEmpty(hablante)) {
-                var chip = ChipNexus(Fila(cuerpo, "Hablante"), hablante, Tema.cyan, Tema.onCyan);
-                Estilizar(chip.GetComponentInChildren<TMP_Text>(), EstiloTexto.Etiqueta);
-                chip.GetComponentInChildren<TMP_Text>().color = Tema.onCyan;
+                var marcoRetrato = PanelColumna(rt, "Retrato", 3, 0, Tema.bg950);
+                UiKit.ColorDeBorde(marcoRetrato, retrato == Tono.Violeta ? Tema.violet : Tema.lineStrong);
+                Ilustracion(marcoRetrato, MaterialesNexus.IdDePersonaje(hablante), null, Tema.Px(92), Tema.Px(110));
             }
+
+            var cuerpo = PanelColumna(rt, "Cartela", Tema.Espacio(4), Tema.Espacio(2), NexusTheme.Alfa(Tema.bg950, 0.94f));
+            Tamano(cuerpo, flexAncho: 1);
+            if (!string.IsNullOrEmpty(hablante))
+                Texto(cuerpo, hablante, EstiloTexto.Etiqueta, retrato == Tono.Violeta ? Tema.violet : Tema.cyan);
             linea = Texto(cuerpo, texto, EstiloTexto.Dialogo);
             if (string.IsNullOrEmpty(hablante)) linea.fontStyle = FontStyles.Italic;
             if (continuar) {
@@ -50,7 +163,6 @@ namespace Nexus.Unity.Tema {
                 var flecha = Texto(pie, "▼", EstiloTexto.Leyenda, Tema.cyan);
                 flecha.gameObject.AddComponent<Parpadeo>();
             }
-            Borde(rt, Tema.line, NexusTheme.RadioLg);
             return rt;
         }
 
@@ -129,14 +241,16 @@ namespace Nexus.Unity.Tema {
         /// (con resplandor) solo si agotar el tiempo tiene consecuencia real.
         /// </summary>
         public TemporizadorView Temporizador(Transform padre, string valor, Tono tono = Tono.Cyan) {
+            // Una pantallita LCD: fondo casi negro y digitos monoespaciados, como el reloj de las referencias.
             var rt = Nodo(padre, "Temporizador");
-            Fondo(rt.gameObject.AddComponent<Image>(), Tema.surfaceRaised, NexusTheme.RadioSm);
+            Fondo(rt.gameObject.AddComponent<Image>(), Tema.bg950, NexusTheme.RadioSm);
             var fila = rt.gameObject.AddComponent<HorizontalLayoutGroup>();
             Configurar(fila, Tema.Espacio(1), 0, TextAnchor.MiddleCenter);
             fila.padding = new RectOffset((int)Tema.Espacio(3), (int)Tema.Espacio(3), (int)Tema.Espacio(1), (int)Tema.Espacio(1));
             var t = Texto(rt, valor, EstiloTexto.Cuerpo, Tema.cyan, TextAlignmentOptions.Center);
-            t.font = Tema.FuenteInterfazNegrita;
-            t.fontSize = Tema.Px(18);
+            t.font = Tema.FuenteCodigo;
+            t.fontWeight = FontWeight.SemiBold;
+            t.fontSize = Tema.Px(24);
             t.textWrappingMode = TextWrappingModes.NoWrap;
             var halo = Halo(rt, Tema.danger, NexusTheme.RadioSm, false);
             var borde = Borde(rt, Tema.line, NexusTheme.RadioSm);
@@ -216,7 +330,9 @@ namespace Nexus.Unity.Tema {
         /// ReviewBriefing: el encabezado fijo de los minijuegos — «Lo que se ve», «Lo que haces», «Lo que cambia», «Cómo
         /// se cierra», en ese orden. Glifo en un aro cyan, etiqueta en cyan y el texto tenue.
         /// </summary>
-        public RectTransform Briefing(Transform padre, IList<RenglonDeBriefing> renglones) {
+        public RectTransform Briefing(Transform padre, IList<RenglonDeBriefing> renglones, bool enPapel = false) {
+            var acento = enPapel ? Tema.papelCyan : Tema.cyan;
+            var tinta = enPapel ? Tema.paperInk : Tema.inkMuted;
             var lista = Columna(padre, "Briefing", Tema.Espacio(4));
             foreach (var r in renglones) {
                 var fila = Fila(lista, "Renglon", Tema.Espacio(3), alineacion: TextAnchor.UpperLeft);
@@ -224,15 +340,15 @@ namespace Nexus.Unity.Tema {
                 Tamano(icono, Tema.Px(28), Tema.Px(28));
                 var aro = Rellenar(Nodo(icono, "Aro")).gameObject.AddComponent<Image>();
                 aro.sprite = Formas.Borde(Tema.Px(14), Mathf.Max(1, Tema.Px(1)));
-                aro.color = Tema.cyan;
+                aro.color = acento;
                 aro.raycastTarget = false;
-                var g = Texto(icono, r.Icono ?? "", EstiloTexto.Leyenda, Tema.cyan, TextAlignmentOptions.Center);
+                var g = Texto(icono, r.Icono ?? "", EstiloTexto.Leyenda, acento, TextAlignmentOptions.Center);
                 Rellenar((RectTransform)g.transform);
                 var cuerpo = Columna(fila, "Cuerpo", Tema.Px(2));
                 Tamano(cuerpo, flexAncho: 1);
-                var e = Texto(cuerpo, r.Etiqueta, EstiloTexto.Leyenda, Tema.cyan);
+                var e = Texto(cuerpo, r.Etiqueta, EstiloTexto.Leyenda, acento);
                 e.fontStyle = FontStyles.UpperCase;
-                Texto(cuerpo, r.Texto, EstiloTexto.Cuerpo, Tema.inkMuted);
+                Texto(cuerpo, r.Texto, EstiloTexto.Cuerpo, tinta);
             }
             return lista;
         }

@@ -66,6 +66,22 @@ namespace Nexus.Unity.Tema {
         public Color paperLine = Hex(0xC9B78F);
         public Color paperAccent = Hex(0x8A3B24);
 
+        [Header("Sobre papel — los valores del tema claro «Aula» del design system")]
+        [Tooltip("Lo que se dibuja sobre papel (los tableros de los minijuegos, los documentos) usa los tonos del tema " +
+                 "claro: sobre crema, el cyan y los estados del tema oscuro no se leen.")]
+        public Color papelCyan = Hex(0x0E7490);
+        public Color papelExito = Hex(0x15803D);
+        public Color papelAviso = Hex(0xB45309);
+        public Color papelPeligro = Hex(0xB91C1C);
+        public Color papelCaja = Hex(0xDCE5EC);
+        public Color papelTrazo = Hex(0x4A5A6A);
+
+        [Header("Etiquetas de papel (las de revisión y auditoría)")]
+        public Color etiquetaAzul = Hex(0xA9C7DC);
+        public Color etiquetaAmbar = Hex(0xE9C46A);
+        public Color etiquetaRoja = Hex(0xE39A8F);
+        public Color etiquetaVerde = Hex(0xA8D5B0);
+
         [Header("Fuentes (vacias = las de Resources/Fuentes)")]
         public TMP_FontAsset fuenteDisplay;
         public TMP_FontAsset fuenteInterfaz;
@@ -188,6 +204,27 @@ namespace Nexus.Unity.Tema {
                 case Tono.Peligro: return onDanger;
                 case Tono.Violeta: return onViolet;
                 default: return ink;
+            }
+        }
+
+        /// <summary>El color de un estado para dibujarlo sobre papel.</summary>
+        public Color PapelDe(Tono tono) {
+            switch (tono) {
+                case Tono.Exito: return papelExito;
+                case Tono.Aviso: return papelAviso;
+                case Tono.Peligro: return papelPeligro;
+                case Tono.Neutro: return paperMuted;
+                default: return papelCyan;
+            }
+        }
+
+        /// <summary>El color de una etiqueta de papel de ese tono.</summary>
+        public Color EtiquetaDe(Tono tono) {
+            switch (tono) {
+                case Tono.Exito: return etiquetaVerde;
+                case Tono.Aviso: return etiquetaAmbar;
+                case Tono.Peligro: return etiquetaRoja;
+                default: return etiquetaAzul;
             }
         }
 
