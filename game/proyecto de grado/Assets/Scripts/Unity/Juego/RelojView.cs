@@ -32,7 +32,7 @@ namespace Nexus.Unity.Juego {
             vista._tema = ui.Tema;
             vista._dia = ui.Texto(columna, "", EstiloTexto.Leyenda);
             vista._hora = ui.Texto(columna, "--:--", EstiloTexto.Titulo);
-            vista._hora.fontSize = ui.Tema.tamTitulo * 1.3f;
+            vista._hora.fontSize = ui.Tema.Px(36) * 1.3f;   // phase, en grande: es el instrumento principal del HUD
             vista._jornada = ui.Barra(columna, 0);
             vista._estado = ui.Texto(columna, "", EstiloTexto.Pequeno);
             vista._alertas = ui.Texto(columna, "", EstiloTexto.Cuerpo);
