@@ -23,13 +23,14 @@ namespace Nexus.Unity.Juego {
         private BarraView _jornada;
 
         public static RelojView Crear(UiKit ui, Transform padre, LevelRunner runner) {
-            var panel = ui.PanelColumna(padre, "Reloj");
+            var panel = ui.PanelColumna(padre, "Reloj", ui.Tema.Espacio(4));
+            ui.Esquinas(panel);   // instrumentacion del HUD
             var columna = panel;
 
             var vista = panel.gameObject.AddComponent<RelojView>();
             vista._runner = runner;
             vista._tema = ui.Tema;
-            vista._dia = ui.Texto(columna, "", EstiloTexto.Pequeno);
+            vista._dia = ui.Texto(columna, "", EstiloTexto.Leyenda);
             vista._hora = ui.Texto(columna, "--:--", EstiloTexto.Titulo);
             vista._hora.fontSize = ui.Tema.tamTitulo * 1.3f;
             vista._jornada = ui.Barra(columna, 0);
@@ -61,8 +62,8 @@ namespace Nexus.Unity.Juego {
             _jornada.Valor = fin > inicio ? (sesion.MinutoDelDia - inicio) / (float)(fin - inicio) : 0;
 
             var ultimaHora = !sesion.JornadaProrrogada && jornada.HoraCierre * 60 - sesion.MinutoDelDia <= 60;
-            _hora.color = ultimaHora ? _tema.mostaza : _tema.texto;
-            _jornada.Color = sesion.JornadaProrrogada ? _tema.naranja : _tema.cian;
+            _hora.color = ultimaHora ? _tema.warning : _tema.ink;
+            _jornada.Color = sesion.JornadaProrrogada ? _tema.warning : _tema.cyan;
 
             _estado.text = Describir(_runner);
 
@@ -74,7 +75,7 @@ namespace Nexus.Unity.Juego {
                 _alertas.text = "";
             } else {
                 var urgente = pendientes[0];
-                _alertas.text = $"<color=#{ColorUtility.ToHtmlStringRGB(_tema.mostaza)}>• {pendientes.Count} esperando</color>" +
+                _alertas.text = $"<color={NexusTheme.Html(_tema.warning)}>• {pendientes.Count} esperando</color>" +
                                 $"  ·  la primera caduca a las {RelojDeJornada.Formatear(urgente.MinutoDeExpiracion)}";
             }
         }

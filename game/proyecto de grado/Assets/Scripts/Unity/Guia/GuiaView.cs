@@ -252,37 +252,37 @@ namespace Nexus.Unity.Guia {
             _velo = ui.Nodo(_app.CapaGuia, "Velo");
             UiKit.Rellenar(_velo);
             var velo = _velo.gameObject.AddComponent<Image>();
-            velo.color = new Color(0, 0, 0, 0.38f);
+            velo.color = NexusTheme.Alfa(tema.bg950, 0.45f);
             velo.raycastTarget = true;
 
             _marco = ui.Nodo(_app.CapaGuia, "Marco");
             _marco.anchorMin = _marco.anchorMax = new Vector2(0.5f, 0.5f);
             foreach (var nombre in new[] { "arriba", "abajo", "izquierda", "derecha" }) {
                 var borde = ui.Nodo(_marco, nombre).gameObject.AddComponent<Image>();
-                borde.color = tema.mostaza;
+                borde.color = tema.warning;   // lo que la guia señala brilla en amarillo (asi lo dicen sus textos)
                 borde.raycastTarget = false;
                 _bordes.Add(borde);
             }
             UbicarBordes(5);
 
-            _burbuja = ui.PanelColumna(_app.CapaGuia, "Burbuja", tema.margen, tema.espacio * 0.75f, tema.fondoSecundario);
-            _burbuja.gameObject.AddComponent<Outline>().effectColor = tema.mostaza;
+            _burbuja = ui.PanelColumna(_app.CapaGuia, "Burbuja", tema.margen, tema.espacio * 0.75f, tema.surfaceRaised);
+            UiKit.ColorDeBorde(_burbuja, tema.warning);
+            ui.Halo(_burbuja, tema.warning, NexusTheme.RadioLg);
             _burbuja.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             _burbuja.sizeDelta = new Vector2(1040, 0);
 
-            _quien = ui.Texto(_burbuja, "", EstiloTexto.Pequeno, tema.mostazaClara);
-            _titulo = ui.Texto(_burbuja, "", EstiloTexto.Subtitulo, tema.texto);
-            _texto = ui.Texto(_burbuja, "", EstiloTexto.Cuerpo, tema.texto);
-            _texto.fontSize = tema.tamCuerpo * 1.1f;
-            _textoMas = ui.PanelColumna(_burbuja, "Mas", tema.espacio, 4, tema.pared);
-            _mas = ui.Texto(_textoMas, "", EstiloTexto.Pequeno, tema.texto);
+            _quien = ui.Texto(_burbuja, "", EstiloTexto.Leyenda, tema.warning);
+            _titulo = ui.Texto(_burbuja, "", EstiloTexto.Encabezado, tema.ink);
+            _texto = ui.Texto(_burbuja, "", EstiloTexto.Dialogo, tema.ink);
+            _textoMas = ui.PanelColumna(_burbuja, "Mas", tema.espacio, 4, tema.surfaceSunken);
+            _mas = ui.Texto(_textoMas, "", EstiloTexto.Pequeno, tema.inkMuted);
 
             var fila = ui.Fila(_burbuja);
             _botonMas = ui.Boton(fila, "Quiero saber más", () => _textoMas.gameObject.SetActive(!_textoMas.gameObject.activeSelf),
                                  VarianteBoton.Fantasma);
             ui.Resorte(fila);
             var esperando = ui.Fila(fila);
-            ui.Texto(esperando, "Hazlo y la guía sigue…", EstiloTexto.Pequeno, tema.mostazaClara);
+            ui.Texto(esperando, "Hazlo y la guía sigue…", EstiloTexto.Pequeno, tema.warning);
             ui.Boton(esperando, "Saltar", () => Cerrar(true), VarianteBoton.Fantasma);
             _esperando = esperando.gameObject;
             _entendido = ui.Boton(fila, "¡Entendido!", Entendido, VarianteBoton.Primario);

@@ -71,6 +71,13 @@ namespace Nexus.Unity.Tema {
             return piezas;
         }
 
+        /// <summary>Cambia el color del borde que UiKit le puso a una pieza (un panel que pasa a ser de aviso).</summary>
+        public static void ColorDeBorde(RectTransform rt, Color color) {
+            foreach (Transform hijo in rt)
+                if (hijo.name == "Borde" && hijo.GetComponent<DecoracionNexus>() != null)
+                    hijo.GetComponent<Image>().color = color;
+        }
+
         private Image Barrita(RectTransform esquina, Vector2 ancla, Vector2 tamano, Color c) {
             var rt = Nodo(esquina, "Trazo");
             rt.anchorMin = rt.anchorMax = rt.pivot = ancla;

@@ -44,20 +44,20 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var ui = app.Ui;
             var tema = ui.Tema;
 
-            _panel = ui.PanelColumna(padre, "Marisol te guia", tema.margen * 0.75f, 4, tema.fondoSecundario);
+            _panel = ui.PanelColumna(padre, "Marisol te guia", tema.margen * 0.75f, 4, tema.surfaceRaised);
             _panel.SetSiblingIndex(indiceEnPadre);
-            _panel.gameObject.AddComponent<Outline>().effectColor = tema.mostaza;
+            UiKit.ColorDeBorde(_panel, tema.warning);   // el mismo amarillo con el que la guia señala las piezas
             var cabecera = ui.Fila(_panel);
-            _progreso = ui.Texto(cabecera, "", EstiloTexto.Pequeno, tema.mostazaClara);
+            _progreso = ui.Texto(cabecera, "", EstiloTexto.Leyenda, tema.warning);
             UiKit.Tamano(_progreso, flexAncho: 1);
             _entendido = ui.Boton(cabecera, "Entendido", Entendido, VarianteBoton.Primario);
-            _texto = ui.Texto(_panel, "", EstiloTexto.Subtitulo, tema.texto);
+            _texto = ui.Texto(_panel, "", EstiloTexto.Encabezado, tema.ink);
             // El porque puede ser largo: va en su propio scroll de alto acotado, para no aplastar el tablero.
             RectTransform contenido;
             _scrollPorque = ui.Desplazable(_panel, out contenido, "Porque");
             _altoPorque = UiKit.Tamano(_scrollPorque, flexAncho: 1, alto: 0);
-            _porque = ui.Texto(contenido, "", EstiloTexto.Cuerpo, tema.cianClaro);
-            _aviso = ui.Texto(_panel, "", EstiloTexto.Pequeno, tema.amarillo);
+            _porque = ui.Texto(contenido, "", EstiloTexto.Cuerpo, tema.inkMuted);
+            _aviso = ui.Texto(_panel, "", EstiloTexto.Pequeno, tema.warning);
             UiKit.Tamano(_panel, flexAlto: 0);
             _panel.gameObject.SetActive(false);
         }
