@@ -66,8 +66,13 @@ namespace Nexus.Unity.Pantallas {
                 _chips[p] = chip;
             }
 
-            var panel = Ui.PanelColumna(marco, "Contenido", Tema.margen * 1.25f, Tema.espacio);
-            Ui.Esquinas(panel);
+            // Como en las referencias de la Fase 1: el protagonista pensando a la izquierda, y la decision en una
+            // ventana de metal a su lado.
+            var escena = Ui.Fila(marco, "Escena", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            UiKit.Tamano(escena, flexAncho: 1, flexAlto: 1);
+            var protagonista = Ui.Ilustracion(escena, "personajes/protagonista", "Tú", 300);
+            UiKit.Tamano(protagonista, flexAlto: 1);
+            var panel = Ui.Ventana(escena, "Contenido");
             UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
             RectTransform contenido;
             _scroll = Ui.Desplazable(panel, out contenido);

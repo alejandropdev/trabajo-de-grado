@@ -22,8 +22,7 @@ namespace Nexus.Unity.Pantallas {
             velo.color = NexusTheme.Alfa(Tema.bg950, 0.72f);   // raycastTarget: bloquea los clics de la pantalla de debajo
 
             // Un modal flota sobre el HUD: surface-raised y las esquinas del Panel.
-            var panel = Ui.PanelColumna(Raiz, "Dialogo", Tema.margen * 1.25f, Tema.espacio, Tema.surfaceRaised);
-            Ui.Esquinas(panel);
+            var panel = Ui.Ventana(Raiz, "Dialogo");
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0.5f, 0.5f);
             var ajuste = panel.gameObject.AddComponent<ContentSizeFitter>();
             ajuste.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
