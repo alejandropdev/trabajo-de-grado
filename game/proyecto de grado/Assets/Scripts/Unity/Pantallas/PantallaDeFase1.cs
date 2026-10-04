@@ -256,7 +256,7 @@ namespace Nexus.Unity.Pantallas {
             GuiaView.Registrar("fase1.expediente", sistema);
             Ui.Texto(sistema, "Fuera, quién lo usa; dentro, sus partes (los módulos). Las flechas dicen quién le pide qué a quién. " +
                               "Cada reto de este nivel es una de estas partes: lo verás arriba del reto.", EstiloTexto.Pequeno, Tema.texto);
-            ExpedienteView.Pizarrita(Ui, sistema, f);
+            ExpedienteView.Pizarrita(App.UiClasico, sistema, f);   // la tiza no cambia de kit
 
             var modulos = _hoja.Tarjeta("Sus partes", Tema.cian);
             foreach (var m in f.Modulos) {

@@ -29,10 +29,17 @@ namespace Nexus.Unity.Tema {
     public sealed class UiKit {
         public NexusTheme Tema { get; }
 
+        /// <summary>
+        /// El kit de antes del design system. Lo usan solo la receta de los minijuegos y las pizarras de tiza, que se
+        /// quedan tal cual (AppRoot.UiPara): con Clasico, botones, textos y paneles se pintan como antes.
+        /// </summary>
+        public bool Clasico { get; }
+
         private Sprite _circulo;
 
-        public UiKit(NexusTheme tema) {
+        public UiKit(NexusTheme tema, bool clasico = false) {
             Tema = tema != null ? tema : NexusTheme.PorDefecto();
+            Clasico = clasico;
         }
 
         // ================================================================ contenedores

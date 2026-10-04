@@ -34,6 +34,9 @@ namespace Nexus.Unity.Aplicacion {
         public static AppRoot Instancia { get; private set; }
 
         public UiKit Ui { get; private set; }
+
+        /// <summary>El kit de antes del design system, con el mismo tema. Ver UiPara.</summary>
+        public UiKit UiClasico { get; private set; }
         public ScreenRouter Router { get; private set; }
         public LevelRunner Runner { get; private set; }
 
@@ -61,6 +64,7 @@ namespace Nexus.Unity.Aplicacion {
             DontDestroyOnLoad(gameObject);
 
             Ui = new UiKit(_tema);
+            UiClasico = new UiKit(Ui.Tema, clasico: true);
 
             var almacen = new AlmacenDeArchivosAtomico(RutasDeGuardado.Raiz);
             Perfiles = new ProfileStore(almacen);
@@ -132,6 +136,20 @@ namespace Nexus.Unity.Aplicacion {
             // Un RectTransform sin Graphic no captura clics: solo la burbuja los captura.
             CapaGuia = UiKit.Rellenar(Ui.Nodo(go.transform, "Guia"));
             return pantallas;
+        }
+
+        /// <summary>
+        /// Las pantallas que NO pasan al design system: la receta de apoyo de los minijuegos y las pizarras de tiza
+        /// (conceptos y apuntes). Se quedan como estaban, botones incluidos.
+        /// </summary>
+        private static readonly HashSet<Type> ConKitClasico = new HashSet<Type> {
+            typeof(Pantallas.Minijuegos.PantallaDeReceta),
+            typeof(PantallaDePizarra)
+        };
+
+        /// <summary>El kit con el que se construye una pantalla.</summary>
+        public UiKit UiPara(Pantalla pantalla) {
+            return pantalla != null && ConKitClasico.Contains(pantalla.GetType()) ? UiClasico : Ui;
         }
 
         /// <summary>La capa de la guia del tutorial, encima de todo. La usa GuiaView.</summary>
