@@ -22,9 +22,9 @@ namespace Nexus.Unity.Pantallas {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen, Tema.margen * 1.5f));
 
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 2);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
-            Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Pequeno, Tema.cian);
+            Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Hero);   // el logotipo: una sola vez por pantalla
             Ui.Texto(titulos, "¿Quién juega?", EstiloTexto.Titulo);
             Ui.Texto(titulos, "Cada estudiante tiene su perfil: ahí se guardan sus partidas, su entrevista de admisión y todo lo que encuentre.",
                      EstiloTexto.Pequeno);
@@ -37,9 +37,8 @@ namespace Nexus.Unity.Pantallas {
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);
 
-            var perfiles = Ui.PanelColumna(cuerpo, "Perfiles", Tema.margen, Tema.espacio);
+            var perfiles = Ui.Tarjeta(cuerpo, "Perfiles");
             UiKit.Tamano(perfiles, flexAncho: 1, flexAlto: 1);
-            Ui.Texto(perfiles, "PERFILES", EstiloTexto.Pequeno, Tema.cian);
             var scroll = Ui.Desplazable(perfiles, out _lista);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
 
@@ -50,7 +49,7 @@ namespace Nexus.Unity.Pantallas {
             _nombre.characterLimit = 40;
             _nombre.onSubmit.AddListener(_ => Crear());
             _enfocarPendiente = true;
-            _aviso = Ui.Texto(nuevo, "", EstiloTexto.Pequeno, Tema.mostaza);
+            _aviso = Ui.Texto(nuevo, "", EstiloTexto.Pequeno, Tema.warning);
             Ui.Boton(Ui.Fila(nuevo), "Crear perfil", Crear, VarianteBoton.Primario);
         }
 
@@ -68,18 +67,18 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Vaciar(_lista);
             var perfiles = App.Perfiles.ListarPerfiles();
             if (perfiles.Count == 0) {
-                Ui.Texto(_lista, "Todavía no hay ningún perfil. Crea el tuyo a la derecha.", EstiloTexto.Cuerpo, Tema.textoTenue);
+                Ui.Texto(_lista, "Todavía no hay ningún perfil. Crea el tuyo a la derecha.", EstiloTexto.Cuerpo, Tema.inkMuted);
                 return;
             }
             foreach (var perfil in perfiles) Fila(perfil);
         }
 
         private void Fila(PlayerProfile perfil) {
-            var fila = Ui.PanelColumna(_lista, "Perfil", Tema.espacio, 6, Tema.pared);
+            var fila = Ui.PanelColumna(_lista, "Perfil", Tema.Espacio(4), 6, Tema.surfaceRaised);
             var linea = Ui.Fila(fila);
             var datos = Ui.Columna(linea, espacio: 2);
             UiKit.Tamano(datos, flexAncho: 1);
-            Ui.Texto(datos, perfil.nombreEstudiante, EstiloTexto.Subtitulo, Tema.texto);
+            Ui.Texto(datos, perfil.nombreEstudiante, EstiloTexto.Encabezado);
             var partidas = App.Partidas.Listar(perfil.idPerfil).Count;
             var coleccion = perfil.coleccionablesGlobales == null ? 0 : perfil.coleccionablesGlobales.Count;
             Ui.Texto(datos, $"Creado el {Fecha(perfil.fechaCreacion)} · {partidas} {(partidas == 1 ? "partida" : "partidas")} · " +

@@ -12,8 +12,8 @@ namespace Nexus.Unity.Aplicacion {
     /// </summary>
     public abstract class Pantalla : MonoBehaviour {
         protected AppRoot App { get; private set; }
-        protected UiKit Ui { get { return App.Ui; } }
-        protected NexusTheme Tema { get { return App.Ui.Tema; } }
+        protected UiKit Ui { get { return App.UiPara(this); } }
+        protected NexusTheme Tema { get { return Ui.Tema; } }
         protected RectTransform Raiz { get; private set; }
 
         /// <summary>

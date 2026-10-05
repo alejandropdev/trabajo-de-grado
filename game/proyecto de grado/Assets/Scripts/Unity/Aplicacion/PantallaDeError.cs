@@ -19,7 +19,7 @@ namespace Nexus.Unity.Aplicacion {
         protected override void Construir() {
             var columna = UiKit.Rellenar(Ui.Columna(Raiz, "Error", relleno: Tema.margen * 2), 0);
 
-            Ui.Texto(columna, "El contenido del juego tiene errores", EstiloTexto.Titulo, Tema.mostaza);
+            Ui.Texto(columna, "El contenido del juego tiene errores", EstiloTexto.Titulo, Tema.danger);
             _resumen = Ui.Texto(columna, "", EstiloTexto.Cuerpo);
             Ui.Texto(columna, "Contenido: " + RutasDeGuardado.Contenido, EstiloTexto.Pequeno);
             Ui.Separador(columna);

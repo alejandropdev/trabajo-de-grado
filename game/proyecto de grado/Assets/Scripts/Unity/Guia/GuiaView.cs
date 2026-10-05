@@ -43,7 +43,7 @@ namespace Nexus.Unity.Guia {
         private readonly List<PasoDeGuia> _repaso = new List<PasoDeGuia>();
         private readonly HashSet<string> _hechas = new HashSet<string>();
 
-        private RectTransform _burbuja, _marco, _textoMas, _velo;
+        private RectTransform _burbuja, _marco, _textoMas, _velo, _retrato;
         private TMP_Text _quien, _titulo, _texto, _mas;
         private Button _entendido, _botonMas;
         private GameObject _esperando;
@@ -252,37 +252,43 @@ namespace Nexus.Unity.Guia {
             _velo = ui.Nodo(_app.CapaGuia, "Velo");
             UiKit.Rellenar(_velo);
             var velo = _velo.gameObject.AddComponent<Image>();
-            velo.color = new Color(0, 0, 0, 0.38f);
+            velo.color = NexusTheme.Alfa(tema.bg950, 0.45f);
             velo.raycastTarget = true;
 
             _marco = ui.Nodo(_app.CapaGuia, "Marco");
             _marco.anchorMin = _marco.anchorMax = new Vector2(0.5f, 0.5f);
             foreach (var nombre in new[] { "arriba", "abajo", "izquierda", "derecha" }) {
                 var borde = ui.Nodo(_marco, nombre).gameObject.AddComponent<Image>();
-                borde.color = tema.mostaza;
+                borde.color = tema.warning;   // lo que la guia señala brilla en amarillo (asi lo dicen sus textos)
                 borde.raycastTarget = false;
                 _bordes.Add(borde);
             }
             UbicarBordes(5);
 
-            _burbuja = ui.PanelColumna(_app.CapaGuia, "Burbuja", tema.margen, tema.espacio * 0.75f, tema.fondoSecundario);
-            _burbuja.gameObject.AddComponent<Outline>().effectColor = tema.mostaza;
+            _burbuja = ui.PanelColumna(_app.CapaGuia, "Burbuja", tema.margen, tema.espacio * 0.75f, tema.surfaceRaised);
+            UiKit.ColorDeBorde(_burbuja, tema.warning);
+            ui.Halo(_burbuja, tema.warning, NexusTheme.RadioLg);
             _burbuja.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             _burbuja.sizeDelta = new Vector2(1040, 0);
 
-            _quien = ui.Texto(_burbuja, "", EstiloTexto.Pequeno, tema.mostazaClara);
-            _titulo = ui.Texto(_burbuja, "", EstiloTexto.Subtitulo, tema.texto);
-            _texto = ui.Texto(_burbuja, "", EstiloTexto.Cuerpo, tema.texto);
-            _texto.fontSize = tema.tamCuerpo * 1.1f;
-            _textoMas = ui.PanelColumna(_burbuja, "Mas", tema.espacio, 4, tema.pared);
-            _mas = ui.Texto(_textoMas, "", EstiloTexto.Pequeno, tema.texto);
+            // Habla una persona: su retrato a la izquierda, como en una viñeta.
+            var viñeta = ui.Fila(_burbuja, "Viñeta", tema.espacio, alineacion: TextAnchor.UpperLeft);
+            _retrato = ui.Columna(viñeta, "Retrato", 0);
+            UiKit.Tamano(_retrato, ancho: 120);
+            var textos = ui.Columna(viñeta, "Textos", tema.espacio * 0.75f);
+            UiKit.Tamano(textos, flexAncho: 1);
+            _quien = ui.Texto(textos, "", EstiloTexto.Leyenda, tema.warning);
+            _titulo = ui.Texto(textos, "", EstiloTexto.Encabezado, tema.ink);
+            _texto = ui.Texto(textos, "", EstiloTexto.Dialogo, tema.ink);
+            _textoMas = ui.PanelColumna(textos, "Mas", tema.espacio, 4, tema.surfaceSunken);
+            _mas = ui.Texto(_textoMas, "", EstiloTexto.Pequeno, tema.inkMuted);
 
             var fila = ui.Fila(_burbuja);
             _botonMas = ui.Boton(fila, "Quiero saber más", () => _textoMas.gameObject.SetActive(!_textoMas.gameObject.activeSelf),
                                  VarianteBoton.Fantasma);
             ui.Resorte(fila);
             var esperando = ui.Fila(fila);
-            ui.Texto(esperando, "Hazlo y la guía sigue…", EstiloTexto.Pequeno, tema.mostazaClara);
+            ui.Texto(esperando, "Hazlo y la guía sigue…", EstiloTexto.Pequeno, tema.warning);
             ui.Boton(esperando, "Saltar", () => Cerrar(true), VarianteBoton.Fantasma);
             _esperando = esperando.gameObject;
             _entendido = ui.Boton(fila, "¡Entendido!", Entendido, VarianteBoton.Primario);
@@ -293,6 +299,8 @@ namespace Nexus.Unity.Guia {
         private void Mostrar(PasoDeGuia paso) {
             _actual = paso;
             _quien.text = (paso.Quien ?? "Guía").ToUpperInvariant() + " · GUÍA" + (_releyendo ? " · REPASO" : "");
+            UiKit.Vaciar(_retrato);
+            _app.Ui.Ilustracion(_retrato, MaterialesNexus.IdDePersonaje(paso.Quien ?? "Marisol Andrade"), null, 120, 140);
             _titulo.text = paso.Titulo ?? "";
             _titulo.gameObject.SetActive(!string.IsNullOrEmpty(paso.Titulo));
             _texto.text = paso.Texto ?? "";

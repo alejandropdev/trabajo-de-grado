@@ -34,6 +34,9 @@ namespace Nexus.Unity.Aplicacion {
         public static AppRoot Instancia { get; private set; }
 
         public UiKit Ui { get; private set; }
+
+        /// <summary>El kit de antes del design system, con el mismo tema. Ver UiPara.</summary>
+        public UiKit UiClasico { get; private set; }
         public ScreenRouter Router { get; private set; }
         public LevelRunner Runner { get; private set; }
 
@@ -61,6 +64,7 @@ namespace Nexus.Unity.Aplicacion {
             DontDestroyOnLoad(gameObject);
 
             Ui = new UiKit(_tema);
+            UiClasico = new UiKit(Ui.Tema, clasico: true);
 
             var almacen = new AlmacenDeArchivosAtomico(RutasDeGuardado.Raiz);
             Perfiles = new ProfileStore(almacen);
@@ -124,14 +128,44 @@ namespace Nexus.Unity.Aplicacion {
 
             var fondo = UiKit.Rellenar(Ui.Nodo(go.transform, "Fondo"));
             var img = fondo.gameObject.AddComponent<Image>();
-            img.color = Ui.Tema.fondo;
+            img.color = Ui.Tema.bg900;
             img.raycastTarget = false;
+            // Detras de todo, la oficina ilustrada, cubriendo la pantalla y muy oscurecida: el juego ocurre en un
+            // sitio, no sobre un fondo plano.
+            var oficina = Tema.MaterialesNexus.Sprite(Tema.MaterialesNexus.FondoOficina);
+            if (oficina != null) {
+                var foto = Ui.Nodo(fondo, "Oficina");
+                foto.anchorMin = foto.anchorMax = new Vector2(0.5f, 0.5f);
+                var ajuste = foto.gameObject.AddComponent<AspectRatioFitter>();
+                ajuste.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                ajuste.aspectRatio = oficina.rect.width / oficina.rect.height;
+                var fi = foto.gameObject.AddComponent<Image>();
+                fi.sprite = oficina;
+                fi.raycastTarget = false;
+                var velo = UiKit.Rellenar(Ui.Nodo(fondo, "Velo")).gameObject.AddComponent<Image>();
+                velo.color = NexusTheme.Alfa(Ui.Tema.bg950, 0.72f);
+                velo.raycastTarget = false;
+            }
 
             var pantallas = UiKit.Rellenar(Ui.Nodo(go.transform, "Pantallas"));
             // La guia va en su propia capa, por encima de TODAS las pantallas (tambien de los modales).
             // Un RectTransform sin Graphic no captura clics: solo la burbuja los captura.
             CapaGuia = UiKit.Rellenar(Ui.Nodo(go.transform, "Guia"));
             return pantallas;
+        }
+
+        /// <summary>
+        /// Las pantallas que NO pasan al design system: la receta de apoyo de los minijuegos y las pizarras de tiza
+        /// (conceptos y apuntes). Se quedan como estaban, botones incluidos.
+        /// </summary>
+        private static readonly HashSet<Type> ConKitClasico = new HashSet<Type> {
+            typeof(Pantallas.Minijuegos.PantallaDeReceta),
+            typeof(PantallaDePizarra)
+        };
+
+        /// <summary>El kit con el que se construye una pantalla.</summary>
+        public UiKit UiPara(Pantalla pantalla) {
+            return pantalla != null && ConKitClasico.Contains(pantalla.GetType()) ? UiClasico : Ui;
         }
 
         /// <summary>La capa de la guia del tutorial, encima de todo. La usa GuiaView.</summary>

@@ -5,7 +5,28 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Nexus.Unity.Tema {
-    public enum EstiloTexto { Titulo, Subtitulo, Cuerpo, Pequeno, Mono }
+    /// <summary>
+    /// Los estilos de texto. Los cinco primeros son los de siempre (todas las pantallas los usan); con el design system
+    /// cada uno cae en su estilo equivalente: Titulo → phase, Subtitulo → panel-title, Cuerpo → body, Pequeno → texto
+    /// secundario en ink-muted, Mono → code. Los demas son los estilos del design system tal cual.
+    /// </summary>
+    public enum EstiloTexto {
+        Titulo, Subtitulo, Cuerpo, Pequeno, Mono,
+        /// <summary>Orbitron 64 — el logotipo; una sola vez por pantalla.</summary>
+        Hero,
+        /// <summary>Rajdhani 17 semibold — encabezado de tarjeta o de seccion.</summary>
+        Encabezado,
+        /// <summary>Rajdhani 16 — las lineas de un personaje. Nunca en mayusculas.</summary>
+        Dialogo,
+        /// <summary>Rajdhani 13 bold, mayusculas via estilo — botones y navegacion.</summary>
+        Etiqueta,
+        /// <summary>Rajdhani 11 semibold — horas, ids, contadores.</summary>
+        Leyenda,
+        /// <summary>JetBrains Mono 11 semibold — prompts y etiquetas de codigo.</summary>
+        CodigoEtiqueta,
+        /// <summary>Spectral — solo documentos del mundo (papel).</summary>
+        DocTitulo, DocCuerpo, DocLeyenda
+    }
 
     public enum VarianteBoton {
         /// <summary>La accion principal de la pantalla. Una, como mucho dos.</summary>
@@ -15,7 +36,9 @@ namespace Nexus.Unity.Tema {
         /// <summary>Lo que tiene consecuencias: borrar, quedarse hasta las 20:00. Cuenta para el 12 % de mostaza.</summary>
         Peligro,
         /// <summary>Solo texto: «volver», «cancelar».</summary>
-        Fantasma
+        Fantasma,
+        /// <summary>Opcion de menu: ancho completo, icono a la izquierda en cyan, se marca con Resaltar.</summary>
+        Menu
     }
 
     /// <summary>
@@ -26,13 +49,27 @@ namespace Nexus.Unity.Tema {
     /// Todo se construye con uGUI y layout automatico (VerticalLayoutGroup / HorizontalLayoutGroup). Las
     /// pantallas describen QUE hay y en que orden; UiKit decide como se ve.
     /// </summary>
-    public sealed class UiKit {
+    public sealed partial class UiKit {
         public NexusTheme Tema { get; }
+
+        /// <summary>
+        /// El kit de antes del design system. Lo usan solo la receta de los minijuegos y las pizarras de tiza, que se
+        /// quedan tal cual (AppRoot.UiPara): con Clasico, botones, textos y paneles se pintan como antes.
+        /// </summary>
+        public bool Clasico { get; }
 
         private Sprite _circulo;
 
-        public UiKit(NexusTheme tema) {
+        // Las medidas de antes del design system, fijas: la receta y las pizarras no se mueven aunque el tema cambie
+        // sus espacios. El kit del design system usa las del tema.
+        private float EspacioBase { get { return Clasico ? 12 : Tema.espacio; } }
+        private float MargenBase { get { return Clasico ? 24 : Tema.margen; } }
+        private float AltoBotonBase { get { return Clasico ? 56 : Tema.altoBoton; } }
+        private float AltoBarraBase { get { return Clasico ? 18 : Tema.altoBarra; } }
+
+        public UiKit(NexusTheme tema, bool clasico = false) {
             Tema = tema != null ? tema : NexusTheme.PorDefecto();
+            Clasico = clasico;
         }
 
         // ================================================================ contenedores
@@ -56,6 +93,10 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Un panel con el fondo del tema (sprite si lo hay, color si no).</summary>
         public RectTransform Panel(Transform padre, string nombre = "Panel", Color? color = null) {
+            return Clasico ? PanelClasico(padre, nombre, color) : PanelNexus(padre, nombre, color);
+        }
+
+        private RectTransform PanelClasico(Transform padre, string nombre, Color? color) {
             var rt = Nodo(padre, nombre);
             var img = rt.gameObject.AddComponent<Image>();
             Vestir(img, Tema.spritePanel, color ?? Tema.fondoSecundario);
@@ -71,7 +112,7 @@ namespace Nexus.Unity.Tema {
                                           float? espacio = null, Color? color = null) {
             var rt = Panel(padre, nombre, color);
             var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            Configurar(grupo, espacio ?? Tema.espacio, relleno ?? Tema.espacio, TextAnchor.UpperLeft);
+            Configurar(grupo, espacio ?? EspacioBase, relleno ?? EspacioBase, TextAnchor.UpperLeft);
             return rt;
         }
 
@@ -80,7 +121,7 @@ namespace Nexus.Unity.Tema {
                                     float relleno = 0, TextAnchor alineacion = TextAnchor.UpperLeft) {
             var rt = Nodo(padre, nombre);
             var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            Configurar(grupo, espacio ?? Tema.espacio, relleno, alineacion);
+            Configurar(grupo, espacio ?? EspacioBase, relleno, alineacion);
             return rt;
         }
 
@@ -89,7 +130,7 @@ namespace Nexus.Unity.Tema {
                                  float relleno = 0, TextAnchor alineacion = TextAnchor.MiddleLeft) {
             var rt = Nodo(padre, nombre);
             var grupo = rt.gameObject.AddComponent<HorizontalLayoutGroup>();
-            Configurar(grupo, espacio ?? Tema.espacio, relleno, alineacion);
+            Configurar(grupo, espacio ?? EspacioBase, relleno, alineacion);
             return rt;
         }
 
@@ -113,6 +154,9 @@ namespace Nexus.Unity.Tema {
             contenido.pivot = new Vector2(0.5f, 1);
             contenido.offsetMin = contenido.offsetMax = Vector2.zero;
             contenido.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            // Con el design system, un poco de aire dentro del visor: las esquinas en L y el resplandor de las piezas
+            // salen unos pixeles por fuera y el recorte del scroll se los comia.
+            if (!Clasico) contenido.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(4, 4, 4, 4);
 
             scroll.viewport = visor;
             scroll.content = contenido;
@@ -151,12 +195,13 @@ namespace Nexus.Unity.Tema {
             }
             var pista = rt.gameObject.AddComponent<Image>();
             pista.sprite = SpriteRedondeado(); pista.type = Image.Type.Sliced;
-            pista.color = new Color(1, 1, 1, 0.08f);
+            pista.color = Clasico ? new Color(1, 1, 1, 0.08f) : NexusTheme.Alfa(Tema.ink, 0.06f);
             var mango = Nodo(rt, "Mango");
             Rellenar(mango);
             var img = mango.gameObject.AddComponent<Image>();
             img.sprite = SpriteRedondeado(); img.type = Image.Type.Sliced;
-            img.color = new Color(Tema.cian.r, Tema.cian.g, Tema.cian.b, 0.75f);
+            var mango_ = Clasico ? Tema.cian : Tema.cyan;
+            img.color = new Color(mango_.r, mango_.g, mango_.b, 0.75f);
             var barra = rt.gameObject.AddComponent<Scrollbar>();
             barra.handleRect = mango;
             barra.targetGraphic = img;
@@ -175,16 +220,22 @@ namespace Nexus.Unity.Tema {
             rt.anchoredPosition = posicion;
             var img = rt.gameObject.AddComponent<Image>();
             img.sprite = SpriteRedondeado(); img.type = Image.Type.Sliced;
-            img.color = new Color(Tema.fondoSecundario.r, Tema.fondoSecundario.g, Tema.fondoSecundario.b, 0.94f);
-            var borde = rt.gameObject.AddComponent<Outline>();
-            borde.effectColor = Tema.cian;
-            borde.effectDistance = new Vector2(1.5f, -1.5f);
+            var fondoAviso = Clasico ? Tema.fondoSecundario : Tema.surfaceRaised;
+            img.color = new Color(fondoAviso.r, fondoAviso.g, fondoAviso.b, 0.94f);
+            if (Clasico) {
+                var borde = rt.gameObject.AddComponent<Outline>();
+                borde.effectColor = Tema.cian;
+                borde.effectDistance = new Vector2(1.5f, -1.5f);
+            } else {
+                Borde(rt, Tema.cyan, 30);
+            }
             var boton = rt.gameObject.AddComponent<Button>();
             boton.targetGraphic = img;
             boton.onClick.AddListener(new UnityAction(alPulsar));
-            var t = Texto(rt, texto, EstiloTexto.Pequeno, Tema.cianClaro, TextAlignmentOptions.Center);
+            var t = Texto(rt, texto, Clasico ? EstiloTexto.Pequeno : EstiloTexto.Leyenda,
+                          Clasico ? Tema.cianClaro : Tema.cyan, TextAlignmentOptions.Center);
             t.textWrappingMode = TextWrappingModes.NoWrap;
-            t.fontStyle = FontStyles.Bold;
+            if (Clasico) t.fontStyle = FontStyles.Bold;
             Rellenar((RectTransform)t.transform);
             rt.sizeDelta = new Vector2(t.GetPreferredValues(texto).x + 28, t.GetPreferredValues(texto).y + 10);
             rt.gameObject.SetActive(false);
@@ -211,6 +262,7 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Una linea fina de separacion.</summary>
         public void Separador(Transform padre) {
+            if (!Clasico) { SeparadorNexus(padre); return; }
             var rt = Nodo(padre, "Separador");
             rt.gameObject.AddComponent<Image>().color = Tema.hormigon;
             var le = rt.gameObject.AddComponent<LayoutElement>();
@@ -239,6 +291,7 @@ namespace Nexus.Unity.Tema {
         public static void Vaciar(Transform contenedor) {
             for (var i = contenedor.childCount - 1; i >= 0; i--) {
                 var hijo = contenedor.GetChild(i).gameObject;
+                if (hijo.GetComponent<DecoracionNexus>() != null) continue;   // el borde o las esquinas del propio panel
                 // Destroy espera al final del frame: apagado ya, para que el layout no lo cuente mientras tanto
                 // (si no, la lista vieja y la nueva se suman un frame y la pantalla «crece» y salta).
                 hijo.SetActive(false);
@@ -258,11 +311,18 @@ namespace Nexus.Unity.Tema {
             tmp.richText = true;
             tmp.raycastTarget = false;
             Estilizar(tmp, estilo);
+            // Un texto nunca se aplasta por debajo de su alto: si no cabe, la columna crece (o hace scroll) en vez de
+            // montar un texto encima de otro.
+            if (!Clasico) rt.gameObject.AddComponent<AltoDeTexto>();
             if (color.HasValue) tmp.color = color.Value;
             return tmp;
         }
 
         public void Estilizar(TMP_Text tmp, EstiloTexto estilo) {
+            if (Clasico) EstilizarClasico(tmp, estilo); else EstilizarNexus(tmp, estilo);
+        }
+
+        private void EstilizarClasico(TMP_Text tmp, EstiloTexto estilo) {
             switch (estilo) {
                 case EstiloTexto.Titulo:
                     tmp.font = Tema.FuenteTitulo; tmp.fontSize = Tema.tamTitulo; tmp.fontStyle = FontStyles.Bold;
@@ -285,6 +345,10 @@ namespace Nexus.Unity.Tema {
         // ================================================================ botones
 
         public Button Boton(Transform padre, string texto, Action alPulsar, VarianteBoton variante = VarianteBoton.Secundario) {
+            return Clasico ? BotonClasico(padre, texto, alPulsar, variante) : BotonNexus(padre, texto, alPulsar, variante);
+        }
+
+        private Button BotonClasico(Transform padre, string texto, Action alPulsar, VarianteBoton variante) {
             var rt = Nodo(padre, "Boton " + texto);
             var img = rt.gameObject.AddComponent<Image>();
             var boton = rt.gameObject.AddComponent<Button>();
@@ -304,12 +368,12 @@ namespace Nexus.Unity.Tema {
             var etiqueta = Texto(rt, texto, EstiloTexto.Cuerpo, colorTexto, TextAlignmentOptions.Center);
             etiqueta.fontStyle = FontStyles.Bold;
             etiqueta.textWrappingMode = TextWrappingModes.NoWrap;
-            etiqueta.margin = new Vector4(Tema.espacio * 1.5f, 0, Tema.espacio * 1.5f, 0);
+            etiqueta.margin = new Vector4(EspacioBase * 1.5f, 0, EspacioBase * 1.5f, 0);
             Rellenar((RectTransform)etiqueta.transform);
 
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.minHeight = le.preferredHeight = Tema.altoBoton;
-            le.preferredWidth = Mathf.Max(160, etiqueta.GetPreferredValues(texto).x + Tema.espacio * 3);
+            le.minHeight = le.preferredHeight = AltoBotonBase;
+            le.preferredWidth = Mathf.Max(160, etiqueta.GetPreferredValues(texto).x + EspacioBase * 3);
 
             if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
             return boton;
@@ -321,6 +385,10 @@ namespace Nexus.Unity.Tema {
         /// del texto puede llevar una segunda linea tenue (lo que va a cambiar, por que esta bloqueado…).
         /// </summary>
         public Button BotonDeOpcion(Transform padre, string texto, string detalle, Action alPulsar) {
+            return Clasico ? BotonDeOpcionClasico(padre, texto, detalle, alPulsar) : BotonDeOpcionNexus(padre, texto, detalle, alPulsar);
+        }
+
+        private Button BotonDeOpcionClasico(Transform padre, string texto, string detalle, Action alPulsar) {
             var rt = Nodo(padre, "Opcion");
             var img = rt.gameObject.AddComponent<Image>();
             Vestir(img, Tema.spriteBoton, Color.white);
@@ -329,8 +397,8 @@ namespace Nexus.Unity.Tema {
             boton.colors = Colores(Tema.pared);
 
             var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            Configurar(grupo, 4, Tema.espacio * 1.5f, TextAnchor.MiddleLeft);
-            Tamano(rt, alto: null).minHeight = Tema.altoBoton;
+            Configurar(grupo, 4, EspacioBase * 1.5f, TextAnchor.MiddleLeft);
+            Tamano(rt, alto: null).minHeight = AltoBotonBase;
 
             var t = Texto(rt, texto, EstiloTexto.Cuerpo);
             t.fontStyle = FontStyles.Bold;
@@ -342,17 +410,21 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Un campo de texto de una linea (el nombre de un perfil, de una partida, una semilla).</summary>
         public TMP_InputField CampoDeTexto(Transform padre, string indicacion, string valor = "", float ancho = 420) {
+            return Clasico ? CampoDeTextoClasico(padre, indicacion, valor, ancho) : CampoDeTextoNexus(padre, indicacion, valor, ancho);
+        }
+
+        private TMP_InputField CampoDeTextoClasico(Transform padre, string indicacion, string valor, float ancho) {
             var rt = Nodo(padre, "Campo");
             var fondo = rt.gameObject.AddComponent<Image>();
             Vestir(fondo, Tema.spriteBoton, Tema.fondo);
             var campo = rt.gameObject.AddComponent<TMP_InputField>();
             campo.targetGraphic = fondo;
             campo.colors = Colores(Tema.fondo);
-            Tamano(rt, ancho, Tema.altoBoton);
+            Tamano(rt, ancho, AltoBotonBase);
 
             var area = Rellenar(Nodo(rt, "Area"));
-            area.offsetMin = new Vector2(Tema.espacio, 6);
-            area.offsetMax = new Vector2(-Tema.espacio, -6);
+            area.offsetMin = new Vector2(EspacioBase, 6);
+            area.offsetMax = new Vector2(-EspacioBase, -6);
             area.gameObject.AddComponent<RectMask2D>();
 
             var marcador = Texto(area, indicacion, EstiloTexto.Cuerpo, Tema.textoTenue, TextAlignmentOptions.MidlineLeft);
@@ -389,6 +461,7 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Una etiqueta pequeña con fondo de color: el estado de algo (aquí estás, cerrada, 3 h).</summary>
         public RectTransform Chip(Transform padre, string texto, Color fondo, Color? colorTexto = null) {
+            if (!Clasico) return ChipNexus(padre, texto, fondo, colorTexto ?? Tema.onCyan);
             var chip = PanelColumna(padre, "Chip " + texto, 6, 0, fondo);
             var t = Texto(chip, texto, EstiloTexto.Pequeno, colorTexto ?? Tema.textoSobreCian, TextAlignmentOptions.Center);
             t.textWrappingMode = TextWrappingModes.NoWrap;
@@ -397,7 +470,8 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Una tarjeta: un panel con titulo cuyo alto sale de su contenido. Devuelve donde meter las cosas.</summary>
         public RectTransform Tarjeta(Transform padre, string titulo, Color? colorTitulo = null) {
-            var panel = PanelColumna(padre, "Tarjeta " + titulo, Tema.margen * 0.75f, Tema.espacio);
+            if (!Clasico) return TarjetaNexus(padre, titulo, colorTitulo ?? Tema.cyan, false);
+            var panel = PanelColumna(padre, "Tarjeta " + titulo, MargenBase * 0.75f, EspacioBase);
             if (!string.IsNullOrEmpty(titulo)) Texto(panel, titulo.ToUpperInvariant(), EstiloTexto.Pequeno, colorTitulo ?? Tema.cian);
             return panel;
         }
@@ -407,6 +481,7 @@ namespace Nexus.Unity.Tema {
         /// las piezas de un diagrama, la respuesta al cliente, el atributo de calidad.
         /// </summary>
         public void Resaltar(Button boton, bool elegido, Color? normal = null) {
+            if (!Clasico && ResaltarNexus(boton, elegido, normal)) return;
             var fondo = elegido ? Tema.cian : normal ?? Tema.pared;
             boton.colors = Colores(fondo);
             foreach (var t in boton.GetComponentsInChildren<TMP_Text>())
@@ -428,10 +503,11 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Una barra horizontal de 0 a 1. El color por defecto es el cian informativo.</summary>
         public BarraView Barra(Transform padre, float valor01, Color? color = null, string nombre = "Barra") {
+            if (!Clasico) return BarraNexus(padre, valor01, color ?? Tema.cyan, nombre);
             var rt = Nodo(padre, nombre);
             Vestir(rt.gameObject.AddComponent<Image>(), Tema.spriteBarraFondo, Tema.hormigon);
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.minHeight = le.preferredHeight = Tema.altoBarra;
+            le.minHeight = le.preferredHeight = AltoBarraBase;
             le.flexibleWidth = 1;
 
             var relleno = Nodo(rt, "Relleno");
@@ -452,6 +528,7 @@ namespace Nexus.Unity.Tema {
         /// dibujaria nunca, asi que si el tema no trae sprite se usa un circulo generado en memoria.
         /// </summary>
         public DialView Dial(Transform padre, float valor01, string etiqueta, Color? color = null, float diametro = 120) {
+            if (!Clasico) return DialNexus(padre, valor01, etiqueta, color ?? Tema.cyan, diametro);
             var rt = Nodo(padre, "Dial " + etiqueta);
             var le = rt.gameObject.AddComponent<LayoutElement>();
             le.minWidth = le.preferredWidth = diametro;
@@ -508,14 +585,15 @@ namespace Nexus.Unity.Tema {
             rt.gameObject.AddComponent<CanvasRenderer>();   // antes que el Graphic: ver GraficoRadar
             var radar = rt.gameObject.AddComponent<GraficoRadar>();
             radar.raycastTarget = false;
-            radar.ColorRejilla = Tema.hormigon;
-            radar.ColorValor = new Color(Tema.cian.r, Tema.cian.g, Tema.cian.b, 0.45f);
-            radar.ColorBorde = Tema.cian;
+            var acento = Clasico ? Tema.cian : Tema.cyan;
+            radar.ColorRejilla = Clasico ? Tema.hormigon : Tema.lineStrong;
+            radar.ColorValor = new Color(acento.r, acento.g, acento.b, Clasico ? 0.45f : 0.3f);
+            radar.ColorBorde = acento;
             radar.Valores = valores01;
 
             if (etiquetas != null)
                 for (var i = 0; i < etiquetas.Length; i++) {
-                    var t = Texto(rt, etiquetas[i], EstiloTexto.Pequeno, null, TextAlignmentOptions.Center);
+                    var t = Texto(rt, etiquetas[i], Clasico ? EstiloTexto.Pequeno : EstiloTexto.Leyenda, null, TextAlignmentOptions.Center);
                     var rtT = (RectTransform)t.transform;
                     rtT.sizeDelta = new Vector2(150, 40);
                     var angulo = Mathf.PI / 2 - i * 2 * Mathf.PI / etiquetas.Length;

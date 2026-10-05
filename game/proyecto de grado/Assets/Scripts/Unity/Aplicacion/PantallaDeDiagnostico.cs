@@ -60,7 +60,7 @@ namespace Nexus.Unity.Aplicacion {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", relleno: Tema.margen, espacio: Tema.margen * 0.75f));
 
             var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, espacio: 2);
+            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
             Ui.Texto(titulos, "Prueba del motor", EstiloTexto.Titulo);
             Ui.Texto(titulos, "Un nivel real, jugado de principio a fin, sin guardar nada. Todavía no son las pantallas del juego: " +
                               "es la forma de ver el flujo mientras se construyen.", EstiloTexto.Pequeno);
@@ -82,7 +82,7 @@ namespace Nexus.Unity.Aplicacion {
 
             var derecha = Ui.PanelColumna(cuerpo, "Diario", Tema.margen * 0.75f, Tema.espacio);
             UiKit.Tamano(derecha, ancho: 420, flexAlto: 1);
-            Ui.Texto(derecha, "LO QUE HA PASADO", EstiloTexto.Pequeno, Tema.cian);
+            Ui.Texto(derecha, "LO QUE HA PASADO", EstiloTexto.Pequeno, Tema.cyan);
             var scrollDiario = Ui.Desplazable(derecha, out _diario);
             UiKit.Tamano(scrollDiario, flexAncho: 1, flexAlto: 1);
 
@@ -98,9 +98,9 @@ namespace Nexus.Unity.Aplicacion {
             var franja = Ui.Fila(padre, "Franja del dia", 6);
             Ui.Texto(franja, "UN DÍA ES ASÍ:", EstiloTexto.Pequeno);
             foreach (var momento in Momentos) {
-                var chip = Ui.PanelColumna(franja, momento, 8, 0, Tema.pared);
+                var chip = Ui.PanelColumna(franja, momento, 8, 0, Tema.surfaceRaised);
                 _chips.Add(chip.GetComponent<Image>());
-                _textosChip.Add(Ui.Texto(chip, momento, EstiloTexto.Pequeno, Tema.texto, TextAlignmentOptions.Center));
+                _textosChip.Add(Ui.Texto(chip, momento, EstiloTexto.Pequeno, Tema.ink, TextAlignmentOptions.Center));
                 UiKit.Tamano(chip, flexAncho: 1);
             }
         }
@@ -121,12 +121,12 @@ namespace Nexus.Unity.Aplicacion {
 
             var proyecto = Ui.Tarjeta(izquierda, "El proyecto");
             var nombres = new[] { "Avance", "Deuda técnica", "Moral del equipo", "Cobertura de pruebas" };
-            var colores = new[] { Tema.cian, Tema.mostaza, Tema.cianClaro, Tema.cian };
+            var colores = new[] { Tema.cyan, Tema.warning, Tema.cyan, Tema.cyan };
             for (var i = 0; i < 4; i++) {
                 var cabecera = Ui.Fila(proyecto);
-                Ui.Texto(cabecera, nombres[i], EstiloTexto.Pequeno, Tema.texto);
+                Ui.Texto(cabecera, nombres[i], EstiloTexto.Pequeno, Tema.ink);
                 Ui.Resorte(cabecera);
-                _valores[i] = Ui.Texto(cabecera, "", EstiloTexto.Pequeno, Tema.texto, TextAlignmentOptions.Right);
+                _valores[i] = Ui.Texto(cabecera, "", EstiloTexto.Pequeno, Tema.ink, TextAlignmentOptions.Right);
                 _barras[i] = Ui.Barra(proyecto, 0, colores[i]);
             }
         }
@@ -223,8 +223,8 @@ namespace Nexus.Unity.Aplicacion {
         private void PintarFranja(Paso paso) {
             var actual = MomentoDe(paso);
             for (var i = 0; i < _chips.Count; i++) {
-                _chips[i].color = i == actual ? Tema.cian : Tema.pared;
-                _textosChip[i].color = i == actual ? Tema.textoSobreCian : Tema.textoTenue;
+                _chips[i].color = i == actual ? Tema.cyan : Tema.surfaceRaised;
+                _textosChip[i].color = i == actual ? Tema.onCyan : Tema.inkMuted;
             }
         }
 
@@ -317,7 +317,7 @@ namespace Nexus.Unity.Aplicacion {
         }
 
         private void Aviso() {
-            Etiqueta("3 · AVISO", Tema.mostaza);
+            Etiqueta("3 · AVISO", Tema.warning);
             Titulo("Ha llegado un aviso");
             Parrafo(_alerta.Texto);
             Parrafo($"Caduca a las {RelojDeJornada.Formatear(_alerta.MinutoDeExpiracion)}. Si no lo atiendes antes, alguien decidirá por ti, y casi nunca bien.");
@@ -344,7 +344,7 @@ namespace Nexus.Unity.Aplicacion {
             Etiqueta("4 · DECISIÓN  —  LO QUE SIGNIFICA");
             Titulo(_resultado.Titulo);
             Parrafo("Elegiste: " + _resultado.OpcionTexto);
-            var color = _resultado.Veredicto == "correcta" ? Tema.cian : _resultado.Veredicto == "aceptable" ? Tema.amarillo : Tema.rojo;
+            var color = _resultado.Veredicto == "correcta" ? Tema.success : _resultado.Veredicto == "aceptable" ? Tema.warning : Tema.danger;
             Ui.Texto(_ahora, _resultado.Veredicto.ToUpperInvariant(), EstiloTexto.Subtitulo, color);
             Parrafo(_resultado.Razon);
             Nota("La rúbrica no se enseña así durante el juego: se lee en el Dashboard de Lecciones al cerrar el nivel. Aquí se muestra para ver el motor.");
@@ -519,7 +519,7 @@ namespace Nexus.Unity.Aplicacion {
         }
 
         private void Etiqueta(string texto, Color? color = null) {
-            Ui.Texto(_ahora, texto, EstiloTexto.Pequeno, color ?? Tema.cian);
+            Ui.Texto(_ahora, texto, EstiloTexto.Pequeno, color ?? Tema.cyan);
         }
 
         private void Titulo(string texto) { Ui.Texto(_ahora, texto, EstiloTexto.Titulo); }
@@ -538,7 +538,7 @@ namespace Nexus.Unity.Aplicacion {
             if (_diario == null) return;
             UiKit.Vaciar(_diario);
             foreach (var e in _entradas)
-                Ui.Texto(_diario, e, EstiloTexto.Pequeno, e.StartsWith("—") ? Tema.cian : Tema.texto);
+                Ui.Texto(_diario, e, EstiloTexto.Pequeno, e.StartsWith("—") ? Tema.cyan : Tema.ink);
         }
     }
 }

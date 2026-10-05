@@ -19,9 +19,10 @@ namespace Nexus.Unity.Pantallas {
 
         protected override void Construir() {
             var velo = Raiz.gameObject.AddComponent<Image>();
-            velo.color = new Color(0, 0, 0, 0.62f);   // raycastTarget: bloquea los clics de la pantalla de debajo
+            velo.color = NexusTheme.Alfa(Tema.bg950, 0.72f);   // raycastTarget: bloquea los clics de la pantalla de debajo
 
-            var panel = Ui.PanelColumna(Raiz, "Dialogo", Tema.margen * 1.25f, Tema.espacio);
+            // Un modal flota sobre el HUD: surface-raised y las esquinas del Panel.
+            var panel = Ui.Ventana(Raiz, "Dialogo");
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0.5f, 0.5f);
             var ajuste = panel.gameObject.AddComponent<ContentSizeFitter>();
             ajuste.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -59,7 +60,7 @@ namespace Nexus.Unity.Pantallas {
         public Action AlConfirmar;
 
         protected override void Rellenar() {
-            Hoja.Subtitulo(Titulo, Tema.texto);
+            Hoja.Subtitulo(Titulo, Tema.ink);
             if (!string.IsNullOrEmpty(Texto)) Hoja.Parrafo(Texto);
             Hoja.Espacio();
             var fila = Hoja.Fila();
@@ -121,7 +122,7 @@ namespace Nexus.Unity.Pantallas {
                 Hoja.Nota(s.Fase1Cerrada
                     ? $"{s.Perfil.Nombre} · día {s.R.DiaActual} · {s.HoraActual}. El reloj está parado."
                     : $"{s.Perfil.Nombre} · planificando (Fase 1). Lo que lleves elegido se guarda.");
-            if (!string.IsNullOrEmpty(Aviso)) Hoja.Nota(Aviso, Tema.amarillo);
+            if (!string.IsNullOrEmpty(Aviso)) Hoja.Nota(Aviso, Tema.warning);
             Hoja.Espacio();
             var col = Ui.Columna(Hoja.Raiz, espacio: Tema.espacio);
             Ui.Boton(col, "Seguir jugando", Seguir, VarianteBoton.Primario);
@@ -181,13 +182,14 @@ namespace Nexus.Unity.Pantallas {
             var personaje = App.Catalogo.Relaciones.PersonajePorId(c.Personaje);
             Hoja.Etiqueta((personaje?.Rol ?? "") + $" · {c.Minutos} min de charla");
             Hoja.Titulo(personaje?.Nombre ?? c.Personaje);
-            foreach (var l in c.Lineas) Hoja.Parrafo($"<b>{l.Quien}:</b> {l.Texto}");
+            foreach (var l in c.Lineas) Hoja.Dialogo(l.Quien, l.Texto);
 
             if (c.Pregunta == null || c.Pregunta.Opciones.Count == 0) {
                 Hoja.Accion("Seguir", () => Contestar(null));
                 return;
             }
-            Hoja.Subtitulo(c.Pregunta.Texto, Tema.mostazaClara);
+            Hoja.Espacio();
+            Ui.Texto(Hoja.Raiz, c.Pregunta.Texto, EstiloTexto.Encabezado, Tema.ink);
             foreach (var o in c.Pregunta.Opciones) {
                 var opcion = o;
                 Hoja.Opcion(opcion.Texto, null, () => Contestar(opcion.Id));
@@ -202,16 +204,16 @@ namespace Nexus.Unity.Pantallas {
             Hoja.Vaciar();
             var personaje = App.Catalogo.Relaciones.PersonajePorId(Conversacion.Personaje);
             Hoja.Titulo(personaje?.Nombre ?? Conversacion.Personaje);
-            if (!string.IsNullOrEmpty(_resultado.Respuesta)) Hoja.Parrafo("«" + _resultado.Respuesta + "»");
+            if (!string.IsNullOrEmpty(_resultado.Respuesta)) Hoja.Dialogo(personaje?.Nombre ?? Conversacion.Personaje, _resultado.Respuesta);
             var cambio = _resultado.CambioDeConfianza;
-            Hoja.Subtitulo(cambio > 0 ? $"Confianza +{cambio}  (ahora {_resultado.ConfianzaTotal})"
-                           : cambio < 0 ? $"Confianza {cambio}  (ahora {_resultado.ConfianzaTotal})"
-                           : $"La confianza no cambia  (sigue en {_resultado.ConfianzaTotal})",
-                           cambio > 0 ? Tema.cian : cambio < 0 ? Tema.rojo : Tema.amarillo);
+            var fila = Hoja.Fila();
+            Ui.Badge(fila, cambio > 0 ? $"Confianza +{cambio}" : cambio < 0 ? $"Confianza {cambio}" : "La confianza no cambia",
+                     cambio > 0 ? Tono.Exito : cambio < 0 ? Tono.Peligro : Tono.Neutro);
+            Ui.Texto(fila, cambio == 0 ? $"sigue en {_resultado.ConfianzaTotal}" : $"ahora {_resultado.ConfianzaTotal}", EstiloTexto.Pequeno);
             foreach (var a in _resultado.AyudasNuevas) {
-                var t = Hoja.Tarjeta("¡Te ofrece una ayuda!", Tema.mostaza);
-                Ui.Texto(t, "«" + a.Texto + "»", EstiloTexto.Cuerpo);
-                Ui.Texto(t, TextoDeAyuda(a.Tipo) + (a.Usos > 1 ? $" · {a.Usos} usos" : ""), EstiloTexto.Pequeno, Tema.mostazaClara);
+                var t = Hoja.Tarjeta("¡Te ofrece una ayuda!", Tono.Cyan);
+                Ui.Texto(t, "«" + a.Texto + "»", EstiloTexto.Dialogo);
+                Ui.Texto(t, TextoDeAyuda(a.Tipo) + (a.Usos > 1 ? $" · {a.Usos} usos" : ""), EstiloTexto.Pequeno);
             }
             Hoja.Accion("Seguir", Cerrar);
         }

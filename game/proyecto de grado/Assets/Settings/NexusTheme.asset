@@ -39,7 +39,7 @@ MonoBehaviour:
   spriteBarraFondo: {fileID: 0}
   spriteBarraRelleno: {fileID: 0}
   spriteDial: {fileID: 0}
-  margen: 24
-  espacio: 12
+  margen: 32
+  espacio: 16
   altoBoton: 56
   altoBarra: 18
