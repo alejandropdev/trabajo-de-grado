@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Nexus.Core.Minijuegos;
+using Evaluador = Nexus.Core.Minijuegos.Repartir.RepartirEvaluador;
 
 namespace Nexus.Core.Datos
 {
@@ -155,14 +156,24 @@ namespace Nexus.Core.Datos
                 if (string.IsNullOrEmpty(d.Id) || !ids.Add(d.Id)) e.Add($"Hay un deposito sin id o repetido ('{d.Id}').");
                 if (d.CostePorDefecto <= 0) e.Add($"El deposito '{d.Id}' necesita un coste por defecto positivo.");
                 if (d.DefectosOcultos < 0) e.Add($"El deposito '{d.Id}' no puede tener defectos negativos.");
+                // La pista es un rango que el jugador ve: si lo que hay de verdad cae fuera, la pista miente.
+                if (d.EstimadoMax > 0 && (d.EstimadoMin > d.EstimadoMax || d.DefectosOcultos < d.EstimadoMin || d.DefectosOcultos > d.EstimadoMax))
+                    e.Add($"El deposito '{d.Id}' esconde {d.DefectosOcultos} defectos, fuera de su rango estimado ({d.EstimadoMin}-{d.EstimadoMax}): la pista seria falsa.");
             }
-            var necesario = r.Depositos.Sum(d => d.CostePorDefecto * d.DefectosOcultos);
+            // Escaso desde lo que ve el jugador: ni cubriendo lo maximo esperado de cada tipo le alcanzan las horas.
+            var necesario = r.Depositos.Sum(d => d.CostePorDefecto * Evaluador.MaximoEsperado(d));
             if (r.Presupuesto >= necesario)
                 e.Add("El presupuesto alcanza para encontrarlo todo: repartir no obligaria a renunciar a nada.");
             if (r.Paso <= 0) e.Add("'repartir.paso' tiene que ser positivo.");
-            else if (r.Presupuesto > 0 && r.Depositos.All(d => d.CostePorDefecto > 0) &&
-                     Nexus.Core.Minijuegos.Repartir.RepartirEvaluador.RepartosGanadores(r).Count == 0)
-                e.Add($"Con {r.Presupuesto} {r.Unidad} (de {r.Paso} en {r.Paso}) no existe ningun reparto que gane: la escena es imposible.");
+            else if (r.Presupuesto > 0 && r.Depositos.All(d => d.CostePorDefecto > 0)) {
+                if (Evaluador.RepartosGanadores(r).Count == 0)
+                    e.Add($"Con {r.Presupuesto} {r.Unidad} (de {r.Paso} en {r.Paso}) no existe ningun reparto que gane: la escena es imposible.");
+                // Con rangos a la vista, quien razona tiene que ganar seguro: el reparto prudente no puede depender
+                // de que haya menos errores de los que cabia esperar.
+                else if (r.Depositos.Any(d => d.EstimadoMax > 0) &&
+                         Evaluador.EscapesEsperados(r, Evaluador.RepartoPrudente(r), true) > r.ToleranciaDeEscapes)
+                    e.Add("Ni el reparto prudente (cubrir lo maximo esperado, renunciando a lo mas caro) gana seguro: acertar seria cuestion de suerte.");
+            }
         }
     }
 

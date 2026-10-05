@@ -3,7 +3,6 @@
   "nombre": "Kanban",
   "familia": "agil",
   "resumen": "No hay sprints ni fechas de corte: hay un flujo y un límite de trabajo en curso. Se empieza algo nuevo solo cuando se termina algo viejo, y el tablero enseña dónde se atasca.",
-
   "razonesValidas": [
     "el_trabajo_llega_de_forma_impredecible",
     "hay_mucho_soporte_y_mantenimiento_mezclado",
@@ -16,7 +15,6 @@
     "asi_el_equipo_va_mas_suelto",
     "no_hace_falta_planificar"
   ],
-
   "textosDeRazones": {
     "el_trabajo_llega_de_forma_impredecible": "El trabajo llega de forma impredecible.",
     "hay_mucho_soporte_y_mantenimiento_mezclado": "Hay mucho soporte y mantenimiento mezclado.",
@@ -27,22 +25,87 @@
     "asi_el_equipo_va_mas_suelto": "Así el equipo va más suelto.",
     "no_hace_falta_planificar": "No hace falta planificar."
   },
-
   "calendario": {
     "tipo": "continuo",
     "etiquetaUnidad": "Flujo continuo",
     "limiteWipInicial": 3
   },
-
   "ceremonias": [
     {
       "id": "reposicion",
       "nombre": "Reposición del tablero",
-      "cuando": "cuandoSeLiberaWip",
-      "costeDias": 0.1,
+      "cuando": "cada",
+      "costeDias": 0,
       "verbo": "V3",
       "texto": "Se ha liberado un hueco en «En curso». El límite no es un número en una hoja: es un hueco dibujado, y solo cabe una tarjeta.",
-      "muestraLeadTime": true
+      "muestraLeadTime": true,
+      "cadaNDias": 2,
+      "paraQueSirve": "Cuando se liberan huecos, se decide qué entra a «Listo para empezar». No se planifica un periodo: se rellena el tablero.",
+      "duracionMinutos": 20,
+      "muestra": "tablero",
+      "opciones": [
+        {
+          "id": "valor",
+          "texto": "Meter lo más valioso que quepa, y solo si hay hueco",
+          "efectos": {
+            "SatisfaccionCliente": 1
+          },
+          "acta": "Entró una tarjeta, la que más le importa al cliente, porque había un hueco. Kanban no discute si algo es importante: discute a costa de qué entra."
+        },
+        {
+          "id": "todo",
+          "texto": "Meter todo lo que ha pedido el cliente, para que vea movimiento",
+          "efectos": {
+            "Cansancio": 2,
+            "DeudaTecnica": 1
+          },
+          "acta": "El tablero se llenó de cosas empezadas. Todas avanzan un poco y ninguna se termina: más trabajo en curso no es más trabajo hecho."
+        },
+        {
+          "id": "apetece",
+          "texto": "Que cada uno coja lo que le apetezca",
+          "efectos": {
+            "SatisfaccionCliente": -1,
+            "MoralEquipo": 1
+          },
+          "acta": "Entraron las tarjetas más entretenidas. La que esperaba el cliente sigue esperando."
+        }
+      ]
+    },
+    {
+      "id": "daily-de-tablero",
+      "nombre": "Reunión diaria ante el tablero",
+      "cuando": "diario",
+      "costeDias": 0,
+      "texto": "De pie, delante del tablero. Se habla de las tarjetas, no de las personas.",
+      "paraQueSirve": "Se recorre el tablero de DERECHA a IZQUIERDA: primero lo que está a punto de terminarse. Terminar va antes que empezar.",
+      "duracionMinutos": 15,
+      "muestra": "tablero",
+      "opciones": [
+        {
+          "id": "derecha-a-izquierda",
+          "texto": "Recorrer el tablero de derecha a izquierda: ¿qué falta para terminar esto?",
+          "bonoDeFlujo": 0.04,
+          "acta": "Dos tarjetas que llevaban días «casi» se cerraron hoy. Mirar primero lo que está más cerca del final es lo que hace que las cosas salgan."
+        },
+        {
+          "id": "por-persona",
+          "texto": "Preguntar a cada persona en qué está",
+          "efectos": {
+            "MoralEquipo": -0.5
+          },
+          "acta": "Todo el mundo estaba ocupado. Las tarjetas atascadas siguieron atascadas: nadie preguntó por ellas, porque nadie es «la tarjeta»."
+        },
+        {
+          "id": "empezar-mas",
+          "texto": "Empezar tarjetas nuevas para que nadie esté parado",
+          "efectos": {
+            "Cansancio": 1
+          },
+          "bonoDeFlujo": -0.03,
+          "acta": "Nadie estuvo parado. El trabajo sí: cada persona saltó entre tres cosas y ninguna se terminó."
+        }
+      ]
     },
     {
       "id": "revision-del-flujo",
@@ -60,7 +123,8 @@
           "texto": "Bajar el límite de WIP una unidad",
           "coeficiente": "gamma",
           "multiplicador": 0.8,
-          "explicacion": "Con menos cosas a medias el equipo se cansa más despacio: cada cambio de contexto tiene un coste que no aparece en ninguna tarea."
+          "explicacion": "Con menos cosas a medias el equipo se cansa más despacio: cada cambio de contexto tiene un coste que no aparece en ninguna tarea.",
+          "ajusteDeLimiteWip": -1
         },
         {
           "id": "clase-de-servicio",
@@ -76,13 +140,15 @@
           "multiplicador": 0.85,
           "explicacion": "La cobertura se diluye más despacio, porque una tarjeta deja de poder cruzar el tablero sin sus pruebas."
         }
-      ]
+      ],
+      "paraQueSirve": "Cada cierto tiempo se mira el diagrama de flujo acumulado: donde una banda se ensancha, ahí se atasca el trabajo."
     }
   ],
-
   "reglasDeCambio": {
     "costeMultiplicador": 0.8,
-    "ventanas": ["siempre"],
+    "ventanas": [
+      "siempre"
+    ],
     "consumeWip": true,
     "textoEnVentana": "Entra cuando haya hueco. Kanban no discute si el cambio es legítimo: discute a costa de qué entra.",
     "penalizacionFueraDeVentana": {
@@ -91,19 +157,19 @@
       "texto": "Siempre hay ventana. Lo que no siempre hay es sitio."
     }
   },
-
   "modificadoresModelo": {
     "gamma": 0.9
   },
-
   "modificadoresDirector": {
-    "multiplicadorPesosPorTag": { "equipo": 1.2, "tecnico": 1.1, "cliente": 0.9 },
+    "multiplicadorPesosPorTag": {
+      "equipo": 1.2,
+      "tecnico": 1.1,
+      "cliente": 0.9
+    },
     "multiplicadorDrama": 0.9,
     "eventosBloqueados": []
   },
-
   "tableroPrincipal": "cfd",
-
   "lanzamiento": {
     "factorRiesgo": 0.85,
     "entregaIncremental": true,
@@ -112,7 +178,6 @@
     "textoSiSale": "Sale como han salido las anteriores, sin que nadie se quede hasta tarde.",
     "textoSiFalla": "Falla en la integración de lo último con lo que ya llevaba semanas en producción."
   },
-
   "rubricaCierre": {
     "practicas": [
       {
@@ -152,5 +217,20 @@
         "razonSiFalla": "El tablero enseñó los atascos y no se cambió nada. Medir sin actuar es decorar."
       }
     ]
+  },
+  "tablero": {
+    "nombresDeColumna": {
+      "porHacer": "Listo para empezar",
+      "haciendo": "En curso",
+      "revision": "Revisión",
+      "hecho": "Hecho"
+    },
+    "limiteDeWip": true,
+    "vistas": [
+      "tablero",
+      "cfd",
+      "pruebas"
+    ],
+    "loQueNoHay": "En Kanban no hay sprints, ni planificación de sprint, ni compromiso por iteración, ni burndown: el trabajo fluye sin parar. Lo que se gobierna es cuántas cosas hay a medias a la vez (el límite de WIP), y se mira el flujo acumulado."
   }
 }

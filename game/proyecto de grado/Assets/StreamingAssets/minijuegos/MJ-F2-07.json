@@ -168,6 +168,7 @@
       "pista": "Hay una fila en lo que pasó de verdad que no aparece en el diseño. ¿Cuál es?"
     }
   ],
+  "toleranciaDeSenuelos": 1,
   "senuelos": [
     {
       "id": "S1",

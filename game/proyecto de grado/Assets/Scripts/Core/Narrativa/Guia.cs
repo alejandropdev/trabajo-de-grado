@@ -19,6 +19,9 @@ namespace Nexus.Core.Narrativa {
     public static class DisparadoresDeGuia {
         private static readonly string[] _contextuales = {
             "fase1.encargo", "fase1.recoleccion", "fase1.metodologia", "fase1.calidad", "fase1.arquitectura", "fase1.resumen",
+            // El expediente del proyecto se lee por partes, una a la vez: cada una avisa al abrirse («fase1.encargo»
+            // es la primera, el cliente), para que la guia hable de lo que hay en pantalla.
+            "fase1.encargo.sistema", "fase1.encargo.especial", "fase1.encargo.medidas", "fase1.encargo.comprueba",
             "dia.antes", "decision.abierta",
             "minijuego.presentacion", "minijuego.jugando.detectar", "minijuego.jugando.ordenar", "minijuego.jugando.repartir",
             "minijuego.cierre", "planificacion", "retro", "cierre", "prorroga", "resumen", "lanzamiento", "lecciones", "diario"

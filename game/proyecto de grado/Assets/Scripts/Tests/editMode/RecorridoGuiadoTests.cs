@@ -60,15 +60,21 @@ namespace Nexus.Tests {
         }
 
         [Test]
-        public void Una_marca_que_mezcla_la_zona_y_un_senuelo_es_falso_positivo() {
+        public void Una_marca_que_mezcla_la_zona_y_un_senuelo_nunca_es_el_mejor_resultado() {
             // Lo que le pasaba al tester: pinchar para mirar dejaba seleccionadas dos piezas, y la marca llevaba las dos.
             var def = CatalogoMinijuegos.Parsear(File.ReadAllText(Path.Combine(Carpeta(), "MJ-OF-N0-DIAGRAMA.json")));
             var estado = new DetectarState(90);
             estado.Alternar(def.Zonas[0].Commits[0]);
             estado.Alternar(def.Senuelos[0].Commits[0]);
             estado.Marcar(def.Zonas[0].Defecto, 1);
+            // Con la tolerancia de la escena, un señuelo ya no lo anula todo: se queda en parcial, y el cierre lo explica.
+            var r = DetectarEvaluador.Evaluar(def, estado);
+            Assert.AreEqual(ResultadosDeMinijuego.Parcial, r.Resultado);
+            Assert.IsTrue(r.Detalle.Any(d => d.Contains("estaba bien")));
+
+            def.ToleranciaDeSenuelos = 0;
             Assert.AreEqual(ResultadosDeMinijuego.FalsoPositivo, DetectarEvaluador.Evaluar(def, estado).Resultado,
-                            "por eso la pantalla ya no acumula la selección al pinchar otra pieza del diagrama");
+                            "sin tolerancia sigue mandando el señuelo: por eso la pantalla ya no acumula la selección");
         }
     }
 }

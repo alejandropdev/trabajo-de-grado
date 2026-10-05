@@ -140,6 +140,48 @@ namespace Nexus.Tests {
             return s.EjecutarLanzamiento();
         }
 
+        /// <summary>
+        /// El mejor gestor posible del tablero y de las ceremonias, dentro de una partida por lo demas pesima: asigna
+        /// cada tarjeta a quien mejor se le da, asiste a todas las ceremonias llevandolas bien y prueba cada dia que puede.
+        /// </summary>
+        private static LaunchResult JugarMalPeroGestionandoBien(string nivel, int semilla) {
+            var s = Empezar(nivel, semilla, false);
+            while (s.R.Fase == 2) {
+                s.ComenzarDia();
+                if (s.PendingPlanning != null) s.Comprometer(s.PendingPlanning.CapacidadSugerida * 2);
+                if (s.PendingRetro != null && s.PendingRetro.Acciones.Count > 0) s.ElegirAccionRetro(s.PendingRetro.Acciones[0].Id);
+                foreach (var c in s.CeremoniasDeHoy())
+                    if (s.PorQueNoSePuedeAsistir(c.Id) == null) s.AsistirACeremonia(c.Id, c.Opciones[0].Id);
+                if (s.PorQueNoSePuedeProbar() == null) s.EjecutarPruebas();
+                foreach (var c in s.Tablero.Tarjetas.Where(x => x.Empezada && !x.Terminada).ToList()) {
+                    var mejor = s.Tablero.Miembros.OrderByDescending(m => m.HabilidadPara(c.Tipo)).First();
+                    if (s.PorQueNoSePuedeAsignar(c.Id, mejor.Id) == null) s.AsignarTarjeta(c.Id, mejor.Id);
+                }
+                for (var v = 0; v < 60 && !s.SePuedeCerrarLaJornada; v++) {
+                    var tramos = new Queue<ResultadoDeAvance>();
+                    tramos.Enqueue(s.AvanzarReloj(30));
+                    while (tramos.Count > 0)
+                        foreach (var a in tramos.Dequeue().AlertasQueSuenan) tramos.Enqueue(s.AtenderAlerta(a.Id));
+                    if (s.Decision != null) s.ResolverDecision(OpcionCon(s, Veredictos.Incorrecta));
+                    if (s.Minijuego != null) s.ResolverMinijuego(JugarMal(s.Minijuego.Archivo));
+                }
+                if (!s.JornadaLlegoAlCierre) s.CerrarJornada();
+                s.TerminarDia(true);
+            }
+            return s.EjecutarLanzamiento();
+        }
+
+        [TestCase("nivel-00", 1)]
+        [TestCase("nivel-01", 1)]
+        [TestCase("nivel-01", 4417)]
+        public void La_mejor_gestion_del_tablero_no_basta_para_salvar_la_peor_partida(string nivel, int semilla) {
+            // El tablero y las ceremonias MODULAN al equipo (una banda del 80 al 115 %): ayudan, pero no tapan haber
+            // decidido todo mal, haberse quedado todas las noches y no haber hecho ni un reto.
+            var l = JugarMalPeroGestionandoBien(nivel, semilla);
+            TestContext.WriteLine("peor, bien gestionada: " + Describir(l));
+            Assert.AreNotEqual(NivelesDeLanzamiento.Bien, l.Nivel, Describir(l));
+        }
+
         private static string Describir(LaunchResult l) {
             return $"{l.Nivel} ({l.Puntaje:0}) · " + string.Join(" · ", l.Factores.Select(f => $"{f.Nombre}={f.Valor} [{f.Estado}]"));
         }

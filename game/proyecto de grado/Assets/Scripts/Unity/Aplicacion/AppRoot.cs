@@ -279,7 +279,51 @@ namespace Nexus.Unity.Aplicacion {
             GuardarPerfil();
         }
 
-        /// <summary>Si este perfil ya termino alguna vez ese minijuego (la primera vez se juega guiado).</summary>
+        /// <summary>
+        /// Si Marisol ya guio a este perfil, de principio a fin, por esa mecanica (detectar, ordenar, repartir). La
+        /// primera vez de cada una se juega guiada; despues, libre, sea el reto que sea.
+        /// </summary>
+        public bool YaSeGuioLaMecanica(string verbo) {
+            return !Nexus.Core.Minijuegos.TutorialPorMecanica.DebeGuiarse(MecanicasGuiadas(), verbo);
+        }
+
+        public void AnotarMecanicaGuiada(string verbo) {
+            var guiadas = MecanicasGuiadas();
+            var canonico = Nexus.Core.Minijuegos.Verbos.Normalizar(verbo);
+            if (guiadas == null || canonico == null || guiadas.Contains(canonico)) return;
+            guiadas.Add(canonico);
+            GuardarPerfil();
+        }
+
+        /// <summary>La lista del perfil; un perfil de antes (null) la deduce de las escenas que ya jugo.</summary>
+        private List<string> MecanicasGuiadas() {
+            if (PerfilActivo == null) return null;
+            if (PerfilActivo.mecanicasGuiadas == null) {
+                PerfilActivo.mecanicasGuiadas = Nexus.Core.Minijuegos.TutorialPorMecanica.Migrar(PerfilActivo.minijuegosJugados, VerboDelMinijuego);
+                GuardarPerfil();
+            }
+            return PerfilActivo.mecanicasGuiadas;
+        }
+
+        /// <summary>El verbo de una escena por su id: del indice si es un reto, o leyendo su JSON si es una practica.</summary>
+        private string VerboDelMinijuego(string id) {
+            if (Catalogo == null || string.IsNullOrEmpty(id)) return null;
+            foreach (var m in Catalogo.Minijuegos)
+                if (m.Id == id) return m.Verbo;
+            foreach (var nivel in Catalogo.Niveles.Values)
+                foreach (var tarea in nivel.Oficina.Tareas) {
+                    if (tarea.Minijuego != id) continue;
+                    try {
+                        return CatalogoMinijuegos.Parsear(new CatalogoDeArchivos(RutasDeGuardado.Contenido).LeerCatalogo(tarea.Archivo)).Verbo;
+                    } catch (Exception e) {
+                        Debug.LogException(e);
+                        return null;
+                    }
+                }
+            return null;
+        }
+
+        /// <summary>Si este perfil ya termino alguna vez ese minijuego.</summary>
         public bool YaJugoElMinijuego(string id) {
             return PerfilActivo != null && PerfilActivo.minijuegosJugados != null && !string.IsNullOrEmpty(id) &&
                    PerfilActivo.minijuegosJugados.Contains(id);

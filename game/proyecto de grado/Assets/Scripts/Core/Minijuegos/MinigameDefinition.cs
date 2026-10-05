@@ -144,7 +144,7 @@ namespace Nexus.Core.Minijuegos {
 
         /// <summary>
         /// Modo guiado: Marisol lleva paso a paso por todo el minijuego hasta hacerlo bien (RecorridoGuiado).
-        /// Lo pide el nivel (el tutorial, siempre) o la UI, la primera vez que el perfil juega ese minijuego.
+        /// Lo pide la UI la primera vez que el perfil se enfrenta a esa mecanica (o el nivel, si lo fuerza).
         /// </summary>
         public bool Guiado;
 

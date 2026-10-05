@@ -41,18 +41,39 @@ namespace Nexus.Unity.Juego {
             return vista;
         }
 
+        /// <summary>
+        /// El reloj en una sola franja, para el HUD de arriba: la hora, la barra de la jornada y el estado. El dia y
+        /// los avisos que esperan los dice el propio HUD (el titulo y el boton «Avisos»), asi que aqui no se repiten.
+        /// </summary>
+        public static RelojView CrearCompacto(UiKit ui, Transform padre, LevelRunner runner) {
+            var fila = ui.Fila(padre, "Reloj", ui.Tema.Espacio(3));
+            var vista = fila.gameObject.AddComponent<RelojView>();
+            vista._runner = runner;
+            vista._tema = ui.Tema;
+            vista._hora = ui.Texto(fila, "--:--", EstiloTexto.Titulo);
+            vista._hora.textWrappingMode = TextWrappingModes.NoWrap;
+            var lado = ui.Columna(fila, "Jornada", ui.Tema.Espacio(1));
+            UiKit.Tamano(lado, ancho: 300);
+            vista._jornada = ui.Barra(lado, 0);
+            vista._estado = ui.Texto(lado, "", EstiloTexto.Leyenda);
+            return vista;
+        }
+
         private void Update() {
             var sesion = _runner == null ? null : _runner.Sesion;
             if (sesion == null) {
                 _hora.text = "--:--";
-                _dia.text = _estado.text = _alertas.text = "";
+                _estado.text = "";
+                if (_dia != null) _dia.text = "";
+                if (_alertas != null) _alertas.text = "";
                 return;
             }
 
             var brief = sesion.BriefDeHoy;
-            _dia.text = sesion.R.DiaActual == 0
-                ? "Antes del día 1"
-                : $"DÍA {sesion.R.DiaActual} / {sesion.Perfil.DiasTotales}" + (brief == null ? "" : "  ·  " + brief.EtiquetaUnidad);
+            if (_dia != null)
+                _dia.text = sesion.R.DiaActual == 0
+                    ? "Antes del día 1"
+                    : $"DÍA {sesion.R.DiaActual} / {sesion.Perfil.DiasTotales}" + (brief == null ? "" : "  ·  " + brief.EtiquetaUnidad);
 
             _hora.text = sesion.HoraActual;
 
@@ -66,6 +87,7 @@ namespace Nexus.Unity.Juego {
             _jornada.Color = sesion.JornadaProrrogada ? _tema.warning : _tema.cyan;
 
             _estado.text = Describir(_runner);
+            if (_alertas == null) return;
 
             var pendientes = sesion.AlertasDeHoy
                 .Where(a => a.EstaPendiente && a.YaSono(sesion.MinutoDelDia))
@@ -84,7 +106,8 @@ namespace Nexus.Unity.Juego {
             switch (runner.Estado) {
                 case EstadoDelDia.Corriendo:
                     if (runner.Pausado) return "EN PAUSA";
-                    return runner.EnEscena ? "El reloj espera mientras decides" : "La jornada corre";
+                    if (runner.EnEscena) return "El reloj espera mientras decides";
+                    return runner.Mirando ? "El reloj espera mientras miras" : "La jornada corre";
                 case EstadoDelDia.EnElCierre: return "Cierre de la jornada: ¿te vas o te quedas?";
                 case EstadoDelDia.Prorroga: return "Horas extra. Ya no llegan avisos.";
                 case EstadoDelDia.DiaTerminado: return "Jornada terminada";

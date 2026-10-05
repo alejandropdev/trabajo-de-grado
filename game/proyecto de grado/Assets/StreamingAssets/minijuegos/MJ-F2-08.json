@@ -8,7 +8,7 @@
   "enElProyecto": "Es el plan de pruebas (PTP) de la versión que sale el viernes, sobre todo del módulo de reservas de los ascensores de carga.",
   "presentacion": {
     "titulo": "Las horas de pruebas",
-    "comoSeJuega": "Es el plan de pruebas (PTP) del release: cuántas horas va a cada tipo de prueba. Tienes 42 horas; súbelas o bájalas con + y −. Cada tipo solo encuentra los errores de su clase, y cada error cuesta las horas que dice su tarjeta. Lo que no encuentres, lo encontrará el cliente. Ganas si se escapa como mucho 1 error.",
+    "comoSeJuega": "Es el plan de pruebas (PTP) del release: cuántas horas va a cada tipo de prueba. Tienes 42 horas; súbelas o bájalas con + y −. Cada tipo solo encuentra los errores de su clase, y cada error cuesta las horas que dice su tarjeta. La tarjeta dice también cuántos errores suele haber de ese tipo: el número exacto no lo sabe nadie, así que planifica para el más alto. Lo que no encuentres, lo encontrará el cliente. Ganas si se escapa como mucho 1 error.",
     "quienEspera": "Óscar",
     "textoPresion": "El release candidato sale el viernes",
     "segundosReloj": 120
@@ -19,18 +19,18 @@
     "unidad": "horas",
     "toleranciaDeEscapes": 1,
     "depositos": [
-      { "id": "unitarias", "nombre": "Unitarias", "costePorDefecto": 2, "defectosOcultos": 5,
+      { "id": "unitarias", "nombre": "Unitarias", "costePorDefecto": 2, "defectosOcultos": 5, "estimadoMin": 4, "estimadoMax": 5,
         "descripcion": "Cada función por separado. Baratas. El módulo de reservas tiene mucha lógica de fechas y turnos.",
-        "pista": "Mucha lógica nueva: suele haber 4 o 5 errores." },
-      { "id": "integracion", "nombre": "Integración", "costePorDefecto": 4, "defectosOcultos": 4,
+        "pista": "Mucha lógica nueva." },
+      { "id": "integracion", "nombre": "Integración", "costePorDefecto": 4, "defectosOcultos": 3, "estimadoMin": 3, "estimadoMax": 4,
         "descripcion": "Que las piezas hablen entre sí: el lector con el módulo de acceso, el módulo con la barrera y con la base de datos.",
-        "pista": "Tres conexiones nuevas: suele haber 3 o 4 errores." },
-      { "id": "e2e", "nombre": "De extremo a extremo", "costePorDefecto": 6, "defectosOcultos": 2,
+        "pista": "Tres conexiones nuevas." },
+      { "id": "e2e", "nombre": "De extremo a extremo", "costePorDefecto": 6, "defectosOcultos": 2, "estimadoMin": 1, "estimadoMax": 2,
         "descripcion": "Un carro de verdad entrando y saliendo. Caras, pero son las únicas que ven el sistema como lo ve el guardia.",
-        "pista": "Flujo completo nuevo: suele haber 1 o 2 errores." },
-      { "id": "regresion", "nombre": "Regresión", "costePorDefecto": 3, "defectosOcultos": 3,
+        "pista": "Flujo completo nuevo." },
+      { "id": "regresion", "nombre": "Regresión", "costePorDefecto": 3, "defectosOcultos": 2, "estimadoMin": 2, "estimadoMax": 3,
         "descripcion": "Que lo que ya funcionaba siga funcionando. Este sprint se tocó el registro de accesos, que ya estaba en producción.",
-        "pista": "Se tocó código en producción: suele haber 2 o 3 errores." }
+        "pista": "Se tocó código en producción." }
     ]
   },
   "consecuencias": {

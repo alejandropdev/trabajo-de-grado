@@ -11,6 +11,7 @@ using Nexus.Core.Modelo;
 using Nexus.Core.Narrativa;
 using Nexus.Core.Servicios;
 using Nexus.Core.Simulacion;
+using Nexus.Core.Tablero;
 
 namespace Nexus.Core.Sesion {
     /// <summary>
@@ -25,7 +26,7 @@ namespace Nexus.Core.Sesion {
     /// IMetricasDelNivel (lo que mide C8) y, a traves de WorldState/RuntimeState, los de C2.
     /// Ninguno de esos paquetes conoce GameSession: por eso se pudieron escribir y probar antes.
     /// </summary>
-    public sealed class GameSession : IStateContext, ISesionPersistible, IMetricasDelNivel, IRelacionesPersistibles {
+    public sealed partial class GameSession : IStateContext, ISesionPersistible, IMetricasDelNivel, IRelacionesPersistibles {
         // --- contenido y entradas ---
         private readonly Catalogo _catalogo;
 
@@ -518,6 +519,7 @@ namespace Nexus.Core.Sesion {
             EffectApplier.Aplicar(W, efectosValidos);
             R.TareaDeOficinaAbierta = null;
             R.TareasDeOficinaHechas++;
+            SincronizarTablero();
             return cambios;
         }
 
@@ -688,7 +690,37 @@ namespace Nexus.Core.Sesion {
 
             _eventos = new EventDirector(EventosDelNivel(_catalogo, Perfil.Id), Perfil, Reglas, _rng, _scheduler);
             _minijuegos = new MinigameDirector(MinijuegosDelNivel(_catalogo, Perfil.Id), Perfil, _rng);
+            AsegurarTablero();
         }
+
+        // ==================================================================== el tablero del equipo
+
+        /// <summary>
+        /// El tablero existe desde que se cierra la Fase 1 (y se reconstruye al cargar un guardado anterior a el). Es una
+        /// proyeccion del avance del motor: se genera del alcance con la semilla de la partida, SIN gastar ninguna
+        /// tirada del azar de la sesion.
+        /// </summary>
+        private void AsegurarTablero() {
+            if (R.Tablero != null || !Fase1Cerrada) return;
+            R.Tablero = GeneradorDeTarjetas.Crear(Perfil, W.Alcance, _rng.Semilla);
+            // Kanban: el limite de trabajo en curso es el del tablero, y con el que se empieza es el neutro.
+            if (Politica != null && Politica.LimiteDeWip && R.LimiteWip > 0)
+                R.Tablero.LimiteEnCurso = R.Tablero.LimiteNeutro = R.LimiteWip;
+            SincronizarTablero();
+        }
+
+        /// <summary>
+        /// Lleva el tablero a W.Avance + lo provisional de hoy, y a W.Alcance. Idempotente: se llama despues de todo lo
+        /// que pueda haber movido el avance o el alcance (un efecto, una decision, el reloj) sin miedo a repetirlo.
+        /// </summary>
+        private void SincronizarTablero() {
+            var t = R.Tablero;
+            if (t == null) return;
+            MotorDelTablero.SincronizarAlcance(t, W.Alcance, _rng.Semilla, R.DiaActual);
+            MotorDelTablero.Conciliar(t, W.Avance + t.ProvisionalHoy, R.DiaActual);
+        }
+
+        private int MinutosDeLaJornada { get { return _reloj.MinutoDeCierre - _reloj.MinutoDeInicio; } }
 
         // ==================================================================== FASE 2 · el dia continuo (§3.3)
 
@@ -789,6 +821,7 @@ namespace Nexus.Core.Sesion {
 
             RegistrarSeries(brief.Derivadas);
             BriefDeHoy = brief;
+            EmpezarElDiaDelTablero();
             return brief;
         }
 
@@ -860,6 +893,11 @@ namespace Nexus.Core.Sesion {
                 resultado.AlertasQueExpiraron.Add(expirada);
             }
 
+            // El equipo trabaja mientras corre el reloj (no en las horas extra: ese dia ya se simulo al quedarse).
+            AsegurarTablero();
+            if (R.Tablero != null && avanzados > 0 && !R.JornadaProrrogada)
+                MotorDelTablero.AvanzarHasta(R.Tablero, avanzados, Derivadas().Velocidad, MinutosDeLaJornada);
+            SincronizarTablero();
             return resultado;
         }
 
@@ -988,6 +1026,7 @@ namespace Nexus.Core.Sesion {
                 Dia = R.DiaActual, ItemId = _planDeHoy.UnidadId, Estimado = puntos
             });
             PendingPlanning = null;
+            MarcarElSprint(puntos);
         }
 
         /// <summary>La decision de las 12:00. Maximo una con consecuencia permanente al dia.</summary>
@@ -1029,6 +1068,7 @@ namespace Nexus.Core.Sesion {
             _eventos.RegistrarDisparo(_eventoDeHoy, R);
             _eventoDeHoy = null;
             Decision = null;
+            SincronizarTablero();   // un cambio de alcance, un «hay que rehacer»…: el tablero lo ve ya
         }
 
         /// <summary>La vuelta de la escena. La UI no aplica nada: devuelve el resultado y el motor lo aplica.</summary>
@@ -1038,6 +1078,7 @@ namespace Nexus.Core.Sesion {
 
             AplicarResultadoDeMinijuego(resultado);
             Minijuego = null;
+            SincronizarTablero();
         }
 
         /// <summary>
@@ -1073,6 +1114,11 @@ namespace Nexus.Core.Sesion {
 
             Coef.MultiplicarUno(accion.Coeficiente, accion.Multiplicador);
             R.AccionesRetroElegidas++;
+            // «Bajar el limite de WIP» lo baja de verdad (antes solo tocaba un coeficiente).
+            if (accion.AjusteDeLimiteWip != 0 && R.LimiteWip > 0) {
+                R.LimiteWip = Math.Max(1, R.LimiteWip + accion.AjusteDeLimiteWip);
+                if (R.Tablero != null && R.Tablero.LimiteEnCurso > 0) R.Tablero.LimiteEnCurso = R.LimiteWip;
+            }
 
             Registrar("RETRO", "Retrospectiva", accion.Id, accion.Texto,
                       Veredictos.Correcta, "OA-PROC-02", accion.Explicacion, null);
@@ -1093,6 +1139,11 @@ namespace Nexus.Core.Sesion {
 
             var avanzados = _reloj.SaltarHasta(_reloj.MinutoDeCierre);
             R.MinutoDelDia = _reloj.Minuto;
+            // Saltar el dia no se salta el trabajo: este camino no pasa por AvanzarReloj.
+            AsegurarTablero();
+            if (R.Tablero != null && avanzados > 0)
+                MotorDelTablero.AvanzarHasta(R.Tablero, avanzados, Derivadas().Velocidad, MinutosDeLaJornada);
+            SincronizarTablero();
             return new ResultadoDeAvance { MinutosAvanzados = avanzados };
         }
 
@@ -1117,7 +1168,12 @@ namespace Nexus.Core.Sesion {
                 R.VecesQueSeFueACasa++;
             }
 
-            ForresterModel.AvanzarUnDia(W, R, Coef, Perfil.VelocidadBase, _velocidadBaseMult, horasExtra);
+            // El jugador modula al equipo, no lo sustituye: con el piloto automatico el factor vale exactamente 1.
+            AsegurarTablero();
+            var factorDeFlujo = MotorDelTablero.FactorDelDia(R.Tablero);
+            ForresterModel.AvanzarUnDia(W, R, Coef, Perfil.VelocidadBase, _velocidadBaseMult, horasExtra, factorDeFlujo);
+            if (R.Tablero != null) MotorDelTablero.CerrarElDia(R.Tablero, W.Avance, R.DiaActual);
+            CerrarElDiaDelTablero();
 
             if (Metodologia.Calendario.Tipo == TiposDeCalendario.Continuo) AvanzarFlujoContinuo();
             if (_planDeHoy != null && _planDeHoy.EsUltimoDiaDeUnidad) CerrarUnidad();
@@ -1140,6 +1196,7 @@ namespace Nexus.Core.Sesion {
         }
 
         private void CerrarUnidad() {
+            CerrarLaUnidadDelTablero();
             R.EntregadoPorIteracion.Add(Math.Round(W.Avance - _avanceAlEmpezarUnidad, 2));
             R.SobreCompromiso = 0;
             _avanceAlEmpezarUnidad = W.Avance;
@@ -1473,6 +1530,9 @@ namespace Nexus.Core.Sesion {
 
             // 5 · el plan de hoy
             if (s.Reglas != null && s.R.DiaActual > 0) s._planDeHoy = s.Reglas.PlanFor(s.R.DiaActual);
+
+            // 5b · un guardado anterior al tablero: se genera y se concilia con el avance que ya tenia
+            s.AsegurarTablero();
 
             // El evento o el minijuego de una alerta AUN PENDIENTE se recupera para que AtenderAlerta
             // siga funcionando tras recargar. Lo que NO se restaura es el panel ya abierto (Decision /

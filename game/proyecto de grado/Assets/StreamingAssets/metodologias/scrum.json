@@ -3,7 +3,6 @@
   "nombre": "Scrum",
   "familia": "agil",
   "resumen": "Se trabaja en sprints cerrados. Al final de cada uno hay algo que se puede enseñar, y una conversación sobre cómo mejorar el proceso. El alcance solo se renegocia entre sprints.",
-
   "razonesValidas": [
     "el_cliente_cambiara_de_opinion",
     "el_problema_no_esta_del_todo_definido",
@@ -16,7 +15,6 @@
     "no_hay_que_documentar_nada",
     "lo_pidio_la_gerencia"
   ],
-
   "textosDeRazones": {
     "el_cliente_cambiara_de_opinion": "El cliente va a cambiar de opinión por el camino.",
     "el_problema_no_esta_del_todo_definido": "El problema todavía no está del todo definido.",
@@ -27,14 +25,12 @@
     "no_hay_que_documentar_nada": "Así no hay que documentar nada.",
     "lo_pidio_la_gerencia": "Lo pidió la gerencia."
   },
-
   "calendario": {
     "tipo": "iterativo",
     "etiquetaUnidad": "Sprint",
     "longitudIteracion": 10,
     "iteraciones": 2
   },
-
   "ceremonias": [
     {
       "id": "planning",
@@ -43,7 +39,8 @@
       "costeDias": 0.5,
       "verbo": "V5",
       "texto": "El equipo se compromete con lo que cree que cabe. Nadie sabe todavía si cabe.",
-      "abreVentanaDeCambio": true
+      "abreVentanaDeCambio": true,
+      "paraQueSirve": "El equipo elige, del product backlog, lo que cree que puede terminar en el sprint. Lo que está más arriba en el backlog entra primero."
     },
     {
       "id": "daily",
@@ -51,7 +48,37 @@
       "cuando": "diario",
       "costeDias": 0.05,
       "texto": "Quince minutos de pie. Sirve para detectar bloqueos, no para rendir cuentas.",
-      "efectos": { "MoralEquipo": 0.2 }
+      "efectos": {
+        "MoralEquipo": 0.2
+      },
+      "paraQueSirve": "Quince minutos, de pie, todos los días: qué bloquea al equipo y cómo se quita de en medio. No es un parte al jefe.",
+      "duracionMinutos": 15,
+      "muestra": "tablero",
+      "opciones": [
+        {
+          "id": "bloqueos",
+          "texto": "Preguntar qué bloquea a cada uno y quitarlo de en medio hoy",
+          "efectos": {
+            "MoralEquipo": 0.5
+          },
+          "bonoDeFlujo": 0.04,
+          "acta": "Salió un bloqueo que nadie había dicho en voz alta y lo resolviste antes de comer. Para eso es la reunión diaria: no para saber qué hizo cada uno, sino qué le impide seguir."
+        },
+        {
+          "id": "parte",
+          "texto": "Que cada uno cuente lo que hizo ayer, para llevar el control",
+          "efectos": {
+            "MoralEquipo": -1
+          },
+          "acta": "Cada uno recitó su lista mirándote a ti. Nadie mencionó lo que le tiene parado: delante del que controla, los problemas no se dicen. La reunión diaria no es un parte al jefe."
+        },
+        {
+          "id": "diseno",
+          "texto": "Aprovechar que están todos para rediscutir el diseño",
+          "bonoDeFlujo": -0.03,
+          "acta": "Los quince minutos fueron cuarenta y cinco, y medio equipo no tenía nada que ver con la discusión. Lo que necesita más tiempo se habla después, con quien haga falta."
+        }
+      ]
     },
     {
       "id": "review",
@@ -59,7 +86,38 @@
       "cuando": "finIteracion",
       "costeDias": 0.5,
       "texto": "Se enseña lo que hay. Lo que no está terminado, no se enseña.",
-      "revelaProductoAlCliente": true
+      "revelaProductoAlCliente": true,
+      "paraQueSirve": "Al acabar el sprint se enseña al cliente lo que está TERMINADO, y se escucha lo que dice. Lo que pida va al product backlog.",
+      "duracionMinutos": 45,
+      "muestra": "burndown",
+      "opciones": [
+        {
+          "id": "terminado",
+          "texto": "Enseñar solo lo terminado y apuntar lo que el cliente pida",
+          "efectos": {
+            "SatisfaccionCliente": 3
+          },
+          "acta": "El cliente vio funcionar lo que hay y pidió dos cosas que nadie había pensado. Van al product backlog. Enseñar poco pero terminado le da algo que ningún informe da: saber dónde está de verdad."
+        },
+        {
+          "id": "a-medias",
+          "texto": "Enseñar también lo que está a medias, como si estuviera",
+          "efectos": {
+            "SatisfaccionCliente": 5,
+            "DeudaTecnica": 3,
+            "MoralEquipo": -2
+          },
+          "acta": "Quedó muy bien en la sala. Ahora el cliente cuenta con cosas que no están, y el equipo tiene que cerrarlas deprisa para que no se note. Lo que no está terminado, no se enseña."
+        },
+        {
+          "id": "correo",
+          "texto": "Mandar un resumen por correo y ahorrarse la reunión",
+          "efectos": {
+            "SatisfaccionCliente": -1
+          },
+          "acta": "El cliente leyó «todo va según lo previsto» y no vio nada. La revisión existe para que vea el producto y lo corrija a tiempo, no para informarle."
+        }
+      ]
     },
     {
       "id": "retro",
@@ -98,35 +156,38 @@
           "multiplicador": 0.75,
           "explicacion": "El equipo se cansa más despacio, porque deja de perseguir un número que nunca fue realista."
         }
-      ]
+      ],
+      "paraQueSirve": "El equipo mira cómo trabajó (no qué construyó) y elige UNA cosa que cambiar en el siguiente sprint."
     }
   ],
-
   "reglasDeCambio": {
     "costeMultiplicador": 1.0,
-    "ventanas": ["entreIteraciones"],
+    "ventanas": [
+      "entreIteraciones"
+    ],
     "consumeWip": false,
     "textoEnVentana": "Estamos entre sprints. Es el momento de meterlo en el backlog sin romper nada.",
     "penalizacionFueraDeVentana": {
       "permitido": true,
       "costeMultiplicador": 1.5,
-      "efectosExtra": { "MoralEquipo": -4 },
+      "efectosExtra": {
+        "MoralEquipo": -4
+      },
       "texto": "El sprint ya está comprometido. Se puede meter, pero algo se cae, y el equipo lo sabe."
     }
   },
-
   "modificadoresModelo": {
     "iota": 0.9
   },
-
   "modificadoresDirector": {
-    "multiplicadorPesosPorTag": { "cliente": 1.2, "equipo": 1.1 },
+    "multiplicadorPesosPorTag": {
+      "cliente": 1.2,
+      "equipo": 1.1
+    },
     "multiplicadorDrama": 1.0,
     "eventosBloqueados": []
   },
-
   "tableroPrincipal": "burndown",
-
   "lanzamiento": {
     "factorRiesgo": 0.9,
     "entregaIncremental": true,
@@ -135,7 +196,6 @@
     "textoSiSale": "Sale sin ruido. Es lo que ya habían visto, terminado.",
     "textoSiFalla": "Falla en lo que nunca se enseñó en ninguna revisión."
   },
-
   "rubricaCierre": {
     "practicas": [
       {
@@ -175,5 +235,21 @@
         "razonSiFalla": "No entró ni un cambio en todo el nivel. Si el alcance era tan estable, quizá la metodología ágil no era la que hacía falta."
       }
     ]
+  },
+  "tablero": {
+    "nombresDeColumna": {
+      "porHacer": "Sprint backlog",
+      "haciendo": "En curso",
+      "revision": "Revisión",
+      "hecho": "Hecho"
+    },
+    "sprintCerrado": true,
+    "vistas": [
+      "tablero",
+      "backlog",
+      "burndown",
+      "pruebas"
+    ],
+    "loQueNoHay": "En Scrum no hay etapas ni documentos que firmar para avanzar, ni un límite de trabajo en curso por columna: lo que limita es el sprint. Lo comprometido no se cambia a mitad; lo nuevo espera en el product backlog al siguiente sprint."
   }
 }

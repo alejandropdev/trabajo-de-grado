@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de cómo viaja una visita desde el formulario de recepción hasta la lista «Quién sigue dentro», la que consulta el vigilante al cerrar.",
   "presentacion": {
     "titulo": "Práctica: el diagrama del registro de visitas",
-    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza del sistema y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí, púlsala y elige a la derecha qué problema tiene. Como es práctica, te digo al momento si acertaste.",
+    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza del sistema y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí, púlsala y elige a la derecha qué problema tiene. Como es práctica, si no te sale puedes intentarlo otra vez.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 90
@@ -101,6 +101,7 @@
       "pista": "Sigue las flechas que llegan a la pantalla del vigilante. ¿De dónde debería sacar los datos: de las visitas ya guardadas o de un formulario a medio escribir?"
     }
   ],
+  "toleranciaDeSenuelos": 1,
   "senuelos": [
     {
       "id": "S1",

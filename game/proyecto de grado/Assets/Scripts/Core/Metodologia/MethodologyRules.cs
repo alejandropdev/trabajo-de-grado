@@ -126,9 +126,23 @@ namespace Nexus.Core.Metodologia {
                 if (string.IsNullOrEmpty(c.Id)) throw Invalido(id, "hay una ceremonia sin 'id'.");
 
                 if (!EsUnoDe(c.Cuando, CuandoAplica.Diario, CuandoAplica.InicioIteracion, CuandoAplica.FinIteracion,
-                             CuandoAplica.FinEtapa, CuandoAplica.Cada, CuandoAplica.CuandoSeLiberaWip))
+                             CuandoAplica.FinEtapa, CuandoAplica.Cada, CuandoAplica.CuandoSeLiberaWip,
+                             CuandoAplica.InicioNivel, CuandoAplica.FinNivel))
                     throw Invalido(id, $"la ceremonia '{c.Id}' tiene 'cuando' = '{c.Cuando}', que no existe. " +
-                                       "Validos: diario, inicioIteracion, finIteracion, finEtapa, cada, cuandoSeLiberaWip.");
+                                       "Validos: diario, inicioIteracion, finIteracion, finEtapa, cada, cuandoSeLiberaWip, inicioNivel, finNivel.");
+
+                if (c.Opciones != null && c.Opciones.Count > 0) {
+                    if (c.DuracionMinutos <= 0) throw Invalido(id, $"la ceremonia '{c.Id}' se puede jugar pero 'duracionMinutos' vale {c.DuracionMinutos}.");
+                    var vistas = new HashSet<string>(StringComparer.Ordinal);
+                    foreach (var o in c.Opciones) {
+                        if (o == null || string.IsNullOrEmpty(o.Id) || !vistas.Add(o.Id)) throw Invalido(id, $"la ceremonia '{c.Id}' tiene una opcion sin 'id' o repetida.");
+                        if (string.IsNullOrEmpty(o.Texto)) throw Invalido(id, $"la opcion '{o.Id}' de '{c.Id}' no tiene 'texto'.");
+                        if (string.IsNullOrEmpty(o.Acta)) throw Invalido(id, $"la opcion '{o.Id}' de '{c.Id}' no deja acta: sin el porque, la ceremonia no enseña nada.");
+                        if (Math.Abs(o.BonoDeFlujo) > 0.1) throw Invalido(id, $"la opcion '{o.Id}' de '{c.Id}' mueve el flujo un {o.BonoDeFlujo:P0}: como mucho un 10 %.");
+                    }
+                }
+                if (!string.IsNullOrEmpty(c.Muestra) && !VistasDeMonitoreo.EsValida(c.Muestra))
+                    throw Invalido(id, $"la ceremonia '{c.Id}' muestra '{c.Muestra}', que no es una vista de monitoreo.");
 
                 if (EsUnoDe(c.Cuando, CuandoAplica.Cada) && c.CadaNDias <= 0)
                     throw Invalido(id, $"la ceremonia '{c.Id}' es de tipo 'cada' pero 'cadaNDias' vale {c.CadaNDias}.");
@@ -192,6 +206,7 @@ namespace Nexus.Core.Metodologia {
 
                 case "secuencial": {
                     var inicio = 1;
+                    var dias = DiasDeCadaEtapa(cal);
                     for (var i = 0; i < cal.Etapas.Count; i++) {
                         if (inicio > DiasTotales) break;
                         var etapa = cal.Etapas[i];
@@ -200,12 +215,12 @@ namespace Nexus.Core.Metodologia {
                             Id = etapa.Id,
                             Nombre = string.IsNullOrEmpty(etapa.Nombre) ? etapa.Id : etapa.Nombre,
                             DiaInicio = inicio,
-                            DiaFin = inicio + etapa.Dias - 1,
+                            DiaFin = inicio + dias[i] - 1,
                             Texto = etapa.Texto,
                             MultiplicadorPesosPorTag = etapa.MultiplicadorPesosPorTag,
                             EfectosPorDia = etapa.EfectosPorDia
                         });
-                        inicio += etapa.Dias;
+                        inicio += dias[i];
                     }
                     break;
                 }
@@ -225,6 +240,29 @@ namespace Nexus.Core.Metodologia {
                 _tramos.Add(new Tramo { Indice = 0, Id = "unico", Nombre = cal.EtiquetaUnidad, DiaInicio = 1, DiaFin = DiasTotales });
 
             _tramos[_tramos.Count - 1].DiaFin = DiasTotales;
+        }
+
+        /// <summary>
+        /// Los dias de cada etapa. Con 'ajustarEtapasAlNivel' se reparten en proporcion a lo que dura el nivel (al
+        /// menos un dia cada una, mientras haya dias): un nivel de cinco dias pasa por todas las etapas, a escala.
+        /// </summary>
+        private int[] DiasDeCadaEtapa(Calendario cal) {
+            var dias = new int[cal.Etapas.Count];
+            var suma = 0;
+            for (var i = 0; i < dias.Length; i++) { dias[i] = Math.Max(1, cal.Etapas[i].Dias); suma += dias[i]; }
+            if (!cal.AjustarEtapasAlNivel || suma == DiasTotales || dias.Length == 0 || DiasTotales < dias.Length) return dias;
+
+            var repartidos = 0;
+            var acumulado = 0.0;
+            for (var i = 0; i < dias.Length; i++) {
+                acumulado += dias[i] * (double)DiasTotales / suma;
+                var hasta = i == dias.Length - 1 ? DiasTotales : (int)Math.Round(acumulado);
+                // Cada etapa, un dia como minimo, y dejando al menos uno para cada una de las que quedan.
+                hasta = Math.Max(repartidos + 1, Math.Min(hasta, DiasTotales - (dias.Length - 1 - i)));
+                dias[i] = hasta - repartidos;
+                repartidos = hasta;
+            }
+            return dias;
         }
 
         // ------------------------------------------------------------------ API
@@ -256,7 +294,7 @@ namespace Nexus.Core.Metodologia {
 
             if (Profile.Ceremonias != null)
                 foreach (var ceremonia in Profile.Ceremonias)
-                    if (AplicaHoy(ceremonia, plan)) plan.Ceremonias.Add(ceremonia);
+                    if (AplicaHoy(ceremonia, plan) || AplicaPorElNivel(ceremonia, dia)) plan.Ceremonias.Add(ceremonia);
 
             return plan;
         }
@@ -342,6 +380,15 @@ namespace Nexus.Core.Metodologia {
             foreach (var tramo in _tramos)
                 if (tramo.Contiene(dia)) return tramo;
             return dia < _tramos[0].DiaInicio ? _tramos[0] : _tramos[_tramos.Count - 1];
+        }
+
+        /// <summary>Las que no dependen del calendario de la metodologia sino del nivel: su primer dia y su ultimo.</summary>
+        private bool AplicaPorElNivel(Ceremonia c, int dia) {
+            switch (Normalizar(c.Cuando)) {
+                case "inicionivel": return dia == 1;
+                case "finnivel": return dia == DiasTotales;
+                default: return false;
+            }
         }
 
         private static bool AplicaHoy(Ceremonia c, DayPlan plan) {

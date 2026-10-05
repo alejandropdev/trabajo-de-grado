@@ -261,6 +261,12 @@
   "presupuestoInicial": 18000,
   "alcanceInicial": 34,
   "equipoInicial": 3,
+  "equipo": [
+    { "id": "valeria", "nombre": "Valeria", "rol": "Interfaz", "habilidades": {"interfaz": 1.3, "datos": 0.8, "logica": 1.0, "pruebas": 1.0} },
+    { "id": "mateo", "nombre": "Mateo", "rol": "Datos", "habilidades": {"interfaz": 0.8, "datos": 1.3, "logica": 1.1, "pruebas": 0.9} },
+    { "id": "camila", "nombre": "Camila", "rol": "Pruebas", "habilidades": {"interfaz": 0.9, "datos": 1.0, "logica": 1.0, "pruebas": 1.3} },
+    { "id": "andres", "nombre": "Andrés", "rol": "Lógica del servidor", "habilidades": {"interfaz": 0.7, "datos": 1.0, "logica": 1.3, "pruebas": 0.8} }
+  ],
   "deudaHeredada": 0,
   "coberturaHeredada": 10,
   "documentacionHeredada": 25,

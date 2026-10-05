@@ -57,10 +57,12 @@ namespace Nexus.Tests {
         }
 
         [Test]
-        public void El_tutorial_juega_guiados_todos_sus_minijuegos() {
-            // Los minijuegos ya no se explican con burbujas: el modo guiado (RecorridoGuiado) los lleva paso a paso.
-            Assert.IsTrue(Catalogo().Niveles["nivel-00"].MinijuegosGuiados);
-            Assert.IsFalse(Catalogo().Niveles["nivel-01"].MinijuegosGuiados, "en N1 solo la primera vez de cada uno");
+        public void Ningun_nivel_fuerza_el_modo_guiado_se_guia_la_primera_vez_de_cada_mecanica() {
+            // Los minijuegos no se explican con burbujas: el modo guiado (RecorridoGuiado) los lleva paso a paso. Pero
+            // solo la primera vez que el perfil se enfrenta a cada mecanica (TutorialPorMecanica), tambien en el
+            // tutorial: antes N0 guiaba cada practica, cada vez que se repetia.
+            foreach (var nivel in Catalogo().Niveles.Values)
+                Assert.IsFalse(nivel.MinijuegosGuiados, nivel.Id + " fuerza el modo guiado");
         }
 
         [Test]

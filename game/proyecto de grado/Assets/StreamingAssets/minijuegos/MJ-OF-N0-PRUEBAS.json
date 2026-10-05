@@ -8,7 +8,7 @@
   "enElProyecto": "Es el plan de pruebas del registro de visitas: qué se prueba antes de que el jurado lo use en la recepción.",
   "presentacion": {
     "titulo": "Práctica: las horas de pruebas",
-    "comoSeJuega": "Probar es buscar errores antes que el cliente. Tienes 12 horas y tres tipos de prueba: súbelas o bájalas con + y −. Cada tipo solo atrapa sus propios errores, y cada error cuesta las horas que dice su tarjeta. Las horas no alcanzan para todo: ganas si se escapa como mucho 1 error.",
+    "comoSeJuega": "Probar es buscar errores antes que el cliente. Tienes 12 horas y tres tipos de prueba: súbelas o bájalas con + y −. Cada tipo solo atrapa sus propios errores, y cada error cuesta las horas que dice su tarjeta. La tarjeta dice también cuántos errores suele haber de ese tipo: el número exacto no lo sabe nadie, así que planifica para el más alto. Las horas no alcanzan para todo: ganas si se escapa como mucho 1 error.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 90
@@ -23,25 +23,25 @@
         "id": "unitarias",
         "nombre": "Unitarias",
         "costePorDefecto": 2,
-        "defectosOcultos": 3,
+        "defectosOcultos": 2, "estimadoMin": 2, "estimadoMax": 3,
         "descripcion": "Prueban cada pieza sola, como revisar cada ladrillo antes de construir.",
-        "pista": "Muchas piezas nuevas: suele haber unos 3 errores."
+        "pista": "Muchas piezas nuevas."
       },
       {
         "id": "integracion",
         "nombre": "Integración",
         "costePorDefecto": 3,
-        "defectosOcultos": 2,
+        "defectosOcultos": 2, "estimadoMin": 1, "estimadoMax": 2,
         "descripcion": "Prueban que las piezas funcionen juntas, como revisar que la pared no se caiga.",
-        "pista": "Pocas uniones: suele haber unos 2 errores."
+        "pista": "Pocas uniones."
       },
       {
         "id": "e2e",
         "nombre": "De extremo a extremo",
         "costePorDefecto": 4,
-        "defectosOcultos": 1,
+        "defectosOcultos": 1, "estimadoMin": 0, "estimadoMax": 1,
         "descripcion": "Prueban todo como lo usaría la recepcionista, de principio a fin. Es la más cara.",
-        "pista": "Si lo demás está bien probado, aquí queda como mucho 1."
+        "pista": "Si lo demás está bien probado, aquí queda poco."
       }
     ]
   },

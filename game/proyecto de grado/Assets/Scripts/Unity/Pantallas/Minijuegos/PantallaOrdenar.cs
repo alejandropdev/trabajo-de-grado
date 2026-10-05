@@ -66,15 +66,34 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private OrdenarCfg Cfg { get { return Def.Ordenar; } }
         private const float Fila = 78, Y0 = 20, Izq = 130, Ancho = 1180;
 
-        /// <summary>Se ven las dependencias mientras se juega: modo guiado o ayuda de un compañero.</summary>
+        /// <summary>
+        /// Las dependencias ROTAS se marcan en rojo mientras se ordena: modo guiado, ayuda de un compañero o
+        /// andamiaje de tutorial (3).
+        /// </summary>
         private bool VerDependencias {
-            get { return Guiado || (Pendiente != null && Pendiente.TieneAyuda(TiposDeAyuda.MostrarDependencias)); }
+            get { return Guiado || Andamiaje >= 3 || (Pendiente != null && Pendiente.TieneAyuda(TiposDeAyuda.MostrarDependencias)); }
         }
+
+        /// <summary>
+        /// Cada tarjeta dice que necesita antes (sin decir si esta bien o mal colocada): con andamiaje normal (2) o
+        /// mas. Ordenar sin saber que depende de que no era priorizar, era adivinar.
+        /// </summary>
+        private bool VerLoQueNecesita { get { return VerDependencias || Andamiaje >= 2; } }
+
+        private bool _avisadoDeRotas;
 
         private string QuienPide { get { return string.IsNullOrEmpty(Def.Presentacion.QuienEspera) || Def.Presentacion.QuienEspera == "Tú mismo" ? "el cliente" : Def.Presentacion.QuienEspera; } }
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
-            _orden = Cfg.Tarjetas.Select(t => t.Id).ToList();
+            // Barajado y nunca ya resuelto: el JSON trae las tarjetas en el orden bueno. Guiado no hace falta (Marisol
+            // dice el puesto de cada una, y un tablero lleno de avisos rojos distrae del recorrido). El dia entra en
+            // la semilla para que repetir la practica no sea calcarla.
+            _orden = Guiado ? Cfg.Tarjetas.Select(t => t.Id).ToList()
+                            : OrdenarEvaluador.OrdenInicial(Cfg, App.Sesion != null ? App.Sesion.R.DiaActual : 0);
+            _ordenDeLaFase1 = null;
+            _contestando = false;
+            _respuesta = null;
+            _avisadoDeRotas = false;
             _lamina = NuevoLienzo(cuerpo, "El backlog · arrastra las tarjetas o usa ▲▼ · arriba lo primero", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
 
             RectTransform pie;
@@ -115,10 +134,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _resumen.text = $"Ocupas {entran.Sum(id => porId[id].Esfuerzo)} de {Cfg.Capacidad} de esfuerzo · valor dentro: {entran.Sum(id => porId[id].Valor)}";
             _faseTexto.text = _contestando ? "Orden cerrado. Ahora contesta al cliente →" : "Ordena el tablero. Cuando lo tengas, pulsa «Listo».";
             var rotas = Rotas();
-            _ayudaDeps.text = VerDependencias
-                ? (rotas.Count == 0 ? $"<color={NexusTheme.Html(Tema.success)}>Ninguna tarjeta va antes de lo que necesita.</color>"
-                                    : $"<color={NexusTheme.Html(Tema.danger)}>{rotas.Count} tarjeta(s) van antes de lo que necesitan: lo dice dentro de cada una.</color>")
-                : "Algunas tarjetas necesitan otra antes. Si las pones al revés, lo verás al entregar.";
+            if (VerDependencias)
+                _ayudaDeps.text = rotas.Count == 0
+                    ? $"<color={NexusTheme.Html(Tema.success)}>Ninguna tarjeta va antes de lo que necesita.</color>"
+                    : $"<color={NexusTheme.Html(Tema.danger)}>{rotas.Count} tarjeta(s) van antes de lo que necesitan: lo dice dentro de cada una.</color>";
+            else if (_avisadoDeRotas && rotas.Count > 0)
+                _ayudaDeps.text = $"<color={NexusTheme.Html(Tema.danger)}>Ojo: {rotas.Count} tarjeta(s) entran antes de lo que necesitan. " +
+                                  "Revisa el orden, o pulsa «Listo» otra vez para enseñarlo así.</color>";
+            else
+                _ayudaDeps.text = VerLoQueNecesita
+                    ? "Cada tarjeta dice qué necesita antes: lo que necesita tiene que quedar por encima, y dentro de la línea."
+                    : "Algunas tarjetas necesitan otra antes. Si las pones al revés, lo verás al entregar.";
             _listo.gameObject.SetActive(!_contestando);
 
             // Fase 2: el panel del cliente; en la fase 1 se ve apagado, para que se sepa lo que viene.
@@ -180,6 +206,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private void PasarAContestar() {
             if (_contestando) return;
             if (Guiado && !Guia.Permite(AccionGuiada.Listo)) { Guia.Rechazar(); return; }
+            // Antes de enseñarselo al cliente, un aviso (una vez) si algo entra sin lo que necesita: es el fallo
+            // que mas se castiga y antes solo se descubria al entregar. Pulsar «Listo» de nuevo sigue adelante.
+            if (!Guiado && !_avisadoDeRotas && Rotas().Count > 0) {
+                _avisadoDeRotas = true;
+                Repintar();
+                return;
+            }
             _ordenDeLaFase1 = _orden.ToList();
             _contestando = true;
             Guia?.Hecho(AccionGuiada.Listo);
@@ -307,6 +340,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 } else if (ver && t.DependeDe.Count > 0) {
                     aviso = "necesita: " + string.Join(", ", t.DependeDe.Select(d => "«" + porId[d].Titulo + "»")) + " · bien colocada";
                     colorAviso = Tema.papelCyan;
+                } else if (VerLoQueNecesita && t.DependeDe.Count > 0) {
+                    // Sin decir si esta bien o mal: solo el dato con el que se ordena.
+                    aviso = "necesita antes: " + string.Join(", ", t.DependeDe.Select(d => "«" + porId[d].Titulo + "»"));
                 }
                 if (aviso != null) {
                     fila.Texto(104, 4, 600, 32, t.Titulo, 19, WithAlpha(Tema.paperInk, tenue), TextAlignmentOptions.MidlineLeft, null, true);
@@ -348,14 +384,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         /// <summary>Las dependencias rotas entre las tarjetas que entran: (la que va antes de tiempo, la que necesitaba).</summary>
         private List<KeyValuePair<string, string>> Rotas() {
-            var lista = new List<KeyValuePair<string, string>>();
-            var entran = OrdenarEvaluador.Entran(Cfg, _orden);
-            foreach (var t in Cfg.Tarjetas) {
-                if (!entran.Contains(t.Id)) continue;
-                foreach (var dep in t.DependeDe)
-                    if (!entran.Contains(dep) || _orden.IndexOf(dep) > _orden.IndexOf(t.Id)) lista.Add(new KeyValuePair<string, string>(t.Id, dep));
-            }
-            return lista;
+            return OrdenarEvaluador.Rotas(Cfg, _orden);
         }
 
         private void Soltar(int desde, float yCentro, int linea) {
@@ -371,6 +400,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var id = _orden[desde];
             _orden.RemoveAt(desde);
             _orden.Insert(hasta, id);
+            _avisadoDeRotas = false;   // el orden cambio: el aviso de «Listo» vuelve a valer
             Repintar();
         }
 

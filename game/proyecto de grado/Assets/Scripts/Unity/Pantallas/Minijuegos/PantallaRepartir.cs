@@ -31,8 +31,11 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// <summary>Se ve cuantos errores hay de verdad: ayuda de un compañero.</summary>
         private bool Revelado { get { return Pendiente != null && Pendiente.TieneAyuda(TiposDeAyuda.RevelarDefectos); } }
 
-        /// <summary>Lo que atrapa cada pila se ve mientras juegas: modo guiado, o si un compañero te lo chivo.</summary>
-        private bool VerAtrapados { get { return Guiado || Revelado; } }
+        /// <summary>
+        /// Lo que atrapa DE VERDAD cada pila solo se ve si un compañero chivo cuantos errores hay. El modo guiado
+        /// ya no lo enseña: Marisol razona con el rango de la tarjeta, que es lo que habra la proxima vez.
+        /// </summary>
+        private bool VerAtrapados { get { return Revelado; } }
 
         private readonly Dictionary<string, RectTransform> _mas = new Dictionary<string, RectTransform>();
         private readonly Dictionary<string, RectTransform> _tipos = new Dictionary<string, RectTransform>();
@@ -55,6 +58,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 Ui.Texto(t, d.Descripcion ?? "", EstiloTexto.Pequeno, Tema.ink);
                 if (Revelado)
                     Ui.Texto(t, $"Te lo chivaron: aquí hay {d.DefectosOcultos} error(es).", EstiloTexto.Pequeno, Tema.warning);
+                else if (Andamiaje >= 2 && d.EstimadoMax > 0)
+                    // El rango es lo que hace razonable el reparto: cuantos hay de verdad no se ve, cuantos cabe esperar si.
+                    Ui.Texto(t, (string.IsNullOrEmpty(d.Pista) ? "" : d.Pista + " ") + "Suele haber " + RepartirEvaluador.RangoEsperado(d) + ".",
+                             EstiloTexto.Pequeno, Tema.cyan);
                 else if (Andamiaje >= 2 && !string.IsNullOrEmpty(d.Pista))
                     Ui.Texto(t, "Pista: " + d.Pista, EstiloTexto.Pequeno, Tema.cyan);
             }
@@ -86,6 +93,18 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var hL = AltoPila * libres / Cfg.Presupuesto;
                 if (hL > 0) l.Dibujo.Rect(64, Arriba + AltoPila - hL - 4, 102, hL, Tema.papelAviso, 0, NexusTheme.Alfa(Tema.papelAviso, 0.85f), false, 9);
                 l.Texto(40, Arriba + AltoPila + 14, 150, 26, "Sin repartir", 17, Tema.papelAviso, TextAlignmentOptions.Center);
+
+                // Con andamiaje de tutorial, la cuenta que el jugador haria de cabeza con las tarjetas: cuantos se
+                // escaparian si hubiera lo maximo (y lo minimo) que cabe esperar. No usa el numero escondido.
+                if (Andamiaje >= 3 && !Revelado && Usado > 0 && Cfg.Depositos.Any(d => d.EstimadoMax > 0)) {
+                    var peor = RepartirEvaluador.EscapesEsperados(Cfg, _asignacion, true);
+                    var mejor = RepartirEvaluador.EscapesEsperados(Cfg, _asignacion, false);
+                    var seguro = peor <= Cfg.ToleranciaDeEscapes;
+                    l.Texto(60, 48, 1200, 26,
+                            seguro ? $"Aunque haya lo máximo esperado, se escaparían {peor}: vas sobre seguro."
+                                   : $"Con este reparto se escaparían entre {mejor} y {peor} errores · ganas con {Cfg.ToleranciaDeEscapes} o menos.",
+                            17, seguro ? Tema.papelExito : Tema.papelAviso, TextAlignmentOptions.MidlineLeft);
+                }
             }
 
             for (var i = 0; i < n; i++) {
@@ -116,12 +135,18 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     _mas[d.Id] = (RectTransform)mas.transform;
                     l.Texto(x - 20, Arriba + AltoPila + 70, AnchoPila + 40, 24, $"{d.CostePorDefecto} {Cfg.Unidad} por error", 15, Tema.paperMuted, TextAlignmentOptions.Center);
                     if (VerAtrapados) {
-                        // Guiado: cuantos atrapa ya esta pila, y si ya no queda nada que atrapar en ella.
+                        // Chivado: cuantos atrapa ya esta pila, y si ya no queda nada que atrapar en ella.
                         var atrapa = Math.Min(d.DefectosOcultos, h / d.CostePorDefecto);
                         var lleno = atrapa >= d.DefectosOcultos;
                         var texto = lleno ? (h > d.CostePorDefecto * d.DefectosOcultos ? "ya no queda nada: sobran horas" : "atrapa todo lo que hay")
                                           : $"atraparía {atrapa}";
                         l.Texto(x - 20, Arriba + AltoPila + 96, AnchoPila + 40, 24, texto, 15, lleno ? Tema.papelExito : Tema.papelAviso, TextAlignmentOptions.Center);
+                    } else {
+                        // Libre: lo que esas horas dan de si (una division que se hacia de cabeza), no lo que hay escondido.
+                        var alcanza = h / d.CostePorDefecto;
+                        l.Texto(x - 20, Arriba + AltoPila + 96, AnchoPila + 40, 24,
+                                h == 0 ? "sin horas: no atrapa nada" : $"alcanza para {alcanza} error{(alcanza == 1 ? "" : "es")}",
+                                15, alcanza > 0 ? Tema.papelCyan : Tema.paperMuted, TextAlignmentOptions.Center);
                     }
                 } else {
                     var r = resultado.First(x2 => x2.DepositoId == d.Id);
@@ -178,9 +203,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         protected override IEnumerable<string> SolucionEnTexto() {
-            var ganador = RepartirEvaluador.RepartosGanadores(Cfg).OrderBy(g => g.Values.Sum()).FirstOrDefault();
-            if (ganador == null) yield break;
-            yield return "Un reparto que ganaba: " + string.Join(" · ", Cfg.Depositos.Select(d => $"{d.Nombre} {ganador[d.Id]} {Cfg.Unidad}")) + ".";
+            // El que se podia razonar con las tarjetas, no el que sale de saber lo escondido.
+            var ganador = RepartirEvaluador.RepartoPrudente(Cfg);
+            yield return "Un reparto que ganaba seguro: " + string.Join(" · ", Cfg.Depositos.Select(d => $"{d.Nombre} {ganador[d.Id]} {Cfg.Unidad}")) +
+                         ": cubre lo máximo que cabía esperar de cada tipo, renunciando solo a lo más caro de atrapar.";
             yield return "Había " + string.Join(", ", Cfg.Depositos.Select(d => $"{d.DefectosOcultos} en {d.Nombre.ToLowerInvariant()}")) + ".";
         }
     }

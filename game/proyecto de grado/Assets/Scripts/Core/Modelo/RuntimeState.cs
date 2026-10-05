@@ -138,6 +138,36 @@ namespace Nexus.Core.Modelo {
         public int VecesExcedioWip;
         public int MinijuegosJugados;
 
+        /// <summary>
+        /// El tablero del equipo (Core/Tablero): el avance repartido en tarjetas. null antes de cerrar la Fase 1, y en
+        /// un guardado anterior al tablero (GameSession.Restaurar lo reconstruye).
+        /// </summary>
+        public Nexus.Core.Tablero.TableroDelEquipo Tablero;
+
+        // --- Lo que el jugador hace con el tablero y las ceremonias ---
+        /// <summary>Las ceremonias a las que ya se asistio hoy (ids). Se vacia al empezar cada dia.</summary>
+        public List<string> CeremoniasHechasHoy = new List<string>();
+        /// <summary>El acta de cada ceremonia del nivel: a cuales fue, como las llevo, y que paso.</summary>
+        public List<ActaDeCeremonia> ActasDeCeremonias = new List<ActaDeCeremonia>();
+        /// <summary>El cambio de codigo que hoy espera revision (id del banco de micro-PR). null = ninguno.</summary>
+        public string PrDeHoy;
+        public string TarjetaDelPrDeHoy;
+        public bool PrRevisado;
+        public int PrsBienRevisados, PrsMalRevisados;
+        public bool PruebasHechasHoy, InspeccionHechaHoy;
+        public int VecesQueSeProbo, DocumentosInspeccionados;
+
+        // --- Series del tablero, una muestra al EMPEZAR cada dia (como las demas) ---
+        /// <summary>Puntos por hacer, en curso y terminados: las tres bandas del diagrama de flujo acumulado.</summary>
+        public List<double> SeriePorHacer = new List<double>();
+        public List<double> SerieEnCurso = new List<double>();
+        public List<double> SerieTerminado = new List<double>();
+        /// <summary>El sprint en curso: lo comprometido y lo que quedaba de ello al cerrar cada dia.</summary>
+        public List<double> BurndownDelSprint = new List<double>();
+        public int DiaDeInicioDelSprint;
+        /// <summary>Los puntos de tarjetas TERMINADAS en cada iteracion cerrada: la velocidad de verdad.</summary>
+        public List<double> TerminadoPorIteracion = new List<double>();
+
         // --- Series para los tableros (burndown, curva S, CFD) ---
         public List<double> SerieAvance = new List<double>();
         public List<double> SerieAlcance = new List<double>();
@@ -220,6 +250,14 @@ namespace Nexus.Core.Modelo {
             if (AyudasConcedidas == null) AyudasConcedidas = new List<string>();
             if (AyudasDisponibles == null) AyudasDisponibles = new Dictionary<string, int>(StringComparer.Ordinal);
             if (IncidenciasVistas == null) IncidenciasVistas = new Dictionary<string, int>(StringComparer.Ordinal);
+            // Guardados anteriores al tablero y a las ceremonias jugables.
+            if (CeremoniasHechasHoy == null) CeremoniasHechasHoy = new List<string>();
+            if (ActasDeCeremonias == null) ActasDeCeremonias = new List<ActaDeCeremonia>();
+            if (SeriePorHacer == null) SeriePorHacer = new List<double>();
+            if (SerieEnCurso == null) SerieEnCurso = new List<double>();
+            if (SerieTerminado == null) SerieTerminado = new List<double>();
+            if (BurndownDelSprint == null) BurndownDelSprint = new List<double>();
+            if (TerminadoPorIteracion == null) TerminadoPorIteracion = new List<double>();
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,
@@ -230,12 +268,25 @@ namespace Nexus.Core.Modelo {
         int IContadoresDeSimulacion.WipActual { get { return WipActual; } }
     }
 
+    /// <summary>Lo que quedo de una ceremonia: si el jugador asistio, como la llevo y que paso por llevarla asi.</summary>
+    public sealed class ActaDeCeremonia {
+        public int Dia;
+        public string CeremoniaId;
+        public string Nombre;
+        public bool Asistio;
+        public string OpcionId;
+        public string Opcion;
+        public string Texto;
+    }
+
     /// <summary>
     /// Las decisiones de la Fase 1 a medio tomar. Solo se entregan al motor al confirmar; mientras tanto viajan
     /// aqui para que «Guardar y salir» no obligue a empezar la planificacion de cero.
     /// </summary>
     public sealed class Fase1Borrador {
         public string Paso;
+        /// <summary>Dentro del paso «El proyecto», la parte del expediente que se estaba leyendo (0 = el cliente).</summary>
+        public int SubPaso;
         public string Metodologia;
         public string RazonMetodologia;
         public string Arquitectura;

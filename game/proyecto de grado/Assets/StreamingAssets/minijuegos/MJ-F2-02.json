@@ -373,6 +373,7 @@
       "pista": "Mira quién firma este commit y compáralo con el original del que es copia. ¿Es la misma persona?"
     }
   ],
+  "toleranciaDeSenuelos": 1,
   "senuelos": [
     {
       "id": "S1",

@@ -20,7 +20,7 @@ namespace Nexus.Core.Minijuegos.Detectar
         {
             var traza = new List<MarcaRegistrada>();
             var zonasAcertadas = new HashSet<string>();
-            bool hayFalsoPositivo = false;
+            var senuelosTocados = new HashSet<string>();
 
             foreach (var marca in st.Marcas)
             {
@@ -34,7 +34,7 @@ namespace Nexus.Core.Minijuegos.Detectar
 
                 bool etiquetaOk = zona != null && marca.Etiqueta == zona.Defecto;
                 if (etiquetaOk) zonasAcertadas.Add(zona.Id);
-                if (senuelo != null) hayFalsoPositivo = true;
+                if (senuelo != null) senuelosTocados.Add(senuelo.Id);
 
                 traza.Add(new MarcaRegistrada
                 {
@@ -48,8 +48,10 @@ namespace Nexus.Core.Minijuegos.Detectar
 
             string clave;
             if (st.Marcas.Count == 0) clave = OMITIDO;
-            else if (hayFalsoPositivo) clave = FALSO_POSITIVO;          // manda sobre acertar
-            else if (zonasAcertadas.Count == def.Zonas.Count) clave = TODOS;
+            // Acusar lo que esta bien manda sobre acertar... a partir de la tolerancia de la escena. Por debajo, un
+            // señuelo marcado deja el resultado en parcial como mucho: nunca en «todos».
+            else if (senuelosTocados.Count > def.ToleranciaDeSenuelos) clave = FALSO_POSITIVO;
+            else if (zonasAcertadas.Count == def.Zonas.Count && senuelosTocados.Count == 0) clave = TODOS;
             else clave = PARCIAL;
 
             return Construir(def, clave, traza, zonasAcertadas);

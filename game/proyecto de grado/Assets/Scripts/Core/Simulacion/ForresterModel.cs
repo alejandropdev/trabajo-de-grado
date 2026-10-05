@@ -83,9 +83,9 @@ namespace Nexus.Core.Simulacion {
         /// variables locales y el paso 7 (acotar) ocurre al escribir con Set(): asi ningun paso
         /// intermedio ve un valor ya acotado, igual que en la especificacion.
         /// </summary>
-        /// <returns>El avance del dia (incluye el +25 % del overtime).</returns>
+        /// <returns>El avance del dia (incluye el +25 % del overtime y el factor de flujo del tablero).</returns>
         public static double AvanzarUnDia(IEstadoSimulable w, IContadoresDeSimulacion r, Coeficientes c,
-                                          double velocidadBase, double mult, bool horasExtra) {
+                                          double velocidadBase, double mult, bool horasExtra, double factorDeFlujo = 1.0) {
             var d = Calcular(w, r, c, velocidadBase, mult);
 
             var avance = Leer(w, Avance);
@@ -99,7 +99,8 @@ namespace Nexus.Core.Simulacion {
             var dias = Leer(w, Dias);
 
             // 1 · el +25 % del overtime es el señuelo
-            var avanceDia = d.Velocidad * (horasExtra ? 1.25 : 1.0);
+            // 'factorDeFlujo' es lo que el jugador le saca al equipo con como asigna el tablero; 1 = piloto automatico.
+            var avanceDia = d.Velocidad * (horasExtra ? 1.25 : 1.0) * factorDeFlujo;
             var avanceAntes = avance;
             avance += avanceDia;
 

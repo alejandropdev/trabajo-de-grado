@@ -29,6 +29,7 @@ namespace Nexus.Unity.Juego {
     ///   · EnEscena  — hay una decision, un minijuego o una cinematica abiertos. La alerta ya se atendio,
     ///                 asi que congelar el mundo aqui no le regala nada al jugador.
     ///   · Pausado   — el menu de pausa. Tambien congela.
+    ///   · Mirando   — un panel del dia abierto (mapa, equipo, monitoreo). Ver es gratis; actuar desde el, no.
     ///   · nunca     — mientras el jugador DECIDE si ir a atender una alerta. Si el mundo se parara, esa
     ///                 decision no costaria nada (§M8): por eso sonar una alerta no pausa.
     /// </summary>
@@ -46,9 +47,16 @@ namespace Nexus.Unity.Juego {
         public bool EnEscena { get; set; }
 
         /// <summary>
-        /// Si el jugador puede ir a otra zona ahora. ★ Con el reloj parado NO: si estas dentro de una escena
-        /// (una decision, un minijuego, una carta) o en pausa, estas ocupado en un sitio. Poder viajar con el
-        /// tiempo congelado seria moverse gratis.
+        /// El jugador tiene abierto un panel del dia (el mapa, el equipo, el monitoreo…). MIRAR es gratis: el reloj
+        /// espera. Pero no es una escena: desde el panel se puede ACTUAR (ir a una zona, empezar una tarea), y cada
+        /// accion cobra sus minutos como siempre. Por eso no entra en PuedeMoverse.
+        /// </summary>
+        public bool Mirando { get; set; }
+
+        /// <summary>
+        /// Si el jugador puede ir a otra zona ahora. ★ Con el reloj parado por una escena o por la pausa NO: si
+        /// estas dentro de una decision, un minijuego o una carta, estas ocupado en un sitio. Poder viajar con el
+        /// tiempo congelado seria moverse gratis. Mirar un panel no ocupa: el viaje se sigue pagando en minutos.
         /// </summary>
         public bool PuedeMoverse {
             get {
@@ -184,6 +192,24 @@ namespace Nexus.Unity.Juego {
             return resultado;
         }
 
+        /// <summary>
+        /// Una accion del jugador sobre el proyecto que cuesta minutos (asignar una tarjeta, hacer pruebas, asistir a
+        /// una ceremonia…). Pasa por aqui, y no directa a la sesion, por lo mismo que las demas: en esos minutos puede
+        /// sonar o caducar un aviso, o llegar el cierre. Devuelve false si ahora no se puede actuar.
+        /// </summary>
+        public bool Actuar(Func<ResultadoDeAvance> accion) {
+            ExigirSesion();
+            if (accion == null || !PuedeMoverse) return false;
+            Notificar(accion());
+            return true;
+        }
+
+        /// <summary>Para lo que ya movio el reloj por su cuenta dentro de una escena (revisar un cambio de codigo).</summary>
+        public void Notificar(ResultadoDeAvance resultado) {
+            Avisar(resultado);
+            ComprobarCierre();
+        }
+
         /// <summary>Ir a otra zona del mapa. El viaje cuesta minutos, y en ellos el dia sigue pasando.</summary>
         public void IrAZona(string zonaId) {
             ExigirSesion();
@@ -225,6 +251,7 @@ namespace Nexus.Unity.Juego {
             Estado = EstadoDelDia.Parado;
             EnEscena = false;
             Pausado = false;
+            Mirando = false;
         }
 
         /// <summary>Los segundos reales jugados desde la ultima vez que se pidieron. Para DatosDePartida.SegundosJugados.</summary>
@@ -241,7 +268,7 @@ namespace Nexus.Unity.Juego {
             if (Estado != EstadoDelDia.Corriendo && Estado != EstadoDelDia.Prorroga) return;
 
             _segundosJugados += Time.unscaledDeltaTime;
-            if (Pausado || EnEscena) return;
+            if (Pausado || EnEscena || Mirando) return;
 
             var minutos = _reloj.Tick(Time.unscaledDeltaTime);
             if (minutos <= 0) return;
@@ -270,7 +297,7 @@ namespace Nexus.Unity.Juego {
             AlTerminarElDia?.Invoke();
         }
 
-        private void Notificar(ResultadoDeAvance resultado) {
+        private void Avisar(ResultadoDeAvance resultado) {
             if (resultado == null) return;
             if (resultado.MinutosAvanzados > 0) AlAvanzar?.Invoke(resultado);
             foreach (var alerta in resultado.AlertasQueSuenan) AlSonarAlerta?.Invoke(alerta);

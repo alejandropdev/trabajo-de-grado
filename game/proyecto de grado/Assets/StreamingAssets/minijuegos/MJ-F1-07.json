@@ -171,6 +171,7 @@
       "pista": "¿Quién puede dar órdenes a este controlador? Piensa en cómo abrieron la barrera la primera vez."
     }
   ],
+  "toleranciaDeSenuelos": 1,
   "senuelos": [
     {
       "id": "S1",

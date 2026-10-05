@@ -64,6 +64,26 @@ namespace Nexus.Unity.Guia {
         }
 
         /// <summary>
+        /// Lo que se señala cuando la pieza de 'clave' no esta en pantalla: el boton que la abre. El mapa, el equipo
+        /// o el trabajo de escritorio viven en paneles que solo existen mientras estan abiertos; con el panel
+        /// cerrado, la guia señala su boton. Una clave acabada en punto («mapa.») vale para todas las que empiecen asi.
+        /// </summary>
+        public static void RegistrarRespaldo(string clave, Component pieza) {
+            if (string.IsNullOrEmpty(clave) || pieza == null) return;
+            _respaldos[clave] = pieza.transform as RectTransform;
+        }
+
+        private static readonly Dictionary<string, RectTransform> _respaldos = new Dictionary<string, RectTransform>();
+
+        private static RectTransform Respaldo(string clave) {
+            RectTransform rt;
+            if (_respaldos.TryGetValue(clave, out rt)) return rt;
+            foreach (var kv in _respaldos)
+                if (kv.Key.EndsWith(".", StringComparison.Ordinal) && clave.StartsWith(kv.Key, StringComparison.Ordinal)) return kv.Value;
+            return null;
+        }
+
+        /// <summary>
         /// La pantalla del dia dice como saber si una accion ya esta hecha («ir-a-zona:pasillo» si ya estas en el
         /// pasillo). Un paso que pide algo ya hecho no sale: si saliera, se quedaria esperando para siempre.
         /// </summary>
@@ -347,7 +367,9 @@ namespace Nexus.Unity.Guia {
                 var libre = _señalado != null ? _señalado() : null;
                 return libre != null && libre.gameObject.activeInHierarchy ? libre : null;
             }
-            if (string.IsNullOrEmpty(_actual.Resaltar) || !_resaltables.TryGetValue(_actual.Resaltar, out rt)) return null;
+            if (string.IsNullOrEmpty(_actual.Resaltar)) return null;
+            if (_resaltables.TryGetValue(_actual.Resaltar, out rt) && rt != null && rt.gameObject.activeInHierarchy) return rt;
+            rt = Respaldo(_actual.Resaltar);
             return rt != null && rt.gameObject.activeInHierarchy ? rt : null;
         }
 

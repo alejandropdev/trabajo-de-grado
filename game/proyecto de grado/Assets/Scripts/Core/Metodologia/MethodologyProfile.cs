@@ -25,6 +25,9 @@ namespace Nexus.Core.Metodologia {
         public const string Cada = "cada";
         /// <summary>No lo dispara el calendario, lo dispara el flujo continuo de Kanban.</summary>
         public const string CuandoSeLiberaWip = "cuandoSeLiberaWip";
+        /// <summary>El primer dia del nivel (el kickoff) y el ultimo (las lecciones aprendidas).</summary>
+        public const string InicioNivel = "inicioNivel";
+        public const string FinNivel = "finNivel";
     }
 
     /// <summary>Cuando se admite un cambio de alcance.</summary>
@@ -93,6 +96,15 @@ namespace Nexus.Core.Metodologia {
         public LanzamientoConfig Lanzamiento = new LanzamientoConfig();                    // 7
         public RubricaCierre RubricaCierre = new RubricaCierre();                          // 8
 
+        /// <summary>9 · Como es el tablero del equipo y que se puede hacer con el. null = la politica por defecto de su calendario.</summary>
+        public PoliticaDeTablero Tablero;
+
+        /// <summary>La politica del tablero que vale: la del JSON o, si no trae, la de su tipo de calendario.</summary>
+        public PoliticaDeTablero PoliticaDeTablero {
+            get { return Tablero ?? (_porDefecto ?? (_porDefecto = PoliticaDeTablero.PorDefecto(Calendario == null ? null : Calendario.Tipo))); }
+        }
+        private PoliticaDeTablero _porDefecto;
+
         public bool EsAgil {
             get { return string.Equals(Familia, FamiliasDeMetodologia.Agil, StringComparison.OrdinalIgnoreCase); }
         }
@@ -109,6 +121,8 @@ namespace Nexus.Core.Metodologia {
             c.ReglasDeCambio = ReglasDeCambio == null ? null : ReglasDeCambio.Clone();
             c.Lanzamiento = Lanzamiento == null ? null : Lanzamiento.Clone();
             c.RubricaCierre = RubricaCierre == null ? null : RubricaCierre.Clone();
+            c.Tablero = Tablero == null ? null : Tablero.Clone();
+            c._porDefecto = null;
 
             if (Ceremonias != null) {
                 c.Ceremonias = new List<Ceremonia>(Ceremonias.Count);
@@ -145,6 +159,12 @@ namespace Nexus.Core.Metodologia {
         // --- continuo ---
         public int LimiteWipInicial = 4;
 
+        /// <summary>
+        /// Secuencial: reparte las etapas en proporcion a los dias del nivel. Sin esto, un nivel mas corto que la suma
+        /// de las etapas no pasa nunca de la primera (un tutorial de cinco dias se quedaba entero en «Analisis»).
+        /// </summary>
+        public bool AjustarEtapasAlNivel;
+
         public Calendario Clone() {
             var c = (Calendario)MemberwiseClone();
             if (Etapas != null) {
@@ -174,8 +194,12 @@ namespace Nexus.Core.Metodologia {
 
         public string Texto;
 
+        /// <summary>Los documentos que se escriben en esta etapa y se firman al cerrarla (SRS, SAD, PTP…).</summary>
+        public List<string> Documentos = new List<string>();
+
         public Etapa Clone() {
             var c = (Etapa)MemberwiseClone();
+            c.Documentos = Documentos == null ? new List<string>() : new List<string>(Documentos);
             c.MultiplicadorPesosPorTag = MultiplicadorPesosPorTag == null
                 ? null
                 : new Dictionary<string, double>(MultiplicadorPesosPorTag, StringComparer.OrdinalIgnoreCase);
@@ -222,8 +246,27 @@ namespace Nexus.Core.Metodologia {
         public bool RevelaProductoAlCliente;
         public bool MuestraLeadTime;
 
+        /// <summary>
+        /// Las formas de llevarla, si el jugador asiste. Con opciones, la ceremonia sale en el espacio de ceremonias del
+        /// dia y se puede jugar; sin ellas, pasa sola como siempre. No asistir no castiga: el equipo la hace sin ti.
+        /// </summary>
+        public List<OpcionDeCeremonia> Opciones = new List<OpcionDeCeremonia>();
+
+        /// <summary>Los minutos de jornada que cuesta asistir.</summary>
+        public int DuracionMinutos = 15;
+
+        /// <summary>Lo que se pone delante en la reunion: una vista de monitoreo (burndown, cfd, curvaS, documentos, tablero).</summary>
+        public string Muestra;
+
+        /// <summary>Para quien no la conoce: que es esta ceremonia y para que sirve, en una frase.</summary>
+        public string ParaQueSirve;
+
         public Ceremonia Clone() {
             var c = (Ceremonia)MemberwiseClone();
+            if (Opciones != null) {
+                c.Opciones = new List<OpcionDeCeremonia>(Opciones.Count);
+                foreach (var o in Opciones) c.Opciones.Add(o == null ? null : o.Clone());
+            }
             c.Efectos = Efectos == null ? null : new Dictionary<string, object>(Efectos, StringComparer.Ordinal);
             if (Acciones != null) {
                 c.Acciones = new List<AccionRetro>(Acciones.Count);
@@ -247,6 +290,9 @@ namespace Nexus.Core.Metodologia {
         public string Coeficiente;
 
         public double Multiplicador = 1.0;
+
+        /// <summary>Kanban: lo que esta accion le suma al limite de trabajo en curso (-1 = bajarlo una unidad).</summary>
+        public int AjusteDeLimiteWip;
 
         /// <summary>Lo que se le explica al jugador. Sin esto la accion es magia.</summary>
         public string Explicacion;
