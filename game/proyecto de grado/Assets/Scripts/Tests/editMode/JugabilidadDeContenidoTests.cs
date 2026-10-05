@@ -52,15 +52,54 @@ namespace Nexus.Tests {
         [TestCase("MJ-OF-N0-PRUEBAS")]
         [TestCase("MJ-OF-N1-PRUEBAS")]
         [TestCase("MJ-F2-08")]
-        public void Las_horas_de_pruebas_tienen_una_sola_combinacion_ganadora(string id) {
-            // Una sola: el reto es encontrarla razonando con las pistas, no probar al azar.
-            Assert.AreEqual(1, RepartirEvaluador.RepartosGanadores(Escena(id).Repartir).Count);
+        public void Las_horas_de_pruebas_tienen_varias_combinaciones_ganadoras_y_la_prudente_gana(string id) {
+            // Antes habia UNA sola entre miles y con los errores escondidos: salia bien por suerte (feedback de la
+            // beta). Ahora hay varias, y quien cubre lo maximo que cabe esperar segun las tarjetas gana seguro.
+            var def = Escena(id);
+            var ganadores = RepartirEvaluador.RepartosGanadores(def.Repartir);
+            Assert.GreaterOrEqual(ganadores.Count, 3, id + ": una combinación ganadora casi única es adivinar");
+
+            var prudente = RepartirEvaluador.RepartoPrudente(def.Repartir);
+            Assert.LessOrEqual(prudente.Values.Sum(), def.Repartir.Presupuesto, id + ": el reparto prudente no cabe");
+            Assert.IsTrue(prudente.Values.All(h => h % Math.Max(1, def.Repartir.Paso) == 0), id + ": el prudente no se puede hacer con los botones");
+            Assert.LessOrEqual(RepartirEvaluador.EscapesEsperados(def.Repartir, prudente, true), def.Repartir.ToleranciaDeEscapes,
+                               id + ": ni en el peor caso de las pistas puede perder");
+            Assert.AreEqual(ResultadosDeMinijuego.Todos, RepartirEvaluador.Evaluar(def, prudente).Resultado, id);
+        }
+
+        [Test]
+        public void La_pista_de_cada_tipo_de_prueba_es_un_rango_que_no_miente() {
+            foreach (var def in Escenas(Verbos.Repartir))
+                foreach (var d in def.Repartir.Depositos) {
+                    Assert.Greater(d.EstimadoMax, 0, $"{def.Id}/{d.Id}: sin rango a la vista, el reparto no se puede razonar");
+                    Assert.That(d.DefectosOcultos, Is.InRange(d.EstimadoMin, d.EstimadoMax), $"{def.Id}/{d.Id}");
+                }
+        }
+
+        [Test]
+        public void El_validador_rechaza_una_pista_falsa_y_un_reparto_que_dependa_de_la_suerte() {
+            var def = Escena("MJ-OF-N1-PRUEBAS");
+            def.Repartir.Depositos[0].DefectosOcultos = def.Repartir.Depositos[0].EstimadoMax + 1;
+            Assert.IsTrue(CatalogoMinijuegos.Validar(def).Any(e => e.Contains("pista seria falsa")));
+
+            def = Escena("MJ-OF-N1-PRUEBAS");
+            def.Repartir.Presupuesto -= 2 * def.Repartir.Paso;   // ya no alcanza para ir sobre seguro
+            Assert.IsTrue(CatalogoMinijuegos.Validar(def).Any(e => e.Contains("cuestion de suerte")));
+        }
+
+        [Test]
+        public void Redondear_a_los_botones_no_cuenta_como_horas_de_mas() {
+            // Regresion cuesta 3 h por error y los botones van de 2 en 2: cubrir 3 errores obliga a poner 10 h.
+            // Antes esa hora de redondeo contaba como «sobrecompra» y podia dar falsoPositivo.
+            var def = Escena("MJ-F2-08");
+            var r = RepartirEvaluador.Evaluar(def, new Dictionary<string, int> { { "regresion", 10 }, { "unitarias", 10 } });
+            Assert.AreEqual(ResultadosDeMinijuego.Parcial, r.Resultado);
         }
 
         [Test]
         public void El_validador_rechaza_un_reparto_imposible() {
             var def = Escena("MJ-OF-N1-PRUEBAS");
-            def.Repartir.Presupuesto = 30;   // lo que habia antes: 37 h hacian falta con tolerancia 1
+            def.Repartir.Presupuesto = 12;   // ni de lejos: hacen falta 26 h para que escape solo 1
             Assert.IsTrue(CatalogoMinijuegos.Validar(def).Any(e => e.Contains("imposible")));
         }
 
@@ -81,6 +120,40 @@ namespace Nexus.Tests {
                 var orden = mejor.Concat(def.Ordenar.Tarjetas.Select(t => t.Id).Where(id => !mejor.Contains(id))).ToList();
                 var r = OrdenarEvaluador.Evaluar(def, orden, "negociar");
                 Assert.AreEqual(ResultadosDeMinijuego.Todos, r.Resultado, def.Id + ": " + string.Join(" | ", r.Detalle));
+            }
+        }
+
+        [Test]
+        public void El_backlog_no_empieza_ya_resuelto_y_siempre_empieza_igual() {
+            // El JSON trae las tarjetas en el orden bueno: quien no tocaba nada ganaba, y quien ordenaba «por valor»
+            // lo rompia. El tablero empieza barajado, en un orden que no gana tal cual.
+            foreach (var def in Escenas(Verbos.Ordenar)) {
+                var cfg = def.Ordenar;
+                var porId = cfg.Tarjetas.ToDictionary(t => t.Id);
+                for (var semilla = 0; semilla < 12; semilla++) {
+                    var orden = OrdenarEvaluador.OrdenInicial(cfg, semilla);
+                    CollectionAssert.AreEquivalent(cfg.Tarjetas.Select(t => t.Id), orden, def.Id + ": se pierde o se repite una tarjeta");
+                    CollectionAssert.AreEqual(orden, OrdenarEvaluador.OrdenInicial(cfg, semilla), def.Id + ": no es determinista");
+                    var capturado = OrdenarEvaluador.Entran(cfg, orden).Sum(id => porId[id].Valor);
+                    var gana = OrdenarEvaluador.Rotas(cfg, orden).Count == 0 &&
+                               capturado >= cfg.UmbralDeValor * OrdenarEvaluador.MejorValorPosible(cfg);
+                    Assert.IsFalse(gana, $"{def.Id} (semilla {semilla}): el tablero empieza ya resuelto");
+                }
+            }
+        }
+
+        [Test]
+        public void Las_dependencias_rotas_que_se_avisan_son_las_que_luego_se_castigan() {
+            foreach (var def in Escenas(Verbos.Ordenar)) {
+                var mejor = OrdenarEvaluador.MejorOrden(def.Ordenar);
+                var orden = mejor.Concat(def.Ordenar.Tarjetas.Select(t => t.Id).Where(id => !mejor.Contains(id))).ToList();
+                CollectionAssert.IsEmpty(OrdenarEvaluador.Rotas(def.Ordenar, orden), def.Id + ": el mejor orden no avisa de nada");
+
+                var conDependencia = def.Ordenar.Tarjetas.First(t => t.DependeDe.Count > 0 && mejor.Contains(t.Id));
+                orden.Remove(conDependencia.Id);
+                orden.Insert(0, conDependencia.Id);   // arriba del todo: antes de lo que necesita
+                Assert.IsTrue(OrdenarEvaluador.Rotas(def.Ordenar, orden).Any(p => p.Key == conDependencia.Id), def.Id);
+                Assert.AreEqual(ResultadosDeMinijuego.FalsoPositivo, OrdenarEvaluador.Evaluar(def, orden, "rechazar").Resultado, def.Id);
             }
         }
 

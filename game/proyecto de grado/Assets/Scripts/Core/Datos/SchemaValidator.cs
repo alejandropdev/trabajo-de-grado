@@ -210,6 +210,17 @@ namespace Nexus.Core.Datos {
             if (p.DiasTotales < 2) e.Add($"{id}: 'diasTotales' vale {p.DiasTotales}; un nivel necesita al menos 2.");
             if (p.AlcanceInicial <= 0) e.Add($"{id}: 'alcanceInicial' vale {p.AlcanceInicial}; sin alcance no hay proyecto.");
             if (p.VelocidadBase <= 0) e.Add($"{id}: 'velocidadBase' vale {p.VelocidadBase}; el proyecto no avanzaria nunca.");
+            // El equipo del tablero: ids unicos, con nombre, y habilidades dentro de lo que el factor de flujo espera.
+            if (p.Equipo != null) {
+                var vistos = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var m in p.Equipo) {
+                    if (m == null || string.IsNullOrEmpty(m.Id) || !vistos.Add(m.Id)) { e.Add($"{id}: hay un miembro del equipo sin id o repetido."); continue; }
+                    if (string.IsNullOrEmpty(m.Nombre)) e.Add($"{id}: el miembro '{m.Id}' no tiene nombre.");
+                    if (m.Habilidades != null)
+                        foreach (var h in m.Habilidades)
+                            if (h.Value < 0.5 || h.Value > 1.5) e.Add($"{id}: la habilidad '{h.Key}' de '{m.Id}' vale {h.Value}; tiene que estar entre 0,5 y 1,5.");
+                }
+            }
             if (p.VolatilidadReal < 0 || p.VolatilidadReal > 100)
                 e.Add($"{id}: 'volatilidadReal' vale {p.VolatilidadReal} y tiene que estar entre 0 y 100.");
             if (p.NivelAndamiaje < 0 || p.NivelAndamiaje > 3)

@@ -35,6 +35,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private RectTransform _cuerpo;
         private bool _recetaInicialPendiente = true;
         private bool _recetaAbierta;
+        private bool _reintentado;
+
+        private const float AnchoDelBriefing = 380, AnchoDelBriefingPlegado = 96;
+        private UnityEngine.UI.LayoutElement _anchoDelBriefing;
+        private GameObject _contenidoDelBriefing;
+        private UnityEngine.UI.Button _plegar;
+        private bool _briefingPlegado;
         protected ResultadoMinijuego Resultado { get; private set; }
 
         public override bool PuedeVolver { get { return false; } }
@@ -108,9 +115,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// </summary>
         private void ConstruirBriefing(Transform padre) {
             var hoja = Ui.Hoja(padre, "Briefing", Tema.Espacio(5));
-            UiKit.Tamano(hoja, ancho: 380, flexAlto: 1);   // +25 %: el briefing se lee de corrido, no a pedazos
+            _anchoDelBriefing = UiKit.Tamano(hoja, ancho: AnchoDelBriefing, flexAlto: 1);   // +25 %: el briefing se lee de corrido, no a pedazos
+            // Mientras se juega estorba mas de lo que ayuda (ya se leyo, y la receta sigue a un boton): se pliega a
+            // un riel al empezar, y se despliega cuando se quiera releer.
+            _plegar = Ui.Boton(hoja, "◄", () => PlegarBriefing(!_briefingPlegado), VarianteBoton.Fantasma);
             RectTransform contenido;
             var scroll = Ui.Desplazable(hoja, out contenido, "Briefing (scroll)");
+            _contenidoDelBriefing = scroll.gameObject;
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
             Ui.Texto(contenido, Def.Presentacion.Titulo ?? Def.Id, EstiloTexto.Titulo, Tema.paperInk);
             var renglones = new List<RenglonDeBriefing>();
@@ -122,6 +133,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 renglones.Add(new RenglonDeBriefing("!", "Quién lo espera", Def.Presentacion.TextoPresion));
             var briefing = Ui.Briefing(contenido, renglones, true);
             GuiaView.Registrar("mj.proyecto", briefing);
+        }
+
+        private void PlegarBriefing(bool plegado) {
+            _briefingPlegado = plegado;
+            _contenidoDelBriefing.SetActive(!plegado);
+            _anchoDelBriefing.minWidth = _anchoDelBriefing.preferredWidth = plegado ? AnchoDelBriefingPlegado : AnchoDelBriefing;
+            _plegar.GetComponentInChildren<TMP_Text>().text = plegado ? "►" : "◄";
         }
 
         private static string Reloj(float segundos) {
@@ -194,6 +212,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private void Empezar() {
             if (_fase != Fase.Receta) return;
             _fase = Fase.Jugando;
+            PlegarBriefing(true);
             UiKit.Vaciar(_cuerpo);
             try {
                 ConstruirJuego(_cuerpo);
@@ -249,8 +268,23 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (Guia != null && !Guia.Permite(AccionGuiada.Entregar)) { Guia.Rechazar(); return; }
             _fase = Fase.Cierre;
             Resultado = Evaluar();
+            // Guiado, solo se llega aqui con el recorrido completo: esta mecanica ya no se vuelve a guiar.
+            if (Guia != null) App.AnotarMecanicaGuiada(Def.Verbo);
             Guia?.Cerrar();
             PintarCierre();
+        }
+
+        /// <summary>
+        /// Una practica que no salio se puede repetir una vez, con el tablero de nuevo en blanco y ya sabiendo lo
+        /// que explico el cierre: es practica, y fallar sin poder corregir no enseña nada. El tiempo ya se pago.
+        /// </summary>
+        private void Reintentar() {
+            if (_fase != Fase.Cierre || _reintentado) return;
+            _reintentado = true;
+            Resultado = null;
+            _restante = _total;
+            _fase = Fase.Receta;
+            Empezar();
         }
 
         private void PintarCierre() {
@@ -302,6 +336,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             }
             hoja.Nota(Practica ? "Era práctica: lo que ganes va al proyecto, pero no cuenta para tu evaluación."
                                : "Esto queda en tu evaluación. El resumen de todo, en Lecciones al cerrar el nivel.");
+            if (Practica && Guia == null && !_reintentado && Resultado.Resultado != ResultadosDeMinijuego.Todos)
+                Ui.Boton(lado, "Intentarlo otra vez", Reintentar);
             Ui.Boton(lado, "Volver a la jornada", () => AlTerminar?.Invoke(Resultado), VarianteBoton.Primario);
             GuiaView.Avisar(App, "minijuego.cierre");
         }

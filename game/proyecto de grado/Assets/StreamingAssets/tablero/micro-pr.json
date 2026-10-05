@@ -1,0 +1,332 @@
+{
+  "microPrs": [
+    {
+      "id": "PR-01",
+      "titulo": "Validar la hora de salida",
+      "descripcion": "Rechaza una salida anterior a la entrada.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function registrarSalida(visita, hora) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  visita.salida = hora;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  if (hora > visita.entrada) visita.salida = hora;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  guardar(visita);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Si la hora no es válida, la visita se guarda igualmente SIN salida y sin avisar a nadie: el error se traga en silencio. Faltaba un else que lo rechace."
+    },
+    {
+      "id": "PR-02",
+      "titulo": "Contar el aforo",
+      "descripcion": "Cuenta cuánta gente hay dentro.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function aforo(visitas) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  let dentro = 0;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  for (let i = 0; i <= visitas.length; i++)"
+        },
+        {
+          "tipo": "add",
+          "texto": "    if (!visitas[i].salida) dentro++;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return dentro;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "El bucle usa <= en vez de <: lee una posición de más, que no existe. El clásico error por uno."
+    },
+    {
+      "id": "PR-03",
+      "titulo": "Nombre del anfitrión en mayúsculas",
+      "descripcion": "Normaliza el nombre al guardarlo.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function normalizar(nombre) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return nombre;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return (nombre || \"\").trim().toUpperCase();"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: además de pasar a mayúsculas, aguanta un nombre vacío y quita los espacios de los lados. Pedir cambios aquí era pedir por pedir."
+    },
+    {
+      "id": "PR-04",
+      "titulo": "Buscar una reserva",
+      "descripcion": "Devuelve la reserva de un ascensor en una franja.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function buscar(reservas, ascensor, franja) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return reservas.find(r =>"
+        },
+        {
+          "tipo": "add",
+          "texto": "    r.ascensor = ascensor && r.franja === franja);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Hay un = donde iba ===: en vez de comparar el ascensor, lo ASIGNA. La búsqueda devuelve cualquier reserva de esa franja y, de paso, las estropea."
+    },
+    {
+      "id": "PR-05",
+      "titulo": "Clave del lector en el código",
+      "descripcion": "Conecta con el lector de credenciales.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function conectarLector() {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  const clave = \"Lector#2024!\";"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return lector.abrir(\"10.0.4.17\", clave);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "La contraseña está escrita en el código: queda para siempre en el historial y la ve cualquiera que tenga el repositorio. Va en la configuración, fuera del código."
+    },
+    {
+      "id": "PR-06",
+      "titulo": "Extraer el cálculo de minutos",
+      "descripcion": "Saca a una función lo que estaba repetido tres veces.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "add",
+          "texto": "function minutosEntre(a, b) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return Math.round((b - a) / 60000);"
+        },
+        {
+          "tipo": "add",
+          "texto": "}"
+        },
+        {
+          "tipo": "del",
+          "texto": "  const m = Math.round((salida - entrada) / 60000);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  const m = minutosEntre(entrada, salida);"
+        }
+      ],
+      "explicacion": "Está bien: no cambia lo que hace el programa, solo quita una repetición y le pone nombre. Es un refactor pequeño y limpio."
+    },
+    {
+      "id": "PR-07",
+      "titulo": "Consulta de accesos por tarjeta",
+      "descripcion": "Lista los accesos de una credencial.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function accesosDe(tarjeta) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  const sql = \"SELECT * FROM accesos WHERE tarjeta = '\" + tarjeta + \"'\";"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return bd.consultar(sql);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "La consulta se arma pegando texto que viene de fuera: quien escriba una comilla en el número de tarjeta puede leer o borrar la tabla (inyección SQL). Se usan parámetros."
+    },
+    {
+      "id": "PR-08",
+      "titulo": "Aviso al anfitrión",
+      "descripcion": "Manda el aviso cuando llega la visita.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function avisar(visita) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  try { correo.enviar(visita.anfitrion, \"Tu visita ha llegado\"); }"
+        },
+        {
+          "tipo": "add",
+          "texto": "  catch (e) { }"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "El catch está vacío: si el correo falla, nadie se entera y el anfitrión no baja. Un error que se captura hay que registrarlo o reintentarlo, nunca tragárselo."
+    },
+    {
+      "id": "PR-09",
+      "titulo": "Prueba de la franja ocupada",
+      "descripcion": "Añade la prueba que faltaba.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "add",
+          "texto": "test(\"no deja reservar una franja ocupada\", () => {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  reservar(\"A1\", \"09:00\");"
+        },
+        {
+          "tipo": "add",
+          "texto": "  expect(() => reservar(\"A1\", \"09:00\")).toThrow();"
+        },
+        {
+          "tipo": "add",
+          "texto": "});"
+        }
+      ],
+      "explicacion": "Está bien: es una prueba corta, con un nombre que dice lo que comprueba, y cubre justo el caso que más falla."
+    },
+    {
+      "id": "PR-10",
+      "titulo": "Turno de noche",
+      "descripcion": "Deja entrar al turno de noche.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function puedeEntrar(turno, hora) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return hora >= turno.inicio && hora < turno.fin;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return true; // TODO: arreglar el turno de noche"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Para que entre el turno de noche se ha quitado la comprobación entera: ahora entra cualquiera a cualquier hora. Un «TODO» en un control de acceso es una puerta abierta."
+    },
+    {
+      "id": "PR-11",
+      "titulo": "Formato de la fecha del informe",
+      "descripcion": "Enseña la fecha como día/mes/año.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function fechaCorta(f) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return f.toISOString();"
+        },
+        {
+          "tipo": "add",
+          "texto": "  const d = String(f.getDate()).padStart(2, \"0\");"
+        },
+        {
+          "tipo": "add",
+          "texto": "  const m = String(f.getMonth() + 1).padStart(2, \"0\");"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return `${d}/${m}/${f.getFullYear()}`;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: se acordó de que los meses empiezan en 0 (por eso el +1) y de rellenar con cero los días de una cifra."
+    },
+    {
+      "id": "PR-12",
+      "titulo": "Liberar la reserva al salir",
+      "descripcion": "Libera el ascensor cuando termina la franja.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function liberar(reserva) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  reserva.estado = \"libre\";"
+        },
+        {
+          "tipo": "add",
+          "texto": "  panel.actualizar(reserva);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  // falta guardar en la base de datos"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Cambia el estado en memoria y en el panel, pero no lo guarda: al reiniciar, la reserva vuelve a estar ocupada. El propio comentario lo dice, y aun así se pidió revisión."
+    }
+  ]
+}

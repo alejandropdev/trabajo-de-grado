@@ -95,6 +95,7 @@
       "pista": "Vuelve al encargo: la recepcionista contó que la mitad de los visitantes llega SIN cita. ¿Este registro sabe qué hacer con ellos?"
     }
   ],
+  "toleranciaDeSenuelos": 1,
   "senuelos": [
     {
       "id": "S1",

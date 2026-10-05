@@ -13,10 +13,11 @@ namespace Nexus.Unity.Pantallas {
     /// <summary>
     /// El Dashboard de Lecciones: lo que el nivel enseño, leido del DebriefReport. Es el unico sitio donde se
     /// ven los veredictos y sus porques — durante el nivel no se enseñan, para que se decida por el mundo y no
-    /// por la nota. Siete secciones:
-    ///   1 · el resultado          2 · el riesgo latente (sus 4 barras)     3 · las competencias (radar)
-    ///   4 · la metodologia        5 · la arquitectura                       6 · cada decision, con su porque
-    ///   7 · la cadena causal: que decision trajo que consecuencia
+    /// por la nota. Siete secciones, repartidas en cuatro pestañas para leerlas de una en una:
+    ///   El resultado                1 · el resultado   2 · el riesgo latente (sus 4 barras)
+    ///   Tus decisiones              6 · cada decision, con su porque   7 · la cadena causal: que trajo que
+    ///   Metodologia y arquitectura  4 · la metodologia   5 · la arquitectura
+    ///   Tus competencias            3 · las competencias (radar)
     /// </summary>
     public sealed class PantallaDeLecciones : Pantalla {
         public DebriefReport Reporte;
@@ -50,17 +51,34 @@ namespace Nexus.Unity.Pantallas {
             var scroll = Ui.Desplazable(marco, out contenido);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
 
-            var fila1 = Ui.Fila(contenido, "Fila 1", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
-            UiKit.Tamano(Resultado(fila1, r), flexAncho: 1);
-            UiKit.Tamano(Riesgo(fila1), flexAncho: 1);
-            UiKit.Tamano(Competencias(fila1, r), flexAncho: 1);
-
-            var fila2 = Ui.Fila(contenido, "Fila 2", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
-            UiKit.Tamano(Metodologia(fila2, r), flexAncho: 1);
-            UiKit.Tamano(Arquitectura(fila2, r), flexAncho: 1);
-
-            Decisiones(contenido, r);
-            Cadena(contenido, r);
+            // Las siete secciones, en cuatro pestañas: de una en una se leen; las siete a la vez en un scroll, no.
+            var pestanas = Ui.Pestanas(contenido, new[] { "El resultado", "Tus decisiones", "Metodología y arquitectura", "Tus competencias" },
+                (i, hoja) => {
+                    switch (i) {
+                        case 0: {
+                            var fila = Ui.Fila(hoja, "Resultado", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
+                            UiKit.Tamano(Resultado(fila, r), ancho: 0, flexAncho: 3);
+                            UiKit.Tamano(Riesgo(fila), ancho: 0, flexAncho: 2);
+                            break;
+                        }
+                        case 1:
+                            Decisiones(hoja, r);
+                            Cadena(hoja, r);
+                            break;
+                        case 2: {
+                            var fila = Ui.Fila(hoja, "Planteamiento", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
+                            UiKit.Tamano(Metodologia(fila, r), ancho: 0, flexAncho: 1);
+                            UiKit.Tamano(Arquitectura(fila, r), ancho: 0, flexAncho: 1);
+                            break;
+                        }
+                        default:
+                            Competencias(hoja, r);
+                            break;
+                    }
+                });
+            // Con su pestaña cerrada, la guia señala la pestaña.
+            GuiaView.RegistrarRespaldo("lecciones.decisiones", pestanas.Boton(1));
+            GuiaView.RegistrarRespaldo("lecciones.radar", pestanas.Boton(3));
             GuiaView.Avisar(App, "lecciones");
         }
 

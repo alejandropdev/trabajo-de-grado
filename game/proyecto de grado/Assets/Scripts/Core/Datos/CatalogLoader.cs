@@ -34,6 +34,9 @@ namespace Nexus.Core.Datos {
 
         public List<Coleccionable> Coleccionables = new List<Coleccionable>();
 
+        /// <summary>Los cambios de codigo que salen a revision en el tablero. Vacio = no hay revisiones.</summary>
+        public List<Nexus.Core.Tablero.MicroPr> MicroPrs = new List<Nexus.Core.Tablero.MicroPr>();
+
         /// <summary>Los pasos de la guia del tutorial (la burbuja de Marisol). Vacio = ningun nivel tiene guia.</summary>
         public List<PasoDeGuia> Guia = new List<PasoDeGuia>();
 
@@ -77,6 +80,7 @@ namespace Nexus.Core.Datos {
         public const string ArchivoGuiones = "narrativa/guiones.json";
         public const string ArchivoAdmision = "prueba-de-admision.json";
         public const string ArchivoColeccionables = "coleccionables.json";
+        public const string ArchivoMicroPrs = "tablero/micro-pr.json";
         public const string ArchivoGuia = "narrativa/guia-tutorial.json";
         public const string ArchivoGlosario = "narrativa/glosario.json";
         public const string ArchivoConversaciones = "narrativa/conversaciones.json";
@@ -128,6 +132,10 @@ namespace Nexus.Core.Datos {
             public int Version { get; set; }
             public List<Nexus.Core.Relaciones.Personaje> Personajes { get; set; }
             public List<Nexus.Core.Relaciones.Conversacion> Conversaciones { get; set; }
+        }
+
+        private sealed class ArchivoDeMicroPrs {
+            public List<Nexus.Core.Tablero.MicroPr> MicroPrs { get; set; }
         }
 
         private sealed class ArchivoDeColeccionables {
@@ -300,6 +308,21 @@ namespace Nexus.Core.Datos {
             if (fuente.Existe(ArchivoAdmision)) {
                 try {
                     catalogo.Admision = Parsear<PruebaDeAdmision>(fuente.LeerCatalogo(ArchivoAdmision), ArchivoAdmision);
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            if (fuente.Existe(ArchivoMicroPrs)) {
+                try {
+                    var archivo = Parsear<ArchivoDeMicroPrs>(fuente.LeerCatalogo(ArchivoMicroPrs), ArchivoMicroPrs);
+                    catalogo.MicroPrs = archivo.MicroPrs ?? new List<Nexus.Core.Tablero.MicroPr>();
+                    var ids = new HashSet<string>(StringComparer.Ordinal);
+                    foreach (var pr in catalogo.MicroPrs) {
+                        if (pr == null || string.IsNullOrEmpty(pr.Id) || !ids.Add(pr.Id)) errores.Add(ArchivoMicroPrs + ": hay un cambio sin id o repetido.");
+                        else if (pr.Lineas == null || pr.Lineas.Count == 0) errores.Add($"{ArchivoMicroPrs}: '{pr.Id}' no tiene lineas que revisar.");
+                        else if (string.IsNullOrEmpty(pr.Explicacion)) errores.Add($"{ArchivoMicroPrs}: '{pr.Id}' no explica nada. Sin explicacion no hay leccion.");
+                    }
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
                 }

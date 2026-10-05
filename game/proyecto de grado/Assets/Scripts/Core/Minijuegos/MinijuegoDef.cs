@@ -28,6 +28,13 @@ namespace Nexus.Core.Minijuegos
         public List<Senuelo> Senuelos = new List<Senuelo>();
         public List<string> PaletaEtiquetas = new List<string>();
 
+        /// <summary>
+        /// Solo verbo V1: cuantos señuelos se pueden marcar sin que el resultado sea «falsoPositivo». Con 0 (lo de
+        /// siempre) un solo señuelo manda sobre haber acertado todo; con 1, quien lo encontro todo y acuso una pieza
+        /// sana se queda en «parcial».
+        /// </summary>
+        public int ToleranciaDeSenuelos;
+
         /// <summary>Clave = nivelAndamiaje como texto ("0".."3").</summary>
         public Dictionary<string, AndamiajeCfg> Andamiaje = new Dictionary<string, AndamiajeCfg>();
 
@@ -125,7 +132,7 @@ namespace Nexus.Core.Minijuegos
         public string Titulo;
         public int Valor;
         public int Esfuerzo;
-        /// <summary>Tarjetas que tienen que ir ANTES. No se enseñan hasta que el jugador choca con ellas.</summary>
+        /// <summary>Tarjetas que tienen que ir ANTES. Con andamiaje alto cada tarjeta las dice; con bajo, se descubren al chocar.</summary>
         public List<string> DependeDe = new List<string>();
         /// <summary>Por que va donde va (opcional). El modo guiado lo dice al colocarla; si falta, lo deduce.</summary>
         public string Porque;
@@ -162,7 +169,14 @@ namespace Nexus.Core.Minijuegos
         public int CostePorDefecto;
         /// <summary>Los defectos de este tipo que hay de verdad. El jugador no lo ve: lo descubre despues.</summary>
         public int DefectosOcultos;
-        /// <summary>Lo que un probador con experiencia esperaria encontrar aqui ("suele haber 3 o 4"). Solo se ve con andamiaje alto.</summary>
+        /// <summary>
+        /// Lo que un probador con experiencia esperaria encontrar aqui, como rango ("entre 4 y 5"). El jugador SI lo
+        /// ve, y DefectosOcultos tiene que caer dentro: asi el reparto se razona con lo que hay en pantalla.
+        /// Sin rango (EstimadoMax = 0) se da por sabido el numero exacto.
+        /// </summary>
+        public int EstimadoMin;
+        public int EstimadoMax;
+        /// <summary>Por que se espera eso ("Mucha lógica nueva"). El rango lo añade la pantalla. Solo se ve con andamiaje alto.</summary>
         public string Pista;
     }
 

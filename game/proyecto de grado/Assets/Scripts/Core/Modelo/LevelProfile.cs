@@ -37,6 +37,11 @@ namespace Nexus.Core.Modelo {
         public double PresupuestoInicial;
         public double AlcanceInicial;
         public int EquipoInicial;
+        /// <summary>
+        /// Los compañeros que llevan el tablero (nombre, rol y a que se les da bien). Vacio = dos compañeros genericos.
+        /// No es EquipoInicial, que es solo una cifra para contar el encargo.
+        /// </summary>
+        public System.Collections.Generic.List<Nexus.Core.Tablero.MiembroDelEquipo> Equipo = new System.Collections.Generic.List<Nexus.Core.Tablero.MiembroDelEquipo>();
         public double DeudaHeredada;
         public double CoberturaHeredada;
         public double DocumentacionHeredada;
@@ -83,8 +88,9 @@ namespace Nexus.Core.Modelo {
         public int NivelAndamiaje = 2;
 
         /// <summary>
-        /// Todos los minijuegos del nivel se juegan guiados (RecorridoGuiado), aunque ya se hayan jugado. El tutorial
-        /// lo pone a true; en los demas niveles solo se guia la primera vez de cada minijuego.
+        /// Todos los minijuegos del nivel se juegan guiados (RecorridoGuiado), aunque ya se hayan jugado. Ningun nivel
+        /// lo usa ya: lo normal es guiar solo la primera vez de cada MECANICA (TutorialPorMecanica), tambien en el
+        /// tutorial. Queda para un nivel que quiera forzarlo.
         /// </summary>
         public bool MinijuegosGuiados;
 

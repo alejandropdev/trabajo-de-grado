@@ -34,6 +34,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private TMP_Text _seleccion, _aviso;
         private Func<string, EstadoPieza> _estadoDe;
         private string _pista;
+        private string _dudaAvisada;
         private readonly Dictionary<string, RectTransform> _piezas = new Dictionary<string, RectTransform>();
         private readonly Dictionary<string, Button> _botonesEtiqueta = new Dictionary<string, Button>();
         private Button _entregar, _limpiar;
@@ -409,7 +410,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 _botonesEtiqueta[e] = Ui.OpcionDeEtiqueta(marcar, Textos.Humanizar(e), TonoDeEtiqueta(e), () => Marcar(e),
                                                           Guiado ? Recetas.Significado(e) : null);
             }
-            _limpiar = Ui.Boton(marcar, "Limpiar la selección", () => { _estado.Seleccion.Clear(); Repintar(); }, VarianteBoton.Fantasma);
+            _limpiar = Ui.Boton(marcar, "Limpiar la selección", () => { _estado.Seleccion.Clear(); _aviso.text = ""; Repintar(); }, VarianteBoton.Fantasma);
             _aviso = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.warning);
 
             var lista = Ui.PanelColumna(panel, "Lista", Tema.margen * 0.75f, Tema.espacio);
@@ -444,6 +445,18 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 return;
             }
             if (Guiado && !Guia.Permite(AccionGuiada.Etiquetar, etiqueta)) { Guia.Rechazar(); return; }
+            // Con andamiaje de tutorial, acusar una pieza sana no pasa en silencio: Marisol duda una vez, y es el
+            // jugador quien decide si la marca igual (pulsando otra vez) o la suelta. Antes solo se sabia al entregar.
+            if (!Guiado && Andamiaje >= 3) {
+                var dudosa = string.Join("|", _estado.Seleccion);
+                if (dudosa != _dudaAvisada && Def.Senuelos.Any(s => s.Commits.Any(_estado.Seleccion.Contains))) {
+                    _dudaAvisada = dudosa;
+                    _aviso.text = "Marisol duda: «¿Seguro que eso es un problema? Mira su detalle otra vez». " +
+                                  "Marcar lo que está bien cuenta en contra. Pulsa el nombre de nuevo para marcarlo igual, o «Limpiar la selección».";
+                    return;
+                }
+            }
+            _dudaAvisada = null;
             _estado.Marcar(etiqueta, Segundo);
             _aviso.text = "";
             Guia?.Hecho(AccionGuiada.Etiquetar, etiqueta);

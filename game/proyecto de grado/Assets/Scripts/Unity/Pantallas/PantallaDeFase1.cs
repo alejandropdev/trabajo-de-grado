@@ -15,7 +15,8 @@ using UnityEngine.UI;
 namespace Nexus.Unity.Pantallas {
     /// <summary>
     /// La Fase 1, antes del primer dia:
-    ///   1 · El encargo (el briefing, y lo que se averiguo en el recorrido)
+    ///   1 · El proyecto, POR PARTES y una a la vez: el cliente · el sistema · que lo hace especial · como se mide ·
+    ///       comprueba que lo entendiste. Antes eran doce tarjetas apiladas en un solo scroll, y no se leian.
     ///   2 · La recoleccion 3D por el plano (zonas A–F). La construye otro subequipo; aqui se simula
     ///   3 · La metodologia y su motivo      4 · El reparto de fichas de calidad
     ///   5 · La arquitectura y su motivo     6 · El resumen, con «Confirmar y empezar»
@@ -34,6 +35,10 @@ namespace Nexus.Unity.Pantallas {
         private bool HayRecoleccion { get { return S.Recoleccion != null; } }
 
         private Paso _paso = Paso.Encargo;
+        /// <summary>La parte del expediente que se esta leyendo, dentro del paso «El proyecto».</summary>
+        private int _subPaso;
+        private static readonly string[] PartesDelExpediente = { "El cliente", "El sistema", "Qué lo hace especial", "Cómo se mide", "Comprueba" };
+        private static readonly string[] AvisoDeCadaParte = { "fase1.encargo", "fase1.encargo.sistema", "fase1.encargo.especial", "fase1.encargo.medidas", "fase1.encargo.comprueba" };
         private bool _guionInicialPendiente = true, _avisarAlEmpezar;
         private Hoja _hoja;
         private RectTransform _navegacion;
@@ -95,7 +100,7 @@ namespace Nexus.Unity.Pantallas {
         private void GuardarBorrador() {
             if (S == null || S.Fase1Cerrada) return;
             S.R.Fase1Borrador = new Fase1Borrador {
-                Paso = _paso.ToString(), Metodologia = _metodologia, RazonMetodologia = _razonMetodologia,
+                Paso = _paso.ToString(), SubPaso = _subPaso, Metodologia = _metodologia, RazonMetodologia = _razonMetodologia,
                 Arquitectura = _arquitectura, RazonArquitectura = _razonArquitectura,
                 Fichas = new Dictionary<string, int>(_fichas),
                 Comprobacion = new Dictionary<string, int>(_comprobacion),
@@ -116,6 +121,7 @@ namespace Nexus.Unity.Pantallas {
             if (b.FalladasAlguna != null) foreach (var id in b.FalladasAlguna) _falladas.Add(id);
             Paso paso;
             if (!string.IsNullOrEmpty(b.Paso) && System.Enum.TryParse(b.Paso, out paso) && Pasos().Contains(paso)) _paso = paso;
+            _subPaso = Mathf.Clamp(b.SubPaso, 0, PartesDelPaso - 1);
             // Se vuelve con la intro ya vista: no hay guiones que esperar, y la guia arranca en el paso donde se dejo.
             _guionInicialPendiente = false;
             _avisarAlEmpezar = true;
@@ -145,7 +151,7 @@ namespace Nexus.Unity.Pantallas {
             if (_avisarAlEmpezar) {
                 _avisarAlEmpezar = false;
                 Repintar();
-                GuiaView.Avisar(App, "fase1." + _paso.ToString().ToLowerInvariant());
+                GuiaView.Avisar(App, AvisoDelPasoActual());
                 return;
             }
             // Los guiones de la Fase 1 (la guia de Marisol, la llegada de Voss) se apilan encima en cuanto la
@@ -205,16 +211,40 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
+        /// <summary>Cuantas partes tiene el paso en el que se esta: el expediente va por partes; lo demas, de una pieza.</summary>
+        private int PartesDelPaso {
+            get { return _paso == Paso.Encargo && Perfil.Proyecto != null ? PartesDelExpediente.Length : 1; }
+        }
+
+        private string AvisoDelPasoActual() {
+            return _paso == Paso.Encargo && Perfil.Proyecto != null
+                ? AvisoDeCadaParte[Mathf.Clamp(_subPaso, 0, AvisoDeCadaParte.Length - 1)]
+                : "fase1." + _paso.ToString().ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// «Atrás» y «Siguiente» recorren primero las partes del expediente y despues los pasos: el camino es uno solo,
+        /// y no hay que entender que hay dos niveles de pestañas para avanzar.
+        /// </summary>
         private void PintarNavegacion() {
             UiKit.Vaciar(_navegacion);
             var pasos = Pasos().ToList();
             var i = pasos.IndexOf(_paso);
-            if (i > 0) Ui.Boton(_navegacion, "◄  Atrás", () => IrA(pasos[i - 1]), VarianteBoton.Fantasma);
+            if (_subPaso > 0) Ui.Boton(_navegacion, "◄  Atrás", () => IrAParte(_subPaso - 1), VarianteBoton.Fantasma);
+            else if (i > 0) Ui.Boton(_navegacion, "◄  Atrás", () => IrA(pasos[i - 1], true), VarianteBoton.Fantasma);
             Ui.Resorte(_navegacion);
-            if (i < pasos.Count - 1) {
+            if (_subPaso < PartesDelPaso - 1) {
+                Ui.Boton(_navegacion, "Siguiente  ►", () => IrAParte(_subPaso + 1), VarianteBoton.Primario);
+            } else if (i < pasos.Count - 1) {
                 var siguiente = Ui.Boton(_navegacion, "Siguiente  ►", () => IrA(pasos[i + 1]), VarianteBoton.Primario);
                 siguiente.interactable = Completo(_paso);
             }
+        }
+
+        private void IrAParte(int parte) {
+            _subPaso = Mathf.Clamp(parte, 0, PartesDelPaso - 1);
+            Repintar();
+            GuiaView.Avisar(App, AvisoDelPasoActual());
         }
 
         // ==================================================================== 1 · el encargo
@@ -222,29 +252,44 @@ namespace Nexus.Unity.Pantallas {
         private void Encargo() {
             var f = Perfil.Proyecto;
             if (f == null) {
+                // Un nivel sin expediente: el encargo cabe en una sola hoja.
                 _hoja.Etiqueta("El encargo");
                 _hoja.Titulo(Perfil.Nombre);
                 if (Perfil.Briefing != null) foreach (var linea in Perfil.Briefing) _hoja.Parrafo(linea);
-            } else {
-                PintarExpediente(f);
+                PintarPistas(_hoja.Raiz);
+                _hoja.Espacio();
+                _hoja.Nota($"{Perfil.DiasTotales} días · equipo de {Perfil.EquipoInicial} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
+                _hoja.Nota("Léelo con calma: las tres decisiones que vienen se juzgan contra lo que dice aquí.");
+                PintarMetricas();
+                return;
             }
-            PintarPistas();
-            _hoja.Espacio();
-            _hoja.Nota($"{Perfil.DiasTotales} días · equipo de {Perfil.EquipoInicial} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
-            _hoja.Nota("Léelo con calma: las tres decisiones que vienen se juzgan contra lo que dice aquí.");
-            PintarMetricas();
-            if (f != null) PintarComprobacion();
+
+            _subPaso = Mathf.Clamp(_subPaso, 0, PartesDelExpediente.Length - 1);
+            _hoja.Etiqueta("El proyecto · " + f.Nombre);
+
+            // Las partes del expediente: se lee UNA a la vez. Se puede saltar a cualquiera, o ir con «Siguiente».
+            var partes = _hoja.Fila(6);
+            for (var i = 0; i < PartesDelExpediente.Length; i++) {
+                var parte = i;
+                var hecha = i == PartesDelExpediente.Length - 1 && ComprobacionHecha;
+                var boton = Ui.Boton(partes, (hecha ? "√ " : (i + 1) + " · ") + PartesDelExpediente[i], () => IrAParte(parte), VarianteBoton.Fantasma);
+                Ui.Resaltar(boton, i == _subPaso);
+            }
+            _hoja.Separador();
+
+            switch (_subPaso) {
+                case 0: ParteDelCliente(f); break;
+                case 1: ParteDelSistema(f); break;
+                case 2: ParteDeLoEspecial(f); break;
+                case 3: PintarMetricas(); break;
+                default: PintarComprobacion(); break;
+            }
         }
 
-        // ==================================================================== 1 · el expediente del proyecto
+        // ==================================================================== 1 · el expediente del proyecto, por partes
 
-        /// <summary>
-        /// Que se construye, para quien y en que sector; el sistema en una imagen; sus partes; las palabras del oficio;
-        /// que tiene de distinto; los documentos que importan; y, al final, el ticket original (feedback beta, ronda 4:
-        /// «se puede jugar el nivel bien sin entender de qué era el proyecto»).
-        /// </summary>
-        private void PintarExpediente(Nexus.Core.Proyecto.FichaDelProyecto f) {
-            _hoja.Etiqueta("El proyecto");
+        /// <summary>Para quien se construye y que le duele; quien lo va a usar; y el encargo en cifras.</summary>
+        private void ParteDelCliente(Nexus.Core.Proyecto.FichaDelProyecto f) {
             _hoja.Titulo(f.Nombre);
             if (!string.IsNullOrEmpty(f.EnUnaFrase)) _hoja.Parrafo(f.EnUnaFrase, Tema.cyan);
 
@@ -258,47 +303,50 @@ namespace Nexus.Unity.Pantallas {
                 foreach (var u in f.Usuarios) Ui.Texto(cliente, $"· <b>{u.Nombre}</b>: {u.QueNecesita}", EstiloTexto.Pequeno, Tema.ink);
             }
 
-            var sistema = _hoja.Tarjeta("El sistema en una imagen");
+            _hoja.Nota($"{Perfil.DiasTotales} días · equipo de {Perfil.EquipoInicial} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
+            _hoja.Nota("Léelo con calma: las tres decisiones que vienen se juzgan contra lo que dice aquí.");
+            if (Perfil.Briefing != null && Perfil.Briefing.Length > 0)
+                Ui.Boton(_hoja.Fila(), "Leer el ticket original", () => DialogosDelExpediente.Ticket(App, Perfil), VarianteBoton.Fantasma);
+        }
+
+        /// <summary>El sistema en una imagen y, al lado, sus partes: lo que se dibuja y lo que significa, juntos.</summary>
+        private void ParteDelSistema(Nexus.Core.Proyecto.FichaDelProyecto f) {
+            var fila = Ui.Fila(_hoja.Raiz, "Sistema", Tema.espacio, alineacion: TextAnchor.UpperLeft);
+            var sistema = Ui.Tarjeta(fila, "El sistema en una imagen");
+            UiKit.Tamano(sistema, ancho: 0, flexAncho: 3);
             GuiaView.Registrar("fase1.expediente", sistema);
             Ui.Texto(sistema, "Fuera, quién lo usa; dentro, sus partes (los módulos). Las flechas dicen quién le pide qué a quién. " +
                               "Cada reto de este nivel es una de estas partes: lo verás arriba del reto.", EstiloTexto.Pequeno, Tema.ink);
             ExpedienteView.Pizarrita(App.UiClasico, sistema, f);   // la tiza no cambia de kit
 
-            var modulos = _hoja.Tarjeta("Sus partes");
+            var modulos = Ui.Tarjeta(fila, "Sus partes");
+            UiKit.Tamano(modulos, ancho: 0, flexAncho: 2);
             foreach (var m in f.Modulos) {
-                var fila = Ui.Fila(modulos, espacio: 8);
-                var texto = Ui.Texto(fila, $"<b>{m.Nombre}</b>: {m.QueHace}", EstiloTexto.Pequeno, Tema.ink);
-                UiKit.Tamano(texto, flexAncho: 1);
-                var hecho = Ui.Texto(fila, m.AvanceInicial > 0 ? $"{m.AvanceInicial:0} % ya hecho" : "por hacer", EstiloTexto.Pequeno,
-                                     m.AvanceInicial > 0 ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Right);
-                UiKit.Tamano(hecho, ancho: 150);
+                Ui.Texto(modulos, $"<b>{m.Nombre}</b> · " + (m.AvanceInicial > 0 ? $"{m.AvanceInicial:0} % ya hecho" : "por hacer"),
+                         EstiloTexto.Pequeno, m.AvanceInicial > 0 ? Tema.cyan : Tema.ink);
+                Ui.Texto(modulos, m.QueHace, EstiloTexto.Pequeno, Tema.inkMuted);
             }
+        }
 
-            var vocabulario = _hoja.Tarjeta("Palabras del oficio");
-            GuiaView.Registrar("fase1.vocabulario", vocabulario);
-            Ui.Texto(vocabulario, "Las usa tu cliente y las verás en los diagramas y en las tarjetas. Pulsa cada una para ver qué es.",
-                     EstiloTexto.Pequeno, Tema.ink);
-            ExpedienteView.ChipsDeVocabulario(App, vocabulario, f);
-
+        /// <summary>
+        /// Lo que distingue a este proyecto (y lo que se averiguo en el recorrido). Las palabras del oficio y los
+        /// documentos son de consulta: estan a un boton, no ocupando la pagina.
+        /// </summary>
+        private void ParteDeLoEspecial(Nexus.Core.Proyecto.FichaDelProyecto f) {
             var cambia = _hoja.Tarjeta(ExpedienteView.NivelAnterior(App, Perfil) != null ? "Qué tiene de distinto este proyecto"
                                                                                         : "Qué tiene de especial este proyecto");
             GuiaView.Registrar("fase1.distinto", cambia);
-            foreach (var linea in ExpedienteView.QueCambia(App, Perfil)) Ui.Texto(cambia, "· " + linea, EstiloTexto.Pequeno, Tema.ink);
+            foreach (var linea in ExpedienteView.QueCambia(App, Perfil)) Ui.Texto(cambia, "· " + linea, EstiloTexto.Cuerpo, Tema.ink);
 
-            if (f.Artefactos.Count > 0) {
-                var docs = _hoja.Tarjeta("Los documentos que importan aquí");
-                foreach (var a in f.Artefactos) {
-                    var fila = Ui.Fila(docs, espacio: 6);
-                    var texto = Ui.Texto(fila, $"<b>{a.Id}</b>: {a.ParaQueAqui}", EstiloTexto.Pequeno, Tema.ink);
-                    UiKit.Tamano(texto, flexAncho: 1);
-                    if (!string.IsNullOrEmpty(a.Glosario)) PantallaDeGlosario.Chip(App, fila, a.Glosario);
-                }
-            }
+            PintarPistas(_hoja.Raiz);
 
-            if (Perfil.Briefing != null && Perfil.Briefing.Length > 0) {
-                var ticket = _hoja.Tarjeta("El ticket original");
-                foreach (var linea in Perfil.Briefing) Ui.Texto(ticket, linea, EstiloTexto.Cuerpo, Tema.ink);
-            }
+            var consulta = _hoja.Tarjeta("Para consultar");
+            GuiaView.Registrar("fase1.vocabulario", consulta);
+            Ui.Texto(consulta, "Las palabras que usa tu cliente (las verás en los diagramas y en las tarjetas) y los documentos que importan en este proyecto.",
+                     EstiloTexto.Pequeno, Tema.ink);
+            var botones = Ui.Fila(consulta);
+            Ui.Boton(botones, "Palabras del oficio", () => DialogosDelExpediente.Vocabulario(App, f));
+            if (f.Artefactos.Count > 0) Ui.Boton(botones, "Los documentos que importan", () => DialogosDelExpediente.Documentos(App, f));
         }
 
         // ==================================================================== «comprueba que lo entendiste»
@@ -306,7 +354,7 @@ namespace Nexus.Unity.Pantallas {
         private List<Nexus.Core.Proyecto.PreguntaDelProyecto> _preguntas;
         private readonly Dictionary<string, int> _comprobacion = new Dictionary<string, int>();
         private readonly HashSet<string> _falladas = new HashSet<string>();
-        private string _ultimaFallada;
+        private string _ultimaFallada, _ultimaAcertada;
         private bool _mantenerScroll;
 
         private List<Nexus.Core.Proyecto.PreguntaDelProyecto> Preguntas {
@@ -320,31 +368,50 @@ namespace Nexus.Unity.Pantallas {
 
         private bool ComprobacionHecha { get { return Preguntas.All(p => _comprobacion.ContainsKey(p.Id)); } }
 
+        /// <summary>
+        /// Una pregunta a la vez: la primera sin contestar, y encima lo que se acaba de acertar con su explicacion.
+        /// Con todas hechas, el repaso de las tres.
+        /// </summary>
         private void PintarComprobacion() {
-            if (Preguntas.Count == 0) return;
+            if (Preguntas.Count == 0) {
+                _hoja.Nota("Este proyecto no trae preguntas: puedes seguir.");
+                return;
+            }
             var t = _hoja.Tarjeta("Comprueba que lo entendiste");
             GuiaView.Registrar("fase1.comprobacion", t);
+            var hechas = Preguntas.Count(p => _comprobacion.ContainsKey(p.Id));
             Ui.Texto(t, $"{Preguntas.Count} preguntas cortas sobre el proyecto. No restan: si fallas, te digo por qué y lo vuelves a intentar. " +
-                        "Hay que contestarlas para seguir.", EstiloTexto.Pequeno, Tema.ink);
-            for (var i = 0; i < Preguntas.Count; i++) {
-                var p = Preguntas[i];
-                var titulo = Ui.Texto(t, $"{i + 1}. {p.Texto}", EstiloTexto.Cuerpo, Tema.ink);
-                titulo.fontStyle = FontStyles.Bold;
-                if (_comprobacion.ContainsKey(p.Id)) {
+                        $"Hay que contestarlas para seguir. Llevas {hechas} de {Preguntas.Count}.", EstiloTexto.Pequeno, Tema.ink);
+
+            if (ComprobacionHecha) {
+                for (var i = 0; i < Preguntas.Count; i++) {
+                    var p = Preguntas[i];
+                    Ui.Texto(t, $"{i + 1}. {p.Texto}", EstiloTexto.Cuerpo, Tema.ink).fontStyle = FontStyles.Bold;
                     Ui.Texto(t, "√ " + p.Opciones[p.Correcta], EstiloTexto.Cuerpo, Tema.success);
-                    Ui.Texto(t, p.Explicacion, EstiloTexto.Pequeno, Tema.inkMuted);
-                    continue;
                 }
-                for (var j = 0; j < p.Opciones.Count; j++) {
-                    var opcion = j;
-                    Ui.BotonDeOpcion(t, p.Opciones[j], null, () => Contestar(p, opcion));
-                }
-                if (_ultimaFallada == p.Id) Ui.Texto(t, "No es esa. Pista: " + p.Explicacion, EstiloTexto.Pequeno, Tema.warning);
+                Ui.Texto(t, "Hecho. Pulsa «Siguiente» para tomar las tres decisiones.", EstiloTexto.Pequeno, Tema.cyan);
+                return;
             }
+
+            var acertada = Preguntas.FirstOrDefault(p => p.Id == _ultimaAcertada);
+            if (acertada != null) {
+                Ui.Texto(t, "√ " + acertada.Opciones[acertada.Correcta], EstiloTexto.Cuerpo, Tema.success);
+                Ui.Texto(t, acertada.Explicacion, EstiloTexto.Pequeno, Tema.inkMuted);
+                Ui.Separador(t);
+            }
+
+            var indice = Preguntas.FindIndex(p => !_comprobacion.ContainsKey(p.Id));
+            var actual = Preguntas[indice];
+            Ui.Texto(t, $"{indice + 1}. {actual.Texto}", EstiloTexto.Cuerpo, Tema.ink).fontStyle = FontStyles.Bold;
+            for (var j = 0; j < actual.Opciones.Count; j++) {
+                var opcion = j;
+                Ui.BotonDeOpcion(t, actual.Opciones[j], null, () => Contestar(actual, opcion));
+            }
+            if (_ultimaFallada == actual.Id) Ui.Texto(t, "No es esa. Pista: " + actual.Explicacion, EstiloTexto.Pequeno, Tema.warning);
         }
 
         private void Contestar(Nexus.Core.Proyecto.PreguntaDelProyecto p, int opcion) {
-            if (opcion == p.Correcta) { _comprobacion[p.Id] = opcion; _ultimaFallada = null; }
+            if (opcion == p.Correcta) { _comprobacion[p.Id] = opcion; _ultimaFallada = null; _ultimaAcertada = p.Id; }
             else { _falladas.Add(p.Id); _ultimaFallada = p.Id; }
             _mantenerScroll = true;
             Repintar();
@@ -369,8 +436,13 @@ namespace Nexus.Unity.Pantallas {
                 new[] { "satisfaccion", "Satisfacción del cliente", "sube al escuchar, explicar y cumplir; baja con sorpresas." },
                 new[] { "riesgo", "Riesgo latente", "junta cansancio, deuda y falta de pruebas: el peligro de entregar." }
             };
-            foreach (var m in metricas) {
-                var fila = Ui.Fila(t, espacio: 6);
+            // En dos columnas: ocho renglones seguidos no se leian, y asi la pagina cabe sin desplazarse.
+            var rejilla = Ui.Fila(t, "Metricas", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            var columnas = new[] { Ui.Columna(rejilla, "Metricas A", Tema.Espacio(2)), Ui.Columna(rejilla, "Metricas B", Tema.Espacio(2)) };
+            foreach (var c in columnas) UiKit.Tamano(c, ancho: 0, flexAncho: 1);
+            for (var k = 0; k < metricas.Length; k++) {
+                var m = metricas[k];
+                var fila = Ui.Fila(columnas[k < (metricas.Length + 1) / 2 ? 0 : 1], espacio: 6);
                 var texto = Ui.Texto(fila, $"<b>{m[1]}</b>: {m[2]}", EstiloTexto.Pequeno, Tema.ink);
                 UiKit.Tamano(texto, flexAncho: 1);
                 PantallaDeGlosario.Chip(App, fila, m[0]);
@@ -385,13 +457,12 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>
         /// Las razones, en dos columnas y con su cuenta arriba, para que se vea que hay mas de cuatro (feedback #7).
         /// </summary>
-        private void PintarRazones(IList<KeyValuePair<string, string>> razones, string elegida, System.Action<string> alElegir) {
-            var cabecera = _hoja.Fila();
-            var titulo = Ui.Texto(cabecera, $"Elige 1 de estas {razones.Count} razones", EstiloTexto.Encabezado, Tema.ink);
+        private void PintarRazones(Transform padre, IList<KeyValuePair<string, string>> razones, string elegida, System.Action<string> alElegir) {
+            var titulo = Ui.Texto(padre, $"Elige 1 de estas {razones.Count} razones", EstiloTexto.Encabezado, Tema.ink);
             titulo.fontStyle = FontStyles.Bold;
             // Dos columnas que se reparten el ancho REAL (antes, celdas fijas de 760: en ventanas estrechas se salian
             // por la derecha, y el texto largo se salia de su celda de alto fijo).
-            var rejilla = Ui.Fila(_hoja.Raiz, "Razones", Tema.espacio, alineacion: TextAnchor.UpperLeft);
+            var rejilla = Ui.Fila(padre, "Razones", Tema.espacio, alineacion: TextAnchor.UpperLeft);
             var columnas = new[] { Ui.Columna(rejilla, "Razones A", Tema.espacio * 0.5f), Ui.Columna(rejilla, "Razones B", Tema.espacio * 0.5f) };
             foreach (var c in columnas) UiKit.Tamano(c, ancho: 0, flexAncho: 1);   // ancho 0 + flexible = mitad exacta
             GuiaView.Registrar("fase1.razones", rejilla);
@@ -403,10 +474,10 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
-        private void PintarPistas() {
+        private void PintarPistas(Transform padre) {
             var pistas = S.PistasEncontradas();
             if (pistas.Count == 0) return;
-            var t = _hoja.Tarjeta("Lo que averiguaste en el recorrido");
+            var t = Ui.Tarjeta(padre, "Lo que averiguaste en el recorrido");
             foreach (var p in pistas) Ui.Texto(t, "· " + p, EstiloTexto.Cuerpo);
         }
 
@@ -491,32 +562,35 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Boton(palabras, e.Termino + " ?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
             }
 
+            // Maestro y detalle: a la izquierda se elige, a la derecha se justifica. Antes las razones caian debajo de las
+            // tarjetas y habia que desplazarse para verlas.
             var disponibles = S.MetodologiasDisponibles();
-            var fila = _hoja.Fila();
-            GuiaView.Registrar("fase1.metodologias", fila);
+            var escena = Ui.Fila(_hoja.Raiz, "Eleccion", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            var opciones = Ui.Columna(escena, "Metodologias", Tema.Espacio(2));
+            UiKit.Tamano(opciones, ancho: 440);
+            GuiaView.Registrar("fase1.metodologias", opciones);
             foreach (var m in disponibles) {
                 var met = m;
-                var columna = Ui.Columna(fila, espacio: 4);
-                UiKit.Tamano(columna, ancho: disponibles.Count > 2 ? 440 : 600);
-                var tarjeta = Ui.BotonDeOpcion(columna, met.Nombre, met.Resumen, () => {
+                var tarjeta = Ui.BotonDeOpcion(opciones, met.Nombre, met.Resumen, () => {
                     if (_metodologia != met.Id) _razonMetodologia = null;   // otra metodologia, otros motivos
                     _metodologia = met.Id;
                     Repintar();
                 });
                 Ui.Resaltar(tarjeta, _metodologia == met.Id);
                 var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, met.Id);
-                if (e != null) Ui.Boton(columna, "¿Qué es " + met.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
+                if (e != null) Ui.Boton(opciones, "¿Qué es " + met.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
             }
 
+            var detalle = Ui.Columna(escena, "Motivos", Tema.espacio);
+            UiKit.Tamano(detalle, ancho: 0, flexAncho: 1);
             var elegida = disponibles.FirstOrDefault(m => m.Id == _metodologia);
             if (elegida == null) {
-                _hoja.Nota("Elige una para ver sus motivos.");
+                Ui.Texto(detalle, "Elige una, a la izquierda, para ver sus motivos.", EstiloTexto.Pequeno);
                 return;
             }
-            _hoja.Espacio();
-            _hoja.Subtitulo($"¿Por qué {elegida.Nombre}?");
+            Ui.Texto(detalle, $"¿Por qué {elegida.Nombre}?", EstiloTexto.Subtitulo);
             var motivos = elegida.TextosDeRazones.OrderBy(x => x.Value, System.StringComparer.Ordinal).ToList();
-            PintarRazones(motivos, _razonMetodologia, id => { _razonMetodologia = id; Repintar(); });
+            PintarRazones(detalle, motivos, _razonMetodologia, id => { _razonMetodologia = id; Repintar(); });
         }
 
         // ==================================================================== 4 · calidad
@@ -559,37 +633,36 @@ namespace Nexus.Unity.Pantallas {
             var fase1 = Perfil.Fase1;
             _hoja.Etiqueta("Decisión 3 de 3");
             _hoja.Titulo("¿Qué forma va a tener lo que construyes?");
-            _hoja.Parrafo("Vuelve a leer el encargo antes de elegir: la respuesta está ahí.");
-            var recordatorio = _hoja.Tarjeta("El encargo, otra vez");
-            if (Perfil.Briefing != null) foreach (var linea in Perfil.Briefing) Ui.Texto(recordatorio, "· " + linea, EstiloTexto.Pequeno);
-            foreach (var p in S.PistasEncontradas()) Ui.Texto(recordatorio, "· " + p, EstiloTexto.Pequeno, Tema.cyan);
+            var releer = _hoja.Fila();
+            UiKit.Tamano(Ui.Texto(releer, "Vuelve a leer el encargo antes de elegir: la respuesta está ahí.", EstiloTexto.Cuerpo), flexAncho: 1);
+            Ui.Boton(releer, "Releer el encargo", () => DialogosDelExpediente.Encargo(App, Perfil, S.PistasEncontradas()));
 
-            _hoja.Espacio();
-            var fila = _hoja.Fila();
+            var escena = Ui.Fila(_hoja.Raiz, "Eleccion", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            var opciones = Ui.Columna(escena, "Arquitecturas", Tema.Espacio(2));
+            UiKit.Tamano(opciones, ancho: 440);
             foreach (var a in fase1.Arquitecturas) {
                 var arq = a;
-                var columna = Ui.Columna(fila, espacio: 4);
-                UiKit.Tamano(columna, ancho: 420);
-                var boton = Ui.BotonDeOpcion(columna, arq.Nombre, null, () => {
+                var boton = Ui.BotonDeOpcion(opciones, arq.Nombre, null, () => {
                     if (_arquitectura != arq.Id) _razonArquitectura = null;   // otra forma, otras razones
                     _arquitectura = arq.Id;
                     Repintar();
                 });
                 Ui.Resaltar(boton, _arquitectura == arq.Id);
                 var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, arq.Id);
-                if (e != null) Ui.Boton(columna, "¿Qué es?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
+                if (e != null) Ui.Boton(opciones, "¿Qué es " + arq.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
             }
 
+            var detalle = Ui.Columna(escena, "Razones", Tema.espacio);
+            UiKit.Tamano(detalle, ancho: 0, flexAncho: 1);
             var elegida = fase1.Arquitecturas.FirstOrDefault(a => a.Id == _arquitectura);
             if (elegida == null) {
-                _hoja.Nota("Elige una forma para ver las razones que la justifican (o no).");
+                Ui.Texto(detalle, "Elige una forma, a la izquierda, para ver las razones que la justifican (o no).", EstiloTexto.Pequeno);
                 return;
             }
-            _hoja.Espacio();
-            _hoja.Subtitulo($"¿Por qué {elegida.Nombre}?");
+            Ui.Texto(detalle, $"¿Por qué {elegida.Nombre}?", EstiloTexto.Subtitulo);
             // Cada forma trae SUS razones (feedback #8): elegir app o web no puede ofrecer los mismos argumentos.
             var razones = fase1.RazonesDe(elegida).Select(r => new KeyValuePair<string, string>(r.Id, r.Texto)).ToList();
-            PintarRazones(razones, _razonArquitectura, id => { _razonArquitectura = id; Repintar(); });
+            PintarRazones(detalle, razones, _razonArquitectura, id => { _razonArquitectura = id; Repintar(); });
         }
 
         // ==================================================================== 6 · resumen
@@ -642,10 +715,11 @@ namespace Nexus.Unity.Pantallas {
             });
         }
 
-        private void IrA(Paso paso) {
+        private void IrA(Paso paso, bool porElFinal = false) {
             _paso = paso;
+            _subPaso = porElFinal ? PartesDelPaso - 1 : 0;
             Repintar();
-            GuiaView.Avisar(App, "fase1." + paso.ToString().ToLowerInvariant());
+            GuiaView.Avisar(App, AvisoDelPasoActual());
         }
     }
 }

@@ -75,16 +75,29 @@ namespace Nexus.Tests
         }
 
         [Test]
-        public void Tocar_un_senuelo_manda_sobre_haber_acertado_todo()
+        public void Un_senuelo_quita_el_mejor_resultado_y_pasar_de_la_tolerancia_manda_sobre_acertar()
         {
             var def = Cargar();
-            var st = ConMarcas(def,
+            Assert.AreEqual(1, def.ToleranciaDeSenuelos);
+
+            // Todo acertado, pero se acuso una pieza sana: ya no es «todos», y tampoco lo anula todo.
+            var conUno = ConMarcas(def,
                 (new[] { "x03", "x04", "x05", "x06" }, "historia_reescrita"),
                 (new[] { "x04" }, "autoria_perdida"),
                 (new[] { "mrg" }, "fusion_sin_revisar"));
-            var res = DetectarEvaluador.Evaluar(def, st);
-            Assert.AreEqual(DetectarEvaluador.FALSO_POSITIVO, res.Resultado);
-            Assert.IsTrue(res.EfectosDiferidos.Any(d => d.EventoForzado == "EV-EQ-07"));
+            Assert.AreEqual(DetectarEvaluador.PARCIAL, DetectarEvaluador.Evaluar(def, conUno).Resultado);
+
+            // Acusar a los dos señuelos pasa de la tolerancia: manda sobre haber acertado todo.
+            var conDos = ConMarcas(def,
+                (new[] { "x03", "x04", "x05", "x06" }, "historia_reescrita"),
+                (new[] { "x04" }, "autoria_perdida"),
+                (new[] { "mrg" }, "fusion_sin_revisar"),
+                (new[] { "s01" }, "rama_huerfana"));
+            Assert.AreEqual(DetectarEvaluador.FALSO_POSITIVO, DetectarEvaluador.Evaluar(def, conDos).Resultado);
+
+            // Sin tolerancia (lo de antes), con uno basta.
+            def.ToleranciaDeSenuelos = 0;
+            Assert.AreEqual(DetectarEvaluador.FALSO_POSITIVO, DetectarEvaluador.Evaluar(def, conUno).Resultado);
         }
 
         [Test]

@@ -13,8 +13,71 @@ namespace Nexus.Core.Minijuegos.Repartir {
     ///                  defectos se quedo a cero: el error clasico de «cobertura alta» en un solo sitio
     ///   parcial        escapan demasiados
     ///   omitido        no se asigno ni una hora
+    ///
+    /// Cuantos defectos hay de verdad no se ve, pero SI el rango que cabe esperar (estimadoMin–estimadoMax). Con
+    /// eso se puede razonar un reparto que gana pase lo que pase dentro del rango (RepartoPrudente): que salga
+    /// bien no depende de adivinar.
     /// </summary>
     public static class RepartirEvaluador {
+        /// <summary>Lo mas que cabe esperar en este deposito segun lo que ve el jugador. Sin rango, lo que hay.</summary>
+        public static int MaximoEsperado(Deposito d) {
+            return d.EstimadoMax > 0 ? d.EstimadoMax : d.DefectosOcultos;
+        }
+
+        public static int MinimoEsperado(Deposito d) {
+            return d.EstimadoMax > 0 ? Math.Max(0, Math.Min(d.EstimadoMin, d.EstimadoMax)) : d.DefectosOcultos;
+        }
+
+        /// <summary>«entre 4 y 5 errores», «unos 3 errores», «como mucho 1 error»: el rango, en palabras.</summary>
+        public static string RangoEsperado(Deposito d) {
+            int min = MinimoEsperado(d), max = MaximoEsperado(d);
+            if (min == max) return max == 1 ? "1 error" : $"unos {max} errores";
+            if (min == 0) return max == 1 ? "como mucho 1 error" : $"como mucho {max} errores";
+            return $"entre {min} y {max} errores";
+        }
+
+        /// <summary>Las horas que hay que poner, con los botones de 'paso' en 'paso', para atrapar esos errores.</summary>
+        public static int HorasParaCubrir(RepartirCfg cfg, Deposito d, int errores) {
+            var paso = Math.Max(1, cfg.Paso);
+            var utiles = d.CostePorDefecto * Math.Max(0, errores);
+            return ((utiles + paso - 1) / paso) * paso;
+        }
+
+        /// <summary>
+        /// Cuantos errores se escaparian si en cada deposito hubiera lo MAS que cabe esperar (peor caso) o lo
+        /// menos (mejor caso). Solo usa lo que el jugador ve, asi que se le puede enseñar mientras reparte.
+        /// </summary>
+        public static int EscapesEsperados(RepartirCfg cfg, IDictionary<string, int> asignacion, bool peorCaso) {
+            var escapan = 0;
+            foreach (var d in cfg.Depositos) {
+                int horas;
+                if (asignacion == null || !asignacion.TryGetValue(d.Id, out horas)) horas = 0;
+                var hay = peorCaso ? MaximoEsperado(d) : MinimoEsperado(d);
+                escapan += Math.Max(0, hay - horas / Math.Max(1, d.CostePorDefecto));
+            }
+            return escapan;
+        }
+
+        /// <summary>
+        /// El reparto de quien razona con lo que ve: cubrir lo mas que cabe esperar en cada tipo y, como las horas
+        /// no alcanzan, renunciar primero a los errores mas caros de atrapar. Es el que enseña el modo guiado, y el
+        /// validador exige que gane: si ni el prudente gana, ganar seria cuestion de suerte.
+        /// </summary>
+        public static Dictionary<string, int> RepartoPrudente(RepartirCfg cfg) {
+            var cubre = cfg.Depositos.ToDictionary(d => d.Id, d => MaximoEsperado(d));
+            Func<Dictionary<string, int>> horas = () => cfg.Depositos.ToDictionary(d => d.Id, d => HorasParaCubrir(cfg, d, cubre[d.Id]));
+            var reparto = horas();
+            while (reparto.Values.Sum() > cfg.Presupuesto) {
+                // Se renuncia a UN error del tipo mas caro que aun tenga alguno cubierto (a igual coste, el ultimo).
+                var cede = cfg.Depositos.Where(d => cubre[d.Id] > 0).OrderByDescending(d => d.CostePorDefecto)
+                              .ThenByDescending(d => cfg.Depositos.IndexOf(d)).FirstOrDefault();
+                if (cede == null) break;
+                cubre[cede.Id]--;
+                reparto = horas();
+            }
+            return reparto;
+        }
+
         public sealed class Reparto {
             public string DepositoId;
             public int Horas;
@@ -54,7 +117,9 @@ namespace Nexus.Core.Minijuegos.Repartir {
             }
 
             var escapan = reparto.Sum(r => r.Escapan);
-            var sobrecompra = reparto.Any(r => r.Horas > porId[r.DepositoId].CostePorDefecto * porId[r.DepositoId].DefectosOcultos);
+            // De mas = por encima de lo que haria falta aunque hubiera lo maximo esperado: se juzga con lo que el
+            // jugador veia, no con el numero escondido, y contando con que los botones van de 'paso' en 'paso'.
+            var sobrecompra = reparto.Any(r => r.Horas > HorasParaCubrir(cfg, porId[r.DepositoId], MaximoEsperado(porId[r.DepositoId])));
             var desatendido = reparto.Any(r => r.Horas == 0 && porId[r.DepositoId].DefectosOcultos > 0);
 
             string clave;
@@ -75,7 +140,7 @@ namespace Nexus.Core.Minijuegos.Repartir {
 
         /// <summary>
         /// Los repartos que ganan ("todos"), contando solo los que se pueden hacer con los botones (multiplos de
-        /// 'paso') y sin desperdiciar horas en un tipo que ya lo encontro todo. Sirve para que el validador
+        /// 'paso') y sin pasar de lo que cubriria lo maximo esperado de cada tipo. Sirve para que el validador
         /// rechace una escena imposible y para que un test la pruebe entera.
         /// </summary>
         public static List<Dictionary<string, int>> RepartosGanadores(RepartirCfg cfg) {
@@ -93,8 +158,7 @@ namespace Nexus.Core.Minijuegos.Repartir {
                     return;
                 }
                 var d = cfg.Depositos[i];
-                var utiles = d.CostePorDefecto * d.DefectosOcultos;
-                var tope = Math.Min(restante, ((utiles + paso - 1) / paso) * paso);
+                var tope = Math.Min(restante, HorasParaCubrir(cfg, d, MaximoEsperado(d)));
                 for (var h = 0; h <= tope; h += paso) {
                     actual[d.Id] = h;
                     probar(i + 1, restante - h);

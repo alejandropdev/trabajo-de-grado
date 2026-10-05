@@ -15,8 +15,11 @@ namespace Nexus.Core {
         public bool preTestHecho;
         // Los pasos de la guia del tutorial que este perfil ya vio: la guia no se repite en otra partida.
         public List<string> guiaVista = new List<string>();
-        // Los minijuegos que este perfil ya terminó alguna vez. La primera vez de cada uno se juega guiada.
+        // Los minijuegos que este perfil ya terminó alguna vez.
         public List<string> minijuegosJugados = new List<string>();
+        // Las mecánicas (verbos) que Marisol ya le guió de principio a fin: la primera vez de cada una se juega
+        // guiada, y solo esa. null = perfil de antes de que existiera: se deduce de minijuegosJugados al abrirlo.
+        public List<string> mecanicasGuiadas;
         public int[] resultadoPostTest = new int[15];
         public List<string> coleccionablesGlobales = new List<string>();
         public string notaNGplus = "";

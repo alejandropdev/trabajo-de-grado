@@ -91,6 +91,16 @@ namespace Nexus.Unity.Tema {
             SetVerticesDirty();
         }
 
+        /// <summary>
+        /// Un relleno sin borde. ★ Tiene que ser CONVEXO: la malla se arma en abanico desde su centro. Un area
+        /// irregular (las bandas de un grafico) se dibuja a trozos, un cuadrilatero por tramo.
+        /// </summary>
+        public void Poligono(List<Vector2> convexo, Color relleno) {
+            if (convexo == null || convexo.Count < 3) return;
+            _rellenos.Add(new Relleno { Poligono = convexo, Color = relleno });
+            SetVerticesDirty();
+        }
+
         public void Circulo(float cx, float cy, float r, Color borde, float grosor = 3, Color? relleno = null, bool discontinuo = false) {
             Elipse(cx, cy, r, r, borde, grosor, relleno, discontinuo);
         }

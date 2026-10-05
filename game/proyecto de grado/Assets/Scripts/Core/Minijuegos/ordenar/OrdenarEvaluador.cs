@@ -121,6 +121,60 @@ namespace Nexus.Core.Minijuegos.Ordenar {
         }
 
         /// <summary>
+        /// Las dependencias rotas entre las tarjetas que entran: (la que va antes de tiempo, la que necesitaba).
+        /// Es lo que la pantalla pinta en rojo mientras se ordena, y lo que el evaluador castiga al entregar.
+        /// </summary>
+        public static List<KeyValuePair<string, string>> Rotas(OrdenarCfg cfg, IList<string> orden) {
+            var lista = new List<KeyValuePair<string, string>>();
+            var entran = Entran(cfg, orden);
+            foreach (var t in cfg.Tarjetas) {
+                if (!entran.Contains(t.Id)) continue;
+                foreach (var dep in t.DependeDe)
+                    if (!entran.Contains(dep) || orden.IndexOf(dep) > orden.IndexOf(t.Id))
+                        lista.Add(new KeyValuePair<string, string>(t.Id, dep));
+            }
+            return lista;
+        }
+
+        /// <summary>
+        /// El orden en que aparece el backlog al empezar: barajado, y nunca uno que ya gane tal cual. El JSON se
+        /// escribe en el orden que se le ocurre a quien lo redacta (casi siempre el bueno), y un tablero que ya
+        /// esta resuelto enseña a no tocar nada. Mismo backlog y misma semilla, mismo orden.
+        /// </summary>
+        public static List<string> OrdenInicial(OrdenarCfg cfg, int semilla) {
+            var ids = cfg.Tarjetas.Select(t => t.Id).ToList();
+            if (ids.Count < 2) return ids;
+            var mejor = MejorValorPosible(cfg);
+            var porId = cfg.Tarjetas.ToDictionary(t => t.Id);
+            for (var intento = 0; intento < 32; intento++) {
+                var orden = Barajar(ids, semilla + intento * 7919);
+                var capturado = Entran(cfg, orden).Sum(id => porId[id].Valor);
+                var yaGana = Rotas(cfg, orden).Count == 0 && mejor > 0 && capturado >= cfg.UmbralDeValor * mejor;
+                if (!yaGana) return orden;
+            }
+            ids.Reverse();
+            return ids;
+        }
+
+        /// <summary>Fisher-Yates con un generador propio: ni System.Random ni GetHashCode dan lo mismo en todas las plataformas.</summary>
+        private static List<string> Barajar(List<string> ids, int semilla) {
+            uint estado = 2166136261u;
+            unchecked {
+                foreach (var id in ids)
+                    foreach (var c in id) estado = (estado ^ (uint)c) * 16777619u;
+                estado ^= (uint)semilla * 2654435761u;
+            }
+            if (estado == 0) estado = 1;
+            var orden = ids.ToList();
+            for (var i = orden.Count - 1; i > 0; i--) {
+                estado ^= estado << 13; estado ^= estado >> 17; estado ^= estado << 5;
+                var j = (int)(estado % (uint)(i + 1));
+                var tmp = orden[i]; orden[i] = orden[j]; orden[j] = tmp;
+            }
+            return orden;
+        }
+
+        /// <summary>
         /// El maximo valor que cabe respetando dependencias. Fuerza bruta sobre subconjuntos: un backlog de
         /// minijuego tiene menos de 16 tarjetas, y asi el numero es exacto, no una heuristica.
         /// </summary>

@@ -189,7 +189,7 @@
     ],
     "loNuevo": [
       "Es tu primer proyecto: un sistema pequeño, para un solo cliente, en cinco días.",
-      "Todo va guiado: Marisol te acompaña en cada reto para que aprendas qué mirar.",
+      "La primera vez que te toque cada tipo de reto, Marisol te lleva paso a paso para que aprendas qué mirar.",
       "Lo que cuenta no es que sea bonito, sino que funcione el viernes: aquí aprendes qué es un MVP."
     ],
     "temasDelNivel": [
@@ -204,6 +204,10 @@
   "presupuestoInicial": 3000,
   "alcanceInicial": 12,
   "equipoInicial": 1,
+  "equipo": [
+    { "id": "valeria", "nombre": "Valeria", "rol": "Interfaz", "habilidades": {"interfaz": 1.3, "datos": 0.8, "logica": 1.0, "pruebas": 1.0} },
+    { "id": "mateo", "nombre": "Mateo", "rol": "Datos y lógica", "habilidades": {"interfaz": 0.8, "datos": 1.3, "logica": 1.1, "pruebas": 0.9} }
+  ],
   "deudaHeredada": 0,
   "coberturaHeredada": 20,
   "documentacionHeredada": 20,
@@ -330,7 +334,6 @@
     "kanban"
   ],
   "nivelAndamiaje": 3,
-  "minijuegosGuiados": true,
   "volatilidadReal": 55,
   "fase1": {
     "calidad": {

@@ -17,17 +17,20 @@ using UnityEngine.UI;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>
-    /// El dia continuo (§3.3). Tres columnas:
-    ///   izquierda — el reloj y el MAPA: donde estas, a donde puedes ir y cuanto cuesta, y lo que hay aqui
-    ///   centro    — «Ahora»: lo unico que hay que mirar para saber que hacer (un aviso, una decision, el cierre…)
-    ///   derecha   — el proyecto (sus stocks) y el diario del dia: lo que ya ha pasado, lo mas reciente arriba
+    /// El dia continuo (§3.3). Lo que se ve SIEMPRE son solo dos cosas, las dos que importan:
+    ///   «La jornada» — lo unico que hay que mirar para saber que hacer ahora (un aviso, una decision, el cierre…)
+    ///   «El proyecto» — como va: el pronostico, sus cinco medidores y las partes del sistema
+    /// Arriba, el HUD (dia, donde estas, reloj, pausa) y debajo el riel de accesos. Todo lo demas —el mapa, el
+    /// equipo, el trabajo de escritorio, los avisos y la bitacora, el detalle del proyecto— vive en paneles que se
+    /// abren desde el riel (Dia/PantallaDelDia.Paneles.cs). Antes estaba todo a la vez, en tres columnas y cinco
+    /// scrolls, y nada destacaba (feedback de la beta).
     ///
     /// El reloj corre solo. Se para DENTRO de una escena (decision, minijuego, planificacion, retro, una carta
-    /// que lees) y en la pausa; nunca mientras decides si ir a atender un aviso — si el mundo se congelara ahi,
-    /// esa decision no costaria nada. Los avisos solo se atienden desde tu escritorio: si estas lejos, volver
-    /// cuesta minutos, y por el camino el aviso puede caducar.
+    /// que lees), en la pausa y mientras se mira un panel; nunca mientras decides si ir a atender un aviso — si el
+    /// mundo se congelara ahi, esa decision no costaria nada. Los avisos solo se atienden desde tu escritorio: si
+    /// estas lejos, volver cuesta minutos, y por el camino el aviso puede caducar.
     /// </summary>
-    public sealed class PantallaDelDia : Pantalla {
+    public sealed partial class PantallaDelDia : Pantalla {
         private enum Paso {
             AntesDeEmpezar, Retro, Planificacion, Jornada, Aviso, Decision, Decidido,
             Cierre, Prorroga, Resumen, FinDelDesarrollo
@@ -38,9 +41,7 @@ namespace Nexus.Unity.Pantallas {
 
         // interfaz
         private Hoja _ahora;
-        private RectTransform _mapa, _aqui, _diario, _equipo;
-        private TMP_Text _titulo, _etiqueta, _riesgo, _satisfaccion;
-        private string _claveEquipo;
+        private TMP_Text _titulo, _etiqueta, _riesgo, _satisfaccion, _textoAvisos;
         private Button _pausa;
         private readonly TMP_Text[] _valores = new TMP_Text[5];
         private readonly TMP_Text[] _efectos = new TMP_Text[5];
@@ -51,7 +52,8 @@ namespace Nexus.Unity.Pantallas {
         private float _siguientePronostico;
         private readonly BarraView[] _barras = new BarraView[5];
         private readonly List<KeyValuePair<Alerta, TMP_Text>> _cuentasAtras = new List<KeyValuePair<Alerta, TMP_Text>>();
-        private string _claveAhora, _claveMapa;
+        private string _claveAhora, _claveRiel;
+        private Paso _pasoAnterior;
 
         // lo que la pantalla sabe y la sesion no
         private bool _escenaApilada;
@@ -64,17 +66,22 @@ namespace Nexus.Unity.Pantallas {
         private bool _tengoElInicioDelDia;   // false al recuperar una partida: no se sabe como empezo ese dia
         private readonly List<string> _entradas = new List<string>();
 
+        /// <summary>Los cinco medidores del proyecto: nombre corto (el panel), nombre largo (el detalle) y su entrada del glosario.</summary>
+        private static readonly string[] MedidoresCortos = { "Avance", "Deuda", "Moral", "Cobertura", "Cansancio" };
+        private static readonly string[] MedidoresLargos = { "Avance", "Deuda técnica", "Moral del equipo", "Cobertura de pruebas", "Cansancio" };
+        private static readonly string[] MedidoresEnGlosario = { "avance", "deuda-tecnica", "moral", "cobertura", "cansancio" };
+
         public override bool PuedeVolver { get { return false; } }
 
         // ==================================================================== construir
 
         protected override void Construir() {
-            var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.margen * 0.75f, Tema.margen * 0.75f));
-            ConstruirCabecera(marco);
+            var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.espacio, Tema.margen * 0.75f));
+            ConstruirHud(marco);
+            ConstruirRiel(marco);
 
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);
-            ConstruirIzquierda(cuerpo);
 
             var centro = Ui.PanelColumna(cuerpo, "Ahora", Tema.margen, Tema.espacio);
             UiKit.Tamano(centro, flexAncho: 1, flexAlto: 1);
@@ -84,12 +91,13 @@ namespace Nexus.Unity.Pantallas {
             _ahora = new Hoja(Ui, contenido);
             GuiaView.Registrar("dia.ahora", centro);
 
-            ConstruirDerecha(cuerpo);
+            ConstruirProyecto(cuerpo);
 
             Runner.Usar(S);
             if (S.R.DiaActual > 0) Runner.ReanudarDia();
             Runner.EnEscena = false;
             Runner.Pausado = false;
+            Runner.Mirando = false;
             Runner.AlSonarAlerta += AlSonar;
             Runner.AlExpirarAlerta += AlExpirar;
             Runner.AlLlegarElCierre += AlCierre;
@@ -118,105 +126,114 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
-        private void ConstruirCabecera(Transform padre) {
-            var cabecera = Ui.Fila(padre, "Cabecera");
-            var titulos = Ui.Columna(cabecera, espacio: Tema.Espacio(1));
+        /// <summary>El HUD: que dia es y donde estas, el reloj, y el control del tiempo. Una sola franja.</summary>
+        private void ConstruirHud(Transform padre) {
+            var hud = Ui.Fila(padre, "HUD");
+            var titulos = Ui.Columna(hud, espacio: Tema.Espacio(1));
             UiKit.Tamano(titulos, flexAncho: 1);
             _etiqueta = Ui.Texto(titulos, "", EstiloTexto.Leyenda, Tema.cyan);
             _titulo = Ui.Texto(titulos, "", EstiloTexto.Subtitulo, Tema.ink);
 
-            _pausa = Ui.Boton(cabecera, "Pausa", () => Runner.Pausado = !Runner.Pausado);
+            GuiaView.Registrar("dia.reloj", RelojView.CrearCompacto(Ui, hud, Runner));
+
+            _pausa = Ui.Boton(hud, "Pausa", () => Runner.Pausado = !Runner.Pausado);
             UiKit.Tamano(_pausa, ancho: 130);
             foreach (var v in new[] { 1, 2, 4 }) {
                 var velocidad = v;
-                UiKit.Tamano(Ui.Boton(cabecera, "×" + v, () => Runner.Velocidad = velocidad, VarianteBoton.Fantasma), ancho: 64);
+                UiKit.Tamano(Ui.Boton(hud, "×" + v, () => Runner.Velocidad = velocidad, VarianteBoton.Fantasma), ancho: 64);
             }
             GuiaView.Registrar("dia.velocidad", _pausa);
-            GuiaView.Registrar("dia.diario", Ui.Boton(cabecera, "Diario", AbrirDiario));
-            GuiaView.BotonDeAyuda(App, cabecera);
-            Ui.Boton(cabecera, "Menú", () => App.Router.Apilar<PantallaDePausa>());
+            Ui.Boton(hud, "Menú", () => App.Router.Apilar<PantallaDePausa>());
         }
 
-        private void ConstruirIzquierda(Transform padre) {
-            var izquierda = Ui.Columna(padre, "Izquierda", Tema.espacio);
-            UiKit.Tamano(izquierda, ancho: 400, flexAlto: 1);
-            GuiaView.Registrar("dia.reloj", RelojView.Crear(Ui, izquierda, Runner));
+        /// <summary>
+        /// El riel: un boton por cada cosa que ya no esta siempre en pantalla. Tambien es a donde señala la guia
+        /// cuando habla de algo que vive dentro de un panel cerrado (RegistrarRespaldo).
+        /// </summary>
+        private void ConstruirRiel(Transform padre) {
+            var riel = Ui.Fila(padre, "Riel", Tema.Espacio(2));
+            var mapa = Ui.Boton(riel, "Mapa", AbrirMapa);
+            var equipo = Ui.Boton(riel, "Equipo", AbrirEquipo);
+            var escritorio = Ui.Boton(riel, "Escritorio", AbrirEscritorio);
+            var tablero = Ui.Boton(riel, "Tablero", () => AbrirTablero(0));
+            Ui.Boton(riel, "Monitoreo", () => AbrirMonitoreo(0));
+            var ceremonias = Ui.Boton(riel, "Ceremonias", () => AbrirCeremonias(0));
+            GuiaView.Registrar("dia.ceremonias", ceremonias);
+            GuiaView.RegistrarRespaldo("dia.tablero", tablero);
+            var avisos = Ui.Boton(riel, "Avisos", () => AbrirAvisos(0));
+            UiKit.Tamano(avisos, ancho: 260);   // su rotulo cambia («Avisos · 2 esperando»): ancho fijo para que quepa
+            _textoAvisos = avisos.GetComponentInChildren<TMP_Text>();
+            var diario = Ui.Boton(riel, "Diario", AbrirDiario);
+            Ui.Resorte(riel);
+            GuiaView.BotonDeAyuda(App, riel);
+
+            GuiaView.Registrar("dia.diario", diario);
+            GuiaView.RegistrarRespaldo("dia.mapa", mapa);
+            GuiaView.RegistrarRespaldo("dia.aqui", mapa);
+            GuiaView.RegistrarRespaldo("mapa.", mapa);
+            GuiaView.RegistrarRespaldo("dia.equipo", equipo);
+            GuiaView.RegistrarRespaldo("dia.oficina", escritorio);
+        }
+
+        /// <summary>
+        /// «El proyecto»: lo que se esta construyendo y como va, de un vistazo. Una linea por medidor (el efecto de
+        /// cada uno solo aparece cuando ya esta haciendo daño); el detalle completo, con sus «?», esta en Monitoreo.
+        /// </summary>
+        private void ConstruirProyecto(Transform padre) {
+            var panel = Ui.PanelColumna(padre, "Proyecto", Tema.margen * 0.75f, Tema.espacio);
+            UiKit.Tamano(panel, ancho: 640, flexAlto: 1);
+            GuiaView.Registrar("dia.proyecto", panel);
+
+            var ficha = S.Perfil.Proyecto;
+            var cabecera = Ui.Fila(panel, "Cabecera");
+            UiKit.Tamano(Ui.Texto(cabecera, "EL PROYECTO" + (ficha != null ? " · " + ficha.Nombre.ToUpperInvariant() : ""),
+                                  EstiloTexto.Leyenda, Tema.cyan), flexAncho: 1);
+            Ui.Boton(cabecera, "Ver el detalle", () => AbrirMonitoreo(0), VarianteBoton.Fantasma);
 
             RectTransform contenido;
-            var scroll = Ui.Desplazable(izquierda, out contenido);
+            var scroll = Ui.Desplazable(panel, out contenido, "Proyecto (scroll)");
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-            var mapa = Ui.Tarjeta(contenido, "El mapa");
-            GuiaView.Registrar("dia.mapa", mapa);
-            _mapa = Ui.Columna(mapa, "Zonas", 6);
-            var aqui = Ui.Tarjeta(contenido, "Aquí");
-            GuiaView.Registrar("dia.aqui", aqui);
-            _aqui = Ui.Columna(aqui, "Zona actual", 6);
-        }
-
-        private void ConstruirDerecha(Transform padre) {
-            var derecha = Ui.Columna(padre, "Derecha", Tema.espacio);
-            UiKit.Tamano(derecha, ancho: 420, flexAlto: 1);
-
-            // ★ Las tarjetas van en su propio scroll: sin el, cuando no cabian, la columna las encogia por debajo de
-            // su alto y los textos se pisaban. Si no caben, se desplazan; el diario, debajo, con alto fijo.
-            RectTransform tarjetas;
-            var scrollTarjetas = Ui.Desplazable(derecha, out tarjetas, "Tarjetas");
-            UiKit.Tamano(scrollTarjetas, flexAncho: 1, flexAlto: 1);
 
             // Lo primero: como saldria el lanzamiento si se entregara al ritmo de hoy. Es lo que da peso a cada barra.
-            var pronostico = Ui.Tarjeta(tarjetas, "Pronóstico del lanzamiento");
+            var pronostico = Ui.Columna(contenido, "Pronostico", Tema.Espacio(1));
             GuiaView.Registrar("dia.pronostico", pronostico);
             _pronosticoTitulo = Ui.Texto(pronostico, "", EstiloTexto.Cuerpo, Tema.ink);
             _pronosticoBarra = Ui.Barra(pronostico, 0, Tema.cyan);
-            _pronosticoDetalle = Ui.Texto(pronostico, "", EstiloTexto.Pequeno, Tema.ink);
+            _pronosticoDetalle = Ui.Texto(pronostico, "", EstiloTexto.Pequeno, Tema.inkMuted);
+            Ui.Separador(contenido);
 
-            var proyecto = Ui.Tarjeta(tarjetas, "El proyecto");
-            GuiaView.Registrar("dia.proyecto", proyecto);
-            var nombres = new[] { "Avance", "Deuda técnica", "Moral del equipo", "Cobertura de pruebas", "Cansancio" };
-            var glosario = new[] { "avance", "deuda-tecnica", "moral", "cobertura", "cansancio" };
             var colores = new[] { Tema.cyan, Tema.warning, Tema.cyan, Tema.cyan, Tema.warning };
-            for (var i = 0; i < nombres.Length; i++) {
-                var fila = Ui.Fila(proyecto);
-                Ui.Texto(fila, nombres[i], EstiloTexto.Pequeno, Tema.ink);
-                PantallaDeGlosario.Chip(App, fila, glosario[i]);
-                Ui.Resorte(fila);
+            for (var i = 0; i < MedidoresCortos.Length; i++) {
+                var fila = Ui.Fila(contenido, "Medidor", Tema.Espacio(3));
+                UiKit.Tamano(Ui.Texto(fila, MedidoresCortos[i], EstiloTexto.Pequeno, Tema.ink), ancho: 120);
+                _barras[i] = Ui.Barra(fila, 0, colores[i]);
                 _valores[i] = Ui.Texto(fila, "", EstiloTexto.Pequeno, Tema.ink, TextAlignmentOptions.Right);
-                _barras[i] = Ui.Barra(proyecto, 0, colores[i]);
-                _efectos[i] = Ui.Texto(proyecto, "", EstiloTexto.Pequeno, Tema.inkMuted);
-                Ui.Estilizar(_efectos[i], EstiloTexto.Leyenda);
+                UiKit.Tamano(_valores[i], ancho: 130);
+                _efectos[i] = Ui.Texto(contenido, "", EstiloTexto.Leyenda, Tema.danger);
+                _efectos[i].gameObject.SetActive(false);
             }
-            var filaRiesgo = Ui.Fila(proyecto);
-            _riesgo = Ui.Texto(filaRiesgo, "", EstiloTexto.Pequeno);
-            UiKit.Tamano(_riesgo, flexAncho: 1);
-            PantallaDeGlosario.Chip(App, filaRiesgo, "riesgo");
-            _satisfaccion = Ui.Texto(proyecto, "", EstiloTexto.Pequeno);
+            _riesgo = Ui.Texto(contenido, "", EstiloTexto.Pequeno);
+            _satisfaccion = Ui.Texto(contenido, "", EstiloTexto.Pequeno);
+
+            // Lo que el equipo tiene entre manos ahora mismo: el tablero, en pequeño.
+            Ui.Separador(contenido);
+            ConstruirTableroDelDia(contenido);
 
             // El avance, parte por parte del sistema: que se construye de verdad cada dia (ronda 4).
-            var ficha = S.Perfil.Proyecto;
             if (ficha != null && ficha.Modulos.Count > 0) {
-                var modulos = Ui.Tarjeta(tarjetas, "Las partes de " + ficha.Nombre);
+                Ui.Separador(contenido);
+                var modulos = Ui.Columna(contenido, "Modulos", Tema.Espacio(2));
                 GuiaView.Registrar("dia.modulos", modulos);
+                Ui.Texto(modulos, "LAS PARTES DEL SISTEMA", EstiloTexto.Leyenda, Tema.cyan);
                 foreach (var m in ficha.Modulos) {
-                    var fila = Ui.Fila(modulos);
-                    var nombre = Ui.Texto(fila, m.Nombre, EstiloTexto.Pequeno, Tema.ink);
-                    UiKit.Tamano(nombre, flexAncho: 1);
+                    var fila = Ui.Fila(modulos, "Modulo", Tema.Espacio(3));
+                    UiKit.Tamano(Ui.Texto(fila, m.Nombre, EstiloTexto.Pequeno, Tema.ink), ancho: 220);
+                    var barra = Ui.Barra(fila, 0, Tema.cyan);
                     var pct = Ui.Texto(fila, "", EstiloTexto.Pequeno, Tema.ink, TextAlignmentOptions.Right);
                     UiKit.Tamano(pct, ancho: 70);
-                    _modulos.Add(new KeyValuePair<TMP_Text, BarraView>(pct, Ui.Barra(modulos, 0, Tema.cyan)));
+                    _modulos.Add(new KeyValuePair<TMP_Text, BarraView>(pct, barra));
                 }
             }
-
-            // Con quien te llevas bien y que ayudas tienes guardadas.
-            var equipo = Ui.Tarjeta(tarjetas, "Tu equipo");
-            GuiaView.Registrar("dia.equipo", equipo);
-            _equipo = Ui.Columna(equipo, "Personas", 4);
-
-            var diario = Ui.PanelColumna(derecha, "Diario del dia", Tema.margen * 0.75f, Tema.espacio);
-            UiKit.Tamano(diario, flexAncho: 1, alto: 240);
-            Ui.Texto(diario, "LO QUE HA PASADO", EstiloTexto.Leyenda, Tema.cyan);
-            var scroll = Ui.Desplazable(diario, out _diario);
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-            PintarDiario();
         }
 
         private void OnDestroy() {
@@ -225,6 +242,7 @@ namespace Nexus.Unity.Pantallas {
             Runner.AlExpirarAlerta -= AlExpirar;
             Runner.AlLlegarElCierre -= AlCierre;
             Runner.AlTerminarElDia -= AlFinDelDia;
+            Runner.Mirando = false;
         }
 
         // ==================================================================== que pasa ahora
@@ -256,24 +274,18 @@ namespace Nexus.Unity.Pantallas {
             var paso = PasoActual();
             var clave = $"{paso}|{S.R.DiaActual}|{S.ZonaActual}|{string.Join(",", AlertasSonando().Select(a => a.Id))}|" +
                         $"{S.SePuedeCerrarLaJornada}|{QuedaAlgunAviso()}|{_compromiso}|{Runner.PuedeMoverse}|" +
-                        string.Join(",", S.TareasDeOficina.Select(t => S.PorQueNoSePuedeHacer(t.Id) == null ? "1" : "0"));
+                        string.Join(",", S.TareasDeOficina.Select(t => S.PorQueNoSePuedeHacer(t.Id) == null ? "1" : "0")) +
+                        $"|{S.R.CeremoniasHechasHoy.Count}|{S.PrPendiente != null}";
             if (clave != _claveAhora) {
                 _claveAhora = clave;
                 PintarAhora(paso);
             }
 
-            var claveMapa = $"{S.R.DiaActual}|{S.ZonaActual}|{Runner.Estado}|{Runner.PuedeMoverse}|{S.ColeccionablesAqui().Count}|" +
-                            S.R.ConversacionesHechas.Count;
-            if (claveMapa != _claveMapa) {
-                _claveMapa = claveMapa;
-                PintarMapa();
-            }
-
-            var claveEquipo = string.Join(",", S.R.Confianza.Select(kv => kv.Key + kv.Value)) + "|" +
-                              string.Join(",", S.AyudasDisponibles().Select(kv => kv.Key + kv.Value)) + "|" + Runner.PuedeMoverse;
-            if (claveEquipo != _claveEquipo) {
-                _claveEquipo = claveEquipo;
-                PintarEquipo();
+            // Un panel abierto se quita de en medio cuando la jornada pasa a pedir otra cosa (llego el cierre, se
+            // acabo el dia): lo que hay que mirar entonces esta debajo.
+            if (paso != _pasoAnterior) {
+                if (paso == Paso.Cierre || paso == Paso.Resumen || paso == Paso.FinDelDesarrollo) CerrarPanel();
+                _pasoAnterior = paso;
             }
 
             foreach (var kv in _cuentasAtras)
@@ -282,16 +294,42 @@ namespace Nexus.Unity.Pantallas {
                     : "";
 
             PintarCabecera();
+            PintarRiel();
             PintarProyecto();
+            PintarTableroDelDia();
         }
 
         private void PintarCabecera() {
             var brief = S.BriefDeHoy;
             _etiqueta.text = S.Perfil.Nombre.ToUpperInvariant() + " · " + S.Metodologia.Nombre.ToUpperInvariant();
-            _titulo.text = S.R.DiaActual == 0
+            var zona = ZonaDondeEstoy();
+            _titulo.text = (S.R.DiaActual == 0
                 ? "Antes del día 1"
-                : $"Día {S.R.DiaActual} de {S.Perfil.DiasTotales}" + (brief != null ? " · " + brief.EtiquetaUnidad : "");
+                : $"Día {S.R.DiaActual} de {S.Perfil.DiasTotales}" + (brief != null ? " · " + brief.EtiquetaUnidad : "")) +
+                (zona != null ? "  ·  estás en: " + zona.Nombre : "");
             _pausa.GetComponentInChildren<TMP_Text>().text = Runner.Pausado ? "Seguir" : "Pausa";
+        }
+
+        /// <summary>El boton «Avisos» dice cuantos esperan: es lo unico del riel que cambia solo.</summary>
+        private void PintarRiel() {
+            var sonando = AlertasSonando().Count;
+            var deHoy = AvisosDeHoy();
+            var clave = sonando + "|" + deHoy;
+            if (clave == _claveRiel) return;
+            _claveRiel = clave;
+            _textoAvisos.text = sonando > 0 ? $"Avisos · {sonando} esperando" : deHoy > 0 ? $"Avisos · {deHoy} de hoy" : "Avisos";
+        }
+
+        /// <summary>Lo que hoy trae de serie para leer: la consecuencia del estado y los anuncios de lo que viene.</summary>
+        private int AvisosDeHoy() {
+            var brief = S.BriefDeHoy;
+            if (brief == null) return 0;
+            return brief.Avisos.Count + (brief.Incidencia != null ? 1 : 0);
+        }
+
+        private ZonaDeNivel ZonaDondeEstoy() {
+            var mapa = S.Perfil.Mapa;
+            return mapa == null || mapa.Vacio ? null : mapa.PorId(S.ZonaActual);
         }
 
         private void PintarProyecto() {
@@ -308,9 +346,18 @@ namespace Nexus.Unity.Pantallas {
             _barras[4].Valor = (float)w.Cansancio / 100f;
             var d = S.BriefDeHoy != null ? S.BriefDeHoy.Derivadas : null;
             _riesgo.text = d == null ? "" : $"Riesgo latente al empezar el día: {d.RiesgoLatente:0} / 100";
-            _satisfaccion.text = $"Satisfacción del cliente: {w.SatisfaccionCliente:0} / 100 · pesa 15 de 100 en el lanzamiento" +
+            _satisfaccion.text = $"Satisfacción del cliente: {w.SatisfaccionCliente:0} / 100" +
                                  (w.SatisfaccionCliente <= 35 ? $" · <color={NexusTheme.Html(Tema.danger)}>tan baja que pedirán explicaciones</color>" : "");
-            PintarEfectos();
+
+            // Debajo de un medidor solo se escribe cuando ya esta haciendo daño: asi el rojo significa algo.
+            bool[] malos;
+            var efectos = EfectosDeLosMedidores(out malos);
+            for (var i = 0; i < _efectos.Length; i++) {
+                var go = _efectos[i].gameObject;
+                if (go.activeSelf != malos[i]) go.SetActive(malos[i]);
+                if (malos[i]) _efectos[i].text = efectos[i];
+            }
+
             if (_modulos.Count > 0) {
                 var porModulo = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(S.Perfil.Proyecto, w.Avance, w.Alcance);
                 for (var i = 0; i < _modulos.Count && i < porModulo.Count; i++) {
@@ -325,89 +372,42 @@ namespace Nexus.Unity.Pantallas {
         }
 
         /// <summary>
-        /// Debajo de cada barra, lo que esa barra esta provocando AHORA, con las mismas formulas que usa el motor:
-        /// sin esto, solo el avance parecia importar (feedback beta, ronda 2).
+        /// Lo que cada medidor esta provocando AHORA, con las mismas formulas que usa el motor: sin esto, solo el
+        /// avance parecia importar (feedback beta, ronda 2). 'malos' dice cuales ya estan en zona de daño.
         /// </summary>
-        private void PintarEfectos() {
+        private string[] EfectosDeLosMedidores(out bool[] malos) {
             var w = S.W;
             var inc = S.EntregaIncremental;
             var faltan = Math.Max(0, w.Alcance - w.Avance);
-            _efectos[0].text = faltan <= 0.05 ? "Todo lo prometido está hecho." : $"Faltan {faltan:0.#} puntos por hacer.";
-
             var lentoDeuda = (1 - Nexus.Core.Simulacion.ForresterModel.FDeuda(w.DeudaTecnica)) * 100;
             var errDeuda = Nexus.Core.Evaluacion.PronosticoDeLanzamiento.DefectosPorDeuda(w.DeudaTecnica, inc);
-            _efectos[1].text = Efecto($"El equipo va un {lentoDeuda:0} % más lento · +{errDeuda:0.#} errores llegarán al cliente",
-                                      w.DeudaTecnica >= 50, w.DeudaTecnica >= 50 ? " · ya rompe cosas" : "");
-
             var rinde = Nexus.Core.Simulacion.ForresterModel.FMoral(w.MoralEquipo) * 100;
-            _efectos[2].text = Efecto($"El equipo rinde al {rinde:0} % de lo que podría", w.MoralEquipo <= 35, w.MoralEquipo <= 35 ? " · hay roces" : "");
-
             var errCob = Nexus.Core.Evaluacion.PronosticoDeLanzamiento.DefectosPorCobertura(w.Cobertura, inc);
-            _efectos[3].text = Efecto($"~{errCob:0} errores sin probar llegarían al cliente", w.Cobertura <= 30, "");
-
             var lentoFatiga = (1 - Nexus.Core.Simulacion.ForresterModel.FFatiga(w.Cansancio)) * 100;
-            _efectos[4].text = Efecto($"El equipo va un {lentoFatiga:0} % más lento por cansancio", w.Cansancio >= 60,
-                                      w.Cansancio >= 60 ? " · se equivoca más" : "");
-        }
 
-        private string Efecto(string texto, bool malo, string extra) {
-            return malo ? $"<color={NexusTheme.Html(Tema.danger)}>{texto}{extra}</color>" : texto;
+            malos = new[] { false, w.DeudaTecnica >= 50, w.MoralEquipo <= 35, w.Cobertura <= 30, w.Cansancio >= 60 };
+            return new[] {
+                faltan <= 0.05 ? "Todo lo prometido está hecho." : $"Faltan {faltan:0.#} puntos por hacer.",
+                $"El equipo va un {lentoDeuda:0} % más lento · +{errDeuda:0.#} errores llegarán al cliente" + (malos[1] ? " · ya rompe cosas" : ""),
+                $"El equipo rinde al {rinde:0} % de lo que podría" + (malos[2] ? " · hay roces" : ""),
+                $"~{errCob:0} errores sin probar llegarían al cliente",
+                $"El equipo va un {lentoFatiga:0} % más lento por cansancio" + (malos[4] ? " · se equivoca más" : "")
+            };
         }
 
         private void PintarPronostico() {
             if (S.R.Fase != 2) return;
             var c = S.Pronostico();
-            var color = NexusTheme.Html(c.Nivel == Nexus.Core.Evaluacion.NivelesDeLanzamiento.Bien ? Tema.success
-                      : c.Nivel == Nexus.Core.Evaluacion.NivelesDeLanzamiento.Mal ? Tema.danger : Tema.warning);
+            var color = NexusTheme.Html(ColorDelNivel(c.Nivel));
             _pronosticoTitulo.text = $"Si sigues así: <color={color}><b>{Nexus.Core.Evaluacion.NivelesDeLanzamiento.Titulo(c.Nivel).ToLowerInvariant()}</b></color> ({c.Puntaje:0}/100)";
             _pronosticoBarra.Valor = (float)(c.Puntaje / 100.0);
             var peor = c.Factores.OrderBy(f => f.Maximo > 0 ? f.Puntos / f.Maximo : 1).First();
-            var malos = c.Factores.Where(f => f.Estado != "bien").Select(f => f.Nombre.ToLowerInvariant()).ToList();
-            _pronosticoDetalle.text = $"Lo que más te resta: {peor.Nombre.ToLowerInvariant()} ({peor.Valor})." +
-                                      (malos.Count > 1 ? " También flojea: " + string.Join(", ", malos.Where(m => m != peor.Nombre.ToLowerInvariant())) + "." : "");
+            _pronosticoDetalle.text = $"Lo que más te resta: {peor.Nombre.ToLowerInvariant()} ({peor.Valor}).";
         }
 
-        /// <summary>Las personas con las que ya hablaste, su confianza, y las ayudas que tienes guardadas.</summary>
-        private void PintarEquipo() {
-            UiKit.Vaciar(_equipo);
-            var rel = App.Catalogo.Relaciones;
-            var conocidos = S.R.Confianza.Keys.ToList();
-            if (conocidos.Count == 0)
-                Ui.Texto(_equipo, "Todavía no has hablado con nadie. Cuando haya alguien en una sala, aparecerá «Hablar con…» en «Aquí».",
-                         EstiloTexto.Pequeno, Tema.inkMuted);
-            var enEsteNivel = new HashSet<string>(rel.Conversaciones.Where(c => c.Nivel == S.NivelId).Select(c => c.Personaje));
-            foreach (var id in conocidos.OrderByDescending(x => enEsteNivel.Contains(x))) {
-                var p = rel.PersonajePorId(id);
-                var confianza = S.Confianza(id);
-                var siguiente = p == null ? null : p.Ayudas.Where(a => a.Umbral > confianza).OrderBy(a => a.Umbral).FirstOrDefault();
-                // RosterRow: el punto dice si ya diste todo con esa persona (confianza maxima) o sigue la relacion.
-                Ui.FilaDeEquipo(_equipo, p?.Nombre ?? id, p?.Rol, siguiente == null ? EstadoDeEquipo.Hecho : EstadoDeEquipo.Activo);
-                Ui.Texto(_equipo, siguiente == null ? $"confianza {confianza} · máxima" : $"confianza {confianza}/{siguiente.Umbral}", EstiloTexto.Leyenda, Tema.cyan);
-                if (siguiente != null) Ui.Barra(_equipo, siguiente.Umbral > 0 ? (float)confianza / siguiente.Umbral : 1, Tema.cyan);
-                // Quien sigue de un nivel a otro: lo que ganes con el no se pierde.
-                var nota = p != null && p.Persistente
-                    ? (enEsteNivel.Contains(id) ? "Sigue contigo en los próximos proyectos." : "No está en este proyecto, pero sigue contigo.")
-                    : "Solo en este proyecto.";
-                Ui.Texto(_equipo, nota, EstiloTexto.Leyenda, Tema.inkFaint);
-            }
-            var ayudas = S.AyudasDisponibles();
-            if (ayudas.Count == 0) return;
-            Ui.Texto(_equipo, "AYUDAS GUARDADAS", EstiloTexto.Leyenda, Tema.cyan);
-            foreach (var kv in ayudas) {
-                var tipo = kv.Key;
-                var fila = Ui.Columna(_equipo, espacio: 2);
-                Ui.Texto(fila, $"{PantallaDeConversacion.TextoDeAyuda(tipo)}  ×{kv.Value}", EstiloTexto.Pequeno, Tema.ink);
-                if (tipo == Nexus.Core.Relaciones.TiposDeAyuda.BajarCansancio) {
-                    var usar = Ui.Boton(fila, "Usar ahora", () => {
-                        var antes = S.W.Cansancio;
-                        if (S.UsarAyuda(tipo)) Anotar($"{S.HoraActual} · El equipo descansa un rato: cansancio {Textos.Cambio(S.W.Cansancio - antes)}.");
-                        _claveEquipo = null;
-                    }, VarianteBoton.Fantasma);
-                    usar.interactable = Runner.PuedeMoverse;
-                } else {
-                    Ui.Texto(fila, "Se elige en la receta, antes de jugar el reto.", EstiloTexto.Pequeno, Tema.inkMuted);
-                }
-            }
+        private Color ColorDelNivel(string nivel) {
+            return nivel == Nexus.Core.Evaluacion.NivelesDeLanzamiento.Bien ? Tema.success
+                 : nivel == Nexus.Core.Evaluacion.NivelesDeLanzamiento.Mal ? Tema.danger : Tema.warning;
         }
 
         /// <summary>Hablar con alguien de la sala: la escena para el reloj, y la charla lo cobra al contestar.</summary>
@@ -465,14 +465,15 @@ namespace Nexus.Unity.Pantallas {
                            "arriba puedes pausarlo o acelerarlo.");
             _ahora.Parrafo("En cualquier momento puede llegar un aviso. Tienes unas horas para atenderlo, y solo se atiende desde tu " +
                            "escritorio. Si lo dejas caducar, alguien decide por ti, y casi nunca bien.");
-            _ahora.Parrafo("Mientras tanto, el mapa de la izquierda es tuyo: cada zona tiene algo que no está en ninguna otra. Pero ir " +
-                           "cuesta tiempo, y estar lejos cuando suena un aviso también.");
+            _ahora.Parrafo("Mientras tanto, el edificio es tuyo: con «Mapa», arriba, vas a otras zonas, y cada una tiene algo que no " +
+                           "está en ninguna otra. Pero ir cuesta tiempo, y estar lejos cuando suena un aviso también.");
             _ahora.Accion("Empezar el día 1", EmpezarDia);
         }
 
         private void Retro() {
             var retro = S.PendingRetro;
-            _ahora.Etiqueta("Ceremonia · retrospectiva");
+            var ceremonia = S.Reglas == null ? null : S.Reglas.CeremoniaPorId(retro.CeremoniaId);
+            _ahora.Etiqueta("Ceremonia · " + (ceremonia != null && !string.IsNullOrEmpty(ceremonia.Nombre) ? ceremonia.Nombre : "retrospectiva"));
             _ahora.Titulo("¿Qué cambiamos del proceso?");
             if (!string.IsNullOrEmpty(retro.Texto)) _ahora.Parrafo(retro.Texto);
             _ahora.Nota("Lo que elijas cambia cómo trabaja el equipo desde hoy. El reloj espera.");
@@ -494,6 +495,19 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Etiqueta("Ceremonia · planificación de " + plan.Unidad);
             _ahora.Titulo("¿Con cuánto te comprometes?");
             _ahora.Parrafo($"El equipo calcula que puede con unos {plan.CapacidadSugerida:0.#} puntos. Quedan {plan.PuntosPendientes:0} puntos por hacer.");
+            // Lo que se promete son tarjetas de verdad: las primeras del backlog, hasta llenar los puntos.
+            if (S.Tablero != null) {
+                var entran = new List<string>();
+                var suma = 0.0;
+                foreach (var c in S.Tablero.Tarjetas.Where(x => !x.EsBug && !x.Terminada).OrderBy(x => x.Empezada ? 0 : 1).ThenBy(x => x.Orden)) {
+                    if (suma >= _compromiso - 0.005) break;
+                    entran.Add($"{c.Titulo} ({c.Restante:0.#})");
+                    suma += c.Restante;
+                }
+                var entra = _ahora.Tarjeta($"Con {_compromiso:0} puntos entran en el sprint {entran.Count} tarjetas");
+                Ui.Texto(entra, entran.Count == 0 ? "Ninguna." : string.Join(" · ", entran), EstiloTexto.Pequeno, Tema.ink);
+                Ui.Texto(entra, "Entran en el orden del backlog: lo de arriba, primero. El resto espera en el product backlog.", EstiloTexto.Pequeno);
+            }
             _ahora.Nota("Prometer más de lo que cabe no da error: genera sobrecompromiso, y el sobrecompromiso genera deuda técnica cada día hasta que se cierra.");
 
             var fila = _ahora.Fila();
@@ -513,28 +527,34 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Etiqueta("La jornada corre");
             _ahora.Titulo(S.HoraActual.StartsWith("0") ? "Buenos días" : "Trabajando");
             _ahora.Parrafo(porSonar
-                ? "Hoy va a llegar algún aviso, y no sabes cuándo. Mientras tanto puedes recorrer el mapa, o esperar en tu escritorio."
-                : "Hoy ya no queda ningún aviso por llegar. Puedes explorar, o dar la jornada por terminada.");
+                ? "Hoy va a llegar algún aviso, y no sabes cuándo. Mientras tanto puedes recorrer el mapa, hablar con la gente o adelantar trabajo en tu escritorio."
+                : "Hoy ya no queda ningún aviso por llegar. Puedes explorar, adelantar trabajo, o dar la jornada por terminada.");
 
+            // Lo que hoy trae para leer cabe en una linea cada cosa; entero, en «Avisos».
             var brief = S.BriefDeHoy;
             if (brief != null && brief.Incidencia != null) {
-                var inc = _ahora.Tarjeta($"Hoy · consecuencia de tu {NombreDeEstadistica(brief.Incidencia.Estadistica)} ({brief.Incidencia.Valor:0})", Tono.Aviso);
-                Ui.Texto(inc, brief.Incidencia.Titulo, EstiloTexto.Cuerpo).fontStyle = FontStyles.Bold;
-                Ui.Texto(inc, brief.Incidencia.Texto, EstiloTexto.Pequeno, Tema.ink);
-                var efectos = brief.Incidencia.Efectos.ToDictionary(kv => kv.Key, kv => Nexus.Core.Servicios.EffectApplier.ToDouble(kv.Value));
-                Ui.Texto(inc, "Lo que costó: " + Textos.Previsualizar(efectos), EstiloTexto.Pequeno, Tema.warning);
+                var n = Ui.Notificacion(_ahora.Raiz, $"Hoy, por tu {NombreDeEstadistica(brief.Incidencia.Estadistica)} ({brief.Incidencia.Valor:0}): {brief.Incidencia.Titulo}", Tono.Aviso);
+                Ui.Boton(n, "Ver", () => AbrirAvisos(0), VarianteBoton.Fantasma);
             }
             if (brief != null && brief.Avisos.Count > 0) {
-                var anuncios = _ahora.Tarjeta("Anuncios de hoy");
-                Ui.Texto(anuncios, "Avisan de lo que llegará en los próximos días. Léelos: lo que hoy es un comentario suelto, mañana es un problema.",
-                         EstiloTexto.Pequeno);
-                foreach (var aviso in brief.Avisos) Ui.Texto(anuncios, aviso, EstiloTexto.Cuerpo);
+                var n = Ui.Notificacion(_ahora.Raiz, brief.Avisos.Count == 1 ? "Hay 1 anuncio de lo que llegará en los próximos días."
+                                                                              : $"Hay {brief.Avisos.Count} anuncios de lo que llegará en los próximos días.", Tono.Cyan);
+                Ui.Boton(n, "Leer", () => AbrirAvisos(0), VarianteBoton.Fantasma);
             }
-
-            PintarOficina();
+            var pendientes = S.CeremoniasDeHoy().Where(c => !c.Hecha).ToList();
+            if (pendientes.Count > 0) {
+                var n = Ui.Notificacion(_ahora.Raiz, "Hoy puedes asistir a: " + string.Join(" · ", pendientes.Select(c => $"{c.Nombre} ({c.DuracionMinutos} min)")), Tono.Cyan);
+                Ui.Boton(n, "Ir", () => AbrirCeremonias(0), VarianteBoton.Fantasma);
+            }
+            if (S.PrPendiente != null) {
+                var n = Ui.Notificacion(_ahora.Raiz, "Un compañero ha dejado un cambio de código para que lo revises.", Tono.Cyan);
+                Ui.Boton(n, "Revisar", AbrirRevision, VarianteBoton.Fantasma);
+            }
+            if (S.TareasDeOficina.Count > 0) GuiaView.Avisar(App, "oficina.disponible");
 
             _ahora.Espacio();
             var botones = _ahora.Fila();
+            if (S.TareasDeOficina.Count > 0) Ui.Boton(botones, "Trabajar en tu escritorio", AbrirEscritorio);
             if (porSonar) Ui.Boton(botones, "Esperar al siguiente aviso", () => Runner.AdelantarHastaElSiguienteAviso());
             var cerrar = Ui.Boton(botones, "Cerrar la jornada", () => { Runner.CerrarJornada(); GuiaView.Hecho(App, "cerrar-jornada"); },
                                   porSonar ? VarianteBoton.Secundario : VarianteBoton.Primario);
@@ -543,27 +563,8 @@ namespace Nexus.Unity.Pantallas {
                 _ahora.Nota("«Cerrar la jornada» salta al final del día, y solo se puede cuando no queda nada pendiente: saltar nunca te ahorra una consecuencia.");
         }
 
-        /// <summary>
-        /// El trabajo de oficina: para que un rato sin avisos no sea solo esperar. Cada tarea es un minijuego de
-        /// practica que cuesta tiempo del dia y mejora el stock de su tema. No cuenta para la evaluacion.
-        /// </summary>
-        private void PintarOficina() {
-            if (S.TareasDeOficina.Count == 0) return;
-            var tarjeta = _ahora.Tarjeta("Trabajo en tu escritorio");
-            GuiaView.Registrar("dia.oficina", tarjeta);
-            Ui.Texto(tarjeta, "Mientras no suena nada, puedes adelantar trabajo. Cada tarea cuesta tiempo del día y mejora el proyecto. " +
-                              "Es práctica: no cuenta para tu evaluación.", EstiloTexto.Pequeno);
-            foreach (var t in S.TareasDeOficina) {
-                var tarea = t;
-                var motivo = S.PorQueNoSePuedeHacer(tarea.Id);
-                var detalle = $"{tarea.Minutos} min · mejora: {tarea.Mejora}" + (motivo == null ? "" : "   —   " + motivo);
-                var boton = Ui.BotonDeOpcion(tarjeta, tarea.Titulo, detalle, () => EmpezarTarea(tarea));
-                boton.interactable = motivo == null && Runner.PuedeMoverse;
-            }
-            GuiaView.Avisar(App, "oficina.disponible");
-        }
-
         private void EmpezarTarea(Nexus.Core.Oficina.TareaDeOficina tarea) {
+            CerrarPanel();   // el reto se abre sobre el dia, no sobre el panel del escritorio
             if (!Runner.EmpezarTarea(tarea.Id)) return;
             Anotar($"{S.HoraActual} · Trabajo: «{tarea.Titulo}».");
             var pendiente = new PendingMinigame {
@@ -637,7 +638,7 @@ namespace Nexus.Unity.Pantallas {
         private void Prorroga() {
             _ahora.Etiqueta("Horas extra");
             _ahora.Titulo("Te has quedado");
-            _ahora.Parrafo("El día ya contó con las horas extra. Hasta la hora límite no llegan avisos: recorre el mapa, habla con quien quede y busca lo que no has encontrado.");
+            _ahora.Parrafo("El día ya contó con las horas extra. Hasta la hora límite no llegan avisos: abre el «Mapa», habla con quien quede y busca lo que no has encontrado.");
             _ahora.Accion("Irme ya", () => { Runner.TerminarLaProrroga(); GuiaView.Hecho(App, "irse"); });
         }
 
@@ -700,61 +701,6 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Accion("Ir al lanzamiento", () => FlujoDelNivel.Lanzar(App));
         }
 
-        // ==================================================================== el mapa
-
-        private void PintarMapa() {
-            UiKit.Vaciar(_mapa);
-            UiKit.Vaciar(_aqui);
-            var mapa = S.Perfil.Mapa;
-            if (mapa == null || mapa.Vacio) {
-                Ui.Texto(_mapa, "Este nivel no tiene mapa.", EstiloTexto.Pequeno);
-                return;
-            }
-            var puedeMoverse = Runner.PuedeMoverse;
-
-            foreach (var zona in mapa.Zonas) {
-                var z = zona;
-                var aqui = S.ZonaActual == z.Id;
-                var abierta = S.ZonaAbierta(z.Id);
-                var detalle = aqui ? "Estás aquí"
-                            : !abierta ? "Cerrada por ahora"
-                            : $"{mapa.CosteDeVisitar(S.ZonaActual, z.Id)} min";
-                if (z.EsAncla) detalle += " · tu escritorio";
-                var boton = Ui.BotonDeOpcion(_mapa, z.Nombre, detalle, () => IrA(z.Id));
-                GuiaView.Registrar("mapa." + z.Id, boton);
-                boton.interactable = !aqui && abierta && puedeMoverse;
-                if (aqui) Ui.Resaltar(boton, true);
-            }
-            if (!puedeMoverse && Runner.Estado != EstadoDelDia.DesarrolloTerminado)
-                Ui.Texto(_mapa, Runner.EnEscena || Runner.Pausado
-                    ? "Estás ocupado aquí: termina lo que tienes abierto antes de irte."
-                    : "Solo te puedes mover mientras corre la jornada.", EstiloTexto.Pequeno, Tema.warning);
-
-            var actual = mapa.PorId(S.ZonaActual);
-            if (actual == null) return;
-            Ui.Texto(_aqui, actual.Nombre, EstiloTexto.Cuerpo).fontStyle = FontStyles.Bold;
-            if (!string.IsNullOrEmpty(actual.Descripcion)) Ui.Texto(_aqui, actual.Descripcion, EstiloTexto.Pequeno, Tema.ink);
-            if (actual.QuienEsta != null && actual.QuienEsta.Count > 0)
-                Ui.Texto(_aqui, "Aquí están: " + string.Join(", ", actual.QuienEsta), EstiloTexto.Pequeno);
-            if (!string.IsNullOrEmpty(actual.QueDa)) Ui.Texto(_aqui, actual.QueDa, EstiloTexto.Pequeno, Tema.cyan);
-
-            foreach (var id in S.ColeccionablesAqui()) {
-                var c = id;
-                var col = App.Catalogo.Coleccionables.FirstOrDefault(x => x.Id == c);
-                var que = col == null ? "algo" : PantallaDelDiario.NombreDeSerie(col.Serie, true);
-                Ui.BotonDeOpcion(_aqui, "Hay algo aquí: " + que, "Mirarlo", () => Recoger(c)).interactable = puedeMoverse;
-            }
-
-            foreach (var conv in S.ConversacionesAqui()) {
-                var cv = conv;
-                var p = App.Catalogo.Relaciones.PersonajePorId(cv.Personaje);
-                var detalle = (cv.Pregunta == null ? "charla corta · " : "te quiere preguntar algo · ") +
-                              $"{cv.Minutos} min · confianza {S.Confianza(cv.Personaje)}";
-                var boton = Ui.BotonDeOpcion(_aqui, "Hablar con " + (p?.Nombre ?? cv.Personaje), detalle, () => Hablar(cv));
-                boton.interactable = puedeMoverse;
-            }
-        }
-
         // ==================================================================== acciones
 
         private void IrA(string zonaId) {
@@ -801,6 +747,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void Atender(Alerta alerta) {
+            CerrarPanel();   // la decision o el reto se abren sobre el dia
             var ancla = Ancla();
             if (ancla != null && S.ZonaActual != ancla.Id) Runner.IrAZona(ancla.Id);
             if (!alerta.EstaPendiente) {
@@ -833,9 +780,10 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
 
-            // Guiado: en el tutorial siempre; en los demas niveles, la primera vez que este perfil juega este reto
-            // (graduado o de practica). Las siguientes, libre: es donde se demuestra lo aprendido.
-            pendiente.Guiado = pendiente.Guiado || S.Perfil.MinijuegosGuiados || !App.YaJugoElMinijuego(pendiente.MinijuegoId);
+            // Guiado: la primera vez que este perfil se enfrenta a la MECANICA (detectar, ordenar, repartir), sea un
+            // reto o una practica, y tambien en el tutorial. Las siguientes, libre: es donde se demuestra lo aprendido.
+            // La escena anota la mecanica como guiada cuando el recorrido se termina (PantallaDeMinijuego).
+            pendiente.Guiado = pendiente.Guiado || S.Perfil.MinijuegosGuiados || !App.YaSeGuioLaMecanica(def.Verbo);
 
             _escenaApilada = true;
             Runner.EnEscena = true;
@@ -960,14 +908,6 @@ namespace Nexus.Unity.Pantallas {
         private void Anotar(string linea) {
             _entradas.Insert(0, linea);
             if (_entradas.Count > 60) _entradas.RemoveAt(_entradas.Count - 1);
-            PintarDiario();
-        }
-
-        private void PintarDiario() {
-            if (_diario == null) return;
-            UiKit.Vaciar(_diario);
-            foreach (var e in _entradas)
-                Ui.Texto(_diario, e, EstiloTexto.Pequeno, e.StartsWith("—") ? Tema.cyan : Tema.ink);
         }
     }
 }

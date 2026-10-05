@@ -111,6 +111,7 @@
       "pista": "Mira hacia dónde escribe el controlador del fabricante. ¿Entra por la puerta del módulo de reservas o directo a sus tablas?"
     }
   ],
+  "toleranciaDeSenuelos": 1,
   "senuelos": [
     {
       "id": "S1",

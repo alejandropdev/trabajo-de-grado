@@ -8,7 +8,7 @@
   "enElProyecto": "Es el plan de pruebas del módulo de reservas: fechas, franjas y choques, que es donde más se equivoca un programa.",
   "presentacion": {
     "titulo": "Práctica: probar las reservas",
-    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 32 horas para el módulo de reservas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. Ganas si al cliente le llega como mucho 1 error.",
+    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 32 horas para el módulo de reservas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. La tarjeta dice también cuántos errores suele haber de ese tipo: el número exacto no lo sabe nadie, así que planifica para el más alto. Ganas si al cliente le llega como mucho 1 error.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 120
@@ -23,33 +23,33 @@
         "id": "unitarias",
         "nombre": "Unitarias",
         "costePorDefecto": 2,
-        "defectosOcultos": 5,
+        "defectosOcultos": 4, "estimadoMin": 4, "estimadoMax": 5,
         "descripcion": "Prueban cada función por separado. Baratas. Hay mucha lógica de fechas y turnos, y cada regla puede fallar sola.",
-        "pista": "Mucha lógica nueva: suele haber 4 o 5 errores."
+        "pista": "Mucha lógica nueva."
       },
       {
         "id": "integracion",
         "nombre": "Integración",
         "costePorDefecto": 4,
-        "defectosOcultos": 3,
+        "defectosOcultos": 3, "estimadoMin": 2, "estimadoMax": 3,
         "descripcion": "Prueban que las piezas hablen entre sí: las reservas con la base de datos y con el controlador del ascensor.",
-        "pista": "Dos conexiones nuevas: suele haber unos 3 errores."
+        "pista": "Dos conexiones nuevas."
       },
       {
         "id": "regresion",
         "nombre": "Regresión",
         "costePorDefecto": 3,
-        "defectosOcultos": 3,
+        "defectosOcultos": 2, "estimadoMin": 2, "estimadoMax": 3,
         "descripcion": "Vuelven a probar lo que ya funcionaba (la barrera) para ver que el cambio no lo rompió.",
-        "pista": "Se tocó código viejo: suele haber 2 o 3 errores."
+        "pista": "Se tocó código viejo."
       },
       {
         "id": "e2e",
         "nombre": "De extremo a extremo",
         "costePorDefecto": 6,
-        "defectosOcultos": 1,
+        "defectosOcultos": 1, "estimadoMin": 0, "estimadoMax": 1,
         "descripcion": "Una reserva de verdad, del portal al ascensor, como la haría un usuario. Caras.",
-        "pista": "Si lo demás está bien probado, aquí queda como mucho 1."
+        "pista": "Si lo demás está bien probado, aquí queda poco."
       }
     ]
   },

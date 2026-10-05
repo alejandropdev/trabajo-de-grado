@@ -215,31 +215,34 @@ namespace Nexus.Core.Minijuegos {
             var pasos = new List<PasoGuiado> {
                 new PasoGuiado {
                     Accion = AccionGuiada.Leer, Texto = "Antes de repartir: cómo se planifican las pruebas.",
-                    Porque = "Las horas nunca alcanzan para todo. Para cada tipo de prueba, multiplica lo que cuesta atrapar un error " +
-                             "por los errores que suele haber: eso es lo que cuesta atraparlos todos. Llena primero lo barato con " +
-                             "muchos errores; lo caro y con pocos, al final, y solo si sobra.",
+                    Porque = "Las horas nunca alcanzan para todo. Cada tarjeta dice cuántos errores suele haber de ese tipo: " +
+                             "multiplica el número MÁS ALTO por lo que cuesta atrapar uno, y eso es lo que cuesta ir sobre seguro. " +
+                             "Cubre primero lo barato; a lo que renuncies, que sea el error más caro de atrapar.",
                     EsLeccion = true
                 }
             };
-            var ganador = RepartirEvaluador.RepartosGanadores(cfg).OrderBy(g => g.Values.Sum()).FirstOrDefault()
-                          ?? cfg.Depositos.ToDictionary(d => d.Id, d => 0);
+            // El reparto de quien razona con lo que se ve (nada de numeros escondidos): es el que se puede repetir solo.
+            var prudente = RepartirEvaluador.RepartoPrudente(cfg);
 
             foreach (var d in cfg.Depositos.OrderBy(x => x.CostePorDefecto)) {
                 int h;
-                ganador.TryGetValue(d.Id, out h);
-                var pista = string.IsNullOrEmpty(d.Pista) ? $"hay unos {d.DefectosOcultos}" : d.Pista.TrimEnd('.').ToLowerInvariant();
+                prudente.TryGetValue(d.Id, out h);
+                var maximo = RepartirEvaluador.MaximoEsperado(d);
+                var cubre = h / Math.Max(1, d.CostePorDefecto);
+                var seEspera = $"suele haber {RepartirEvaluador.RangoEsperado(d)}";
                 if (h > 0)
                     pasos.Add(new PasoGuiado {
                         Accion = AccionGuiada.Asignar, Objetivo = d.Id, Valor = h,
                         Texto = $"Sube {d.Nombre} hasta {h} {cfg.Unidad}.",
-                        Porque = $"Cada error de {d.Nombre.ToLowerInvariant()} cuesta {d.CostePorDefecto} {cfg.Unidad}, y {pista}: " +
-                                 $"{h} {cfg.Unidad} atrapan {Math.Min(d.DefectosOcultos, h / Math.Max(1, d.CostePorDefecto))}."
+                        Porque = $"Cada error de {d.Nombre.ToLowerInvariant()} cuesta {d.CostePorDefecto} {cfg.Unidad}, y {seEspera}: " +
+                                 $"{h} {cfg.Unidad} alcanzan para atrapar {cubre}." +
+                                 (cubre < maximo ? " No llega al máximo: es lo más caro de atrapar, y a algo hay que renunciar." : "")
                     });
                 else
                     pasos.Add(new PasoGuiado {
                         Accion = AccionGuiada.Leer, Objetivo = d.Id,
                         Texto = $"Deja {d.Nombre} en 0.",
-                        Porque = $"Es la más cara ({d.CostePorDefecto} {cfg.Unidad} por error) y casi no tiene errores: con lo que queda no " +
+                        Porque = $"Es la más cara ({d.CostePorDefecto} {cfg.Unidad} por error) y {seEspera}: con lo que queda no " +
                                  "da. Dejar algo fuera A PROPÓSITO también es planificar.",
                         EsLeccion = true
                     });
