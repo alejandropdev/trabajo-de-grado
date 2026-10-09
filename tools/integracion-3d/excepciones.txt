@@ -1,0 +1,71 @@
+# Assets del origen que NO se copian: su GUID ya existe en el proyecto que recibe.
+TextMesh Pro/Fonts/LiberationSans - OFL.txt
+TextMesh Pro/Fonts/LiberationSans - OFL.txt.meta
+TextMesh Pro/Fonts/LiberationSans.ttf
+TextMesh Pro/Fonts/LiberationSans.ttf.meta
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat.meta
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset.meta
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Outline.mat
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Outline.mat.meta
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset
+TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset.meta
+TextMesh Pro/Resources/LineBreaking Following Characters.txt
+TextMesh Pro/Resources/LineBreaking Following Characters.txt.meta
+TextMesh Pro/Resources/LineBreaking Leading Characters.txt
+TextMesh Pro/Resources/LineBreaking Leading Characters.txt.meta
+TextMesh Pro/Resources/Sprite Assets.meta
+TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset
+TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset.meta
+TextMesh Pro/Resources/Style Sheets.meta
+TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset
+TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset.meta
+TextMesh Pro/Resources/TMP Settings.asset
+TextMesh Pro/Resources/TMP Settings.asset.meta
+TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader
+TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader.meta
+TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader
+TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader.meta
+TextMesh Pro/Shaders/TMP_Bitmap.shader
+TextMesh Pro/Shaders/TMP_Bitmap.shader.meta
+TextMesh Pro/Shaders/TMP_SDF Overlay.shader
+TextMesh Pro/Shaders/TMP_SDF Overlay.shader.meta
+TextMesh Pro/Shaders/TMP_SDF SSD.shader
+TextMesh Pro/Shaders/TMP_SDF SSD.shader.meta
+TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader
+TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader.meta
+TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader
+TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader.meta
+TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader
+TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader.meta
+TextMesh Pro/Shaders/TMP_SDF-Mobile.shader
+TextMesh Pro/Shaders/TMP_SDF-Mobile.shader.meta
+TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader
+TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader.meta
+TextMesh Pro/Shaders/TMP_SDF-Surface.shader
+TextMesh Pro/Shaders/TMP_SDF-Surface.shader.meta
+TextMesh Pro/Shaders/TMP_SDF.shader
+TextMesh Pro/Shaders/TMP_SDF.shader.meta
+TextMesh Pro/Shaders/TMP_Sprite.shader
+TextMesh Pro/Shaders/TMP_Sprite.shader.meta
+TextMesh Pro/Shaders/TMPro.cginc
+TextMesh Pro/Shaders/TMPro.cginc.meta
+TextMesh Pro/Shaders/TMPro_Mobile.cginc
+TextMesh Pro/Shaders/TMPro_Mobile.cginc.meta
+TextMesh Pro/Shaders/TMPro_Properties.cginc
+TextMesh Pro/Shaders/TMPro_Properties.cginc.meta
+TextMesh Pro/Shaders/TMPro_Surface.cginc
+TextMesh Pro/Shaders/TMPro_Surface.cginc.meta
+TextMesh Pro/Sprites.meta
+TextMesh Pro/Sprites/EmojiOne Attribution.txt
+TextMesh Pro/Sprites/EmojiOne Attribution.txt.meta
+TextMesh Pro/Sprites/EmojiOne.json
+TextMesh Pro/Sprites/EmojiOne.json.meta
+TextMesh Pro/Sprites/EmojiOne.png
+TextMesh Pro/Sprites/EmojiOne.png.meta
+# Los .meta de las carpetas que quedan vacias al no copiar lo anterior (Unity los borraria solo).
+TextMesh Pro/Fonts.meta
+TextMesh Pro/Resources.meta
+TextMesh Pro/Resources/Fonts & Materials.meta
+TextMesh Pro/Shaders.meta

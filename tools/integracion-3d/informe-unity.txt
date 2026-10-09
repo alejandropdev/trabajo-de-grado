@@ -1,0 +1,58 @@
+Verificación de Assets/Mundo3D · Unity 6000.0.82f1
+
+MATERIALES (.mat) por shader
+      2  Skybox/Procedural
+    310  Universal Render Pipeline/Lit
+  Sin shader valido para URP: 0
+
+PREFABS: 682 · con scripts perdidos: 0
+
+ESCENAS
+  ★ Assets/Mundo3D/Escenas/Recoleccion3D.unity
+      9996 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/BrokenVector/LowPolyStoragePack/Example.unity
+      97 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/Corkboard_Desk/Demo_Scene.unity
+      5 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/Free Stylized Cargo Props Pack/Demo Scene.unity
+      16 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/Gridness Studios/Grocery Store Pack Lite/Demo Scene/LiteGroceryScene.unity
+      88 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/Gridness Studios/Grocery Store Pack Lite/Scenes/ModelList.unity
+      19 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/H&L Assets/Concrete bench/Scenes/Built-in.unity
+      5 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/H&L Assets/Concrete bench/Scenes/HDRP.unity
+      7 objetos · scripts perdidos: 3 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/H&L Assets/Concrete bench/Scenes/URP.unity
+      5 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/iPoly3D/Server Room/Demo/Demo.unity
+      153 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/Korea_TreasureProps/Scene/OverView.unity
+      173 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/malfarie/Levels/Level1.unity
+      9996 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 1
+    Assets/Mundo3D/Externo/MenuBoard/DemoScene/demo.unity
+      29 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 1
+    Assets/Mundo3D/Externo/nappin/OfficeEssentialsPack/OfficeEssentialsPack.unity
+      473 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/NThirdPerson/Characters/Bixomon/Scenes/Demo.unity
+      39 objetos · scripts perdidos: 2 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/NThirdPerson/SpeedTutor - Tutorial Scene - FREE/Scenes/SpeedTutor Test Scene.unity
+      45 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/NThirdPerson/ThirdPerson.unity
+      242 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 1
+    Assets/Mundo3D/Externo/Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Scene/Demo.unity
+      189 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/Scenes/SampleScene.unity
+      2 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/VNB - Office Set/Scenes/Demo 1 - Office Set 1.unity
+      563 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+    Assets/Mundo3D/Externo/VNB - Office Set/Scenes/Demo 2 - Office Set 1.unity
+      566 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+
+EL JUEGO
+  Escena del recorrido (Assets/Mundo3D/Escenas/Recoleccion3D.unity): existe · en Build Settings
+  Build Settings: Nexus → MenuInicial → Recoleccion3D
+
+PROBLEMAS EN LO QUE USA EL JUEGO (★): 0

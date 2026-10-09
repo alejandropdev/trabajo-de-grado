@@ -1,0 +1,385 @@
+identico: 4463  cambiado: 315  exceptuado: 69  FALTA: 0  GUID DISTINTO: 0
+cambiado	Asset List Bodega/M_Locker.mat
+cambiado	Asset List Cafetería/MSilla.mat
+cambiado	Asset List Cafetería/New Material.mat
+cambiado	Asset List Oficina/M_muñeco.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Blue.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Green.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Purple.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Red.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Yellow.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Metal_Blue.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Metal_Green.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Metal_Purple.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Metal_Red.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Metal_Yellow.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Blue.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Green.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Purple.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Red.mat
+cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Yellow.mat
+cambiado	Corkboard_Desk/Model/Materials/Corkboard&Desk_DefaultMaterial_AlbedoTransparency.mat
+cambiado	Free Stylized Cargo Props Pack/Material/Floor.mat
+cambiado	Free Stylized Cargo Props Pack/Material/M_Atlas_01.mat
+cambiado	Free Stylized Cargo Props Pack/Material/M_BuildIn_Atlas_01 1.mat
+cambiado	Gridness Studios/Grocery Store Pack Lite/Materials/Grocery_Light_Mat.mat
+cambiado	Gridness Studios/Grocery Store Pack Lite/Materials/Grossery_Mat.mat
+cambiado	H&L Assets/Concrete bench/Built-in/Materials/New Material.mat
+cambiado	H&L Assets/Concrete bench/HDRP/Materials/New Material.mat
+cambiado	H&L Assets/Concrete bench/URP/Materials/New Material.mat
+cambiado	Korea_TreasureProps/Materials/M_001_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_002_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_003_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_004_Helmet.mat
+cambiado	Korea_TreasureProps/Materials/M_005_Stove.mat
+cambiado	Korea_TreasureProps/Materials/M_006_Brick_001.mat
+cambiado	Korea_TreasureProps/Materials/M_006_Brick_002.mat
+cambiado	Korea_TreasureProps/Materials/M_007_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_008_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_009_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_010_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_011_Statue_of_the_Buddha_001.mat
+cambiado	Korea_TreasureProps/Materials/M_011_Statue_of_the_Buddha_002.mat
+cambiado	Korea_TreasureProps/Materials/M_012_Gilt_Bronze_Shoes_001.mat
+cambiado	Korea_TreasureProps/Materials/M_012_Gilt_Bronze_Shoes_002.mat
+cambiado	Korea_TreasureProps/Materials/M_013_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_014_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_015_Stamp.mat
+cambiado	Korea_TreasureProps/Materials/M_016_Stamp.mat
+cambiado	Korea_TreasureProps/Materials/M_017_Storage_Box.mat
+cambiado	Korea_TreasureProps/Materials/M_018_Pillow.mat
+cambiado	Korea_TreasureProps/Materials/M_019_Golden_Crown_001.mat
+cambiado	Korea_TreasureProps/Materials/M_019_Golden_Crown_002.mat
+cambiado	Korea_TreasureProps/Materials/M_020_Saligu.mat
+cambiado	Korea_TreasureProps/Materials/M_021_Saligu_001.mat
+cambiado	Korea_TreasureProps/Materials/M_021_Saligu_001_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_021_Saligu_002.mat
+cambiado	Korea_TreasureProps/Materials/M_022_Saligu_001.mat
+cambiado	Korea_TreasureProps/Materials/M_022_Saligu_001_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_022_Saligu_002.mat
+cambiado	Korea_TreasureProps/Materials/M_022_Saligu_002_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_022_Saligu_003.mat
+cambiado	Korea_TreasureProps/Materials/M_022_Saligu_003_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_023_Bronze_Ritual_Object.mat
+cambiado	Korea_TreasureProps/Materials/M_024_An_Earthenware_Doll_001.mat
+cambiado	Korea_TreasureProps/Materials/M_024_An_Earthenware_Doll_002.mat
+cambiado	Korea_TreasureProps/Materials/M_025_cup.mat
+cambiado	Korea_TreasureProps/Materials/M_025_cup_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_025_cup_Tray.mat
+cambiado	Korea_TreasureProps/Materials/M_026_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_027_Sundial.mat
+cambiado	Korea_TreasureProps/Materials/M_028_Buddhist_Temple_Bell.mat
+cambiado	Korea_TreasureProps/Materials/M_029_Wooden_Scroll_001.mat
+cambiado	Korea_TreasureProps/Materials/M_029_Wooden_Scroll_002.mat
+cambiado	Korea_TreasureProps/Materials/M_029_Wooden_Scroll_003.mat
+cambiado	Korea_TreasureProps/Materials/M_030_Queen_Pillow_001.mat
+cambiado	Korea_TreasureProps/Materials/M_030_Queen_Pillow_002.mat
+cambiado	Korea_TreasureProps/Materials/M_030_Queen_Pillow_003.mat
+cambiado	Korea_TreasureProps/Materials/M_031_Bowl.mat
+cambiado	Korea_TreasureProps/Materials/M_032_Brick.mat
+cambiado	Korea_TreasureProps/Materials/M_033_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_034_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_035_Bowl.mat
+cambiado	Korea_TreasureProps/Materials/M_036_Cup.mat
+cambiado	Korea_TreasureProps/Materials/M_037_Pot.mat
+cambiado	Korea_TreasureProps/Materials/M_038_Pot.mat
+cambiado	Korea_TreasureProps/Materials/M_039_Pot.mat
+cambiado	Korea_TreasureProps/Materials/M_039_Pot_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_040_A_Ceramic_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_041_Vase.mat
+cambiado	Korea_TreasureProps/Materials/M_042_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_043_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_044_Yeonjeong.mat
+cambiado	Korea_TreasureProps/Materials/M_045_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_045_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_046_Pot.mat
+cambiado	Korea_TreasureProps/Materials/M_047_Brick.mat
+cambiado	Korea_TreasureProps/Materials/M_048_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_049_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_050_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_051_A_Ceramic_Bottle1.mat
+cambiado	Korea_TreasureProps/Materials/M_052_Pot.mat
+cambiado	Korea_TreasureProps/Materials/M_053_Brick_001.mat
+cambiado	Korea_TreasureProps/Materials/M_053_Brick_002.mat
+cambiado	Korea_TreasureProps/Materials/M_054_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_055_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_056_Brick.mat
+cambiado	Korea_TreasureProps/Materials/M_057_Brick.mat
+cambiado	Korea_TreasureProps/Materials/M_058_Cup.mat
+cambiado	Korea_TreasureProps/Materials/M_058_Cup_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_059_Clay_Statue.mat
+cambiado	Korea_TreasureProps/Materials/M_060_Clay_Statue.mat
+cambiado	Korea_TreasureProps/Materials/M_061_Jar.mat
+cambiado	Korea_TreasureProps/Materials/M_062_Stove.mat
+cambiado	Korea_TreasureProps/Materials/M_063_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_064_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_065_Bowl.mat
+cambiado	Korea_TreasureProps/Materials/M_065_Bowl_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_066_Candlestick.mat
+cambiado	Korea_TreasureProps/Materials/M_067_Kettle.mat
+cambiado	Korea_TreasureProps/Materials/M_068_Kettle.mat
+cambiado	Korea_TreasureProps/Materials/M_069_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_069_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_070_A_Ceramic_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_071_Bowl.mat
+cambiado	Korea_TreasureProps/Materials/M_072_A_Ceramic_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_073_Vase.mat
+cambiado	Korea_TreasureProps/Materials/M_074_Kettle.mat
+cambiado	Korea_TreasureProps/Materials/M_075_Pot.mat
+cambiado	Korea_TreasureProps/Materials/M_076_Bottle_001.mat
+cambiado	Korea_TreasureProps/Materials/M_076_Bottle_002.mat
+cambiado	Korea_TreasureProps/Materials/M_077_Bowl.mat
+cambiado	Korea_TreasureProps/Materials/M_078_Kettle.mat
+cambiado	Korea_TreasureProps/Materials/M_078_Kettle_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_079_Bowl.mat
+cambiado	Korea_TreasureProps/Materials/M_079_Bowl_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_080_A_Ceramic_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_080_A_Ceramic_Bottle_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_081_A_Ceramic_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_082_Kettle.mat
+cambiado	Korea_TreasureProps/Materials/M_083_Kettle.mat
+cambiado	Korea_TreasureProps/Materials/M_083_Kettle_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_084_Vase.mat
+cambiado	Korea_TreasureProps/Materials/M_085_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_086_Kettle.mat
+cambiado	Korea_TreasureProps/Materials/M_086_Kettle_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_086_Kettle_Tray.mat
+cambiado	Korea_TreasureProps/Materials/M_087_Stationery.mat
+cambiado	Korea_TreasureProps/Materials/M_088_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_088_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_089_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_089_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_090_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_091_Sculpt.mat
+cambiado	Korea_TreasureProps/Materials/M_092_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_092_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_093_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_094_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_094_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_095_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_095_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_096_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_096_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_097_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_097_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_098_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_099_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_099_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_100_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_101_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_101_Incense_Burner_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_102_A_Celadon_Doll.mat
+cambiado	Korea_TreasureProps/Materials/M_103_Statue_of_the_Buddha.mat
+cambiado	Korea_TreasureProps/Materials/M_104_A_Ceramic_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_105_Bottle.mat
+cambiado	Korea_TreasureProps/Materials/M_106_Incense_Burner.mat
+cambiado	Korea_TreasureProps/Materials/M_107_Bowl.mat
+cambiado	Korea_TreasureProps/Materials/M_107_Bowl_Lid.mat
+cambiado	Korea_TreasureProps/Materials/M_108_Stationery.mat
+cambiado	Korea_TreasureProps/Materials/M_109_Silver_Cup.mat
+cambiado	Korea_TreasureProps/Materials/T_001_Statue_of_the_Buddha_AO.mat
+cambiado	Korea_TreasureProps/Materials/T_001_Statue_of_the_Buddha_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_007_Statue_of_the_Buddha_AO.mat
+cambiado	Korea_TreasureProps/Materials/T_007_Statue_of_the_Buddha_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_024_An_Earthenware_Doll_001_AO.mat
+cambiado	Korea_TreasureProps/Materials/T_024_An_Earthenware_Doll_001_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_024_An_Earthenware_Doll_001_NM.mat
+cambiado	Korea_TreasureProps/Materials/T_024_An_Earthenware_Doll_002_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_029_Wooden_Scroll_001_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_031_Bowl_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_031_Bowl_NM.mat
+cambiado	Korea_TreasureProps/Materials/T_031_Bowl_RN.mat
+cambiado	Korea_TreasureProps/Materials/T_032_Brick_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_033_Bottle_AO.mat
+cambiado	Korea_TreasureProps/Materials/T_033_Bottle_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_034_Bottle_AO.mat
+cambiado	Korea_TreasureProps/Materials/T_034_Bottle_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_054_Statue_of_the_Buddha_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_055_Statue_of_the_Buddha_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_064_Bottle_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_087_Stationery_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_102_A_Celadon_Doll_BC.mat
+cambiado	Korea_TreasureProps/Materials/T_103_Statue_of_the_Budha_BC.mat
+cambiado	MenuBoard/Resources/Materials/board_A.mat
+cambiado	MenuBoard/Resources/Materials/board_B.mat
+cambiado	MenuBoard/Resources/Materials/board_C.mat
+cambiado	MenuBoard/Resources/Materials/wood.mat
+cambiado	NThirdPerson/Characters/Bixomon/Animations/Boximon Main Rig.FBX.meta
+cambiado	NThirdPerson/Characters/Bixomon/Demo Assets/Ground.mat
+cambiado	NThirdPerson/Characters/Bixomon/Materials/Boximon Fiery.mat
+cambiado	NThirdPerson/Characters/ybot/ybot.fbx.meta
+cambiado	NThirdPerson/Materials/CheckPoint.mat
+cambiado	NThirdPerson/Materials/Cyan.mat
+cambiado	NThirdPerson/Materials/Magenta.mat
+cambiado	NThirdPerson/Materials/Red.mat
+cambiado	NThirdPerson/Scripts/NKeyEvent.cs
+cambiado	NThirdPerson/Scripts/NPause.cs
+cambiado	NThirdPerson/Scripts/NThirdPersonPlayer.cs
+cambiado	NThirdPerson/SpeedTutor - Tutorial Scene - FREE/Material/M_Tileable_Cube.mat
+cambiado	NThirdPerson/SpeedTutor - Tutorial Scene - FREE/Material/M_Tileable_Walls.mat
+cambiado	Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Materials/Panda Mat.mat
+cambiado	Texturas/Extra/New Material 1.mat
+cambiado	Texturas/Extra/New Material 10.mat
+cambiado	Texturas/Extra/New Material 11.mat
+cambiado	Texturas/Extra/New Material 12.mat
+cambiado	Texturas/Extra/New Material 13.mat
+cambiado	Texturas/Extra/New Material 14.mat
+cambiado	Texturas/Extra/New Material 15.mat
+cambiado	Texturas/Extra/New Material 16.mat
+cambiado	Texturas/Extra/New Material 17.mat
+cambiado	Texturas/Extra/New Material 18.mat
+cambiado	Texturas/Extra/New Material 19.mat
+cambiado	Texturas/Extra/New Material 2.mat
+cambiado	Texturas/Extra/New Material 20.mat
+cambiado	Texturas/Extra/New Material 21.mat
+cambiado	Texturas/Extra/New Material 22.mat
+cambiado	Texturas/Extra/New Material 23.mat
+cambiado	Texturas/Extra/New Material 24.mat
+cambiado	Texturas/Extra/New Material 25.mat
+cambiado	Texturas/Extra/New Material 26.mat
+cambiado	Texturas/Extra/New Material 27.mat
+cambiado	Texturas/Extra/New Material 28.mat
+cambiado	Texturas/Extra/New Material 29.mat
+cambiado	Texturas/Extra/New Material 3.mat
+cambiado	Texturas/Extra/New Material 30.mat
+cambiado	Texturas/Extra/New Material 31.mat
+cambiado	Texturas/Extra/New Material 32.mat
+cambiado	Texturas/Extra/New Material 4.mat
+cambiado	Texturas/Extra/New Material 5.mat
+cambiado	Texturas/Extra/New Material 6.mat
+cambiado	Texturas/Extra/New Material 7.mat
+cambiado	Texturas/Extra/New Material 8.mat
+cambiado	Texturas/Extra/New Material 9.mat
+cambiado	Texturas/Extra/New Material.mat
+cambiado	Texturas/MaterialesReales/Binario.mat
+cambiado	Texturas/MaterialesReales/Cine.mat
+cambiado	Texturas/MaterialesReales/CojinRojo.mat
+cambiado	Texturas/MaterialesReales/Concreto.mat
+cambiado	Texturas/MaterialesReales/Madera.mat
+cambiado	Texturas/MaterialesReales/MaderaClara.mat
+cambiado	Texturas/MaterialesReales/Marmol niitido.mat
+cambiado	Texturas/MaterialesReales/Marmol.mat
+cambiado	Texturas/MaterialesReales/MarmolParedesCurvas.mat
+cambiado	Texturas/MaterialesReales/Materials/TapeteGris.mat
+cambiado	Texturas/MaterialesReales/Metal.mat
+cambiado	Texturas/MaterialesReales/Oro.mat
+cambiado	Texturas/MaterialesReales/ParedBaño.mat
+cambiado	Texturas/MaterialesReales/ParedCafetería.mat
+cambiado	Texturas/MaterialesReales/ParedMadera.mat
+cambiado	Texturas/MaterialesReales/ParedOficinas.mat
+cambiado	Texturas/MaterialesReales/Peli 1.mat
+cambiado	Texturas/MaterialesReales/Peli 2.mat
+cambiado	Texturas/MaterialesReales/Peli 3.mat
+cambiado	Texturas/MaterialesReales/Peli4.mat
+cambiado	Texturas/MaterialesReales/PisoGeneral.mat
+cambiado	Texturas/MaterialesReales/Porcelana.mat
+cambiado	Texturas/MaterialesReales/Ropa.mat
+cambiado	Texturas/MaterialesReales/Tapete.mat
+cambiado	Texturas/MaterialesReales/Tela.mat
+cambiado	VNB - Office Set/Materials/board_doc_1.mat
+cambiado	VNB - Office Set/Materials/board_doc_2.mat
+cambiado	VNB - Office Set/Materials/board_doc_3.mat
+cambiado	VNB - Office Set/Materials/paintings_1.mat
+cambiado	VNB - Office Set/Materials/paintings_2.mat
+cambiado	VNB - Office Set/Materials/paintings_3.mat
+cambiado	VNB - Office Set/Materials/paintings_4.mat
+cambiado	VNB - Office Set/Materials/palette_1.mat
+cambiado	VNB - Office Set/Materials/palette_2.mat
+cambiado	VNB - Office Set/Materials/palette_3.mat
+cambiado	VNB - Office Set/Materials/palette_4.mat
+cambiado	VNB - Office Set/Materials/palette_5.mat
+cambiado	VNB - Office Set/Materials/palette_6.mat
+cambiado	VNB - Office Set/Materials/rug_1.mat
+cambiado	VNB - Office Set/Materials/rug_2.mat
+cambiado	VNB - Office Set/Materials/screen.mat
+cambiado	VNB - Office Set/Materials/screen_off.mat
+cambiado	iPoly3D/Server Room/Materials/Glass.mat
+cambiado	iPoly3D/Server Room/Materials/Server_Material.mat
+cambiado	iPoly3D/Server Room/Materials/Server_Material_White_Glow.mat
+cambiado	malfarie/3D/Personaje/New Material.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)EmissiveWarm.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)Floor.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)Glass.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientBeige.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientBlack.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientBlue.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientBrown.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientDarkBrown.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientDarkGreen.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientDarkGrey.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientDarkRed.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientGreen.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientGrey.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientOrange.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientRed.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientYellow.mat
+cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)MetallicBlack.mat
+exceptuado	TextMesh Pro/Fonts.meta
+exceptuado	TextMesh Pro/Fonts/LiberationSans - OFL.txt
+exceptuado	TextMesh Pro/Fonts/LiberationSans - OFL.txt.meta
+exceptuado	TextMesh Pro/Fonts/LiberationSans.ttf
+exceptuado	TextMesh Pro/Fonts/LiberationSans.ttf.meta
+exceptuado	TextMesh Pro/Resources.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Outline.mat
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Outline.mat.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset.meta
+exceptuado	TextMesh Pro/Resources/LineBreaking Following Characters.txt
+exceptuado	TextMesh Pro/Resources/LineBreaking Following Characters.txt.meta
+exceptuado	TextMesh Pro/Resources/LineBreaking Leading Characters.txt
+exceptuado	TextMesh Pro/Resources/LineBreaking Leading Characters.txt.meta
+exceptuado	TextMesh Pro/Resources/Sprite Assets.meta
+exceptuado	TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset
+exceptuado	TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset.meta
+exceptuado	TextMesh Pro/Resources/Style Sheets.meta
+exceptuado	TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset
+exceptuado	TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset.meta
+exceptuado	TextMesh Pro/Resources/TMP Settings.asset
+exceptuado	TextMesh Pro/Resources/TMP Settings.asset.meta
+exceptuado	TextMesh Pro/Shaders.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF Overlay.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF Overlay.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF SSD.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF SSD.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Sprite.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Sprite.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMPro.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro.cginc.meta
+exceptuado	TextMesh Pro/Shaders/TMPro_Mobile.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro_Mobile.cginc.meta
+exceptuado	TextMesh Pro/Shaders/TMPro_Properties.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro_Properties.cginc.meta
+exceptuado	TextMesh Pro/Shaders/TMPro_Surface.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro_Surface.cginc.meta
+exceptuado	TextMesh Pro/Sprites.meta
+exceptuado	TextMesh Pro/Sprites/EmojiOne Attribution.txt
+exceptuado	TextMesh Pro/Sprites/EmojiOne Attribution.txt.meta
+exceptuado	TextMesh Pro/Sprites/EmojiOne.json
+exceptuado	TextMesh Pro/Sprites/EmojiOne.json.meta
+exceptuado	TextMesh Pro/Sprites/EmojiOne.png
+exceptuado	TextMesh Pro/Sprites/EmojiOne.png.meta
