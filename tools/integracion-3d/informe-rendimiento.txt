@@ -1,0 +1,55 @@
+Coste de las escenas del recorrido 3D · Unity 6000.0.82f1
+(lo que hay en la escena: sin culling, que es lo que decide cuanto se dibuja en cada fotograma)
+
+== Assets/Mundo3D/Externo/malfarie/Levels/Level1.unity
+  Triángulos              18,024,302
+  Vértices                14,379,381
+  Piezas que se dibujan        8,126   (de ellas, 7,421 renderers proyectan sombra)
+  Mallas distintas             4,580   923 MB en memoria
+  Materiales distintos           361
+  Texturas distintas              70   88 MB en memoria
+  Colliders                    6,966   6,341 MeshCollider · 624 BoxCollider · 1 CharacterController
+  Luces 3 · Animators 13 · Rigidbodies 2 · cámara hasta 5,000 m
+  Lo que más pesa:
+      3,199,620  Asset list Museo/SillasCine.fbx
+      3,036,295  Asset List Oficina/LaberintoOficina.prefab
+      1,498,914  Asset list Museo/Maniqui6.fbx
+        999,952  Asset list Museo/RackRopa.fbx
+        992,420  Asset list Museo/Armario3.fbx
+        928,732  Asset List Cafetería/Carrito.fbx
+        749,978  Asset list Museo/Maniqui4.fbx
+        633,312  Asset list Museo/Pilares.fbx
+        550,619  Asset list Museo/Maniqui3.fbx
+        466,458  Asset list Museo/Sintetizador.fbx
+        455,936  Asset List Cafetería/Grifo.fbx
+        441,719  Asset list Museo/Maniqui1.fbx
+        423,900  Asset List Cafetería/POS.fbx
+        316,692  Asset List Cafetería/banco.fbx
+        315,746  malfarie/3D/Cafetería/Cafetería/Cafetería/Mapa3D_VF3.fbx
+
+== Assets/Mundo3D/Escenas/Recoleccion3D.unity
+  Triángulos               2,867,669
+  Vértices                 3,331,290
+  Piezas que se dibujan        4,641   (de ellas, 1,129 renderers proyectan sombra)
+  Mallas distintas             1,317   238 MB en memoria
+  Materiales distintos           343
+  Texturas distintas              70   88 MB en memoria
+  Colliders                    2,372   1,571 MeshCollider · 800 BoxCollider · 1 CharacterController
+  Luces 3 · Animators 13 · Rigidbodies 2 · cámara hasta 150 m
+  Lo que más pesa:
+        315,746  malfarie/3D/Cafetería/Cafetería/Cafetería/Mapa3D_VF3.fbx
+        282,701  Asset list Museo/Armario3.fbx
+        190,000  Assets/Mundo3D/Optimizado/Modelos/banco_opt.fbx
+        164,836  Asset List Cafetería/Carrito.fbx
+        150,000  Assets/Mundo3D/Optimizado/Modelos/SillasCine_opt.fbx
+        111,040  Asset List Cafetería/SoporteTarjetas.fbx
+        109,593  Asset List Cafetería/POS.fbx
+         87,786  nappin/OfficeEssentialsPack/Prefabs/(Prb)VendingMachine.prefab
+         81,618  Assets/Mundo3D/Optimizado/Modelos/Maniqui3_opt.fbx
+         74,997  Assets/Mundo3D/Optimizado/Modelos/Maniqui6_opt.fbx
+         50,000  Assets/Mundo3D/Optimizado/Modelos/RackRopa_opt.fbx
+         40,000  Assets/Mundo3D/Optimizado/Modelos/Grifo_opt.fbx
+         39,992  Assets/Mundo3D/Optimizado/Modelos/Sanitario_opt.fbx
+         38,984  Asset list Museo/Pilares.fbx
+         26,124  Assets/Mundo3D/Optimizado/Modelos/SalYPimienta_opt.fbx
+

@@ -1,0 +1,161 @@
+modelo,veces,estado,piezas,triangulos_antes,triangulos_despues,presupuesto,materiales,optimizado,por_piezas
+Asset List Cafetería/Atril.fbx,1,omitido: ya es ligero,1,1332,1332,0,0,,
+Asset List Cafetería/AtrilPOS.fbx,3,omitido: ya es ligero,2,110,110,0,0,,
+Asset List Cafetería/Bandeja.fbx,5,omitido: ya es ligero,1,316,316,0,0,,
+Asset List Cafetería/Cafetera.fbx,1,reducido,16,243576,12000,12000,16,Assets/Mundo3D/Optimizado/Modelos/Cafetera_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Cafetera_partes.fbx
+Asset List Cafetería/CajaRegistradora.fbx,2,reducido,4,4592,4592,12000,3,Assets/Mundo3D/Optimizado/Modelos/CajaRegistradora_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/CajaRegistradora_partes.fbx
+Asset List Cafetería/Caneca1.fbx,1,reducido,4,5568,5568,12000,1,Assets/Mundo3D/Optimizado/Modelos/Caneca1_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Caneca1_partes.fbx
+Asset List Cafetería/Caneca2.fbx,1,omitido: ya es ligero,1,1070,1070,0,0,,
+Asset List Cafetería/Carrito.fbx,7,reducido,122,132676,5000,5000,15,Assets/Mundo3D/Optimizado/Modelos/Carrito_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Carrito_partes.fbx
+Asset List Cafetería/Closet.fbx,1,reducido,18,9334,9334,12000,5,Assets/Mundo3D/Optimizado/Modelos/Closet_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Closet_partes.fbx
+Asset List Cafetería/DispensadorAgua.fbx,1,reducido,2,75288,12000,12000,1,Assets/Mundo3D/Optimizado/Modelos/DispensadorAgua_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/DispensadorAgua_partes.fbx
+Asset List Cafetería/DispensadorPapel.fbx,2,omitido: ya es ligero,3,1024,1024,0,0,,
+Asset List Cafetería/Estantes.fbx,1,reducido,1414,87628,11999,12000,12,Assets/Mundo3D/Optimizado/Modelos/Estantes_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Estantes_partes.fbx
+Asset List Cafetería/Estantes2.fbx,1,reducido,4,47082,12000,12000,4,Assets/Mundo3D/Optimizado/Modelos/Estantes2_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Estantes2_partes.fbx
+Asset List Cafetería/Estantes3.fbx,1,omitido: ya es ligero,2,1120,1120,0,0,,
+Asset List Cafetería/Grifo.fbx,8,reducido,14,56992,5000,5000,14,Assets/Mundo3D/Optimizado/Modelos/Grifo_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Grifo_partes.fbx
+Asset List Cafetería/Jabon.fbx,8,reducido,6,1404,1404,5000,2,Assets/Mundo3D/Optimizado/Modelos/Jabon_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Jabon_partes.fbx
+Asset List Cafetería/Lockers.fbx,1,omitido: ya es ligero,1,802,802,0,0,,
+Asset List Cafetería/Mesa1.fbx,7,omitido: ya es ligero,1,398,398,0,0,,
+Asset List Cafetería/MesaEmpl.fbx,1,omitido: ya es ligero,1,284,284,0,0,,
+Asset List Cafetería/MesaPlegable.fbx,1,omitido: ya es ligero,1,5556,5556,0,0,,
+Asset List Cafetería/MiniBar.fbx,1,reducido,1304,227492,12000,12000,40,Assets/Mundo3D/Optimizado/Modelos/MiniBar_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/MiniBar_partes.fbx
+Asset List Cafetería/Neveras.fbx,1,reducido,144,4914,4914,12000,9,Assets/Mundo3D/Optimizado/Modelos/Neveras_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Neveras_partes.fbx
+Asset List Cafetería/POS.fbx,3,reducido,22,141300,12000,12000,6,Assets/Mundo3D/Optimizado/Modelos/POS_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/POS_partes.fbx
+Asset List Cafetería/PapelDeBaño.fbx,2,reducido,4,2899,2899,12000,1,Assets/Mundo3D/Optimizado/Modelos/PapelDeBaño_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/PapelDeBaño_partes.fbx
+Asset List Cafetería/Pocillo.fbx,6,omitido: ya es ligero,1,2584,2584,0,0,,
+Asset List Cafetería/Rat.fbx,1,reducido,2,10744,10744,12000,2,Assets/Mundo3D/Optimizado/Modelos/Rat_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Rat_partes.fbx
+Asset List Cafetería/SalYPimienta.fbx,7,reducido,6,3732,3732,5000,5,Assets/Mundo3D/Optimizado/Modelos/SalYPimienta_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/SalYPimienta_partes.fbx
+Asset List Cafetería/Sanitario.fbx,8,reducido,5,10492,4999,5000,1,Assets/Mundo3D/Optimizado/Modelos/Sanitario_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Sanitario_partes.fbx
+Asset List Cafetería/Servilletas.fbx,7,omitido: ya es ligero,1,432,432,0,0,,
+Asset List Cafetería/SillaEmpl.fbx,2,omitido: ya es ligero,1,5620,5620,0,0,,
+Asset List Cafetería/SoporteTarjetas.fbx,16,omitido: ya es ligero,1,6940,6940,0,0,,
+Asset List Cafetería/ToallasF.fbx,1,reducido,1,30088,12000,12000,1,Assets/Mundo3D/Optimizado/Modelos/ToallasF_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/ToallasF_partes.fbx
+Asset List Cafetería/Trono.fbx,1,reducido,13,3897,3897,12000,1,Assets/Mundo3D/Optimizado/Modelos/Trono_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Trono_partes.fbx
+Asset List Cafetería/VM1.fbx,1,reducido,7,247163,12000,12000,5,Assets/Mundo3D/Optimizado/Modelos/VM1_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/VM1_partes.fbx
+Asset List Cafetería/VM2.fbx,1,reducido,5,15935,12000,12000,5,Assets/Mundo3D/Optimizado/Modelos/VM2_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/VM2_partes.fbx
+Asset List Cafetería/banco.fbx,38,reducido,1,8334,5000,5000,1,Assets/Mundo3D/Optimizado/Modelos/banco_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/banco_partes.fbx
+Asset List Cafetería/laptop.fbx,1,omitido: ya es ligero,1,524,524,0,0,,
+Asset List Cafetería/menuCafes.fbx,1,reducido,1,8944,8944,12000,1,Assets/Mundo3D/Optimizado/Modelos/menuCafes_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/menuCafes_partes.fbx
+Asset List Escondite/ExtraRecep.fbx,1,reducido,40,37243,12000,12000,9,Assets/Mundo3D/Optimizado/Modelos/ExtraRecep_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/ExtraRecep_partes.fbx
+Asset List Escondite/Laptop.fbx,3,reducido,3,8324,8324,12000,3,Assets/Mundo3D/Optimizado/Modelos/Laptop_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Laptop_partes.fbx
+Asset List Escondite/Recepción.fbx,1,reducido,37,35697,12000,12000,9,Assets/Mundo3D/Optimizado/Modelos/Recepción_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Recepción_partes.fbx
+Asset List Oficina/Meshy_AI_Dwight_Bobblehead_1005003727_texture.fbx,1,reducido,1,66684,12000,12000,1,Assets/Mundo3D/Optimizado/Modelos/Meshy_AI_Dwight_Bobblehead_1005003727_texture_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Meshy_AI_Dwight_Bobblehead_1005003727_texture_partes.fbx
+Asset list Museo/Armario2.fbx,1,reducido,27,223956,12000,12000,7,Assets/Mundo3D/Optimizado/Modelos/Armario2_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Armario2_partes.fbx
+Asset list Museo/Armario3.fbx,1,reducido,474,992420,118456,25000,20,Assets/Mundo3D/Optimizado/Modelos/Armario3_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Armario3_partes.fbx
+Asset list Museo/Armario4.fbx,1,reducido,37,60412,12000,12000,37,Assets/Mundo3D/Optimizado/Modelos/Armario4_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Armario4_partes.fbx
+Asset list Museo/Armario6.fbx,1,reducido,19,1500,1500,12000,3,Assets/Mundo3D/Optimizado/Modelos/Armario6_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Armario6_partes.fbx
+Asset list Museo/ArmarioRopa.fbx,1,reducido,84,102176,45000,45000,28,Assets/Mundo3D/Optimizado/Modelos/ArmarioRopa_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/ArmarioRopa_partes.fbx
+Asset list Museo/CajaRegistradora.fbx,3,omitido: ya es ligero,1,1048,1048,0,0,,
+Asset list Museo/CamaraCine.fbx,2,reducido,54,15321,12000,12000,48,Assets/Mundo3D/Optimizado/Modelos/CamaraCine_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/CamaraCine_partes.fbx
+Asset list Museo/CarritoPalomitas.fbx,1,reducido,8,151385,12000,12000,6,Assets/Mundo3D/Optimizado/Modelos/CarritoPalomitas_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/CarritoPalomitas_partes.fbx
+Asset list Museo/CuadroVert.fbx,21,omitido: ya es ligero,3,140,140,0,0,,
+Asset list Museo/Escoba.fbx,1,omitido: ya es ligero,2,122,122,0,0,,
+Asset list Museo/Maniqui1.fbx,1,reducido,8,441719,70000,70000,2,Assets/Mundo3D/Optimizado/Modelos/Maniqui1_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Maniqui1_partes.fbx
+Asset list Museo/Maniqui2.fbx,1,reducido,1,50000,50000,50000,1,Assets/Mundo3D/Optimizado/Modelos/Maniqui2_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Maniqui2_partes.fbx
+Asset list Museo/Maniqui3.fbx,1,reducido,10,550619,89999,90000,4,Assets/Mundo3D/Optimizado/Modelos/Maniqui3_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Maniqui3_partes.fbx
+Asset list Museo/Maniqui4.fbx,1,reducido,8,749978,70000,70000,1,Assets/Mundo3D/Optimizado/Modelos/Maniqui4_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Maniqui4_partes.fbx
+Asset list Museo/Maniqui6.fbx,3,reducido,5,499638,70000,70000,1,Assets/Mundo3D/Optimizado/Modelos/Maniqui6_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Maniqui6_partes.fbx
+Asset list Museo/ManiquiRopa.fbx,2,reducido,6,4141,4141,12000,3,Assets/Mundo3D/Optimizado/Modelos/ManiquiRopa_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/ManiquiRopa_partes.fbx
+Asset list Museo/PilaRopa.fbx,3,omitido: ya es ligero,1,7033,7033,0,0,,
+Asset list Museo/Pilares.fbx,8,reducido,2,81220,5000,5000,2,Assets/Mundo3D/Optimizado/Modelos/Pilares_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Pilares_partes.fbx
+Asset list Museo/RackRopa.fbx,2,reducido,6,499976,90000,90000,1,Assets/Mundo3D/Optimizado/Modelos/RackRopa_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/RackRopa_partes.fbx
+Asset list Museo/RackZapatos.fbx,2,reducido,28,15564,12000,12000,19,Assets/Mundo3D/Optimizado/Modelos/RackZapatos_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/RackZapatos_partes.fbx
+Asset list Museo/Reja.fbx,2,omitido: ya es ligero,3,6294,6294,0,0,,
+Asset list Museo/ShelfMetal.fbx,1,reducido,51,143410,12000,12000,5,Assets/Mundo3D/Optimizado/Modelos/ShelfMetal_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/ShelfMetal_partes.fbx
+Asset list Museo/SillasCine.fbx,30,reducido,14,106654,5000,5000,3,Assets/Mundo3D/Optimizado/Modelos/SillasCine_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/SillasCine_partes.fbx
+Asset list Museo/Sintetizador.fbx,1,reducido,17,466458,25000,25000,4,Assets/Mundo3D/Optimizado/Modelos/Sintetizador_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Sintetizador_partes.fbx
+Asset list Museo/Springtrap.fbx,1,reducido,4,84217,29999,30000,4,Assets/Mundo3D/Optimizado/Modelos/Springtrap_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Springtrap_partes.fbx
+Corkboard_Desk/Model/Cork Board.fbx,1,omitido: ya es ligero,1,28,28,0,0,,
+Corkboard_Desk/Model/Desk.fbx,1,omitido: ya es ligero,1,348,348,0,0,,
+Free Stylized Cargo Props Pack/Model/SM_Box_Wrapped_Large_01.fbx,2,omitido: ya es ligero,1,1236,1236,0,0,,
+Free Stylized Cargo Props Pack/Model/SM_Box_Wrapped_Small_01.fbx,2,omitido: ya es ligero,1,1076,1076,0,0,,
+Free Stylized Cargo Props Pack/Model/SM_Crate_Wood_Large_01.fbx,24,omitido: ya es ligero,1,156,156,0,0,,
+Free Stylized Cargo Props Pack/Model/SM_Crate_Wood_Small_01.fbx,8,omitido: ya es ligero,1,156,156,0,0,,
+Free Stylized Cargo Props Pack/Model/SM_Pallet_Wood_01.fbx,5,omitido: ya es ligero,1,288,288,0,0,,
+Free Stylized Cargo Props Pack/Model/SM_Shipping_Box_01.fbx,19,omitido: ya es ligero,1,328,328,0,0,,
+Gridness Studios/Grocery Store Pack Lite/Meshes/LiteGroceryStore.fbx,114,omitido: es un kit de piezas ligeras,17,1735,1735,0,0,,
+Korea_TreasureProps/Meshes/SM_001_Statue_of_the_Buddha.FBX,1,omitido: ya es ligero,1,5006,5006,0,0,,
+Korea_TreasureProps/Meshes/SM_007_Statue_of_the_Buddha.fbx,1,omitido: ya es ligero,1,4092,4092,0,0,,
+Korea_TreasureProps/Meshes/SM_024_An_Earthenware_Doll_002.fbx,1,omitido: ya es ligero,1,7400,7400,0,0,,
+Korea_TreasureProps/Meshes/SM_029_Wooden_Scroll.fbx,1,omitido: ya es ligero,1,5386,5386,0,0,,
+Korea_TreasureProps/Meshes/SM_031_Bowl.fbx,1,omitido: ya es ligero,1,6324,6324,0,0,,
+Korea_TreasureProps/Meshes/SM_033_Bottle.fbx,1,omitido: ya es ligero,1,3706,3706,0,0,,
+Korea_TreasureProps/Meshes/SM_034_Bottle.fbx,1,omitido: ya es ligero,1,3774,3774,0,0,,
+Korea_TreasureProps/Meshes/SM_054_Statue_of_the_Buddha.fbx,1,omitido: ya es ligero,1,7560,7560,0,0,,
+Korea_TreasureProps/Meshes/SM_055_Statue_of_the_Buddha.fbx,1,omitido: ya es ligero,1,3794,3794,0,0,,
+Korea_TreasureProps/Meshes/SM_064_Bottle.fbx,1,omitido: ya es ligero,1,3232,3232,0,0,,
+Korea_TreasureProps/Meshes/SM_087_Stationery.fbx,1,omitido: ya es ligero,1,6770,6770,0,0,,
+Korea_TreasureProps/Meshes/SM_102_A_Celadon_Doll.fbx,1,omitido: ya es ligero,1,3802,3802,0,0,,
+Korea_TreasureProps/Meshes/SM_103_Statue_of_the_Buddha.fbx,1,omitido: ya es ligero,1,5160,5160,0,0,,
+MenuBoard/Resources/Models/menuboard.fbx,1,omitido: ya es ligero,3,86,86,0,0,,
+NThirdPerson/Characters/ybot/ybot.fbx,1,omitido: tiene esqueleto,0,0,0,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Fridge_02.fbx,2,reducido,5,2130,2130,12000,1,Assets/Mundo3D/Optimizado/Modelos/Prop_Fridge_02_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Prop_Fridge_02_partes.fbx
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Fridge_04.fbx,2,omitido: ya es ligero,1,378,378,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Frier.fbx,3,reducido,4,9582,9582,12000,1,Assets/Mundo3D/Optimizado/Modelos/Prop_Frier_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Prop_Frier_partes.fbx
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Griller.fbx,2,omitido: ya es ligero,3,1158,1158,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_KitchenCabinet_01.fbx,2,omitido: ya es ligero,3,461,461,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_KitchenTable_03.fbx,2,omitido: ya es ligero,2,432,432,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_KitchenTable_07.fbx,2,omitido: ya es ligero,1,412,412,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Microwave_01.fbx,2,omitido: ya es ligero,2,630,630,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Oven_02.fbx,2,omitido: ya es ligero,2,818,818,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Sink_01.fbx,2,omitido: ya es ligero,1,528,528,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_StorageShelve.fbx,2,omitido: ya es ligero,1,2224,2224,0,0,,
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_Stove.fbx,2,reducido,7,4066,4066,12000,1,Assets/Mundo3D/Optimizado/Modelos/Prop_Stove_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/Prop_Stove_partes.fbx
+Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Models/Prop_TrayHolder.fbx,2,omitido: ya es ligero,1,2032,2032,0,0,,
+VNB - Office Set/Models/office_set_vnb.fbx,234,omitido: es un kit de piezas ligeras,170,17935,17935,0,0,,
+iPoly3D/Server Room/Models/Keyboard.fbx,2,omitido: ya es ligero,1,1058,1058,0,0,,
+iPoly3D/Server Room/Models/chair.fbx,2,omitido: ya es ligero,1,728,728,0,0,,
+iPoly3D/Server Room/Models/coffie.fbx,2,omitido: ya es ligero,1,192,192,0,0,,
+iPoly3D/Server Room/Models/desk.fbx,2,reducido,9,716,716,12000,0,Assets/Mundo3D/Optimizado/Modelos/desk_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/desk_partes.fbx
+iPoly3D/Server Room/Models/display.001.fbx,3,omitido: ya es ligero,1,356,356,0,0,,
+iPoly3D/Server Room/Models/display.fbx,3,omitido: ya es ligero,1,356,356,0,0,,
+iPoly3D/Server Room/Models/electric cable.fbx,3,omitido: ya es ligero,1,308,308,0,0,,
+iPoly3D/Server Room/Models/exit_sign.fbx,2,omitido: ya es ligero,1,128,128,0,0,,
+iPoly3D/Server Room/Models/floor.fbx,2,omitido: ya es ligero,1,12,12,0,0,,
+iPoly3D/Server Room/Models/laptop.fbx,2,omitido: ya es ligero,1,104,104,0,0,,
+iPoly3D/Server Room/Models/mouse.fbx,3,omitido: ya es ligero,1,140,140,0,0,,
+iPoly3D/Server Room/Models/panel.fbx,16,omitido: ya es ligero,1,128,128,0,0,,
+iPoly3D/Server Room/Models/pc.fbx,3,omitido: ya es ligero,1,572,572,0,0,,
+iPoly3D/Server Room/Models/pencilbox.fbx,2,omitido: ya es ligero,1,264,264,0,0,,
+iPoly3D/Server Room/Models/security_camera.fbx,5,omitido: ya es ligero,1,916,916,0,0,,
+iPoly3D/Server Room/Models/server.fbx,17,omitido: ya es ligero,2,1076,1076,0,0,,
+iPoly3D/Server Room/Models/server_2.fbx,17,omitido: ya es ligero,1,320,320,0,0,,
+iPoly3D/Server Room/Models/tablet.fbx,3,omitido: ya es ligero,1,220,220,0,0,,
+malfarie/3D/Cafetería/Cafetería/Cafetería/Mapa3D_VF3.fbx,1,omitido: es el nivel,,,,,,,
+malfarie/3D/Personaje/Idle (1).fbx,1,omitido: tiene esqueleto,0,0,0,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)BigDrawer.fbx,1,reducido,10,13380,12000,12000,4,Assets/Mundo3D/Optimizado/Modelos/(Msh)BigDrawer_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)BigDrawer_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)BookOpen.fbx,1,reducido,1,15596,1999,2000,2,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookOpen_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookOpen_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)BookPile1.fbx,3,omitido: ya es ligero,1,4864,4864,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)BookPile2.fbx,2,reducido,9,21888,2000,2000,4,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile2_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile2_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)BookPile4.fbx,1,reducido,9,21888,2000,2000,6,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile4_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile4_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)BookPile5.fbx,1,reducido,18,43776,11999,12000,6,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile5_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile5_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)BookPile6.fbx,1,reducido,38,92416,12000,12000,6,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile6_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)BookPile6_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)Clock.fbx,2,reducido,4,17864,11998,12000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)Clock_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)Clock_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)CoffePot.fbx,1,omitido: ya es ligero,2,7698,7698,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)CoffeTable.fbx,2,omitido: ya es ligero,1,1868,1868,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)ConferenceTable.fbx,1,omitido: ya es ligero,1,4850,4850,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)Desk1.fbx,1,omitido: ya es ligero,1,1244,1244,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)DeskLight.fbx,1,reducido,4,6902,1999,2000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)DeskLight_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)DeskLight_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)DeskPlant.fbx,1,reducido,1,17656,1999,2000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)DeskPlant_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)DeskPlant_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)DeskPrinter.fbx,1,omitido: ya es ligero,1,2766,2766,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)DocumentHolder.fbx,1,omitido: ya es ligero,1,2740,2740,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)Fatboy.fbx,2,reducido,1,20718,12000,12000,1,Assets/Mundo3D/Optimizado/Modelos/(Msh)Fatboy_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)Fatboy_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)KitchenModule.fbx,1,reducido,1,12400,12000,12000,4,Assets/Mundo3D/Optimizado/Modelos/(Msh)KitchenModule_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)KitchenModule_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)LoungeChair.fbx,2,omitido: ya es ligero,1,2082,2082,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)Microwave.fbx,1,omitido: ya es ligero,1,3088,3088,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)Mug.fbx,1,omitido: ya es ligero,2,7820,7820,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)OfficeChair.fbx,1,reducido,1,20254,11998,12000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)OfficeChair_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)OfficeChair_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)PC.fbx,1,reducido,4,11000,11000,12000,2,Assets/Mundo3D/Optimizado/Modelos/(Msh)PC_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)PC_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)Plant1.fbx,1,reducido,1,21610,11999,12000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)Plant1_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)Plant1_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)Plant2.fbx,2,reducido,1,36881,11999,12000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)Plant2_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)Plant2_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)PlantBox.fbx,1,reducido,1,49227,12000,12000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)PlantBox_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)PlantBox_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)Printer.fbx,1,reducido,1,22268,12000,12000,5,Assets/Mundo3D/Optimizado/Modelos/(Msh)Printer_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)Printer_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)Projector.fbx,1,reducido,1,31112,2000,2000,3,Assets/Mundo3D/Optimizado/Modelos/(Msh)Projector_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)Projector_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)Shelves3.fbx,1,reducido,1,8412,8412,12000,1,Assets/Mundo3D/Optimizado/Modelos/(Msh)Shelves3_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)Shelves3_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)Sofa1.fbx,3,omitido: ya es ligero,1,5760,5760,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)Sofa2.fbx,1,omitido: ya es ligero,1,5148,5148,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)Sofa3.fbx,3,omitido: ya es ligero,1,5148,5148,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)TrashCan.fbx,1,omitido: ya es ligero,3,5512,5512,0,0,,
+nappin/OfficeEssentialsPack/Models/(Msh)VendingMachine.fbx,2,reducido,168,1277278,5575,25000,11,Assets/Mundo3D/Optimizado/Modelos/(Msh)VendingMachine_opt.fbx,Assets/Mundo3D/Optimizado/Modelos/(Msh)VendingMachine_partes.fbx
+nappin/OfficeEssentialsPack/Models/(Msh)WaterDispenser.fbx,3,omitido: ya es ligero,1,6896,6896,0,0,,

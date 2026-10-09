@@ -23,6 +23,12 @@ namespace Nexus.Mundo3D {
     /// La pantalla de la Fase 1 queda debajo, apagada, y vuelve a encenderse al cerrar esta.
     /// </summary>
     public sealed class PantallaDeRecoleccion3D : Pantalla {
+        /// <summary>
+        /// El nivel de calidad con el que se pinta el mundo 3D: su propio perfil de URP, mas barato que el del juego
+        /// (Nexus > Mundo 3D > 4 · Configurar el render del 3D). Si no existe, se pinta con el del juego.
+        /// </summary>
+        public const string NivelDeCalidad = "Mundo 3D";
+
         public EntradaDeRecoleccion Entrada;
         public Action<ResultadoDeRecoleccion> AlTerminar;
 
@@ -30,9 +36,11 @@ namespace Nexus.Mundo3D {
         public override bool PuedeVolver { get { return false; } }
 
         private readonly List<Behaviour> _apagados = new List<Behaviour>();
-        private TMP_Text _estado;
+        private readonly MedidorDeRendimiento _medidor = new MedidorDeRendimiento();
+        private TMP_Text _estado, _fps;
         private Button _salir;
         private bool _escenaCargada, _fondoQuitado, _terminando;
+        private int _calidadAnterior = -1;
 
         protected override void Construir() {
             // La raiz no tiene imagen: no tapa el mundo ni se queda con sus clics. Solo el panel los recibe.
@@ -46,6 +54,8 @@ namespace Nexus.Mundo3D {
             _estado = Ui.Texto(panel, "Cargando el recorrido…", EstiloTexto.Pequeno, Tema.ink);
             _salir = Ui.Boton(panel, "Dejar de recolectar", Terminar, VarianteBoton.Primario);
             _salir.interactable = false;
+            _fps = Ui.Texto(panel, "", EstiloTexto.Mono, Tema.inkMuted);
+            _fps.gameObject.SetActive(false);
         }
 
         private void Start() {
@@ -86,11 +96,16 @@ namespace Nexus.Mundo3D {
                 _apagados.Add(b);
             }
             SceneManager.SetActiveScene(escena);   // su cielo y su iluminacion, no los de la escena del juego
+            var calidad = Array.IndexOf(QualitySettings.names, NivelDeCalidad);
+            if (calidad >= 0 && calidad != QualitySettings.GetQualityLevel()) {
+                _calidadAnterior = QualitySettings.GetQualityLevel();
+                QualitySettings.SetQualityLevel(calidad, true);
+            }
             App.MostrarFondo(false);
             _fondoQuitado = true;
 
             _estado.text = "W A S D para moverte · ratón para mirar · Espacio para saltar.\n" +
-                           "<b>Esc</b> o <b>Tab</b> sueltan el ratón para pulsar el botón.";
+                           "<b>Esc</b> o <b>Tab</b> sueltan el ratón para pulsar el botón. <b>F3</b>: rendimiento.";
             _salir.interactable = true;
         }
 
@@ -112,10 +127,16 @@ namespace Nexus.Mundo3D {
         }
 
         private void Update() {
+            var teclado = Keyboard.current;
+            if (!_escenaCargada || _terminando || teclado == null) return;
+
+            _medidor.Anotar(Time.unscaledDeltaTime);
+            if (teclado.f3Key.wasPressedThisFrame) _fps.gameObject.SetActive(!_fps.gameObject.activeSelf);
+            if (_fps.gameObject.activeSelf) _fps.text = $"{_medidor.FpsAhora:0} FPS · {_medidor.MsAhora:0.0} ms";
+
             // El mundo captura el raton para mirar. Tab lo suelta (y lo vuelve a capturar) sin depender de la
             // pausa de la escena, para que el boton se pueda pulsar siempre.
-            var teclado = Keyboard.current;
-            if (!_escenaCargada || _terminando || teclado == null || !teclado.tabKey.wasPressedThisFrame) return;
+            if (!teclado.tabKey.wasPressedThisFrame) return;
             var capturado = Cursor.lockState == CursorLockMode.Locked;
             Cursor.lockState = capturado ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = capturado;
@@ -134,6 +155,7 @@ namespace Nexus.Mundo3D {
             var resultado = ResultadoProvisional.Para(Entrada);
 
             if (_escenaCargada) {
+                _medidor.Guardar(ModuloDeRecoleccion3D.Escena);
                 var descarga = SceneManager.UnloadSceneAsync(ModuloDeRecoleccion3D.Escena);
                 while (descarga != null && !descarga.isDone) yield return null;
                 _escenaCargada = false;
@@ -154,6 +176,10 @@ namespace Nexus.Mundo3D {
             if (_fondoQuitado) {
                 App.MostrarFondo(true);
                 _fondoQuitado = false;
+            }
+            if (_calidadAnterior >= 0) {
+                QualitySettings.SetQualityLevel(_calidadAnterior, true);
+                _calidadAnterior = -1;
             }
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;

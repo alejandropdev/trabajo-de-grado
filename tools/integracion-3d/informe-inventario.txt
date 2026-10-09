@@ -1,8 +1,11 @@
-identico: 4463  cambiado: 315  exceptuado: 69  FALTA: 0  GUID DISTINTO: 0
+identico: 4392  cambiado: 386  exceptuado: 69  FALTA: 0  GUID DISTINTO: 0
 cambiado	Asset List Bodega/M_Locker.mat
 cambiado	Asset List Cafetería/MSilla.mat
 cambiado	Asset List Cafetería/New Material.mat
 cambiado	Asset List Oficina/M_muñeco.mat
+cambiado	Asset List Oficina/Meshy_AI_Dwight_Bobblehead_1005003727_texture.png.meta
+cambiado	Asset List Oficina/Meshy_AI_Dwight_Bobblehead_1005003727_texture_metallic.png.meta
+cambiado	Asset List Oficina/Meshy_AI_Dwight_Bobblehead_1005003727_texture_normal.png.meta
 cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Blue.mat
 cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Green.mat
 cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Diffuse_Purple.mat
@@ -18,12 +21,22 @@ cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Green.mat
 cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Purple.mat
 cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Red.mat
 cambiado	BrokenVector/LowPolyStoragePack/Materials/Storage_Unlit_Yellow.mat
+cambiado	BrokenVector/LowPolyStoragePack/Palettes/Palette_Blue.png.meta
+cambiado	BrokenVector/LowPolyStoragePack/Palettes/Palette_Green.png.meta
+cambiado	BrokenVector/LowPolyStoragePack/Palettes/Palette_Purple.png.meta
+cambiado	BrokenVector/LowPolyStoragePack/Palettes/Palette_Red.png.meta
+cambiado	BrokenVector/LowPolyStoragePack/Palettes/Palette_Yellow.png.meta
 cambiado	Corkboard_Desk/Model/Materials/Corkboard&Desk_DefaultMaterial_AlbedoTransparency.mat
+cambiado	Corkboard_Desk/Texture/Corkboard&Desk_DefaultMaterial_AlbedoTransparency.png.meta
+cambiado	Corkboard_Desk/Texture/Corkboard&Desk_DefaultMaterial_MetallicSmoothness.png.meta
+cambiado	Corkboard_Desk/Texture/Corkboard&Desk_DefaultMaterial_Normal.png.meta
 cambiado	Free Stylized Cargo Props Pack/Material/Floor.mat
 cambiado	Free Stylized Cargo Props Pack/Material/M_Atlas_01.mat
 cambiado	Free Stylized Cargo Props Pack/Material/M_BuildIn_Atlas_01 1.mat
+cambiado	Free Stylized Cargo Props Pack/texture/Atlas_01.png.meta
 cambiado	Gridness Studios/Grocery Store Pack Lite/Materials/Grocery_Light_Mat.mat
 cambiado	Gridness Studios/Grocery Store Pack Lite/Materials/Grossery_Mat.mat
+cambiado	Gridness Studios/Grocery Store Pack Lite/Textures/GridnessColorPack.png.meta
 cambiado	H&L Assets/Concrete bench/Built-in/Materials/New Material.mat
 cambiado	H&L Assets/Concrete bench/HDRP/Materials/New Material.mat
 cambiado	H&L Assets/Concrete bench/URP/Materials/New Material.mat
@@ -200,10 +213,25 @@ cambiado	Korea_TreasureProps/Materials/T_064_Bottle_BC.mat
 cambiado	Korea_TreasureProps/Materials/T_087_Stationery_BC.mat
 cambiado	Korea_TreasureProps/Materials/T_102_A_Celadon_Doll_BC.mat
 cambiado	Korea_TreasureProps/Materials/T_103_Statue_of_the_Budha_BC.mat
+cambiado	Korea_TreasureProps/Textures/T_001_Statue_of_the_Buddha_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_007_Statue_of_the_Buddha_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_024_An_Earthenware_Doll_002_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_029_Wooden_Scroll_001_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_031_Bowl_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_033_Bottle_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_034_Bottle_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_054_Statue_of_the_Buddha_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_055_Statue_of_the_Buddha_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_064_Bottle_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_087_Stationery_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_102_A_Celadon_Doll_BC.png.meta
+cambiado	Korea_TreasureProps/Textures/T_103_Statue_of_the_Budha_BC.png.meta
 cambiado	MenuBoard/Resources/Materials/board_A.mat
 cambiado	MenuBoard/Resources/Materials/board_B.mat
 cambiado	MenuBoard/Resources/Materials/board_C.mat
 cambiado	MenuBoard/Resources/Materials/wood.mat
+cambiado	MenuBoard/Resources/Textures/board_A.jpg.meta
+cambiado	MenuBoard/Resources/Textures/wood.jpg.meta
 cambiado	NThirdPerson/Characters/Bixomon/Animations/Boximon Main Rig.FBX.meta
 cambiado	NThirdPerson/Characters/Bixomon/Demo Assets/Ground.mat
 cambiado	NThirdPerson/Characters/Bixomon/Materials/Boximon Fiery.mat
@@ -217,7 +245,9 @@ cambiado	NThirdPerson/Scripts/NPause.cs
 cambiado	NThirdPerson/Scripts/NThirdPersonPlayer.cs
 cambiado	NThirdPerson/SpeedTutor - Tutorial Scene - FREE/Material/M_Tileable_Cube.mat
 cambiado	NThirdPerson/SpeedTutor - Tutorial Scene - FREE/Material/M_Tileable_Walls.mat
+cambiado	NThirdPerson/SpeedTutor - Tutorial Scene - FREE/Textures/Gray_Tileable_Demo_Texture.png.meta
 cambiado	Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Materials/Panda Mat.mat
+cambiado	Pandazole_Ultimate_Pack/Pandazole Kitchen Food/Textures/PandaMat.png.meta
 cambiado	Texturas/Extra/New Material 1.mat
 cambiado	Texturas/Extra/New Material 10.mat
 cambiado	Texturas/Extra/New Material 11.mat
@@ -252,29 +282,48 @@ cambiado	Texturas/Extra/New Material 8.mat
 cambiado	Texturas/Extra/New Material 9.mat
 cambiado	Texturas/Extra/New Material.mat
 cambiado	Texturas/MaterialesReales/Binario.mat
+cambiado	Texturas/MaterialesReales/BinarioTapete.jpg.meta
 cambiado	Texturas/MaterialesReales/Cine.mat
+cambiado	Texturas/MaterialesReales/CinePatron.jpg.meta
+cambiado	Texturas/MaterialesReales/CojinRojo.jpg.meta
 cambiado	Texturas/MaterialesReales/CojinRojo.mat
+cambiado	Texturas/MaterialesReales/Concreto.jpg.meta
 cambiado	Texturas/MaterialesReales/Concreto.mat
 cambiado	Texturas/MaterialesReales/Madera.mat
+cambiado	Texturas/MaterialesReales/MaderaClara.jpg.meta
 cambiado	Texturas/MaterialesReales/MaderaClara.mat
 cambiado	Texturas/MaterialesReales/Marmol niitido.mat
 cambiado	Texturas/MaterialesReales/Marmol.mat
+cambiado	Texturas/MaterialesReales/Marmol2.jpg.meta
 cambiado	Texturas/MaterialesReales/MarmolParedesCurvas.mat
 cambiado	Texturas/MaterialesReales/Materials/TapeteGris.mat
+cambiado	Texturas/MaterialesReales/Metal.jpg.meta
 cambiado	Texturas/MaterialesReales/Metal.mat
+cambiado	Texturas/MaterialesReales/Oro.jpg.meta
 cambiado	Texturas/MaterialesReales/Oro.mat
+cambiado	Texturas/MaterialesReales/ParedBaño.jpg.meta
 cambiado	Texturas/MaterialesReales/ParedBaño.mat
+cambiado	Texturas/MaterialesReales/ParedCafetería.jpg.meta
 cambiado	Texturas/MaterialesReales/ParedCafetería.mat
+cambiado	Texturas/MaterialesReales/ParedMadera.jpg.meta
 cambiado	Texturas/MaterialesReales/ParedMadera.mat
+cambiado	Texturas/MaterialesReales/ParedOficinaAzulOscuro.jpg.meta
 cambiado	Texturas/MaterialesReales/ParedOficinas.mat
 cambiado	Texturas/MaterialesReales/Peli 1.mat
 cambiado	Texturas/MaterialesReales/Peli 2.mat
 cambiado	Texturas/MaterialesReales/Peli 3.mat
+cambiado	Texturas/MaterialesReales/Peli1.png.meta
+cambiado	Texturas/MaterialesReales/Peli2.png.meta
+cambiado	Texturas/MaterialesReales/Peli3.png.meta
 cambiado	Texturas/MaterialesReales/Peli4.mat
+cambiado	Texturas/MaterialesReales/Peli4.png.meta
 cambiado	Texturas/MaterialesReales/PisoGeneral.mat
 cambiado	Texturas/MaterialesReales/Porcelana.mat
+cambiado	Texturas/MaterialesReales/Ropa.jpg.meta
 cambiado	Texturas/MaterialesReales/Ropa.mat
 cambiado	Texturas/MaterialesReales/Tapete.mat
+cambiado	Texturas/MaterialesReales/TapeteGris.jpg.meta
+cambiado	Texturas/MaterialesReales/Tela.jpg.meta
 cambiado	Texturas/MaterialesReales/Tela.mat
 cambiado	VNB - Office Set/Materials/board_doc_1.mat
 cambiado	VNB - Office Set/Materials/board_doc_2.mat
@@ -293,9 +342,18 @@ cambiado	VNB - Office Set/Materials/rug_1.mat
 cambiado	VNB - Office Set/Materials/rug_2.mat
 cambiado	VNB - Office Set/Materials/screen.mat
 cambiado	VNB - Office Set/Materials/screen_off.mat
+cambiado	VNB - Office Set/Textures/DocBoard.png.meta
+cambiado	VNB - Office Set/Textures/Paintings.png.meta
+cambiado	VNB - Office Set/Textures/Paintings2.png.meta
+cambiado	VNB - Office Set/Textures/Rug_1.png.meta
+cambiado	VNB - Office Set/Textures/palette1.png.meta
+cambiado	VNB - Office Set/Textures/screens.png.meta
 cambiado	iPoly3D/Server Room/Materials/Glass.mat
 cambiado	iPoly3D/Server Room/Materials/Server_Material.mat
 cambiado	iPoly3D/Server Room/Materials/Server_Material_White_Glow.mat
+cambiado	iPoly3D/Server Room/Textures/lowpoly_server_texture.png.meta
+cambiado	iPoly3D/Server Room/Textures/texture_glow.png.meta
+cambiado	malfarie/3D/Personaje/Meshy_AI_Gadget_Scout_0831185442_texture.png.meta
 cambiado	malfarie/3D/Personaje/New Material.mat
 cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)EmissiveWarm.mat
 cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)Floor.mat
@@ -314,6 +372,19 @@ cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientOrange.mat
 cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientRed.mat
 cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)GradientYellow.mat
 cambiado	nappin/OfficeEssentialsPack/Materials/(Mat)MetallicBlack.mat
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientBeige.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientBlack.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientBlue.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientBrown.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientDarkbrown.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientDarkgreen.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientDarkgrey.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientDarkred.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientGreen.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientGrey.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientOrange.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientRed.png.meta
+cambiado	nappin/OfficeEssentialsPack/Textures/(Txt)GradientYellow.png.meta
 exceptuado	TextMesh Pro/Fonts.meta
 exceptuado	TextMesh Pro/Fonts/LiberationSans - OFL.txt
 exceptuado	TextMesh Pro/Fonts/LiberationSans - OFL.txt.meta
