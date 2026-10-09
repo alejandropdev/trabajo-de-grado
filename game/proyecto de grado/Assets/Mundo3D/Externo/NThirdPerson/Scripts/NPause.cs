@@ -39,7 +39,7 @@ namespace NComponent
                 //Audios
                 if (pauseAudios)
                 {
-                    AudioSource[] components = FindObjectsOfType<AudioSource>();
+                    AudioSource[] components = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
                     for (int i = 0; i < components.Length; i++)
                     {
                         AudioSource component = components[i];
@@ -53,7 +53,7 @@ namespace NComponent
                 //Videos
                 if (pauseAudios)
                 {
-                    VideoPlayer[] components = FindObjectsOfType<VideoPlayer>();
+                    VideoPlayer[] components = FindObjectsByType<VideoPlayer>(FindObjectsSortMode.None);
                     for (int i = 0; i < components.Length; i++)
                     {
                         VideoPlayer component = components[i];
@@ -67,7 +67,7 @@ namespace NComponent
                 //Animators
                 if (pauseAnimators)
                 {
-                    Animator[] components = FindObjectsOfType<Animator>();
+                    Animator[] components = FindObjectsByType<Animator>(FindObjectsSortMode.None);
                     for (int i = 0; i < components.Length; i++)
                     {
                         Animator component = components[i];
@@ -81,7 +81,7 @@ namespace NComponent
                 //Rigidbodies
                 if (pauseRigidbodies)
                 {
-                    Rigidbody[] components = FindObjectsOfType<Rigidbody>();
+                    Rigidbody[] components = FindObjectsByType<Rigidbody>(FindObjectsSortMode.None);
                     for (int i = 0; i < components.Length; i++)
                     {
                         Rigidbody component = components[i];

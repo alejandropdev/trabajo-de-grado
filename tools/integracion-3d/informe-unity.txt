@@ -9,7 +9,7 @@ PREFABS: 682 · con scripts perdidos: 0
 
 ESCENAS
   ★ Assets/Mundo3D/Escenas/Recoleccion3D.unity
-      9996 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
+      5138 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
     Assets/Mundo3D/Externo/BrokenVector/LowPolyStoragePack/Example.unity
       97 objetos · scripts perdidos: 0 · renderers con material roto: 0 · StandaloneInputModule: 0
     Assets/Mundo3D/Externo/Corkboard_Desk/Demo_Scene.unity
