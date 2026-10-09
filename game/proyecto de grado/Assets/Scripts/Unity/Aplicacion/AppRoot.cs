@@ -53,6 +53,16 @@ namespace Nexus.Unity.Aplicacion {
 
         private AutoGuardado _autoGuardado;
 
+        // --- modulos que se enchufan desde otro ensamblado ---
+
+        /// <summary>
+        /// El recorrido 3D de la Fase 1. Lo registra Nexus.Mundo3D antes de que cargue la primera escena; null si
+        /// ese ensamblado no esta en la build, y entonces la Fase 1 ofrece el recorrido simulado.
+        /// </summary>
+        public static IModuloDeRecoleccion ModuloDeRecoleccion { get; set; }
+
+        private GameObject _fondo;
+
         // ==================================================================== arranque
 
         private void Awake() {
@@ -127,6 +137,7 @@ namespace Nexus.Unity.Aplicacion {
             escala.matchWidthOrHeight = 0.5f;
 
             var fondo = UiKit.Rellenar(Ui.Nodo(go.transform, "Fondo"));
+            _fondo = fondo.gameObject;
             var img = fondo.gameObject.AddComponent<Image>();
             img.color = Ui.Tema.bg900;
             img.raycastTarget = false;
@@ -170,6 +181,14 @@ namespace Nexus.Unity.Aplicacion {
 
         /// <summary>La capa de la guia del tutorial, encima de todo. La usa GuiaView.</summary>
         public RectTransform CapaGuia { get; private set; }
+
+        /// <summary>
+        /// El fondo del lienzo es opaco: tapa cualquier cosa que pinte una camara. Se quita mientras el juego
+        /// enseña un mundo (el recorrido 3D) y se vuelve a poner al salir de el.
+        /// </summary>
+        public void MostrarFondo(bool visible) {
+            if (_fondo != null) _fondo.SetActive(visible);
+        }
 
         /// <summary>
         /// El proyecto usa el Input System nuevo en exclusiva (activeInputHandler = 1), y con el el

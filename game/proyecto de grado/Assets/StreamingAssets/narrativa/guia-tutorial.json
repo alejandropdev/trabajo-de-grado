@@ -91,9 +91,9 @@
       "nivel": "nivel-00",
       "disparador": "fase1.recoleccion",
       "orden": 50,
-      "titulo": "Elige cómo recorrer",
-      "texto": "«Rápida» gasta poco tiempo pero encuentra poco. «A fondo» encuentra más, pero también puedes tropezar con algo. Si no sabes, prueba «Normal».",
-      "mas": "Esta parte será en 3D. Mientras se construye, aquí se simula con un botón.",
+      "titulo": "Sal a recorrerlo",
+      "texto": "Pulsa «Empezar recolección» para recorrer el sitio en 3D. Te mueves con W A S D y miras con el ratón. Cuando hayas visto lo que querías, pulsa «Dejar de recolectar» y vuelves aquí.",
+      "mas": "El recorrido en 3D todavía se está construyendo: por ahora te deja caminar por el sitio, y lo que encuentras lo decide el juego al salir.",
       "resaltar": "fase1.simular"
     },
     {

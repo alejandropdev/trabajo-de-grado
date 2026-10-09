@@ -481,7 +481,7 @@ namespace Nexus.Unity.Pantallas {
             foreach (var p in pistas) Ui.Texto(t, "· " + p, EstiloTexto.Cuerpo);
         }
 
-        // ==================================================================== 2 · la recoleccion 3D (simulada)
+        // ==================================================================== 2 · la recoleccion 3D
 
         private void Recoleccion() {
             var cfg = S.Recoleccion;
@@ -489,10 +489,14 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Titulo("Recolección");
             if (!string.IsNullOrEmpty(cfg.Texto)) _hoja.Parrafo(cfg.Texto);
 
+            var modulo = AppRoot.ModuloDeRecoleccion;
             if (!S.RecoleccionHecha) {
                 var aviso = _hoja.Tarjeta("Esta parte es en 3D", Tono.Aviso);
-                Ui.Texto(aviso, "El recorrido en 3D lo está construyendo otro equipo. Mientras tanto, se simula: elige cómo de a fondo " +
-                                "quieres recorrerlo. Cuanto más miras, más encuentras… y más tiempo gastas, y más cosas puedes tocar que no debías.",
+                Ui.Texto(aviso, modulo != null
+                             ? "Vas a salir de estas pantallas y a recorrer el sitio en 3D. Muévete con W A S D, mira con el ratón y salta " +
+                               "con Espacio. Cuando hayas visto lo que querías, pulsa «Dejar de recolectar» para volver aquí."
+                             : "El recorrido en 3D lo está construyendo otro equipo. Mientras tanto, se simula: elige cómo de a fondo " +
+                               "quieres recorrerlo. Cuanto más miras, más encuentras… y más tiempo gastas, y más cosas puedes tocar que no debías.",
                          EstiloTexto.Pequeno, Tema.ink);
             }
 
@@ -508,6 +512,11 @@ namespace Nexus.Unity.Pantallas {
             if (!S.RecoleccionHecha) {
                 var fila = _hoja.Fila();
                 GuiaView.Registrar("fase1.simular", fila);
+                if (modulo != null) {
+                    Ui.Boton(fila, "Empezar recolección", () => EmpezarRecoleccion(modulo), VarianteBoton.Primario);
+                    return;
+                }
+                // Sin el mundo 3D en la build, el recorrido simulado de siempre.
                 Ui.Boton(fila, "Simular recolección 3D: rápida", () => Simular(IntensidadesDeSimulacion.Rapida));
                 Ui.Boton(fila, "Normal", () => Simular(IntensidadesDeSimulacion.Normal), VarianteBoton.Primario);
                 Ui.Boton(fila, "A fondo", () => Simular(IntensidadesDeSimulacion.AFondo));
@@ -538,9 +547,26 @@ namespace Nexus.Unity.Pantallas {
             return $"<b>{que}:</b> {texto}{efectos}";
         }
 
+        private EntradaDeRecoleccion EntradaDelRecorrido() {
+            return S.EntradaDeRecoleccion(App.PerfilActivo != null ? App.PerfilActivo.coleccionablesGlobales : null);
+        }
+
         private void Simular(string intensidad) {
-            var entrada = S.EntradaDeRecoleccion(App.PerfilActivo != null ? App.PerfilActivo.coleccionablesGlobales : null);
-            S.AplicarRecoleccion(SimuladorDeRecoleccion.Simular(entrada, intensidad));
+            AplicarRecoleccion(SimuladorDeRecoleccion.Simular(EntradaDelRecorrido(), intensidad));
+        }
+
+        /// <summary>
+        /// Sale al mundo 3D. Lo elegido hasta ahora ya esta en el borrador (Repintar lo guarda), y esta pantalla
+        /// sigue en la pila, apagada, hasta que el recorrido devuelve su resultado.
+        /// </summary>
+        private void EmpezarRecoleccion(IModuloDeRecoleccion modulo) {
+            modulo.Empezar(App, EntradaDelRecorrido(), AplicarRecoleccion);
+        }
+
+        /// <summary>Lo que devuelve el recorrido (el 3D o su simulacion) se entrega al motor, una sola vez.</summary>
+        private void AplicarRecoleccion(ResultadoDeRecoleccion resultado) {
+            if (S.RecoleccionHecha) return;
+            S.AplicarRecoleccion(resultado);
             foreach (var h in S.HallazgosRecogidos())
                 if (h.Tipo == TiposDeHallazgo.Coleccionable) App.AnotarColeccionable(h.Id);
             Repintar();

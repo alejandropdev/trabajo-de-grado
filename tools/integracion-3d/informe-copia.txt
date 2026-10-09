@@ -1,0 +1,70 @@
+identico: 4778  cambiado: 0  exceptuado: 69  FALTA: 0  GUID DISTINTO: 0
+exceptuado	TextMesh Pro/Fonts.meta
+exceptuado	TextMesh Pro/Fonts/LiberationSans - OFL.txt
+exceptuado	TextMesh Pro/Fonts/LiberationSans - OFL.txt.meta
+exceptuado	TextMesh Pro/Fonts/LiberationSans.ttf
+exceptuado	TextMesh Pro/Fonts/LiberationSans.ttf.meta
+exceptuado	TextMesh Pro/Resources.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Outline.mat
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Outline.mat.meta
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset
+exceptuado	TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset.meta
+exceptuado	TextMesh Pro/Resources/LineBreaking Following Characters.txt
+exceptuado	TextMesh Pro/Resources/LineBreaking Following Characters.txt.meta
+exceptuado	TextMesh Pro/Resources/LineBreaking Leading Characters.txt
+exceptuado	TextMesh Pro/Resources/LineBreaking Leading Characters.txt.meta
+exceptuado	TextMesh Pro/Resources/Sprite Assets.meta
+exceptuado	TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset
+exceptuado	TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset.meta
+exceptuado	TextMesh Pro/Resources/Style Sheets.meta
+exceptuado	TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset
+exceptuado	TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset.meta
+exceptuado	TextMesh Pro/Resources/TMP Settings.asset
+exceptuado	TextMesh Pro/Resources/TMP Settings.asset.meta
+exceptuado	TextMesh Pro/Shaders.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Bitmap.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF Overlay.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF Overlay.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF SSD.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF SSD.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Mobile.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF-Surface.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_SDF.shader
+exceptuado	TextMesh Pro/Shaders/TMP_SDF.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMP_Sprite.shader
+exceptuado	TextMesh Pro/Shaders/TMP_Sprite.shader.meta
+exceptuado	TextMesh Pro/Shaders/TMPro.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro.cginc.meta
+exceptuado	TextMesh Pro/Shaders/TMPro_Mobile.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro_Mobile.cginc.meta
+exceptuado	TextMesh Pro/Shaders/TMPro_Properties.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro_Properties.cginc.meta
+exceptuado	TextMesh Pro/Shaders/TMPro_Surface.cginc
+exceptuado	TextMesh Pro/Shaders/TMPro_Surface.cginc.meta
+exceptuado	TextMesh Pro/Sprites.meta
+exceptuado	TextMesh Pro/Sprites/EmojiOne Attribution.txt
+exceptuado	TextMesh Pro/Sprites/EmojiOne Attribution.txt.meta
+exceptuado	TextMesh Pro/Sprites/EmojiOne.json
+exceptuado	TextMesh Pro/Sprites/EmojiOne.json.meta
+exceptuado	TextMesh Pro/Sprites/EmojiOne.png
+exceptuado	TextMesh Pro/Sprites/EmojiOne.png.meta
