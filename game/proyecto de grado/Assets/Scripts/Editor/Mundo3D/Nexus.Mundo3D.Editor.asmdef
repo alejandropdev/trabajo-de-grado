@@ -1,0 +1,23 @@
+{
+    "name": "Nexus.Mundo3D.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Nexus.Mundo3D",
+        "Cinemachine",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Core.Editor",
+        "Unity.RenderPipelines.Universal.Editor",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
