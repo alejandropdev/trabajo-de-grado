@@ -8,13 +8,13 @@
   "enElProyecto": "Es el plan de pruebas del módulo de reservas: fechas, franjas y choques, que es donde más se equivoca un programa.",
   "presentacion": {
     "titulo": "Práctica: probar las reservas",
-    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 32 horas para el módulo de reservas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. La tarjeta dice también cuántos errores suele haber de ese tipo: el número exacto no lo sabe nadie, así que planifica para el más alto. Ganas si al cliente le llega como mucho 1 error.",
+    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 34 horas para el módulo de reservas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. La tarjeta dice también cuántos errores suele haber de ese tipo: el número exacto no lo sabe nadie, así que planifica para el más alto. Ganas si al cliente le llega como mucho 1 error, y ninguno de la pila marcada en rojo: hay pruebas caras que no se pueden saltar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 120
   },
   "repartir": {
-    "presupuesto": 32,
+    "presupuesto": 34,
     "paso": 2,
     "unidad": "horas",
     "toleranciaDeEscapes": 1,
@@ -47,9 +47,11 @@
         "id": "e2e",
         "nombre": "De extremo a extremo",
         "costePorDefecto": 6,
-        "defectosOcultos": 1, "estimadoMin": 0, "estimadoMax": 1,
-        "descripcion": "Una reserva de verdad, del portal al ascensor, como la haría un usuario. Caras.",
-        "pista": "Si lo demás está bien probado, aquí queda poco."
+        "defectosOcultos": 1, "estimadoMin": 1, "estimadoMax": 1,
+        "descripcion": "Una reserva de verdad, del portal al ascensor, como la haría un usuario. Caras, pero es lo único que prueba el camino entero.",
+        "pista": "El camino completo es nuevo.",
+        "critico": true,
+        "porQueEsCritico": "si la reserva no llega al ascensor, el sistema dice que sí y el ascensor no viene: nadie lo nota hasta que hay una carga esperando."
       }
     ]
   },

@@ -35,6 +35,12 @@ namespace Nexus.Core.Minijuegos
         /// </summary>
         public int ToleranciaDeSenuelos;
 
+        /// <summary>
+        /// Solo verbo V1: en esta escena NO hay ningun defecto. Lo que parece raro son señuelos, y lo correcto es
+        /// revisarla entera y aprobarla. No todo lo que llega a revision esta mal.
+        /// </summary>
+        public bool SinDefectos;
+
         /// <summary>Clave = nivelAndamiaje como texto ("0".."3").</summary>
         public Dictionary<string, AndamiajeCfg> Andamiaje = new Dictionary<string, AndamiajeCfg>();
 
@@ -86,6 +92,11 @@ namespace Nexus.Core.Minijuegos
         public int Fila;
         public int Columna;
         public string Detalle;
+        /// <summary>
+        /// Diagrama de componentes: la capa a la que pertenece ("interfaz", "logica", "datos" o "externo"). Solo se
+        /// dibuja (una franja de color y su rotulo): deja ver a simple vista que flecha se salta una capa.
+        /// </summary>
+        public string Capa;
     }
 
     public sealed class Conexion
@@ -97,6 +108,8 @@ namespace Nexus.Core.Minijuegos
         /// <summary>El orden en el tiempo, en un diagrama de secuencia.</summary>
         public int Orden;
         public string Grupo;
+        /// <summary>Diagrama de componentes: "pide" (por defecto), "lee" o "escribe". Solo cambia el trazo de la flecha.</summary>
+        public string Tipo;
     }
 
     /// <summary>El backlog del verbo V3: tarjetas, capacidad y la peticion del cliente.</summary>
@@ -158,6 +171,13 @@ namespace Nexus.Core.Minijuegos
         public int ToleranciaDeEscapes = 1;
         /// <summary>De cuanto en cuanto suben y bajan los botones +/-. El validador lo usa para comprobar que se puede ganar.</summary>
         public int Paso = 1;
+        /// <summary>
+        /// Un reparto que ya trae hecho alguien del equipo (deposito -> horas). Si esta, se empieza con el puesto: lo
+        /// que se pide es revisarlo, y si esta bien, entregarlo tal cual. No todo lo que se revisa esta mal.
+        /// </summary>
+        public Dictionary<string, int> Propuesta;
+        /// <summary>Quien lo propone («Camila»).</summary>
+        public string QuienPropone;
     }
 
     public sealed class Deposito
@@ -178,6 +198,14 @@ namespace Nexus.Core.Minijuegos
         public int EstimadoMax;
         /// <summary>Por que se espera eso ("Mucha lógica nueva"). El rango lo añade la pantalla. Solo se ve con andamiaje alto.</summary>
         public string Pista;
+        /// <summary>
+        /// Aqui no se puede escapar NADA: es el camino del que depende todo lo demas (que la barrera no se abra sola,
+        /// que la visita quede registrada). Si se escapa un error de este tipo se pierde, por pocos que sean en total.
+        /// Es lo que hace que las pruebas caras no sean siempre «lo primero a lo que se renuncia».
+        /// </summary>
+        public bool Critico;
+        /// <summary>Por que no se puede fallar ahi. Se ve en la pila.</summary>
+        public string PorQueEsCritico;
     }
 
     public sealed class Rama

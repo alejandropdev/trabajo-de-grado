@@ -109,6 +109,12 @@ namespace Nexus.Core.Modelo {
         /// </summary>
         public Nexus.Core.Oficina.OficinaConfig Oficina = new Nexus.Core.Oficina.OficinaConfig();
 
+        /// <summary>
+        /// La Fase 3: la tuberia de despliegue y los enchufes de cada modulo. null = el nivel no tiene Fase 3 y pasa
+        /// del desarrollo al lanzamiento, como antes.
+        /// </summary>
+        public Nexus.Core.Despliegue.DespliegueDef Despliegue;
+
         /// <summary>Copia profunda. Todo lo mutable (arrays, diccionarios, subobjetos) se duplica.</summary>
         public LevelProfile Clone() {
             var c = (LevelProfile)MemberwiseClone();
@@ -125,6 +131,7 @@ namespace Nexus.Core.Modelo {
             c.Fase1 = Fase1 == null ? null : Fase1.Clone();
             c.Oficina = Oficina == null ? null : Oficina.Clone();
             c.Proyecto = Proyecto == null ? null : Proyecto.Clone();
+            c.Despliegue = Despliegue == null ? null : Despliegue.Clone();
             return c;
         }
     }

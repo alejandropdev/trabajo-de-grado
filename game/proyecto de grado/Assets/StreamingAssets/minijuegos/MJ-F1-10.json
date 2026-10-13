@@ -1,0 +1,223 @@
+{
+  "id": "MJ-F1-10",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SSD / SDD",
+  "objetivoAprendizaje": "OA-DOC-01",
+  "modulo": "turnos",
+  "enElProyecto": "Es el diagrama de «Prioridades y turnos»: quién usa primero el ascensor de carga cuando dos reservas chocan. Lo dibujó Andrés.",
+  "presentacion": {
+    "titulo": "El diagrama de Andrés",
+    "comoSeJuega": "Andrés dibujó cómo se deciden los turnos del ascensor y te pide una revisión antes de programarlo. Mira cada caja y cada flecha: ¿cada pieza habla con las demás por su sitio? ¿falta algo de lo que pidió Facilities? Si encuentras un problema, pínchalo y di cuál es. Si lo miras todo y no falla nada, pulsa «Está bien: lo apruebo». No todo lo que llega a revisión está mal.",
+    "quienEspera": "Andrés",
+    "textoPresion": "Andrés empieza a programarlo mañana",
+    "segundosReloj": 120
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "portal",
+        "capa": "interfaz",
+        "texto": "Portal de reservas",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Donde el personal de Facilities pide un ascensor para una franja."
+      },
+      {
+        "id": "reservas",
+        "capa": "logica",
+        "texto": "Reservas de ascensores",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Comprueba que la franja está libre y guarda la reserva."
+      },
+      {
+        "id": "turnos",
+        "capa": "logica",
+        "texto": "Prioridades y turnos",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Cuando dos reservas chocan, decide quién va primero según las reglas de Facilities."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 0,
+        "detalle": "Guarda las reservas y la tabla de reglas de prioridad."
+      },
+      {
+        "id": "ascensor",
+        "capa": "externo",
+        "texto": "Controlador del ascensor",
+        "tipo": "externo",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "El aparato del fabricante. No se puede cambiar: solo recibe órdenes."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "c1",
+        "tipo": "pide",
+        "desde": "portal",
+        "hasta": "reservas",
+        "texto": "reservar una franja"
+      },
+      {
+        "id": "c2",
+        "tipo": "pide",
+        "desde": "reservas",
+        "hasta": "turnos",
+        "texto": "¿quién va primero?"
+      },
+      {
+        "id": "c3",
+        "tipo": "lee",
+        "desde": "turnos",
+        "hasta": "bd",
+        "texto": "reglas de prioridad"
+      },
+      {
+        "id": "c4",
+        "tipo": "escribe",
+        "desde": "reservas",
+        "hasta": "bd",
+        "texto": "guarda la reserva"
+      },
+      {
+        "id": "c5",
+        "tipo": "pide",
+        "desde": "reservas",
+        "hasta": "ascensor",
+        "texto": "orden de subir"
+      }
+    ]
+  },
+  "zonas": [],
+  "toleranciaDeSenuelos": 0,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "c3"
+      ],
+      "razonNoEsDefecto": "Las reglas de prioridad viven en la base de datos a propósito: así Facilities las cambia sin que nadie toque el código."
+    },
+    {
+      "id": "S2",
+      "commits": [
+        "ascensor"
+      ],
+      "razonNoEsDefecto": "Un aparato de otro fabricante parece un riesgo, pero está bien tratado: solo una pieza le habla, y por una sola flecha."
+    },
+    {
+      "id": "S3",
+      "commits": [
+        "c2"
+      ],
+      "razonNoEsDefecto": "Que reservas le pregunte a turnos no es acoplamiento indebido: es pedirle a otra pieza lo que le toca decidir a ella."
+    }
+  ],
+  "paletaEtiquetas": [
+    "requisito_ambiguo",
+    "acoplamiento_indebido",
+    "falla_de_seguridad",
+    "dependencia_circular",
+    "elemento_sin_especificar"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "requisito_ambiguo",
+        "acoplamiento_indebido",
+        "falla_de_seguridad"
+      ],
+      "contadorRestantes": false
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "requisito_ambiguo",
+        "acoplamiento_indebido",
+        "falla_de_seguridad",
+        "dependencia_circular"
+      ],
+      "contadorRestantes": false
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "dependencia_circular",
+        "elemento_sin_especificar"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {
+        "Documentacion": 4,
+        "MoralEquipo": 2
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DOC-01",
+        "razon": "Lo revisaste entero y estaba bien, y lo aprobaste. Saber cuándo un diseño no necesita cambios es parte de revisar."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {
+        "Dias": 0.3
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DOC-01",
+        "razon": "Marcaste una pieza que estaba bien. Andrés va a rehacer algo que ya funcionaba."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {
+        "Dias": 0.5,
+        "MoralEquipo": -3
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DOC-01",
+        "razon": "Acusaste a piezas que estaban bien. Si toda revisión acaba en «está mal», el equipo deja de enseñar su trabajo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DOC-01",
+        "razon": "No lo revisaste. Estaba bien, pero eso no lo sabías: aprobar sin mirar no es aprobar."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Andrés asiente: «Entonces lo dejo así». Y lo deja así."
+  },
+  "sinDefectos": true
+}

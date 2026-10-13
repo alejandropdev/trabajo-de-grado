@@ -75,16 +75,25 @@ namespace Nexus.Unity.Pantallas {
 
         public static void AbrirTermino(AppRoot app, FichaDelProyecto f, TerminoDelSector termino) {
             if (termino == null) return;
+            var enElJuego = string.IsNullOrEmpty(termino.DondeLoVeras) ? "" : "En " + termino.DondeLoVeras;
+            var enElOficio = f != null && f.Sector != null && !string.IsNullOrEmpty(f.Sector.Nombre)
+                ? $"Es una palabra del sector de {f.Sector.Nombre.ToLowerInvariant()}: quien trabaja ahí la usa a diario, y tu cliente también."
+                : "";
+            var donde = new PaginaDePizarra { Titulo = "Dónde lo verás", EnElJuego = true };
+            // Con su dibujo, en dos columnas: donde sale en el juego y quien la dice en el oficio. Sin el, como texto.
+            if (!string.IsNullOrEmpty(termino.DibujoDonde) && enElJuego.Length > 0 && enElOficio.Length > 0) {
+                donde.Columnas.Add(new ColumnaDePizarra { Titulo = "En el juego", Texto = enElJuego, Dibujo = termino.DibujoDonde, Color = "cian" });
+                donde.Columnas.Add(new ColumnaDePizarra { Titulo = "En el oficio", Texto = enElOficio, Dibujo = "of-quien-lo-usa", Color = "mostaza" });
+            } else {
+                donde.Texto = (enElJuego.Length == 0 ? "" : enElJuego + "\n") + enElOficio;
+            }
             var paginas = new List<PaginaDePizarra> {
-                new PaginaDePizarra { Titulo = "¿Qué es «" + termino.Termino + "»?", Texto = termino.Definicion },
-                new PaginaDePizarra {
-                    Titulo = "Dónde lo verás", EnElJuego = true,
-                    Texto = (string.IsNullOrEmpty(termino.DondeLoVeras) ? "" : "En " + termino.DondeLoVeras + "\n") +
-                            (f != null && f.Sector != null && !string.IsNullOrEmpty(f.Sector.Nombre)
-                                ? $"Es una palabra del sector de {f.Sector.Nombre.ToLowerInvariant()}: quien trabaja ahí la usa a diario, y tu cliente también."
-                                : "")
-                }
+                new PaginaDePizarra { Titulo = "¿Qué es «" + termino.Termino + "»?", Texto = termino.Definicion, Dibujo = termino.Dibujo },
+                donde
             };
+            // Si la asignatura tambien explica la palabra (MVP), sus paginas van en medio; la primera no, que repite el «¿qué es?».
+            var ampliacion = Glosario.Buscar(app.Catalogo.Glosario, termino.Glosario);
+            if (ampliacion != null) paginas.InsertRange(1, Glosario.PaginasDe(ampliacion).Skip(1));
             app.Router.Apilar<PantallaDePizarra>(p => {
                 p.Etiqueta = "EL OFICIO";
                 p.Tema = f == null ? "" : "Palabras del proyecto · " + f.Nombre;

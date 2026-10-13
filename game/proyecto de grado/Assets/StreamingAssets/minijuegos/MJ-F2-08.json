@@ -8,13 +8,13 @@
   "enElProyecto": "Es el plan de pruebas (PTP) de la versión que sale el viernes, sobre todo del módulo de reservas de los ascensores de carga.",
   "presentacion": {
     "titulo": "Las horas de pruebas",
-    "comoSeJuega": "Es el plan de pruebas (PTP) del release: cuántas horas va a cada tipo de prueba. Tienes 42 horas; súbelas o bájalas con + y −. Cada tipo solo encuentra los errores de su clase, y cada error cuesta las horas que dice su tarjeta. La tarjeta dice también cuántos errores suele haber de ese tipo: el número exacto no lo sabe nadie, así que planifica para el más alto. Lo que no encuentres, lo encontrará el cliente. Ganas si se escapa como mucho 1 error.",
+    "comoSeJuega": "Es el plan de pruebas (PTP) del release: cuántas horas va a cada tipo de prueba. Tienes 44 horas; súbelas o bájalas con + y −. Cada tipo solo encuentra los errores de su clase, y cada error cuesta las horas que dice su tarjeta. La tarjeta dice también cuántos errores suele haber de ese tipo: el número exacto no lo sabe nadie, así que planifica para el más alto. Lo que no encuentres, lo encontrará el cliente. Ganas si se escapa como mucho 1 error, y ninguno de la pila marcada en rojo: hay pruebas que no se pueden dejar para después.",
     "quienEspera": "Óscar",
     "textoPresion": "El release candidato sale el viernes",
     "segundosReloj": 120
   },
   "repartir": {
-    "presupuesto": 42,
+    "presupuesto": 44,
     "paso": 2,
     "unidad": "horas",
     "toleranciaDeEscapes": 1,
@@ -27,6 +27,7 @@
         "pista": "Tres conexiones nuevas." },
       { "id": "e2e", "nombre": "De extremo a extremo", "costePorDefecto": 6, "defectosOcultos": 2, "estimadoMin": 1, "estimadoMax": 2,
         "descripcion": "Un carro de verdad entrando y saliendo. Caras, pero son las únicas que ven el sistema como lo ve el guardia.",
+        "critico": true, "porQueEsCritico": "es el camino entero de un carro, de la matrícula a la barrera. Si falla, la barrera vuelve a abrirse a quien no debe.",
         "pista": "Flujo completo nuevo." },
       { "id": "regresion", "nombre": "Regresión", "costePorDefecto": 3, "defectosOcultos": 2, "estimadoMin": 2, "estimadoMax": 3,
         "descripcion": "Que lo que ya funcionaba siga funcionando. Este sprint se tocó el registro de accesos, que ya estaba en producción.",
@@ -38,7 +39,7 @@
       "efectosInmediatos": { "Cobertura": 10 },
       "efectosDiferidos": [],
       "hallazgos": [],
-      "rubrica": { "veredicto": "correcta", "oa": "OA-TEST-01", "razon": "Repartiste las horas donde estaba el riesgo. No hay presupuesto para probarlo todo: planificar las pruebas es decidir qué no se prueba, y hacerlo a propósito." }
+      "rubrica": { "veredicto": "correcta", "oa": "OA-TEST-01", "razon": "Repartiste las horas donde estaba el riesgo, y no dejaste sin probar el camino que no podía fallar aunque fuera el más caro. Planificar las pruebas es decidir qué no se prueba, y hacerlo a propósito." }
     },
     "parcial": {
       "efectosInmediatos": { "Cobertura": 4 },

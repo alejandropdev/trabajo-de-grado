@@ -46,6 +46,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
             foreach (var d in Cfg.Depositos) _asignacion[d.Id] = 0;
+            // Si alguien del equipo ya trae un reparto, se empieza con el puesto: lo que toca es revisarlo.
+            if (Cfg.Propuesta != null && !Guiado)
+                foreach (var kv in Cfg.Propuesta) if (_asignacion.ContainsKey(kv.Key)) _asignacion[kv.Key] = kv.Value;
             _lamina = NuevoLienzo(cuerpo, "Las horas de pruebas · una pila por tipo · súbelas y bájalas con + y −", 1330, 820);
             GuiaView.Registrar("mj.repartir.pilas", _lamina.Raiz);
 
@@ -56,6 +59,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var t = Ui.Tarjeta(lado, $"{d.Nombre} · {d.CostePorDefecto} {Cfg.Unidad} por error");
                 _tipos[d.Id] = t;
                 Ui.Texto(t, d.Descripcion ?? "", EstiloTexto.Pequeno, Tema.ink);
+                if (d.Critico)
+                    Ui.Texto(t, "AQUÍ NO PUEDE ESCAPARSE NADA. " + d.PorQueEsCritico, EstiloTexto.Pequeno, Tema.danger);
                 if (Revelado)
                     Ui.Texto(t, $"Te lo chivaron: aquí hay {d.DefectosOcultos} error(es).", EstiloTexto.Pequeno, Tema.warning);
                 else if (Andamiaje >= 2 && d.EstimadoMax > 0)
@@ -65,7 +70,11 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 else if (Andamiaje >= 2 && !string.IsNullOrEmpty(d.Pista))
                     Ui.Texto(t, "Pista: " + d.Pista, EstiloTexto.Pequeno, Tema.cyan);
             }
-            Ui.Texto(lado, $"Ganas si se escapan como mucho {Cfg.ToleranciaDeEscapes} error(es).", EstiloTexto.Pequeno, Tema.warning);
+            Ui.Texto(lado, $"Ganas si se escapan como mucho {Cfg.ToleranciaDeEscapes} error(es)" +
+                           (Cfg.Depositos.Any(d => d.Critico) ? ", y ninguno de la pila marcada en rojo." : "."), EstiloTexto.Pequeno, Tema.warning);
+            if (Cfg.Propuesta != null && !Guiado)
+                Ui.Texto(lado, $"{(string.IsNullOrEmpty(Cfg.QuienPropone) ? "El equipo" : Cfg.QuienPropone)} ya trae este reparto. Revísalo con las tarjetas: " +
+                               "si cubre el riesgo, entrégalo tal cual. Revisar no siempre es cambiar.", EstiloTexto.Pequeno, Tema.cyan);
             _entregar = Ui.Boton(pie, "Entregar el reparto", Entregar, VarianteBoton.Primario);
             GuiaView.Registrar("mj.entregar", _entregar);
             Repintar();
@@ -99,8 +108,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 if (Andamiaje >= 3 && !Revelado && Usado > 0 && Cfg.Depositos.Any(d => d.EstimadoMax > 0)) {
                     var peor = RepartirEvaluador.EscapesEsperados(Cfg, _asignacion, true);
                     var mejor = RepartirEvaluador.EscapesEsperados(Cfg, _asignacion, false);
-                    var seguro = peor <= Cfg.ToleranciaDeEscapes;
+                    var critico = RepartirEvaluador.PuedeEscaparAlgoCritico(Cfg, _asignacion, true);
+                    var seguro = peor <= Cfg.ToleranciaDeEscapes && !critico;
                     l.Texto(60, 48, 1200, 26,
+                            critico ? "Con este reparto podría escaparse un error de la pila que no puede fallar." :
                             seguro ? $"Aunque haya lo máximo esperado, se escaparían {peor}: vas sobre seguro."
                                    : $"Con este reparto se escaparían entre {mejor} y {peor} errores · ganas con {Cfg.ToleranciaDeEscapes} o menos.",
                             17, seguro ? Tema.papelExito : Tema.papelAviso, TextAlignmentOptions.MidlineLeft);
@@ -113,7 +124,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var x = x0 + i * sep;
                 l.Texto(x - 40, Arriba - 76, AnchoPila + 80, 28, d.Nombre, 21, Tema.paperInk, TextAlignmentOptions.Center, null, true);
                 l.Texto(x, Arriba - 44, AnchoPila, 26, $"{h} {Cfg.Unidad}", 19, Tema.papelCyan, TextAlignmentOptions.Center);
-                l.Dibujo.Rect(x, Arriba, AnchoPila, AltoPila, Tema.papelCyan, 3, Tema.papelCaja, false, 14);
+                l.Dibujo.Rect(x, Arriba, AnchoPila, AltoPila, d.Critico ? Tema.papelPeligro : Tema.papelCyan, d.Critico ? 5 : 3, Tema.papelCaja, false, 14);
+                if (d.Critico) l.Texto(x - 40, Arriba - 104, AnchoPila + 80, 24, "NO PUEDE FALLAR", 15, Tema.papelPeligro, TextAlignmentOptions.Center, null, true);
                 var hh = AltoPila * h / Cfg.Presupuesto;
                 if (hh > 0) {
                     l.Dibujo.Rect(x + 5, Arriba + AltoPila - hh - 5, AnchoPila - 10, hh, Relleno, 0, Relleno, false, 10);

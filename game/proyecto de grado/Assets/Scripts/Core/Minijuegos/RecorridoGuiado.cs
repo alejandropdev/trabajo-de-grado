@@ -125,6 +125,13 @@ namespace Nexus.Core.Minijuegos {
                 });
             }
 
+            if (def.Zonas.Count == 0) {
+                pasos.Add(new PasoGuiado {
+                    Accion = AccionGuiada.Entregar, Texto = "No hay nada que marcar. Pulsa «Está bien: lo apruebo».",
+                    Porque = "Lo revisaste entero y no falla nada. Aprobar algo que está bien también es revisar: no hay que encontrar un error para haber hecho el trabajo."
+                });
+                return pasos;
+            }
             pasos.Add(new PasoGuiado {
                 Accion = AccionGuiada.Entregar, Texto = "Ya está todo marcado. Pulsa «Entregar».",
                 Porque = "Revisar bien es encontrar lo que falla sin acusar a lo que funciona."
@@ -154,6 +161,12 @@ namespace Nexus.Core.Minijuegos {
                              "queda libre, primero lo que más vale para el esfuerzo que cuesta; 3) lo que no cabe sobre la línea " +
                              "(la capacidad del equipo) espera al siguiente sprint.",
                     EsLeccion = true
+                },
+                new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Así se mueve una tarjeta.",
+                    Porque = "El número grande es su puesto: el 1 es lo primero que hará el equipo. Para cambiarla de puesto, " +
+                             "arrástrala por el agarre ≡ hasta el hueco marcado, o súbela y bájala con ▲ y ▼. El tablero empieza " +
+                             "desordenado a propósito: ordenarlo es el reto."
                 }
             };
 
@@ -236,7 +249,8 @@ namespace Nexus.Core.Minijuegos {
                         Texto = $"Sube {d.Nombre} hasta {h} {cfg.Unidad}.",
                         Porque = $"Cada error de {d.Nombre.ToLowerInvariant()} cuesta {d.CostePorDefecto} {cfg.Unidad}, y {seEspera}: " +
                                  $"{h} {cfg.Unidad} alcanzan para atrapar {cubre}." +
-                                 (cubre < maximo ? " No llega al máximo: es lo más caro de atrapar, y a algo hay que renunciar." : "")
+                                 (d.Critico ? $" Y aquí no se renuncia a nada, aunque sea caro: {d.PorQueEsCritico}" : "") +
+                                 (cubre < maximo ? " No llega al máximo: es lo más caro de atrapar de lo que SÍ se puede dejar, y a algo hay que renunciar." : "")
                     });
                 else
                     pasos.Add(new PasoGuiado {
@@ -260,7 +274,8 @@ namespace Nexus.Core.Minijuegos {
         public static ResultadoMinijuego Aplicar(MinijuegoDef def, IList<PasoGuiado> pasos) {
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar: {
-                    var orden = def.Ordenar.Tarjetas.Select(t => t.Id).ToList();
+                    // Desde el tablero barajado, que es como lo encuentra el jugador (tambien en el modo guiado).
+                    var orden = OrdenarEvaluador.OrdenInicial(def.Ordenar, 0);
                     string respuesta = null;
                     foreach (var p in pasos) {
                         if (p.Accion == AccionGuiada.Mover) { orden.Remove(p.Objetivo); orden.Insert(Math.Min(p.Valor, orden.Count), p.Objetivo); }
@@ -283,6 +298,8 @@ namespace Nexus.Core.Minijuegos {
                         if (p.Accion == AccionGuiada.Seleccionar && !estado.Seleccion.Contains(p.Objetivo)) estado.Alternar(p.Objetivo);
                         if (p.Accion == AccionGuiada.Etiquetar) estado.Marcar(p.Objetivo, t++);
                     }
+                    // En una escena limpia, entregar ES aprobar.
+                    if (def.Zonas.Count == 0 && pasos.Any(p => p.Accion == AccionGuiada.Entregar)) estado.Aprobado = true;
                     return DetectarEvaluador.Evaluar(def, estado);
                 }
             }

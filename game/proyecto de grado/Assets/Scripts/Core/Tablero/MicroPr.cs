@@ -17,6 +17,20 @@ namespace Nexus.Core.Tablero {
         public string Explicacion;
     }
 
+    /// <summary>
+    /// Un trozo del documento de una etapa (el SRS, el SAD…) que se lee al inspeccionarlo: tres o cuatro renglones,
+    /// con un problema dentro o sin el. Se firma o se piden cambios. Contenido: tablero/micro-doc.json.
+    /// </summary>
+    public sealed class ExtractoDeDocumento {
+        public string Id;
+        /// <summary>El documento del que sale: «SRS», «SAD», «SDD», «PTP».</summary>
+        public string Documento;
+        public string Titulo;
+        public List<string> Secciones = new List<string>();
+        public bool TieneDefecto;
+        public string Explicacion;
+    }
+
     public static class VeredictosDePr {
         public const string Aprobar = "aprobar";
         public const string PedirCambios = "cambios";

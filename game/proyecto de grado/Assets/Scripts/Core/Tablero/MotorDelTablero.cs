@@ -127,6 +127,15 @@ namespace Nexus.Core.Tablero {
             t.SumaFactorMinutos = 0;
             t.MinutosDeHoy = 0;
             t.BonoDeFlujoHoy = 0;
+            // Lo de hoy con cada compañero se acaba con el dia. Su cansancio propio vuelve poco a poco al del equipo;
+            // a quien lleva dos tarjetas a la vez se le acumula.
+            foreach (var m in t.Miembros) {
+                var lleva = t.Tarjetas.Count(c => c.Asignado == m.Id && c.Empezada && !c.Terminada);
+                if (!m.DescansaHoy && lleva >= 2) m.DesvioDeCansancio = Math.Min(30, m.DesvioDeCansancio + 2);
+                else if (m.DesvioDeCansancio > 0) m.DesvioDeCansancio = Math.Max(0, m.DesvioDeCansancio - 1);
+                else if (m.DesvioDeCansancio < 0) m.DesvioDeCansancio = Math.Min(0, m.DesvioDeCansancio + 1);
+                m.DescansaHoy = false; m.ParejaHoy = null; m.HabloHoy = false;
+            }
             Conciliar(t, avanceOficial, dia);
         }
 

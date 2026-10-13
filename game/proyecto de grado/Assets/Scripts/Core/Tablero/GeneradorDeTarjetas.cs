@@ -36,6 +36,52 @@ namespace Nexus.Core.Tablero {
             return t;
         }
 
+        /// <summary>
+        /// El product backlog que armo el jugador, hecho tarjetas. Por cada modulo, sus tarjetas genericas («parte 1»,
+        /// «parte 2») se cambian por las historias elegidas, y los puntos del modulo se reparten entre ellas segun lo
+        /// que valen: la suma no cambia. Las historias que el cliente pidio y se dejaron fuera entran igual, las
+        /// ultimas y marcadas: ese trabajo existia aunque nadie lo apuntara. Sin backlog elegido no hace nada.
+        /// </summary>
+        public static void AplicarHistorias(TableroDelEquipo t, Nexus.Core.Proyecto.FichaDelProyecto f, IList<string> idsEnOrden) {
+            if (t == null || f == null || idsEnOrden == null || idsEnOrden.Count == 0) return;
+            var orden = new Dictionary<string, int>(StringComparer.Ordinal);
+            for (var i = 0; i < idsEnOrden.Count; i++) if (!orden.ContainsKey(idsEnOrden[i])) orden[idsEnOrden[i]] = i;
+
+            var nuevas = new List<TarjetaDeTrabajo>();
+            foreach (var modulo in f.Modulos) {
+                var viejas = t.Tarjetas.Where(c => !c.EsBug && c.Modulo == modulo.Id).ToList();
+                if (viejas.Count == 0) continue;
+                var historias = f.Historias.Where(h => h != null && h.Modulo == modulo.Id &&
+                                                       (orden.ContainsKey(h.Id) || h.Tipo == Nexus.Core.Proyecto.TiposDeHistoria.Pedida)).ToList();
+                if (historias.Count == 0) { nuevas.AddRange(viejas); continue; }   // un modulo sin historias se queda como estaba
+
+                var puntos = viejas.Sum(c => c.Puntos);
+                var pesos = historias.Sum(h => (double)Math.Max(1, h.Valor));
+                var repartido = 0.0;
+                for (var i = 0; i < historias.Count; i++) {
+                    var h = historias[i];
+                    // La ultima se lleva lo que falte: la suma del modulo es EXACTAMENTE la de antes.
+                    var p = i == historias.Count - 1 ? Math.Round(puntos - repartido, 2) : Math.Round(puntos * Math.Max(1, h.Valor) / pesos, 2);
+                    repartido += p;
+                    var tarde = !orden.ContainsKey(h.Id);
+                    nuevas.Add(new TarjetaDeTrabajo {
+                        Id = "T" + (++t.Generadas).ToString("00"),
+                        Titulo = (tarde ? "Se descubrió tarde: " : "") + h.Titulo,
+                        Modulo = modulo.Id, Historia = h.Id, DescubiertaTarde = tarde,
+                        Tipo = viejas[i % viejas.Count].Tipo, Puntos = p,
+                        // Lo elegido, en el orden del jugador; lo descubierto tarde, detras de todo.
+                        Orden = tarde ? 10000 + nuevas.Count : orden[h.Id]
+                    });
+                }
+            }
+            // Lo que no cuelga de un modulo (no deberia haber nada todavia) se conserva.
+            nuevas.AddRange(t.Tarjetas.Where(c => c.EsBug || f.Modulos.All(m => m.Id != c.Modulo)));
+            // El orden queda compacto y sin empates: 0, 1, 2…
+            var n = 0;
+            foreach (var c in nuevas.OrderBy(c => c.Orden).ToList()) c.Orden = n++;
+            t.Tarjetas = nuevas.OrderBy(c => c.Orden).ToList();
+        }
+
         /// <summary>Añade tarjetas hasta sumar 'puntos' (un cambio pedido, un bug).</summary>
         public static void Cortar(TableroDelEquipo t, string moduloId, string nombre, double puntos, int semilla,
                                   bool bug = false, int dia = 0, string tipo = null) {
@@ -64,7 +110,7 @@ namespace Nexus.Core.Tablero {
         private static List<MiembroDelEquipo> MiembrosDe(LevelProfile perfil) {
             if (perfil.Equipo != null && perfil.Equipo.Count > 0)
                 return perfil.Equipo.Select(m => new MiembroDelEquipo {
-                    Id = m.Id, Nombre = m.Nombre, Rol = m.Rol, Personaje = m.Personaje,
+                    Id = m.Id, Nombre = m.Nombre, Rol = m.Rol, Personaje = m.Personaje, Descripcion = m.Descripcion, Frase = m.Frase,
                     Habilidades = new Dictionary<string, double>(m.Habilidades ?? new Dictionary<string, double>(), StringComparer.OrdinalIgnoreCase)
                 }).ToList();
             return new List<MiembroDelEquipo> {

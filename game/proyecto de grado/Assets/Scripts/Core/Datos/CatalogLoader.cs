@@ -36,6 +36,7 @@ namespace Nexus.Core.Datos {
 
         /// <summary>Los cambios de codigo que salen a revision en el tablero. Vacio = no hay revisiones.</summary>
         public List<Nexus.Core.Tablero.MicroPr> MicroPrs = new List<Nexus.Core.Tablero.MicroPr>();
+        public List<Nexus.Core.Tablero.ExtractoDeDocumento> Extractos = new List<Nexus.Core.Tablero.ExtractoDeDocumento>();
 
         /// <summary>Los pasos de la guia del tutorial (la burbuja de Marisol). Vacio = ningun nivel tiene guia.</summary>
         public List<PasoDeGuia> Guia = new List<PasoDeGuia>();
@@ -81,9 +82,11 @@ namespace Nexus.Core.Datos {
         public const string ArchivoAdmision = "prueba-de-admision.json";
         public const string ArchivoColeccionables = "coleccionables.json";
         public const string ArchivoMicroPrs = "tablero/micro-pr.json";
+        public const string ArchivoExtractos = "tablero/micro-doc.json";
         public const string ArchivoGuia = "narrativa/guia-tutorial.json";
         public const string ArchivoGlosario = "narrativa/glosario.json";
         public const string ArchivoConversaciones = "narrativa/conversaciones.json";
+        public const string CarpetaCursos = "narrativa/cursos";
 
         public static JsonSerializerSettings Settings { get { return JsonDeGuardado.Settings; } }
 
@@ -128,10 +131,21 @@ namespace Nexus.Core.Datos {
             public List<EntradaDeGlosario> Terminos { get; set; }
         }
 
+        /// <summary>El sobre de narrativa/cursos/&lt;id&gt;.json: { "version": 1, "id": "scrum", "paginas": [ … ] }.</summary>
+        private sealed class ArchivoDeCurso {
+            public int Version { get; set; }
+            public string Id { get; set; }
+            public List<PaginaDePizarra> Paginas { get; set; }
+        }
+
         private sealed class ArchivoDeConversaciones {
             public int Version { get; set; }
             public List<Nexus.Core.Relaciones.Personaje> Personajes { get; set; }
             public List<Nexus.Core.Relaciones.Conversacion> Conversaciones { get; set; }
+        }
+
+        private sealed class ArchivoDeExtractos {
+            public List<Nexus.Core.Tablero.ExtractoDeDocumento> Extractos { get; set; }
         }
 
         private sealed class ArchivoDeMicroPrs {
@@ -328,6 +342,21 @@ namespace Nexus.Core.Datos {
                 }
             }
 
+            if (fuente.Existe(ArchivoExtractos)) {
+                try {
+                    var archivo = Parsear<ArchivoDeExtractos>(fuente.LeerCatalogo(ArchivoExtractos), ArchivoExtractos);
+                    catalogo.Extractos = archivo.Extractos ?? new List<Nexus.Core.Tablero.ExtractoDeDocumento>();
+                    var ids = new HashSet<string>(StringComparer.Ordinal);
+                    foreach (var x in catalogo.Extractos) {
+                        if (x == null || string.IsNullOrEmpty(x.Id) || !ids.Add(x.Id)) errores.Add(ArchivoExtractos + ": hay un extracto sin id o repetido.");
+                        else if (string.IsNullOrEmpty(x.Documento) || x.Secciones == null || x.Secciones.Count == 0) errores.Add($"{ArchivoExtractos}: '{x.Id}' no dice de que documento es o no tiene nada que leer.");
+                        else if (string.IsNullOrEmpty(x.Explicacion)) errores.Add($"{ArchivoExtractos}: '{x.Id}' no explica nada. Sin explicacion no hay leccion.");
+                    }
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
             if (fuente.Existe(ArchivoColeccionables)) {
                 try {
                     var archivo = Parsear<ArchivoDeColeccionables>(fuente.LeerCatalogo(ArchivoColeccionables),
@@ -351,6 +380,19 @@ namespace Nexus.Core.Datos {
                 try {
                     var archivo = Parsear<ArchivoDeGlosario>(fuente.LeerCatalogo(ArchivoGlosario), ArchivoGlosario);
                     catalogo.Glosario = archivo.Terminos ?? new List<EntradaDeGlosario>();
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
+            // Cada curso se cuelga del termino del glosario con su mismo id.
+            foreach (var ruta in fuente.ListarCatalogos(CarpetaCursos)) {
+                try {
+                    var archivo = Parsear<ArchivoDeCurso>(fuente.LeerCatalogo(ruta), ruta);
+                    var termino = Glosario.Buscar(catalogo.Glosario, archivo.Id);
+                    if (termino == null) { errores.Add($"{ruta}: el curso es de '{archivo.Id}', que no esta en el glosario."); continue; }
+                    if (termino.Curso.Count > 0) { errores.Add($"{ruta}: '{archivo.Id}' ya tiene curso."); continue; }
+                    termino.Curso = archivo.Paginas ?? new List<PaginaDePizarra>();
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
                 }

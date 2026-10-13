@@ -14,6 +14,8 @@ namespace Nexus.Core.Minijuegos.Detectar
         public readonly List<string> Seleccion = new List<string>();   // commits pinchados aun sin etiquetar
         public float SegundosRestantes;
         public bool Enviado;
+        /// <summary>El jugador lo dio por bueno a proposito («Está bien: lo apruebo»): no es lo mismo que no revisarlo.</summary>
+        public bool Aprobado;
 
         public DetectarState(int segundosReloj)
         {

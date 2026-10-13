@@ -17,6 +17,7 @@
     "elementos": [
       {
         "id": "garita",
+        "capa": "externo",
         "texto": "Lector de la garita",
         "tipo": "externo",
         "fila": 0,
@@ -25,6 +26,7 @@
       },
       {
         "id": "app-guardia",
+        "capa": "interfaz",
         "texto": "Pantalla del guardia",
         "tipo": "componente",
         "fila": 0,
@@ -33,6 +35,7 @@
       },
       {
         "id": "app-facilities",
+        "capa": "interfaz",
         "texto": "Portal de Facilities",
         "tipo": "componente",
         "fila": 0,
@@ -41,6 +44,7 @@
       },
       {
         "id": "mod-acceso",
+        "capa": "logica",
         "texto": "Módulo de acceso",
         "tipo": "componente",
         "fila": 1,
@@ -49,6 +53,7 @@
       },
       {
         "id": "mod-reservas",
+        "capa": "logica",
         "texto": "Módulo de reservas",
         "tipo": "componente",
         "fila": 1,
@@ -57,6 +62,7 @@
       },
       {
         "id": "mod-informes",
+        "capa": "logica",
         "texto": "Módulo de informes",
         "tipo": "componente",
         "fila": 1,
@@ -65,6 +71,7 @@
       },
       {
         "id": "barrera",
+        "capa": "externo",
         "texto": "Controlador de la barrera",
         "tipo": "externo",
         "fila": 2,
@@ -73,6 +80,7 @@
       },
       {
         "id": "bd",
+        "capa": "datos",
         "texto": "Base de datos",
         "tipo": "baseDeDatos",
         "fila": 2,
@@ -81,6 +89,7 @@
       },
       {
         "id": "correo",
+        "capa": "externo",
         "texto": "Servicio de correo",
         "tipo": "externo",
         "fila": 2,
@@ -91,48 +100,56 @@
     "conexiones": [
       {
         "id": "c1",
+        "tipo": "pide",
         "desde": "garita",
         "hasta": "mod-acceso",
         "texto": "envía la matrícula leída"
       },
       {
         "id": "c2",
+        "tipo": "pide",
         "desde": "mod-acceso",
         "hasta": "barrera",
         "texto": "abrir / cerrar"
       },
       {
         "id": "c3",
+        "tipo": "pide",
         "desde": "app-guardia",
         "hasta": "mod-acceso",
         "texto": "consulta los accesos"
       },
       {
         "id": "c4",
+        "tipo": "pide",
         "desde": "app-facilities",
         "hasta": "mod-reservas",
         "texto": "pide un ascensor"
       },
       {
         "id": "c5",
+        "tipo": "escribe",
         "desde": "mod-reservas",
         "hasta": "bd",
         "texto": "guarda las reservas"
       },
       {
         "id": "c6",
+        "tipo": "escribe",
         "desde": "mod-acceso",
         "hasta": "bd",
         "texto": "guarda los accesos"
       },
       {
         "id": "c7",
+        "tipo": "lee",
         "desde": "mod-informes",
         "hasta": "bd",
         "texto": "lee directamente las tablas internas de reservas"
       },
       {
         "id": "c8",
+        "tipo": "pide",
         "desde": "mod-reservas",
         "hasta": "correo",
         "texto": "avisa de la reserva"

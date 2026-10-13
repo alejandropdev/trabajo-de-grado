@@ -1,0 +1,211 @@
+{
+  "id": "MJ-F0-02",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SRS",
+  "objetivoAprendizaje": "OA-DOC-01",
+  "modulo": "dentro",
+  "enElProyecto": "Es el diagrama de «Quién sigue dentro»: la lista que mira el vigilante al cerrar. Lo dibujó Mateo y te pide que lo revises antes de programarlo.",
+  "presentacion": {
+    "titulo": "El diagrama de Mateo",
+    "comoSeJuega": "Mateo dibujó cómo va a funcionar «Quién sigue dentro» y te pide una revisión antes de programarlo. Mira cada caja y cada flecha, y compáralas con lo que pidió el vigilante. Si encuentras un problema, pínchalo y di cuál es. Si después de mirarlo todo no falla nada, pulsa «Está bien: lo apruebo». No todo lo que llega a revisión está mal: marcar algo que funciona hace perder el tiempo a quien lo hizo.",
+    "quienEspera": "Mateo",
+    "textoPresion": "Mateo empieza a programarlo a las 11:00",
+    "segundosReloj": 90
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "pantalla",
+        "capa": "interfaz",
+        "texto": "Pantalla del vigilante",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Una sola lista, sin botones: el vigilante solo necesita mirarla al cerrar."
+      },
+      {
+        "id": "recepcion",
+        "capa": "interfaz",
+        "texto": "Pantalla de recepción",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 1,
+        "detalle": "Donde la recepcionista marca la salida de cada visitante."
+      },
+      {
+        "id": "dentro",
+        "capa": "logica",
+        "texto": "Quién sigue dentro",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Arma la lista de visitas que entraron y todavía no han salido."
+      },
+      {
+        "id": "registro",
+        "capa": "logica",
+        "texto": "Registro de visitas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Guarda la hora de entrada y la de salida de cada visita."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 0,
+        "detalle": "Guarda cada visita con su entrada y su salida."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "c1",
+        "tipo": "pide",
+        "desde": "pantalla",
+        "hasta": "dentro",
+        "texto": "la lista de hoy"
+      },
+      {
+        "id": "c2",
+        "tipo": "lee",
+        "desde": "dentro",
+        "hasta": "bd",
+        "texto": "visitas sin salida"
+      },
+      {
+        "id": "c3",
+        "tipo": "pide",
+        "desde": "recepcion",
+        "hasta": "registro",
+        "texto": "marcar salida"
+      },
+      {
+        "id": "c4",
+        "tipo": "escribe",
+        "desde": "registro",
+        "hasta": "bd",
+        "texto": "guarda la salida"
+      }
+    ]
+  },
+  "zonas": [],
+  "toleranciaDeSenuelos": 0,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "pantalla"
+      ],
+      "razonNoEsDefecto": "Una pantalla que solo enseña una lista parece incompleta, pero es justo lo que pidió el vigilante: mirar, no escribir."
+    },
+    {
+      "id": "S2",
+      "commits": [
+        "c2"
+      ],
+      "razonNoEsDefecto": "La lógica leyendo de la base de datos no es acoplamiento: es la capa de arriba hablando con la de abajo por su sitio."
+    },
+    {
+      "id": "S3",
+      "commits": [
+        "bd"
+      ],
+      "razonNoEsDefecto": "Que dos módulos usen la misma base de datos es normal en un sistema pequeño; uno escribe la salida y el otro la lee."
+    }
+  ],
+  "paletaEtiquetas": [
+    "requisito_incompleto",
+    "acoplamiento_indebido",
+    "elemento_sin_especificar"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "requisito_incompleto",
+        "acoplamiento_indebido"
+      ],
+      "contadorRestantes": false
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "requisito_incompleto",
+        "acoplamiento_indebido",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": false
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "acoplamiento_indebido"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {
+        "Documentacion": 3,
+        "MoralEquipo": 2
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DOC-01",
+        "razon": "Lo revisaste entero y estaba bien, y lo dijiste. Una revisión que no encuentra nada no está mal hecha: confirmar que algo funciona también es un resultado."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {
+        "Dias": 0.2
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DOC-01",
+        "razon": "Marcaste una pieza que estaba bien. Mateo va a gastar la mañana revisando algo que funcionaba."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {
+        "Dias": 0.3,
+        "MoralEquipo": -2
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DOC-01",
+        "razon": "Acusaste a piezas que estaban bien. Revisar no es sospechar de todo: quien recibe siempre un «está mal» deja de pedir revisiones."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DOC-01",
+        "razon": "No lo revisaste. Esta vez el diagrama estaba bien, pero no lo sabías: salió bien por suerte, no por tu revisión."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Mateo guarda el diagrama con tu visto bueno y se pone a programar."
+  },
+  "sinDefectos": true
+}

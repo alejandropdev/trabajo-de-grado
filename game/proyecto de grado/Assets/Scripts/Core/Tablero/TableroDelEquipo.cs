@@ -39,6 +39,10 @@ namespace Nexus.Core.Tablero {
         public int DiaFin = -1;
         /// <summary>Scrum: el sprint al que se comprometio (indice de la unidad). -1 = sigue en el product backlog.</summary>
         public int Sprint = -1;
+        /// <summary>La historia del product backlog de la que sale (id), si el jugador armo el backlog.</summary>
+        public string Historia;
+        /// <summary>El cliente la habia pedido y no entro al backlog: aparecio despues, la ultima de la fila.</summary>
+        public bool DescubiertaTarde;
 
         public bool Terminada { get { return Trabajo >= Puntos - MotorDelTablero.Epsilon; } }
         public bool Empezada { get { return Trabajo > MotorDelTablero.Epsilon; } }
@@ -64,6 +68,18 @@ namespace Nexus.Core.Tablero {
         /// pero no sube el cansancio global a escondidas.
         /// </summary>
         public double DesvioDeCansancio;
+
+        /// <summary>Quien es, en una o dos frases, y algo que diria: para presentarlo. Vienen del nivel.</summary>
+        public string Descripcion;
+        public string Frase;
+
+        // --- lo de hoy (se limpia al cerrar el dia) ---
+        /// <summary>Hoy tiene un respiro: no lleva tarjeta.</summary>
+        public bool DescansaHoy;
+        /// <summary>Con quien trabaja hoy en pareja (id), o null.</summary>
+        public string ParejaHoy;
+        /// <summary>Ya se hablo hoy con el uno a uno.</summary>
+        public bool HabloHoy;
 
         public double HabilidadPara(string tipo) {
             if (string.IsNullOrEmpty(tipo) || Habilidades == null) return 1.0;
@@ -140,6 +156,7 @@ namespace Nexus.Core.Tablero {
             c.Tarjetas = Tarjetas.Select(t => t.Clone()).ToList();
             c.Miembros = Miembros.Select(m => new MiembroDelEquipo {
                 Id = m.Id, Nombre = m.Nombre, Rol = m.Rol, Personaje = m.Personaje, DesvioDeCansancio = m.DesvioDeCansancio,
+                Descripcion = m.Descripcion, Frase = m.Frase, DescansaHoy = m.DescansaHoy, ParejaHoy = m.ParejaHoy, HabloHoy = m.HabloHoy,
                 Habilidades = new Dictionary<string, double>(m.Habilidades, StringComparer.OrdinalIgnoreCase)
             }).ToList();
             return c;

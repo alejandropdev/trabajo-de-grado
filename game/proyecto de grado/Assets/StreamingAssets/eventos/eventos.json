@@ -516,6 +516,148 @@
           }
         }
       ]
+    },
+    {
+      "id": "EV-OK-02",
+      "nombre": "La estimación de Mateo",
+      "soloNiveles": [
+        "nivel-01"
+      ],
+      "tags": [
+        "equipo"
+      ],
+      "fases": [
+        "desarrollo"
+      ],
+      "severidad": 1,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "standup",
+        "texto": "En la reunión diaria, Mateo: «Tengo la estimación del módulo de turnos. Quiero que alguien la mire antes de comprometernos.»"
+      },
+      "precondiciones": [
+        "diaActual >= 4"
+      ],
+      "opciones": [
+        {
+          "id": "aceptarla",
+          "texto": "La repasas con él: las cuentas salen y el margen es razonable. La aceptas tal cual.",
+          "efectosInmediatos": {
+            "MoralEquipo": 3,
+            "Documentacion": 2
+          },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "La estimación estaba razonada y la aceptaste después de mirarla. Confiar en el trabajo bien hecho de un compañero no es dejadez: es lo que hace que quiera volver a enseñártelo."
+          }
+        },
+        {
+          "id": "recortarla",
+          "texto": "Recortarle un tercio: «seguro que se puede hacer en menos».",
+          "efectosInmediatos": {
+            "MoralEquipo": -4
+          },
+          "efectosDiferidos": [
+            {
+              "enDias": 4,
+              "efectos": {
+                "DeudaTecnica": 4,
+                "Cansancio": 4
+              }
+            }
+          ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "No encontraste ningún error en sus cuentas: solo querías un número más bajo. Una estimación recortada sin motivo no acorta el trabajo, acorta la confianza."
+          }
+        },
+        {
+          "id": "inflarla",
+          "texto": "Subirla un cincuenta por ciento, por si acaso.",
+          "efectosInmediatos": {
+            "SatisfaccionCliente": -3
+          },
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Un colchón sobre una estimación que ya tenía margen es prometerle al cliente menos de lo que cabe. No hace daño al equipo, pero tampoco era necesario."
+          }
+        }
+      ]
+    },
+    {
+      "id": "EV-OK-03",
+      "nombre": "Camila pasa las pruebas en verde",
+      "soloNiveles": [
+        "nivel-01"
+      ],
+      "tags": [
+        "calidad"
+      ],
+      "fases": [
+        "desarrollo"
+      ],
+      "severidad": 1,
+      "objetivoAprendizaje": "OA-TEST-02",
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "chat",
+        "texto": "Camila, en el chat: «Las pruebas del control de acceso están todas en verde. Antes de darlo por probado quiero que las veas conmigo.»"
+      },
+      "precondiciones": [
+        "diaActual >= 6"
+      ],
+      "opciones": [
+        {
+          "id": "darlo-por-probado",
+          "texto": "Miráis juntos qué comprueba cada prueba: cubren la matrícula autorizada, la que no y la que no se lee. Lo dais por probado.",
+          "efectosInmediatos": {
+            "Cobertura": 4,
+            "MoralEquipo": 2
+          },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-TEST-02",
+            "razon": "Miraste qué comprobaban, no solo el color. Estaban bien hechas y lo dijiste: un verde que se entiende vale más que diez pruebas nuevas hechas por desconfianza."
+          }
+        },
+        {
+          "id": "repetir-todo",
+          "texto": "Pedirle que las escriba todas otra vez de otra forma, para estar seguros.",
+          "efectosInmediatos": {
+            "Cansancio": 4,
+            "MoralEquipo": -3,
+            "Avance": -1
+          },
+          "efectosDiferidos": [ { "enDias": 3, "efectos": {"Cansancio": 3, "MoralEquipo": -2} } ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-TEST-02",
+            "razon": "Las pruebas cubrían los casos que importaban. Repetirlas no añade seguridad: gasta dos días y dice que el trabajo de Camila no cuenta."
+          }
+        },
+        {
+          "id": "fiarse-del-verde",
+          "texto": "«Si está en verde, está bien.» No las abres.",
+          "efectosInmediatos": {
+            "MoralEquipo": 1
+          },
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-TEST-02",
+            "razon": "Esta vez el verde decía la verdad. Pero un verde no dice qué se probó: aprobar sin mirar funciona hasta el día en que las pruebas no comprueban nada."
+          }
+        }
+      ]
     }
   ]
 }

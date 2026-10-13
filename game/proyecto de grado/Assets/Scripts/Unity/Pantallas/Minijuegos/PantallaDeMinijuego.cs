@@ -247,6 +247,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// <summary>La pieza de la pantalla de la que habla un paso guiado (para señalarla). null = ninguna.</summary>
         protected virtual RectTransform PiezaGuiada(PasoGuiado paso) { return null; }
 
+        /// <summary>Lo que cuesta pedir una pista: segundos del reloj. Nunca lo deja a cero (no entrega por ti).</summary>
+        protected void CobrarSegundos(float segundos) { _restante = Mathf.Max(1f, _restante - segundos); }
+
         private void Update() {
             if (_recetaInicialPendiente) {
                 // La receta se apila encima en cuanto la pantalla existe (en Construir el router aun no la tiene).
@@ -418,6 +421,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         /// <summary>Un panel de lienzo que ocupa lo que le den, con una lamina de tamaño fijo dentro (con scroll si no cabe).</summary>
         protected Lamina NuevoLienzo(Transform padre, string rotulo, float ancho, float alto, float? anchoFijo = null) {
+            return CrearLienzo(Ui, padre, rotulo, ancho, alto, anchoFijo);
+        }
+
+        /// <summary>El mismo lienzo, para las pantallas que no son un minijuego (la Fase 3, el producto).</summary>
+        public static Lamina CrearLienzo(UiKit Ui, Transform padre, string rotulo, float ancho, float alto, float? anchoFijo = null) {
+            var Tema = Ui.Tema;
             // El tablero es un documento: una hoja de papel dentro de una ventana de metal, con su titulo en tinta.
             var panel = Ui.Ventana(padre, "Lienzo", true);
             if (anchoFijo.HasValue) UiKit.Tamano(panel, ancho: anchoFijo.Value, flexAlto: 1);

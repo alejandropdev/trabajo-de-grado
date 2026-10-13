@@ -93,10 +93,131 @@ namespace Nexus.Tests {
                 var paginas = Glosario.PaginasDe(t);
                 Assert.GreaterOrEqual(paginas.Count, 2, t.Id);
                 Assert.IsTrue(paginas.Any(p => p.EnElJuego), t.Id + ": falta cómo se ve en el juego");
-                Assert.IsTrue(paginas.Any(p => p.Vinetas.Count > 0), t.Id + ": un pizarrón sin dibujos");
+                Assert.IsTrue(paginas.Any(p => p.Vinetas.Count > 0 || p.Columnas.Count > 0 || !string.IsNullOrEmpty(p.Dibujo)), t.Id + ": un pizarrón sin dibujos");
                 foreach (var v in paginas.SelectMany(p => p.Vinetas)) Assert.IsTrue(IconosDePizarra.Existe(v.Icono), t.Id + ": " + v.Icono);
             }
         }
+
+        // ================================================================ los pizarrones ilustrados
+
+        /// <summary>Todas las paginas que el jugador puede abrir: las del glosario, las de los cursos y, aparte, las palabras del oficio.</summary>
+        private static IEnumerable<KeyValuePair<string, PaginaDePizarra>> TodasLasPaginas() {
+            foreach (var t in Catalogo().Glosario) {
+                foreach (var p in Glosario.PaginasDe(t)) yield return new KeyValuePair<string, PaginaDePizarra>(t.Id, p);
+                foreach (var p in t.Curso) yield return new KeyValuePair<string, PaginaDePizarra>("curso de " + t.Id, p);
+            }
+        }
+
+        [Test]
+        public void Ningun_pizarron_lleva_emojis() {
+            var textos = new List<string>();
+            foreach (var kv in TodasLasPaginas()) {
+                textos.Add(kv.Value.Titulo); textos.Add(kv.Value.Texto);
+                foreach (var c in kv.Value.Columnas) { textos.Add(c.Titulo); textos.Add(c.Texto); }
+                foreach (var v in kv.Value.Vinetas) textos.Add(v.Texto);
+            }
+            foreach (var nivel in Catalogo().Niveles.Values)
+                foreach (var t in nivel.Proyecto.Vocabulario) { textos.Add(t.Definicion); textos.Add(t.DondeLoVeras); }
+            foreach (var texto in textos.Where(x => x != null))
+                for (var i = 0; i < texto.Length; i++) {
+                    var c = texto[i];
+                    // pares sustitutos (los emojis de color), simbolos varios y dingbats, y el selector de variacion
+                    var emoji = char.IsSurrogate(c) || (c >= 0x2600 && c <= 0x27BF) || c == 0xFE0F || c == 0x2B50;
+                    Assert.IsFalse(emoji, "hay un emoji en «" + texto + "»: la letra de tiza no los pinta");
+                }
+        }
+
+        [Test]
+        public void Cada_escena_ilustra_una_sola_pagina() {
+            // Los sitios del juego (j-…) si se repiten: son la misma pantalla vista desde otro concepto.
+            var repetibles = new HashSet<string> { "mov-que" };
+            var usos = new Dictionary<string, List<string>>();
+            Action<string, string> apuntar = (escena, donde) => {
+                if (!EscenasDePizarra.Existe(escena) || escena.StartsWith("j-", StringComparison.Ordinal) || repetibles.Contains(escena)) return;
+                if (!usos.ContainsKey(escena)) usos[escena] = new List<string>();
+                usos[escena].Add(donde);
+            };
+            foreach (var kv in TodasLasPaginas()) {
+                apuntar(kv.Value.Dibujo, kv.Key);
+                foreach (var c in kv.Value.Columnas) apuntar(c.Dibujo, kv.Key);
+            }
+            foreach (var nivel in Catalogo().Niveles.Values)
+                foreach (var t in nivel.Proyecto.Vocabulario) { apuntar(t.Dibujo, t.Termino); apuntar(t.DibujoDonde, t.Termino); }
+            foreach (var kv in usos)
+                Assert.AreEqual(1, kv.Value.Count, $"la escena '{kv.Key}' se repite en: {string.Join(", ", kv.Value)}");
+        }
+
+        [Test]
+        public void Ninguna_escena_se_queda_sin_usar() {
+            var usadas = new HashSet<string>(TodasLasPaginas().SelectMany(kv => new[] { kv.Value.Dibujo }.Concat(kv.Value.Columnas.Select(c => c.Dibujo))).Where(x => x != null));
+            foreach (var nivel in Catalogo().Niveles.Values)
+                foreach (var t in nivel.Proyecto.Vocabulario) { usadas.Add(t.Dibujo); usadas.Add(t.DibujoDonde); }
+            usadas.Add("of-quien-lo-usa");   // la pone el pizarron de las palabras del oficio, en «Dónde lo verás»
+            foreach (var escena in EscenasDePizarra.Todas) Assert.IsTrue(usadas.Contains(escena), "nadie usa la escena " + escena);
+        }
+
+        [Test]
+        public void Cada_palabra_del_oficio_tiene_su_dibujo_y_el_de_donde_se_ve() {
+            foreach (var nivel in Catalogo().Niveles.Values)
+                foreach (var t in nivel.Proyecto.Vocabulario) {
+                    Assert.IsTrue(EscenasDePizarra.Existe(t.Dibujo), $"{nivel.Id}/{t.Termino}: sin dibujo");
+                    Assert.IsTrue(EscenasDePizarra.Existe(t.DibujoDonde), $"{nivel.Id}/{t.Termino}: sin dibujo de «Dónde lo verás»");
+                }
+        }
+
+        [Test]
+        public void Cada_medida_del_proyecto_explica_que_pasa_si_es_alta_o_baja_y_que_conviene() {
+            foreach (var id in new[] { "avance", "alcance", "deuda-tecnica", "cobertura", "cansancio", "moral", "satisfaccion", "riesgo", "documentacion" }) {
+                var titulos = Glosario.PaginasDe(Glosario.Buscar(Catalogo().Glosario, id)).Select(p => p.Titulo).ToList();
+                foreach (var parte in new[] { "si es alto", "si es bajo", "recomendable", "Por qué importa" })
+                    Assert.IsTrue(titulos.Any(t => t.Contains(parte)), $"{id}: falta la página de «{parte}»");
+            }
+        }
+
+        [Test]
+        public void Los_cursos_de_las_metodologias_estan_enteros() {
+            foreach (var caso in new[] { new { id = "scrum", paginas = 31 }, new { id = "kanban", paginas = 24 }, new { id = "cascada", paginas = 23 } }) {
+                var curso = Glosario.Buscar(Catalogo().Glosario, caso.id).Curso;
+                Assert.AreEqual(caso.paginas, curso.Count, "curso de " + caso.id);
+                foreach (var p in curso) {
+                    Assert.IsTrue(EtiquetasDePizarra.Existe(p.Etiqueta), $"{caso.id}/«{p.Titulo}»: etiqueta");
+                    Assert.IsFalse(string.IsNullOrEmpty(p.Capitulo), $"{caso.id}/«{p.Titulo}»: capítulo");
+                    Assert.IsTrue(EscenasDePizarra.Existe(p.Dibujo) || p.Columnas.Count > 0, $"{caso.id}/«{p.Titulo}»: dibujo");
+                }
+                Assert.AreEqual("RESUMEN", curso.Last().Etiqueta, caso.id + ": el curso acaba en su resumen");
+            }
+        }
+
+        [Test]
+        public void El_texto_de_cada_pagina_ilustrada_cabe_en_la_pizarra() {
+            // Lo que cabe sin pisar el dibujo ni los botones: PantallaDePizarra no hace scroll.
+            var maximoPorColumnas = new Dictionary<int, int> { { 2, 170 }, { 3, 115 }, { 4, 80 } };
+            foreach (var kv in TodasLasPaginas()) {
+                var p = kv.Value;
+                var donde = $"{kv.Key}/«{p.Titulo}»";
+                if (!string.IsNullOrEmpty(p.Dibujo)) Assert.LessOrEqual((p.Texto ?? "").Length, 280, donde + ": texto largo para llevar escena");
+                if (p.Columnas.Count == 0) continue;
+                Assert.LessOrEqual((p.Texto ?? "").Length, 190, donde + ": texto largo para llevar columnas");
+                foreach (var c in p.Columnas) {
+                    Assert.LessOrEqual((c.Texto ?? "").Length, maximoPorColumnas[p.Columnas.Count], $"{donde}: la columna «{c.Titulo}» no cabe");
+                    Assert.LessOrEqual((c.Titulo ?? "").Length, p.Columnas.Count == 2 ? 40 : 28, $"{donde}: el título «{c.Titulo}» no cabe");
+                }
+            }
+        }
+
+        [Test]
+        public void El_glosario_explica_lo_que_el_juego_antes_daba_por_sabido() {
+            foreach (var id in LoQueAntesSeDabaPorSabido)
+                Assert.IsNotNull(Glosario.Buscar(Catalogo().Glosario, id), "falta en el glosario: " + id);
+        }
+
+        private static readonly string[] LoQueAntesSeDabaPorSabido = {
+            "mvp",
+            "ticket", "cliente", "interesados", "scrum-master", "desarrollador", "tester", "rol-interfaz", "rol-datos", "rol-servidor",
+            "historia-de-usuario", "columnas-del-tablero", "revision-de-codigo", "burndown", "flujo-acumulado", "curva-s", "velocidad",
+            "reunion-diaria", "planificacion-de-sprint",
+            "diagrama-de-componentes", "diagrama-de-secuencia", "traza", "log", "defecto", "dependencia", "presupuesto", "incidencia"
+        };
 
         // ================================================================ arquitecturas con sus propias razones
 

@@ -244,7 +244,63 @@ namespace Nexus.Core.Datos {
             ValidarMapa(id, p.Mapa, e);
             ValidarFase1(id, p.Fase1, e);
             ValidarProyecto(id, p.Proyecto, e);
+            ValidarDespliegue(id, p, e);
             return e;
+        }
+
+        /// <summary>
+        /// La Fase 3 de un nivel: que la tuberia se pueda armar bien (caben los obligatorios y no se piden en circulo),
+        /// que cada cable vaya a una toma que existe y no es trampa, y que solo hablen de modulos del proyecto.
+        /// </summary>
+        private static void ValidarDespliegue(string id, LevelProfile p, List<string> e) {
+            var d = p.Despliegue;
+            if (d == null) return;
+            var donde = id + ": despliegue";
+            if (d.Segundos < 30 || d.Segundos > 900) e.Add($"{donde}: 'segundos' vale {d.Segundos}; va de 30 a 900.");
+            if (d.UmbralDeModulo < 0 || d.UmbralDeModulo > 100) e.Add($"{donde}: 'umbralDeModulo' va de 0 a 100.");
+
+            var tramos = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var t in d.Tuberia.Tramos) {
+                if (t == null || string.IsNullOrEmpty(t.Id) || !tramos.Add(t.Id)) { e.Add($"{donde}: hay un tramo sin id o repetido ('{t?.Id}')."); continue; }
+                if (string.IsNullOrEmpty(t.Nombre) || string.IsNullOrEmpty(t.Porque)) e.Add($"{donde}: el tramo '{t.Id}' necesita 'nombre' y 'porque' (es lo que se explica en el resultado).");
+                if (t.Trampa && t.Obligatorio) e.Add($"{donde}: el tramo '{t.Id}' no puede ser trampa y obligatorio a la vez.");
+            }
+            foreach (var t in d.Tuberia.Tramos.Where(x => x != null))
+                foreach (var antes in t.DespuesDe ?? new List<string>())
+                    if (!tramos.Contains(antes)) e.Add($"{donde}: el tramo '{t.Id}' va despues de '{antes}', que no existe.");
+            var obligatorios = d.Tuberia.Tramos.Count(t => t != null && t.Obligatorio);
+            if (obligatorios == 0) e.Add($"{donde}: la tuberia no tiene ningun tramo obligatorio; no habria nada que acertar.");
+            if (d.Tuberia.Huecos < obligatorios) e.Add($"{donde}: la tuberia tiene {d.Tuberia.Huecos} huecos y {obligatorios} tramos obligatorios: no caben.");
+            if (!d.Tuberia.Tramos.Any(t => t != null && t.Trampa)) e.Add($"{donde}: la tuberia no tiene ningun tramo trampa; elegir no costaria nada.");
+            // Que el orden correcto exista: seguirlo no puede dejar ningun tramo antes de lo que necesita.
+            var orden = Nexus.Core.Despliegue.EvaluadorDeDespliegue.TuberiaCorrecta(d);
+            foreach (var t in d.Tuberia.Tramos.Where(x => x != null && x.Obligatorio))
+                if ((t.DespuesDe ?? new List<string>()).Any(a => orden.IndexOf(a) > orden.IndexOf(t.Id)))
+                    e.Add($"{donde}: los tramos se piden en circulo alrededor de '{t.Id}'; no hay orden que valga.");
+
+            var tomas = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var t in d.Tomas) {
+                if (t == null || string.IsNullOrEmpty(t.Id) || !tomas.Add(t.Id)) { e.Add($"{donde}: hay una toma sin id o repetida ('{t?.Id}')."); continue; }
+                if (string.IsNullOrEmpty(t.Nombre)) e.Add($"{donde}: la toma '{t.Id}' no tiene nombre.");
+                if (t.Trampa && string.IsNullOrEmpty(t.Porque)) e.Add($"{donde}: la toma trampa '{t.Id}' no dice que pasa si se usa ('porque').");
+            }
+            var modulos = p.Proyecto == null ? new HashSet<string>() : new HashSet<string>(p.Proyecto.Modulos.Select(m => m.Id), StringComparer.Ordinal);
+            foreach (var kv in d.Modulos) {
+                if (!modulos.Contains(kv.Key)) { e.Add($"{donde}: hay cables para el modulo '{kv.Key}', que no esta en el proyecto."); continue; }
+                var cables = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var c in kv.Value ?? new List<Nexus.Core.Despliegue.CableDef>()) {
+                    if (c == null || string.IsNullOrEmpty(c.Id) || !cables.Add(c.Id)) { e.Add($"{donde}: el modulo '{kv.Key}' tiene un cable sin id o repetido."); continue; }
+                    if (string.IsNullOrEmpty(c.Nombre) || string.IsNullOrEmpty(c.Porque)) e.Add($"{donde}: el cable '{c.Id}' de '{kv.Key}' necesita 'nombre' y 'porque'.");
+                    if (c.EsDependencia) {
+                        if (!modulos.Contains(c.ModuloNecesario) || c.ModuloNecesario == kv.Key)
+                            e.Add($"{donde}: el cable '{c.Id}' de '{kv.Key}' depende del modulo '{c.ModuloNecesario}', que no existe o es el mismo.");
+                        continue;
+                    }
+                    var toma = d.Toma(c.Toma);
+                    if (toma == null) e.Add($"{donde}: el cable '{c.Id}' de '{kv.Key}' va a la toma '{c.Toma}', que no existe.");
+                    else if (toma.Trampa) e.Add($"{donde}: la toma correcta del cable '{c.Id}' de '{kv.Key}' es una trampa.");
+                }
+            }
         }
 
         /// <summary>
@@ -269,6 +325,20 @@ namespace Nexus.Core.Datos {
             foreach (var u in f.Usuarios)
                 if (!string.IsNullOrEmpty(u.Modulo) && f.Modulo(u.Modulo) == null)
                     e.Add($"{id}: el usuario '{u.Nombre}' apunta al modulo '{u.Modulo}', que no existe.");
+
+            var pantallas = new[] { "formulario", "lista", "aviso", "lector", "calendario", "grafica" };
+            foreach (var m in f.Modulos)
+                if (!string.IsNullOrEmpty(m.Pantalla) && Array.IndexOf(pantallas, m.Pantalla) < 0)
+                    e.Add($"{id}: el modulo '{m.Id}' tiene la pantalla '{m.Pantalla}', que no se sabe dibujar.");
+            var papeles = new HashSet<string>();
+            foreach (var p in f.Papeles ?? new List<Nexus.Core.Proyecto.PapelDelCliente>()) {
+                if (p == null || string.IsNullOrEmpty(p.Id) || !papeles.Add(p.Id)) { e.Add($"{id}: hay un papel del cliente sin id o repetido ('{p?.Id}')."); continue; }
+                if (p.Dia < 1) e.Add($"{id}: el papel '{p.Id}' llega el dia {p.Dia}; el primero es el 1.");
+                if (Array.IndexOf(Nexus.Core.Proyecto.TiposDePapel.Todos, p.Tipo) < 0) e.Add($"{id}: el papel '{p.Id}' es de tipo '{p.Tipo}', que no existe.");
+                if (string.IsNullOrEmpty(p.Titulo) || p.Lineas == null || p.Lineas.Count == 0 || string.IsNullOrEmpty(p.QueTeDice))
+                    e.Add($"{id}: el papel '{p.Id}' necesita 'titulo', 'lineas' y 'queTeDice'.");
+                if (!string.IsNullOrEmpty(p.Modulo) && f.Modulo(p.Modulo) == null) e.Add($"{id}: el papel '{p.Id}' habla del modulo '{p.Modulo}', que no existe.");
+            }
         }
 
         private static void ValidarMapa(string id, MapaDeZonas mapa, List<string> e) {
@@ -809,10 +879,42 @@ namespace Nexus.Core.Datos {
                 if (t.Paginas == null || t.Paginas.Count == 0) continue;
                 if (t.Paginas.Count < 2) e.Add($"glosario/{t.Id}: un pizarrón necesita al menos dos páginas.");
                 if (!t.Paginas.Any(p => p != null && p.EnElJuego)) e.Add($"glosario/{t.Id}: falta la página que dice dónde se ve en el juego.");
-                foreach (var p in t.Paginas.Where(x => x != null))
-                    foreach (var v in p.Vinetas ?? new List<VinetaDePizarra>())
-                        if (v == null || !IconosDePizarra.Existe(v.Icono)) e.Add($"glosario/{t.Id}: el icono '{v?.Icono}' no existe.");
+                foreach (var p in t.Paginas.Where(x => x != null)) ValidarPagina(p, $"glosario/{t.Id}", e);
+                foreach (var p in t.Curso ?? new List<PaginaDePizarra>()) {
+                    if (p == null) { e.Add($"curso/{t.Id}: hay una pagina vacia."); continue; }
+                    var donde = $"curso/{t.Id}/«{p.Titulo}»";
+                    ValidarPagina(p, donde, e);
+                    if (string.IsNullOrEmpty(p.Titulo) || string.IsNullOrEmpty(p.Texto)) e.Add($"{donde}: falta 'titulo' o 'texto'.");
+                    if (string.IsNullOrEmpty(p.Capitulo)) e.Add($"{donde}: una pagina de curso necesita su 'capitulo'.");
+                    if (string.IsNullOrEmpty(p.Etiqueta)) e.Add($"{donde}: una pagina de curso necesita su 'etiqueta'.");
+                    if (string.IsNullOrEmpty(p.Dibujo) && (p.Columnas == null || p.Columnas.Count == 0))
+                        e.Add($"{donde}: una pagina de curso necesita su dibujo.");
+                }
             }
+            foreach (var nivel in c.Niveles.Values) {
+                if (nivel.Proyecto == null || nivel.Proyecto.Vocabulario == null) continue;
+                foreach (var t in nivel.Proyecto.Vocabulario.Where(x => x != null)) {
+                    var donde = $"{nivel.Id}/vocabulario/{t.Termino}";
+                    foreach (var dibujo in new[] { t.Dibujo, t.DibujoDonde })
+                        if (!string.IsNullOrEmpty(dibujo) && !EscenasDePizarra.Existe(dibujo)) e.Add($"{donde}: la escena '{dibujo}' no existe.");
+                    if (!string.IsNullOrEmpty(t.Glosario) && !ids.Contains(t.Glosario)) e.Add($"{donde}: '{t.Glosario}' no esta en el glosario.");
+                }
+            }
+        }
+
+        /// <summary>Lo que haria que una pagina se pintara mal: un dibujo que no existe, columnas de mas o de menos, una nota inventada.</summary>
+        private static void ValidarPagina(PaginaDePizarra p, string donde, List<string> e) {
+            foreach (var v in p.Vinetas ?? new List<VinetaDePizarra>())
+                if (v == null || !IconosDePizarra.Existe(v.Icono)) e.Add($"{donde}: el icono '{v?.Icono}' no existe.");
+            if (!string.IsNullOrEmpty(p.Dibujo) && !EscenasDePizarra.Existe(p.Dibujo)) e.Add($"{donde}: la escena '{p.Dibujo}' no existe.");
+            if (!string.IsNullOrEmpty(p.Etiqueta) && !EtiquetasDePizarra.Existe(p.Etiqueta)) e.Add($"{donde}: la etiqueta '{p.Etiqueta}' no existe.");
+            var columnas = p.Columnas ?? new List<ColumnaDePizarra>();
+            if (columnas.Count == 1 || columnas.Count > 4) e.Add($"{donde}: una pagina lleva de 2 a 4 columnas (tiene {columnas.Count}).");
+            foreach (var col in columnas)
+                if (col == null || !(EscenasDePizarra.Existe(col.Dibujo) || IconosDePizarra.Existe(col.Dibujo)))
+                    e.Add($"{donde}: el dibujo '{col?.Dibujo}' de una columna no existe.");
+            var formas = (string.IsNullOrEmpty(p.Dibujo) ? 0 : 1) + (columnas.Count > 0 ? 1 : 0) + (p.Vinetas != null && p.Vinetas.Count > 0 ? 1 : 0);
+            if (formas > 1) e.Add($"{donde}: una pagina lleva escena, columnas o viñetas, no varias cosas a la vez.");
         }
 
         private static void ValidarRelaciones(Catalogo c, List<string> e) {

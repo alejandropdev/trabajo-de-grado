@@ -29,7 +29,7 @@ namespace Nexus.Unity.Pantallas {
             var hoja = new Hoja(Ui, centro);
 
             var nivel = l.Nivel ?? (l.Exito ? NivelesDeLanzamiento.Bien : NivelesDeLanzamiento.Mal);
-            hoja.Etiqueta("Fase 3 · el lanzamiento · " + s.Perfil.Nombre);
+            hoja.Etiqueta("Fase 4 · el lanzamiento · " + s.Perfil.Nombre);
             hoja.Titulo(NivelesDeLanzamiento.Titulo(nivel));
             var tono = nivel == NivelesDeLanzamiento.Bien ? Tono.Exito : nivel == NivelesDeLanzamiento.Mal ? Tono.Peligro : Tono.Aviso;
             UiKit.Tamano(Ui.Cifra(hoja.Fila(), $"{l.Puntaje:0} / 100", "Puntaje del lanzamiento", null, tono).transform.parent, ancho: 320);
@@ -48,6 +48,18 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Texto(datos, $"<b>{marca} {f.Nombre}:</b> {f.Valor}   <size=80%>({f.Puntos:0}/{f.Maximo:0} pts)</size>", EstiloTexto.Cuerpo, c);
                 Ui.Barra(datos, f.Maximo > 0 ? (float)(f.Puntos / f.Maximo) : 0, c);
                 Ui.Texto(datos, f.Explicacion, EstiloTexto.Pequeno, Tema.inkMuted);
+            }
+
+            // La Fase 3 del nivel: cada despliegue, y lo que entre todos le pusieron al riesgo y a los errores de arriba.
+            if (s.R.Despliegues.Count > 0) {
+                var despliegues = hoja.Tarjeta("Cómo salieron los despliegues");
+                foreach (var d in s.R.Despliegues) {
+                    var c = d.Nivel == "bien" ? Tema.success : d.Nivel == "mal" ? Tema.danger : Tema.warning;
+                    Ui.Texto(despliegues, $"<b>Día {d.Dia}: {d.Titulo}.</b> Encendieron {d.Encendidos.Count} módulo(s)" +
+                                          (d.Caidos.Count > 0 ? $", {d.Caidos.Count} no" : "") + ".", EstiloTexto.Cuerpo, c);
+                }
+                Ui.Texto(despliegues, $"En total le sumaron al lanzamiento: riesgo {Textos.Cambio(s.RiesgoPorDespliegues())} y {s.DefectosPorDespliegues()} error(es) más.",
+                         EstiloTexto.Pequeno, Tema.inkMuted);
             }
 
             if (l.DecisionesQuePesaron.Count > 0) {

@@ -12,6 +12,14 @@ namespace Nexus.Core.Evaluacion {
             return Math.Max(0, (int)Math.Round(DefectosPorCobertura(cobertura, entregaIncremental) + DefectosPorDeuda(deuda, entregaIncremental)));
         }
 
+        /// <summary>
+        /// El riesgo con el que se lanza: el latente del proyecto, lo que le pone la metodologia y lo que dejaron los
+        /// despliegues (Fase 3). Siempre entre 0 y 100.
+        /// </summary>
+        public static double Riesgo(double riesgoLatente, double factorRiesgo, double riesgoDeDespliegue = 0) {
+            return Math.Max(0.0, Math.Min(100.0, riesgoLatente * factorRiesgo + riesgoDeDespliegue));
+        }
+
         public static double DefectosPorCobertura(double cobertura, bool entregaIncremental) {
             return (100.0 - cobertura) / 12.0 * (entregaIncremental ? 1.0 : 1.3);
         }
@@ -27,11 +35,11 @@ namespace Nexus.Core.Evaluacion {
         public static CalificacionDeLanzamiento Calcular(double avance, double alcance, double velocidad, int diasRestantes,
                                                          double cobertura, double deuda, double riesgoLatente, double factorRiesgo,
                                                          bool entregaIncremental, double satisfaccion, DecisionTrace traza,
-                                                         UmbralesDeLanzamiento umbrales) {
+                                                         UmbralesDeLanzamiento umbrales, double riesgoDeDespliegue = 0, int defectosDeDespliegue = 0) {
             var proyectado = Math.Min(alcance, avance + Math.Max(0, velocidad) * Math.Max(0, diasRestantes));
             return CalculoDeLanzamiento.Calcular(new EntradaDeLanzamiento {
-                Riesgo = Math.Min(100.0, riesgoLatente * factorRiesgo),
-                Defectos = Defectos(cobertura, deuda, entregaIncremental),
+                Riesgo = Riesgo(riesgoLatente, factorRiesgo, riesgoDeDespliegue),
+                Defectos = Defectos(cobertura, deuda, entregaIncremental) + Math.Max(0, defectosDeDespliegue),
                 Entregado = proyectado, Comprometido = alcance, Satisfaccion = satisfaccion, Traza = traza
             }, umbrales);
         }

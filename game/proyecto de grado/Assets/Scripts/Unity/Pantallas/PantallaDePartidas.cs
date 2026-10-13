@@ -41,7 +41,6 @@ namespace Nexus.Unity.Pantallas {
                     App.GuardarPerfil();
                     App.Router.IrA<PantallaDePartidas>();
                 }, VarianteBoton.Fantasma);
-            Ui.Boton(cabecera, "Cambiar de perfil", () => App.Router.IrA<PantallaDePerfiles>(), VarianteBoton.Fantasma);
 
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);
@@ -52,6 +51,10 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
 
             ConstruirNueva(cuerpo);
+
+            // Volver atras va abajo a la izquierda, donde se busca en cualquier juego.
+            var pie = Ui.Fila(marco, "Pie");
+            Ui.Boton(pie, "◄  Cambiar de perfil", () => App.Router.IrA<PantallaDePerfiles>(), VarianteBoton.Fantasma);
         }
 
         private void ConstruirNueva(Transform padre) {

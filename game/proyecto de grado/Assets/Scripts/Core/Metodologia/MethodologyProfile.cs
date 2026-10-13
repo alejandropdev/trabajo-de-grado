@@ -158,6 +158,8 @@ namespace Nexus.Core.Metodologia {
 
         // --- continuo ---
         public int LimiteWipInicial = 4;
+        /// <summary>Cada cuantos dias se revisa el flujo y se entrega. 0 = lo de serie (MethodologyRules.DiasEntreDesplieguesContinuos).</summary>
+        public int CadaCuantosDias;
 
         /// <summary>
         /// Secuencial: reparte las etapas en proporcion a los dias del nivel. Sin esto, un nivel mas corto que la suma

@@ -138,6 +138,47 @@ namespace Nexus.Core.Sesion {
             R.DiaDeInicioDelSprint = R.DiaActual;
         }
 
+        /// <summary>Si la planificacion de este nivel se hace eligiendo tarjetas: cuando hay mas de un sprint.</summary>
+        public bool SeArmaElSprintBacklog {
+            get {
+                return R.Tablero != null && Politica != null && Politica.SprintCerrado && Reglas != null && Reglas.Tramos.Count >= 2;
+            }
+        }
+
+        /// <summary>Lo que se puede meter en el sprint que se esta planificando: lo no terminado, lo ya empezado primero.</summary>
+        public List<TarjetaDeTrabajo> CandidatasAlSprint() {
+            if (R.Tablero == null) return new List<TarjetaDeTrabajo>();
+            return R.Tablero.Tarjetas.Where(x => !x.EsBug && !x.Terminada).OrderBy(x => x.Empezada ? 0 : 1).ThenBy(x => x.Orden).ToList();
+        }
+
+        /// <summary>
+        /// El sprint backlog, armado a mano: estas tarjetas, y no «las primeras hasta llenar los puntos». El compromiso
+        /// es la suma de lo que les falta; pasarse de la capacidad genera sobrecompromiso igual que con Comprometer.
+        /// Lo que ya esta empezado entra siempre: no se deja a medias por no haberlo marcado.
+        /// </summary>
+        public void ComprometerTarjetas(IEnumerable<string> ids) {
+            if (PendingPlanning == null) throw new InvalidOperationException("Hoy no hay planificacion abierta.");
+            if (R.Tablero == null) throw new InvalidOperationException("Todavía no hay tablero.");
+            var elegidas = new HashSet<string>(ids ?? new string[0], StringComparer.Ordinal);
+            var tarjetas = CandidatasAlSprint().Where(c => elegidas.Contains(c.Id) || c.Empezada).ToList();
+            if (tarjetas.Count == 0) throw new InvalidOperationException("Un sprint sin ninguna tarjeta no es un sprint.");
+            var puntos = Math.Round(tarjetas.Sum(c => c.Restante), 2);
+
+            R.CompromisoActual = puntos;
+            R.SobreCompromiso = Math.Max(0, puntos - PendingPlanning.CapacidadSugerida);
+            R.CompromisosPorIteracion.Add(puntos);
+            R.HistorialEstimaciones.Add(new Estimacion { Dia = R.DiaActual, ItemId = _planDeHoy.UnidadId, Estimado = puntos });
+            PendingPlanning = null;
+
+            var t = R.Tablero;
+            if (Politica == null || !Politica.SprintCerrado) return;
+            t.SprintActual = R.SprintActual;
+            foreach (var c in tarjetas) c.Sprint = R.SprintActual;
+            R.BurndownDelSprint.Clear();
+            R.BurndownDelSprint.Add(Math.Round(RestanteDelSprint(), 2));
+            R.DiaDeInicioDelSprint = R.DiaActual;
+        }
+
         /// <summary>
         /// Los dias que dura de verdad la unidad en curso (el sprint, la etapa) en ESTE nivel. No es la longitud que
         /// declara la metodologia: un sprint «de 10 dias» en un nivel de 5 dura 5, y el burndown tiene que acabar ahi.
@@ -269,6 +310,49 @@ namespace Nexus.Core.Sesion {
             R.InspeccionHechaHoy = true;
             R.DocumentosInspeccionados++;
             return AvanzarReloj(MinutosDeInspeccionar);
+        }
+
+        /// <summary>
+        /// El trozo de ese documento que toca leer hoy, o null si no hay ninguno escrito. Lo decide un hash de
+        /// (semilla, documento, dia): reproducible y sin gastar el azar de la sesion.
+        /// </summary>
+        public ExtractoDeDocumento ExtractoDeHoy(string documento) {
+            var banco = _catalogo.Extractos == null ? null : _catalogo.Extractos.Where(x => x.Documento == documento).ToList();
+            if (banco == null || banco.Count == 0) return null;
+            return banco[GeneradorDeTarjetas.Hash(_rng.Semilla, "doc:" + documento + ":" + R.DiaActual) % banco.Count];
+        }
+
+        /// <summary>
+        /// Inspeccionar leyendo: se lee el extracto de hoy y se decide. No todo documento que se inspecciona esta mal:
+        /// si esta bien, lo correcto es firmarlo; pedir cambios a algo correcto le cuesta a quien lo escribio. Firmar
+        /// algo con un problema lo deja pasar a la etapa siguiente, donde arreglarlo es mas caro.
+        /// </summary>
+        public ResultadoDeRevision InspeccionarDocumento(string documento, string veredicto, out ResultadoDeAvance avance) {
+            Exigir(PorQueNoSePuedeInspeccionar(documento));
+            if (veredicto != VeredictosDePr.Aprobar && veredicto != VeredictosDePr.PedirCambios)
+                throw new InvalidOperationException($"'{veredicto}' no es un veredicto: firmar (aprobar) o cambios.");
+            var extracto = ExtractoDeHoy(documento);
+            if (extracto == null) {   // sin extractos escritos, la inspeccion de siempre
+                avance = InspeccionarDocumento(documento);
+                return new ResultadoDeRevision { Acierto = true, Titulo = "Documento inspeccionado", Explicacion = "El equipo lo leyó sección por sección." };
+            }
+            var firmo = veredicto == VeredictosDePr.Aprobar;
+            var efectos = new Dictionary<string, object>();
+            double calidad; string titulo;
+            if (extracto.TieneDefecto && firmo) { calidad = 5; efectos["Documentacion"] = 1.0; efectos["DeudaTecnica"] = 2.0; titulo = "Se firmó con un problema dentro"; }
+            else if (extracto.TieneDefecto) { calidad = 25; efectos["Documentacion"] = 3.0; titulo = "Lo viste antes de firmar"; }
+            else if (firmo) { calidad = 25; efectos["Documentacion"] = 3.0; efectos["MoralEquipo"] = 0.5; titulo = "Estaba bien, y se firmó"; }
+            else { calidad = 10; efectos["Documentacion"] = 1.0; efectos["MoralEquipo"] = -1.0; titulo = "Estaba bien: pediste cambios que no hacían falta"; }
+
+            EstadoArtefacto estado;
+            if (!R.Artefactos.TryGetValue(documento, out estado)) R.Artefactos[documento] = estado = new EstadoArtefacto();
+            estado.Calidad = Math.Min(100, estado.Calidad + calidad);
+            var cambios = EffectApplier.Previsualizar(W, efectos);
+            EffectApplier.Aplicar(W, efectos);
+            R.InspeccionHechaHoy = true;
+            R.DocumentosInspeccionados++;
+            avance = AvanzarReloj(MinutosDeInspeccionar);
+            return new ResultadoDeRevision { Acierto = extracto.TieneDefecto != firmo, Titulo = titulo, Explicacion = extracto.Explicacion, Cambios = cambios };
         }
 
         /// <summary>Cada dia de una etapa, sus documentos avanzan lo que toca para estar completos el dia de la firma.</summary>

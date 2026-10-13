@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Jornada;
+using Nexus.Core.Sesion;
 using Nexus.Unity.Guia;
 using Nexus.Unity.Juego;
 using Nexus.Unity.Tema;
@@ -27,6 +28,9 @@ namespace Nexus.Unity.Pantallas {
 
         private void AbrirPanel(string etiqueta, string titulo, float ancho, Action<Hoja> pintar, Func<string> clave = null) {
             if (_panel != null) return;
+            // Abrir un panel es seguir con el dia: la tarjeta «Decidido» ya se leyo. Si se quedara puesta, el reloj
+            // seguiria parado al cerrar el panel y desde dentro no se podria hacer nada.
+            _decidido = null;
             Runner.Mirando = true;
             try {
                 _panel = App.Router.Apilar<PanelDelDia>(p => {
@@ -36,6 +40,7 @@ namespace Nexus.Unity.Pantallas {
                     p.Pintar = pintar;
                     p.Clave = clave;
                     p.AlCerrar = AlCerrarElPanel;
+                    p.AlReabrir = AlReabrirElPanel;
                 });
             } catch {
                 // Un panel que no se pudo pintar no puede dejar el reloj parado para siempre.
@@ -47,6 +52,12 @@ namespace Nexus.Unity.Pantallas {
         private void AlCerrarElPanel() {
             _panel = null;
             if (App != null && Runner != null) Runner.Mirando = false;
+        }
+
+        /// <summary>El panel quedo tapado por otra pantalla (el diario) y vuelve a verse: sigue abierto, y el reloj espera.</summary>
+        private void AlReabrirElPanel(PanelDelDia panel) {
+            _panel = panel;
+            if (App != null && Runner != null) Runner.Mirando = true;
         }
 
         /// <summary>Cierra el panel abierto, si es lo que esta encima. No hace nada si no hay ninguno.</summary>
@@ -133,19 +144,109 @@ namespace Nexus.Unity.Pantallas {
         // ==================================================================== el equipo
 
         private void AbrirEquipo() {
-            AbrirPanel("Con quién te llevas bien y qué ayudas tienes", "Tu equipo", 900, PintarPanelDelEquipo,
+            _miembroAbierto = null; _accionDeMiembro = null; _ultimoResultado = null;
+            AbrirPanel("Con quién trabajas, qué hace cada uno y con quién te llevas bien", "Tu equipo", 980, PintarPanelDelEquipo,
                 () => string.Join(",", S.R.Confianza.Select(kv => kv.Key + kv.Value)) + "|" +
-                      string.Join(",", S.AyudasDisponibles().Select(kv => kv.Key + kv.Value)) + "|" + Runner.PuedeMoverse);
+                      string.Join(",", S.AyudasDisponibles().Select(kv => kv.Key + kv.Value)) + "|" + Runner.PuedeMoverse + "|" +
+                      _miembroAbierto + _accionDeMiembro + "|" + _ultimoResultado + "|" + S.MinutoDelDia + "|" +
+                      string.Join(",", S.EquipoDelProyecto().Select(m => m.Id + m.DescansaHoy + m.ParejaHoy + m.HabloHoy)));
+        }
+
+        private string _miembroAbierto, _accionDeMiembro;
+
+        /// <summary>
+        /// El equipo del proyecto: quien es cada uno, que lleva ahora, que termino, como esta de cansado y lo que se
+        /// puede hacer con el hoy. Se ve siempre, se haya hablado o no con nadie: son con quienes se trabaja.
+        /// </summary>
+        private void PintarEquipoDelProyecto(Hoja h) {
+            var fichas = S.FichasDelEquipo();
+            if (fichas.Count == 0) return;
+            h.Subtitulo("Tu equipo de proyecto", Tema.cyan);
+            h.Nota("Son quienes construyen el sistema contigo. Lo que hagas con cada uno cuesta minutos de la jornada.", Tema.inkMuted);
+            DecirLoUltimo(h);
+            var enDesarrollo = S.Tablero != null && S.R.Fase == 2 && S.R.DiaActual > 0;
+            foreach (var f in fichas) {
+                var m = f.Miembro;
+                var datos = S.DatosDeMiembro(m.Id) ?? m;
+                var ficha = Ui.PanelColumna(h.Raiz, "Miembro " + m.Id, Tema.Espacio(4), Tema.Espacio(2), Tema.surfaceRaised);
+                Ui.FilaDeEquipo(ficha, m.Nombre, m.Rol, m.DescansaHoy ? EstadoDeEquipo.Inactivo : f.Cansancio >= 70 ? EstadoDeEquipo.Bloqueado : EstadoDeEquipo.Activo);
+                if (!string.IsNullOrEmpty(datos.Descripcion)) Ui.Texto(ficha, datos.Descripcion, EstiloTexto.Pequeno, Tema.ink);
+                if (!string.IsNullOrEmpty(datos.Frase)) Ui.Texto(ficha, "«" + datos.Frase + "»", EstiloTexto.Dialogo, Tema.inkMuted);
+                var sabe = (f.Fuerte != null ? "Se le da mejor: " + NombreDeTipo(f.Fuerte) : "") +
+                           (f.Fuerte != null && f.Flojo != null ? "  ·  " : "") + (f.Flojo != null ? "le cuesta: " + NombreDeTipo(f.Flojo) : "");
+                if (sabe.Length > 0) Ui.Texto(ficha, sabe, EstiloTexto.Leyenda, Tema.cyan);
+                if (!enDesarrollo) continue;
+
+                Ui.Texto(ficha, f.Ahora.Count == 0 ? "Ahora: sin tarjeta."
+                                                   : "Ahora: " + string.Join(" · ", f.Ahora.Select(c => $"«{c.Titulo}» ({c.Trabajo:0.#} de {c.Puntos:0.#} pts)")), EstiloTexto.Pequeno, Tema.ink);
+                Ui.Texto(ficha, f.Terminadas.Count == 0 ? "Todavía no ha terminado ninguna tarjeta."
+                                                        : "Terminó: " + string.Join(" · ", f.Terminadas.Take(4).Select(c => $"«{c.Titulo}» (día {c.DiaFin})")) +
+                                                          (f.Terminadas.Count > 4 ? $" y {f.Terminadas.Count - 4} más" : ""), EstiloTexto.Pequeno, Tema.inkMuted);
+                var cansancio = Ui.Fila(ficha, "Cansancio", Tema.Espacio(2));
+                UiKit.Tamano(Ui.Texto(cansancio, $"Cansancio {f.Cansancio:0}", EstiloTexto.Pequeno, Tema.ink), ancho: 130);
+                Ui.Barra(cansancio, (float)f.Cansancio / 100f, f.Cansancio >= 70 ? Tema.danger : f.Cansancio >= 45 ? Tema.warning : Tema.success);
+                Ui.Texto(ficha, f.ComoVa, EstiloTexto.Pequeno, Tema.warning);
+
+                // Lo que se puede hacer con el, hoy.
+                var acciones = Ui.Fila(ficha, "Acciones", Tema.Espacio(2));
+                var id = m.Id; var nombre = m.Nombre;
+                var hablar = Ui.Boton(acciones, $"Hablar ({GameSession.MinutosDeUnoAUno} min)", () => {
+                    ResultadoDeUnoAUno r = null;
+                    Actuar(() => { ResultadoDeAvance a; r = S.HablarUnoAUno(id, out a); return a; }, $"Hablaste con {nombre}.");
+                    if (r != null) _ultimoResultado = $"{r.Quien}: {r.LoQueDice} (moral {Textos.Cambio(r.Cambios["MoralEquipo"])})";
+                }, VarianteBoton.Fantasma);
+                hablar.interactable = S.PorQueNoSePuedeHablarUnoAUno(id) == null;
+                var tarjeta = Ui.Boton(acciones, "Darle una tarjeta…", () => Alternar(id, "tarjeta"), VarianteBoton.Fantasma);
+                tarjeta.interactable = Runner.PuedeMoverse;
+                var pareja = Ui.Boton(acciones, "En pareja con…", () => Alternar(id, "pareja"), VarianteBoton.Fantasma);
+                pareja.interactable = Runner.PuedeMoverse && string.IsNullOrEmpty(m.ParejaHoy) && !m.DescansaHoy;
+                var respiro = Ui.Boton(acciones, "Respiro hoy", () =>
+                    Actuar(() => S.DarRespiro(id), $"{nombre} tiene hoy un respiro: baja su cansancio y hoy el equipo avanza menos."), VarianteBoton.Fantasma);
+                respiro.interactable = S.PorQueNoSePuedeDarRespiro(id) == null;
+
+                if (_miembroAbierto != id) continue;
+                if (_accionDeMiembro == "tarjeta") {
+                    var libres = S.Tablero.Tarjetas.Where(c => !c.Terminada && !(c.Asignado == id && c.AsignacionManual)).OrderBy(c => c.Empezada ? 0 : 1).ThenBy(c => c.Orden).Take(5).ToList();
+                    Ui.Texto(ficha, $"¿Qué tarjeta le das? Cuesta {GameSession.MinutosDeAsignar} min. Rinde más en lo que se le da bien.", EstiloTexto.Pequeno, Tema.cyan);
+                    foreach (var c in libres) {
+                        var cid = c.Id; var titulo = c.Titulo;
+                        var hab = m.HabilidadPara(c.Tipo);
+                        var b = Ui.BotonDeOpcion(ficha, $"{c.Titulo} · {NombreDeTipo(c.Tipo)} · {c.Restante:0.#} pts",
+                            hab > 1.05 ? "Es lo suyo: irá más rápido." : hab < 0.95 ? "No es lo suyo: irá más lento." : "Lo hace a ritmo normal.",
+                            () => { Actuar(() => S.AsignarTarjeta(cid, id), $"{nombre} lleva ahora «{titulo}»."); _miembroAbierto = null; });
+                        b.interactable = S.PorQueNoSePuedeAsignar(cid, id) == null;
+                    }
+                } else if (_accionDeMiembro == "pareja") {
+                    Ui.Texto(ficha, $"¿Con quién? Cuesta {GameSession.MinutosDePareja} min. Hoy sale menos trabajo, pero más cuidado: sube la cobertura y baja la deuda.", EstiloTexto.Pequeno, Tema.cyan);
+                    foreach (var otro in fichas.Where(x => x.Miembro.Id != id)) {
+                        var oid = otro.Miembro.Id; var onombre = otro.Miembro.Nombre;
+                        var b = Ui.Boton(ficha, "Con " + onombre, () => {
+                            Actuar(() => S.PonerEnPareja(id, oid), $"{nombre} y {onombre} trabajan hoy en pareja: cobertura +2, deuda −1, y hoy se avanza algo menos.");
+                            _miembroAbierto = null;
+                        }, VarianteBoton.Secundario);
+                        b.interactable = S.PorQueNoSePuedePonerEnPareja(id, oid) == null;
+                    }
+                }
+            }
+            h.Separador();
+        }
+
+        private void Alternar(string miembro, string accion) {
+            if (_miembroAbierto == miembro && _accionDeMiembro == accion) { _miembroAbierto = null; _accionDeMiembro = null; }
+            else { _miembroAbierto = miembro; _accionDeMiembro = accion; }
         }
 
         /// <summary>Las personas con las que ya hablaste, su confianza, y las ayudas que tienes guardadas.</summary>
         private void PintarPanelDelEquipo(Hoja h) {
+            PintarEquipoDelProyecto(h);
+            h.Subtitulo("Gente del edificio", Tema.cyan);
+            h.Nota("No son de tu equipo, pero si te ganas su confianza te echan una mano.", Tema.inkMuted);
             var lista = Ui.Columna(h.Raiz, "Personas", Tema.Espacio(1));
             GuiaView.Registrar("dia.equipo", lista);
             var rel = App.Catalogo.Relaciones;
             var conocidos = S.R.Confianza.Keys.ToList();
             if (conocidos.Count == 0)
-                Ui.Texto(lista, "Todavía no has hablado con nadie. Cuando haya alguien en una sala, aparecerá «Hablar con…» en el mapa, en «Aquí».",
+                Ui.Texto(lista, "Todavía no has hablado con nadie de fuera del equipo. Cuando haya alguien en una sala, aparecerá «Hablar con…» en el mapa, en «Aquí».",
                          EstiloTexto.Pequeno, Tema.inkMuted);
             var enEsteNivel = new HashSet<string>(rel.Conversaciones.Where(c => c.Nivel == S.NivelId).Select(c => c.Personaje));
             foreach (var id in conocidos.OrderByDescending(x => enEsteNivel.Contains(x))) {
