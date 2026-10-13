@@ -47,6 +47,7 @@ namespace Nexus.Unity.Pantallas {
         public static void Ticket(AppRoot app, LevelProfile perfil) {
             Abrir(app, "El ticket original", h => {
                 h.Nota("Así llegó el encargo, con las palabras del cliente.");
+                PantallaDeGlosario.Palabras(app, h.Raiz, "Si alguna palabra no te suena:", "ticket", "cliente", "requisito");
                 if (perfil.Briefing != null) foreach (var linea in perfil.Briefing) h.Parrafo(linea);
             });
         }

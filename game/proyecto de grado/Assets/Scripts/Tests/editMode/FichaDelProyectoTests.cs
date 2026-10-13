@@ -138,5 +138,93 @@ namespace Nexus.Tests {
             Assert.AreEqual(AccionGuiada.Leer, primero.Accion);
             StringAssert.Contains(def.EnElProyecto, primero.Porque);
         }
+
+        // ---------------------------------------------------------------- el producto y los papeles del cliente
+
+        [Test]
+        public void Cada_modulo_trae_la_pantalla_con_que_se_dibuja_y_sus_datos_de_ejemplo() {
+            var pantallas = new[] { "formulario", "lista", "aviso", "lector", "calendario", "grafica" };
+            foreach (var id in Niveles)
+                foreach (var m in Nivel(id).Proyecto.Modulos) {
+                    CollectionAssert.Contains(pantallas, m.Pantalla, $"{id}/{m.Id}: pantalla desconocida");
+                    Assert.GreaterOrEqual(m.Datos.Count, 2, $"{id}/{m.Id}: sin datos de ejemplo, el MVP se veria vacio");
+                }
+        }
+
+        [Test]
+        public void En_cada_nivel_hay_al_menos_un_modulo_que_se_puede_usar_en_la_maqueta() {
+            foreach (var id in Niveles)
+                Assert.IsTrue(Nivel(id).Proyecto.Modulos.Any(m => !string.IsNullOrEmpty(m.Accion)), id + ": ningun modulo tiene accion");
+        }
+
+        [Test]
+        public void La_etapa_de_un_modulo_nunca_retrocede_cuando_el_proyecto_avanza() {
+            foreach (var id in Niveles) {
+                var nivel = Nivel(id);
+                var f = nivel.Proyecto;
+                var antes = MaquetaDelProducto.Calcular(f, 0, 100, null);
+                // Sin avance, cada parte esta donde la dejaron (en el nivel 1 se hereda trabajo ya empezado).
+                foreach (var m in antes)
+                    Assert.AreEqual(EtapasDelProducto.De(m.Modulo.AvanceInicial, false), m.Etapa, $"{id}/{m.Modulo.Id}: etapa de partida");
+                for (var avance = 5; avance <= 100; avance += 5) {
+                    var ahora = MaquetaDelProducto.Calcular(f, avance, 100, null);
+                    for (var i = 0; i < ahora.Count; i++)
+                        Assert.GreaterOrEqual(EtapasDelProducto.Orden(ahora[i].Etapa), EtapasDelProducto.Orden(antes[i].Etapa),
+                                              $"{id}/{ahora[i].Modulo.Id}: retrocedio al pasar a {avance}");
+                    antes = ahora;
+                }
+                Assert.IsTrue(antes.All(m => m.Etapa == EtapasDelProducto.Mvp), id + ": con todo hecho, todo es un MVP");
+                Assert.AreEqual(EtapasDelProducto.Mvp, MaquetaDelProducto.EtapaGeneral(antes));
+            }
+        }
+
+        [Test]
+        public void Un_modulo_desplegado_esta_en_produccion_y_lo_que_sube_de_etapa_se_anuncia() {
+            var f = Nivel("nivel-00").Proyecto;
+            var primero = f.Modulos[0].Id;
+            var conUno = MaquetaDelProducto.Calcular(f, 100, 100, new[] { primero });
+            Assert.AreEqual(EtapasDelProducto.Desplegado, conUno.First(m => m.Modulo.Id == primero).Etapa);
+            Assert.AreNotEqual(EtapasDelProducto.Desplegado, MaquetaDelProducto.EtapaGeneral(conUno), "falta desplegar el resto");
+            Assert.AreEqual(EtapasDelProducto.Desplegado, MaquetaDelProducto.EtapaGeneral(MaquetaDelProducto.Calcular(f, 100, 100, f.Modulos.Select(m => m.Id))));
+
+            Assert.IsEmpty(MaquetaDelProducto.QueSubieron(f, 40, 40, 100, null));
+            Assert.IsNotEmpty(MaquetaDelProducto.QueSubieron(f, 0, 100, 100, null));
+        }
+
+        [Test]
+        public void Cada_usuario_del_cliente_dice_algo_distinto_segun_la_etapa_de_su_modulo() {
+            foreach (var id in Niveles) {
+                var f = Nivel(id).Proyecto;
+                var boceto = VocesDelCliente.Para(f, MaquetaDelProducto.Calcular(f, 0, 100, null), 50);
+                var mvp = VocesDelCliente.Para(f, MaquetaDelProducto.Calcular(f, 100, 100, null), 50);
+                Assert.AreEqual(f.Usuarios.Count, boceto.Count, id + ": un usuario habla de un modulo que no existe");
+                for (var i = 0; i < boceto.Count; i++) {
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(boceto[i].Frase));
+                    Assert.AreNotEqual(boceto[i].Frase, mvp[i].Frase, $"{id}/{boceto[i].Quien}: dice lo mismo con un boceto que con un MVP");
+                }
+            }
+        }
+
+        [Test]
+        public void Los_papeles_del_cliente_llegan_dentro_del_nivel_y_hablan_de_modulos_que_existen() {
+            foreach (var id in Niveles) {
+                var nivel = Nivel(id);
+                var f = nivel.Proyecto;
+                Assert.GreaterOrEqual(f.Papeles.Count, 5, id + ": pocos papeles del cliente");
+                CollectionAssert.AllItemsAreUnique(f.Papeles.Select(p => p.Id).ToList(), id);
+                Assert.IsTrue(f.Papeles.Any(p => p.Dia == 1), id + ": el primer dia no llega ningun papel");
+                foreach (var p in f.Papeles) {
+                    Assert.That(p.Dia, Is.InRange(1, nivel.DiasTotales), $"{id}/{p.Id}: llega fuera del nivel");
+                    CollectionAssert.Contains(TiposDePapel.Todos, p.Tipo, $"{id}/{p.Id}");
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(p.Titulo), $"{id}/{p.Id}: sin titulo");
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(p.QueTeDice), $"{id}/{p.Id}: no dice que ensena");
+                    Assert.That(p.Lineas.Count, Is.InRange(2, 5), $"{id}/{p.Id}: renglones");
+                    // Lo que cabe en el papel dibujado (DibujosDelProducto.Papel).
+                    foreach (var l in p.Lineas) Assert.LessOrEqual(l.Length, 62, $"{id}/{p.Id}: «{l}» no cabe en el papel");
+                    if (!string.IsNullOrEmpty(p.Modulo)) Assert.IsTrue(f.Modulos.Any(m => m.Id == p.Modulo), $"{id}/{p.Id}: modulo «{p.Modulo}»");
+                }
+                Assert.AreEqual(f.Papeles.Count(p => p.Dia <= 2), f.PapelesHasta(2).Count);
+            }
+        }
     }
 }

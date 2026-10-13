@@ -1,0 +1,143 @@
+{
+  "id": "MJ-F2-09",
+  "verbo": "V2_REPARTIR",
+  "lienzo": "depositos",
+  "temaPrincipal": "PTP",
+  "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "acceso",
+  "enElProyecto": "Es el plan de pruebas del control de acceso: lo que decide si la barrera se abre. Camila ya lo trae repartido y te pide que lo revises antes de empezar.",
+  "presentacion": {
+    "titulo": "El plan de pruebas de Camila",
+    "comoSeJuega": "Camila ya repartió las horas de pruebas del control de acceso y te pide que lo revises. Las pilas empiezan como ella las dejó. Mira cada tarjeta: cuántos errores suele haber y cuánto cuesta atrapar cada uno. Si su reparto cubre el riesgo, entrégalo tal cual; si ves un hueco, corrígelo con + y −. Ganas si se escapa como mucho 1 error, y ninguno de la pila marcada en rojo. Revisar no siempre es encontrar algo mal.",
+    "quienEspera": "Camila",
+    "textoPresion": "Camila empieza a probar a las 14:00",
+    "segundosReloj": 120
+  },
+  "repartir": {
+    "presupuesto": 26,
+    "paso": 2,
+    "unidad": "horas",
+    "toleranciaDeEscapes": 1,
+    "quienPropone": "Camila",
+    "propuesta": {
+      "unitarias": 8,
+      "integracion": 4,
+      "e2e": 6,
+      "regresion": 6
+    },
+    "depositos": [
+      {
+        "id": "unitarias",
+        "nombre": "Unitarias",
+        "costePorDefecto": 2,
+        "defectosOcultos": 3,
+        "estimadoMin": 3,
+        "estimadoMax": 4,
+        "descripcion": "Cada regla por separado: matrícula autorizada, horario, lista negra. Baratas.",
+        "pista": "Varias reglas nuevas."
+      },
+      {
+        "id": "integracion",
+        "nombre": "Integración",
+        "costePorDefecto": 4,
+        "defectosOcultos": 1,
+        "estimadoMin": 1,
+        "estimadoMax": 2,
+        "descripcion": "Que el control de acceso hable bien con el lector de matrículas y con la base de datos.",
+        "pista": "Dos conexiones, una ya probada."
+      },
+      {
+        "id": "e2e",
+        "nombre": "De extremo a extremo",
+        "costePorDefecto": 6,
+        "defectosOcultos": 1,
+        "estimadoMin": 1,
+        "estimadoMax": 1,
+        "descripcion": "Un carro de verdad llegando a la barrera: se lee la matrícula, se decide y se abre o no. Cara.",
+        "pista": "Es por donde entraron la otra vez.",
+        "critico": true,
+        "porQueEsCritico": "es el camino por el que hackearon la barrera. Si esto falla, se abre otra vez a quien no debe."
+      },
+      {
+        "id": "regresion",
+        "nombre": "Regresión",
+        "costePorDefecto": 3,
+        "defectosOcultos": 2,
+        "estimadoMin": 1,
+        "estimadoMax": 2,
+        "descripcion": "Que el registro de entradas y salidas, que ya funcionaba, siga funcionando.",
+        "pista": "Se tocó código en producción."
+      }
+    ]
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {
+        "Cobertura": 10
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-TEST-01",
+        "razon": "El reparto de Camila cubría el riesgo, incluido el camino que no podía fallar, y lo diste por bueno. Revisar bien también es saber cuándo algo está bien y no tocarlo."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {
+        "Cobertura": 4
+      },
+      "efectosDiferidos": [
+        {
+          "enDias": 5,
+          "efectos": {
+            "SatisfaccionCliente": -5,
+            "DeudaTecnica": 4
+          }
+        }
+      ],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-TEST-01",
+        "razon": "El reparto de Camila ganaba tal cual. Al moverlo quedó un hueco por el que se escaparon errores: cambiar algo que estaba bien también es un error de revisión."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {
+        "Cobertura": 6
+      },
+      "efectosDiferidos": [
+        {
+          "enDias": 5,
+          "efectos": {
+            "SatisfaccionCliente": -7,
+            "DeudaTecnica": 5
+          }
+        }
+      ],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "Cargaste horas de sobra en un tipo y dejaste otro sin nada. El reparto que traía Camila ya estaba equilibrado."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {
+        "DeudaTecnica": 6,
+        "Cobertura": -4
+      },
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "Dejaste las pilas en cero: el plan que traía Camila se perdió y todo lo que había lo encontrará el cliente."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Camila apunta en su cuaderno: «revisado y aprobado sin cambios». No todas las revisiones acaban con una corrección."
+  }
+}

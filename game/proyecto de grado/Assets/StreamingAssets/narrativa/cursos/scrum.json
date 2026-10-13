@@ -1,0 +1,285 @@
+{
+  "version": 1,
+  "id": "scrum",
+  "paginas": [
+    {
+      "titulo": "¿Qué es Scrum?",
+      "texto": "Un marco de trabajo para crear productos complejos en ciclos cortos, entregando algo útil en cada ciclo. Piensa en una cocina: en vez de un banquete enorme de una vez, bandejas pequeñas que salen una por una.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-que",
+      "capitulo": "Qué es Scrum"
+    },
+    {
+      "titulo": "Origen",
+      "texto": "El nombre viene del rugby: Takeuchi y Nonaka lo usaron en 1986 para hablar de equipos que avanzan juntos, como en la melé. Ken Schwaber y Jeff Sutherland lo convirtieron en método en 1995.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "sc-origen",
+      "capitulo": "Qué es Scrum"
+    },
+    {
+      "titulo": "El Manifiesto Ágil",
+      "texto": "En 2001 se pusieron por delante cuatro ideas: personas sobre procesos, software que funciona sobre documentación, colaborar con el cliente sobre el contrato y responder al cambio sobre seguir un plan.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "sc-manifiesto",
+      "capitulo": "Qué es Scrum"
+    },
+    {
+      "titulo": "Empirismo: los 3 pilares",
+      "texto": "En Scrum se decide según lo que se observa, no según lo que se supone. Tres pilares lo sostienen: transparencia (todo a la vista), inspección (mirar a menudo) y adaptación (corregir).",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-pilares",
+      "capitulo": "Qué es Scrum"
+    },
+    {
+      "titulo": "Pensamiento Lean",
+      "texto": "Eliminar el desperdicio y enfocarse en lo esencial. En la cocina: no preparar platos que nadie pidió. En software: no construir lo que nadie va a usar.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-lean",
+      "capitulo": "Qué es Scrum"
+    },
+    {
+      "titulo": "Los 5 valores",
+      "texto": "Compromiso con el objetivo, foco en el trabajo del Sprint, apertura para contar lo que pasa, respeto entre compañeros y coraje para decir lo que va mal.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-valores",
+      "capitulo": "Qué es Scrum"
+    },
+    {
+      "titulo": "El Equipo Scrum",
+      "texto": "Un solo equipo de 10 personas o menos. Se organiza solo, sabe hacer entre todos todo lo necesario y no tiene jefes por dentro. Lo forman tres roles.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUIÉN?",
+      "dibujo": "sc-equipo",
+      "capitulo": "El equipo"
+    },
+    {
+      "titulo": "Product Owner",
+      "texto": "El «Dueño del menú». Busca que el producto valga lo máximo posible: decide qué se cocina y en qué orden. Es el dueño del Product Backlog y habla por el cliente.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUIÉN?",
+      "dibujo": "sc-po",
+      "capitulo": "El equipo"
+    },
+    {
+      "titulo": "Scrum Master",
+      "texto": "El «Coach». Ayuda a que todos entiendan y apliquen Scrum, y quita de en medio lo que frena al equipo (los impedimentos). Es un líder que sirve, no uno que manda.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUIÉN?",
+      "dibujo": "sc-sm",
+      "capitulo": "El equipo"
+    },
+    {
+      "titulo": "Developers",
+      "texto": "Los cocineros: quienes construyen. Crean una parte terminada del producto en cada Sprint, deciden cómo hacer el trabajo y responden por su calidad.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUIÉN?",
+      "dibujo": "sc-dev",
+      "capitulo": "El equipo"
+    },
+    {
+      "titulo": "Panorama del ciclo",
+      "texto": "Todo sale de una lista, el Backlog. Se planea (Planning), se trabaja en el Sprint con una reunión corta cada día (Daily), se enseña lo hecho (Review), se revisa cómo se trabajó (Retro) y se vuelve a empezar.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "sc-ciclo",
+      "capitulo": "El ciclo y el backlog"
+    },
+    {
+      "titulo": "Product Backlog",
+      "texto": "La lista ordenada de todo lo que podría necesitar el producto: el rollo de pedidos de la cocina. Es una lista viva: siempre entran cosas nuevas y nunca está «terminada».",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-backlog",
+      "capitulo": "El ciclo y el backlog"
+    },
+    {
+      "titulo": "Product Goal",
+      "texto": "El objetivo a largo plazo del producto: a dónde se quiere llegar. Todo lo que hay en el Product Backlog debería acercar a él. Es el compromiso del Product Backlog.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-goal",
+      "capitulo": "El ciclo y el backlog"
+    },
+    {
+      "titulo": "Historias de usuario",
+      "texto": "Una forma de escribir lo que se pide: «Como [quién], quiero [qué], para [por qué]». Se acompaña de criterios de aceptación: lo que debe cumplirse para darla por buena.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "sc-historia",
+      "capitulo": "El ciclo y el backlog"
+    },
+    {
+      "titulo": "Refinamiento del Backlog",
+      "texto": "Dividir, detallar y ordenar los elementos de la lista para que estén listos antes de empezarlos. Lo grande se corta en trozos que quepan en un Sprint.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "sc-refinar",
+      "capitulo": "El ciclo y el backlog"
+    },
+    {
+      "titulo": "Estimación",
+      "texto": "Los Developers calculan el tamaño de cada elemento comparándolo con otros, con puntos (1, 2, 3, 5, 8…). En el Planning Poker todos muestran su carta a la vez y hablan cuando no coinciden.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "sc-estimar",
+      "capitulo": "El ciclo y el backlog"
+    },
+    {
+      "titulo": "El Sprint",
+      "texto": "Un ciclo de un mes o menos, siempre de la misma duración. Dentro ocurre todo lo demás. Mientras dura, no se hacen cambios que pongan en peligro su objetivo.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CUÁNDO?",
+      "dibujo": "sc-sprint",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Cancelar un Sprint",
+      "texto": "Solo el Product Owner puede cancelarlo, y solo si el objetivo del Sprint deja de tener sentido. Es raro y cuesta caro: se pierde el trabajo a medias.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "sc-cancelar",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Sprint Planning",
+      "texto": "La reunión que abre el Sprint. Responde tres preguntas: ¿por qué es valioso este Sprint?, ¿qué se va a hacer? y ¿cómo se hará? Dura como máximo 8 horas en un Sprint de un mes.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CUÁNDO?",
+      "dibujo": "sc-planning",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Sprint Goal",
+      "texto": "El único objetivo del Sprint: una frase que dice para qué sirve. Da al equipo una dirección común. Es el compromiso del Sprint Backlog.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-sprint-goal",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Sprint Backlog",
+      "texto": "El objetivo del Sprint, más los elementos elegidos, más el plan para entregarlos. Es de los Developers: ellos lo actualizan a medida que aprenden.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-sprint-backlog",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Daily Scrum",
+      "texto": "Quince minutos cada día, siempre a la misma hora, para revisar el avance hacia el objetivo y ajustar el plan del día. Ahí salen a la luz los bloqueos.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CUÁNDO?",
+      "dibujo": "sc-daily",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Incremento",
+      "texto": "Una pieza terminada y usable que se suma a las anteriores. Todo junto tiene que seguir funcionando. Puede haber varios incrementos en un mismo Sprint.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-incremento",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Definition of Done",
+      "texto": "La «definición de hecho»: la lista de calidad que todo incremento debe cumplir para darse por terminado. Si no la cumple, no está hecho. Es el compromiso del incremento.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "sc-dod",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Sprint Review",
+      "texto": "Al final del Sprint se muestra el resultado a los interesados (cliente, usuarios), se escucha su opinión y se ajusta el Backlog. Dura como máximo 4 horas.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CUÁNDO?",
+      "dibujo": "sc-review",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Sprint Retrospective",
+      "texto": "La última reunión del Sprint: el equipo revisa cómo trabajó y elige las mejoras que va a probar en el siguiente. Dura como máximo 3 horas.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CUÁNDO?",
+      "dibujo": "sc-retro",
+      "capitulo": "El Sprint y sus eventos"
+    },
+    {
+      "titulo": "Tablero Scrum",
+      "texto": "Hace visible el Sprint Backlog. Lo normal son tres columnas: por hacer, en curso y hecho. Cada tarjeta avanza de izquierda a derecha.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "sc-tablero",
+      "capitulo": "Herramientas y errores"
+    },
+    {
+      "titulo": "Burndown y velocidad",
+      "texto": "El burndown es una gráfica del trabajo que queda en el Sprint: si todo va bien, baja cada día. La velocidad es el trabajo que el equipo termina por Sprint, en promedio.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "sc-burndown",
+      "capitulo": "Herramientas y errores"
+    },
+    {
+      "titulo": "Errores comunes",
+      "texto": "Dailies que se vuelven informes para el jefe, Sprints sin objetivo, saltarse la Retro o meter cambios a mitad del Sprint.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "sc-errores",
+      "capitulo": "Herramientas y errores"
+    },
+    {
+      "titulo": "Escalar Scrum",
+      "texto": "Cuando un producto necesita varios equipos, estos se coordinan con marcos como Scrum of Scrums, Nexus, LeSS o SAFe. Siguen construyendo un solo producto.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "sc-escalar",
+      "capitulo": "Herramientas y errores"
+    },
+    {
+      "titulo": "Resumen de Scrum",
+      "texto": "3 roles (Product Owner, Scrum Master, Developers), 5 eventos (Sprint, Planning, Daily, Review, Retro), 3 artefactos (Product Backlog, Sprint Backlog, Incremento) y 3 compromisos.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "RESUMEN",
+      "dibujo": "sc-resumen",
+      "capitulo": "Resumen"
+    }
+  ]
+}

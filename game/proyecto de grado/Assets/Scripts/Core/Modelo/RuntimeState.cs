@@ -33,6 +33,15 @@ namespace Nexus.Core.Modelo {
         /// <summary>True si eligio quedarse en el cierre y el dia sigue hasta la hora limite.</summary>
         public bool JornadaProrrogada;
 
+        /// <summary>
+        /// True si el dia de hoy ya se cerro y se simulo (TerminarDia). Con el reloj solo no se sabe: a las 18:00
+        /// «todavia no eligio» y «se fue a casa» marcan la misma hora. null en los guardados anteriores a este campo.
+        /// </summary>
+        public bool? JornadaSimulada;
+
+        /// <summary>El product backlog que armo el jugador en la Fase 1: ids de historias, en su orden. null = no lo armo.</summary>
+        public List<string> BacklogElegido;
+
         /// <summary>1 = planificacion · 2 = desarrollo · 3 = lanzamiento · 4 = evaluacion.</summary>
         public int Fase = 1;
 
@@ -168,6 +177,19 @@ namespace Nexus.Core.Modelo {
         /// <summary>Los puntos de tarjetas TERMINADAS en cada iteracion cerrada: la velocidad de verdad.</summary>
         public List<double> TerminadoPorIteracion = new List<double>();
 
+        // --- Fase 3: los despliegues ---
+        /// <summary>El historial de los despliegues del nivel, uno por cada Fase 3 jugada.</summary>
+        public List<RegistroDeDespliegue> Despliegues = new List<RegistroDeDespliegue>();
+        /// <summary>Los modulos que ya estan en produccion: el cliente los ha visto funcionar.</summary>
+        public List<string> ModulosDesplegados = new List<string>();
+        /// <summary>Lo que los despliegues suman (o restan) al riesgo del lanzamiento.</summary>
+        public double RiesgoDeDespliegue;
+        /// <summary>Errores que se escaparon por como se desplego: se suman a los del lanzamiento.</summary>
+        public int DefectosDeDespliegue;
+
+        /// <summary>Los papeles del cliente que el jugador ya abrio (para saber cuales son nuevos).</summary>
+        public List<string> PapelesLeidos = new List<string>();
+
         // --- Series para los tableros (burndown, curva S, CFD) ---
         public List<double> SerieAvance = new List<double>();
         public List<double> SerieAlcance = new List<double>();
@@ -258,6 +280,10 @@ namespace Nexus.Core.Modelo {
             if (SerieTerminado == null) SerieTerminado = new List<double>();
             if (BurndownDelSprint == null) BurndownDelSprint = new List<double>();
             if (TerminadoPorIteracion == null) TerminadoPorIteracion = new List<double>();
+            // Guardados anteriores a la Fase 3.
+            if (Despliegues == null) Despliegues = new List<RegistroDeDespliegue>();
+            if (ModulosDesplegados == null) ModulosDesplegados = new List<string>();
+            if (PapelesLeidos == null) PapelesLeidos = new List<string>();
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,
@@ -266,6 +292,19 @@ namespace Nexus.Core.Modelo {
         int IContadoresDeSimulacion.DiasSeguidosTrabajando { get { return DiasSeguidosTrabajando; } }
         double IContadoresDeSimulacion.SobreCompromiso { get { return SobreCompromiso; } }
         int IContadoresDeSimulacion.WipActual { get { return WipActual; } }
+    }
+
+    /// <summary>Lo que quedo de una Fase 3: que dia fue, como salio, que modulos encendieron y cuanto pesa en el lanzamiento.</summary>
+    public sealed class RegistroDeDespliegue {
+        public int Dia;
+        public bool EsFinal;
+        /// <summary>bien | regular | mal.</summary>
+        public string Nivel;
+        public string Titulo;
+        public List<string> Encendidos = new List<string>();
+        public List<string> Caidos = new List<string>();
+        public double Riesgo;
+        public int Defectos;
     }
 
     /// <summary>Lo que quedo de una ceremonia: si el jugador asistio, como la llevo y que paso por llevarla asi.</summary>
@@ -289,6 +328,8 @@ namespace Nexus.Core.Modelo {
         public int SubPaso;
         public string Metodologia;
         public string RazonMetodologia;
+        /// <summary>La duracion de sprints, etapas o cadencia elegida (OpcionesDeCalendario).</summary>
+        public string DuracionDeUnidad;
         public string Arquitectura;
         public string RazonArquitectura;
         public Dictionary<string, int> Fichas = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -296,6 +337,8 @@ namespace Nexus.Core.Modelo {
         public Dictionary<string, int> Comprobacion = new Dictionary<string, int>(StringComparer.Ordinal);
         /// <summary>Las preguntas que se fallaron alguna vez (no cuentan como acierto a la primera).</summary>
         public List<string> FalladasAlguna = new List<string>();
+        /// <summary>El product backlog que se estaba armando: ids de historias, en su orden.</summary>
+        public List<string> Backlog = new List<string>();
     }
 
     /// <summary>Una estimacion del jugador frente a lo que costo de verdad (verbo V5).</summary>

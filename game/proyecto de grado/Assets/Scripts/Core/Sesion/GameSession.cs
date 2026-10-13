@@ -70,12 +70,15 @@ namespace Nexus.Core.Sesion {
         private double _avanceAlEmpezarUnidad;
         private string _unidadAnterior;
         private string _arquitectura;
+        private string _opcionDeCalendario;
         private string _razonMetodologia;
         private string _razonArquitectura;
         private Dictionary<string, int> _fichasDeCalidad = new Dictionary<string, int>(StringComparer.Ordinal);
 
         // Lo decidido en la Fase 1, de solo lectura: lo leen los apuntes del proyecto.
         public string ArquitecturaElegida { get { return _arquitectura; } }
+        /// <summary>La duracion elegida para los sprints, las etapas o la cadencia. null = la de serie.</summary>
+        public string OpcionDeCalendario { get { return _opcionDeCalendario; } }
         public string RazonDeLaMetodologia { get { return _razonMetodologia; } }
         public string RazonDeLaArquitectura { get { return _razonArquitectura; } }
         public IReadOnlyDictionary<string, int> FichasDeCalidad { get { return _fichasDeCalidad; } }
@@ -98,6 +101,13 @@ namespace Nexus.Core.Sesion {
         public bool JornadaLlegoAlCierre { get { return _reloj.LlegoElCierre; } }
         public bool JornadaTerminada { get { return _reloj.Terminada; } }
         public bool JornadaProrrogada { get { return R.JornadaProrrogada; } }
+
+        /// <summary>
+        /// Si el dia de hoy ya se cerro y se simulo. En un guardado anterior al campo se deduce como entonces: el
+        /// dia contaba en cuanto se elegia a las 18:00, asi que estaba simulado si el reloj habia acabado o si se
+        /// habia prorrogado.
+        /// </summary>
+        public bool JornadaSimulada { get { return R.JornadaSimulada ?? (_reloj.Terminada || R.JornadaProrrogada); } }
         public int MinutosRestantesDeJornada { get { return _reloj.MinutosRestantes; } }
 
         /// <summary>Donde esta el jugador. Null si el nivel no tiene mapa: todo ocurre en el escritorio.</summary>
@@ -537,6 +547,34 @@ namespace Nexus.Core.Sesion {
 
         // ==================================================================== FASE 1
 
+        /// <summary>Las duraciones entre las que se puede elegir con la metodologia ya elegida.</summary>
+        public List<OpcionDeCalendario> OpcionesDeCalendarioDisponibles() {
+            return Metodologia == null ? new List<OpcionDeCalendario>() : OpcionesDeCalendario.Para(MetodologiaDeCatalogo(), Perfil.DiasTotales);
+        }
+
+        private MethodologyProfile MetodologiaDeCatalogo() {
+            MethodologyProfile perfil;
+            return _catalogo.Metodologias.TryGetValue(Metodologia.Id, out perfil) ? perfil : Metodologia;
+        }
+
+        /// <summary>
+        /// Cuanto dura cada sprint, como se reparten las etapas o cada cuanto se revisa el flujo. Solo cambia el
+        /// calendario: de el salen mas o menos ceremonias, planificaciones y despliegues. Se parte siempre del
+        /// calendario del catalogo, para que elegir una opcion y luego otra no las acumule.
+        /// </summary>
+        public void AjustarCalendario(string opcionId) {
+            ExigirFase1Abierta();
+            if (Metodologia == null) throw new InvalidOperationException("Primero hay que elegir metodologia.");
+            if (!OpcionesDeCalendarioDisponibles().Exists(o => o.Id == opcionId))
+                throw new InvalidOperationException($"'{opcionId}' no es una duración válida para {Metodologia.Id} en {Perfil.Id}.");
+            var limpio = MetodologiaDeCatalogo().Clone();
+            OpcionesDeCalendario.Aplicar(limpio, opcionId, Perfil.DiasTotales);
+            Metodologia.Calendario = limpio.Calendario;
+            Metodologia.Ceremonias = limpio.Ceremonias;
+            Reglas = new MethodologyRules(Metodologia, Perfil.DiasTotales);
+            _opcionDeCalendario = opcionId == OpcionesDeCalendario.DeSerie ? null : opcionId;
+        }
+
         /// <summary>
         /// La primera de las tres decisiones fundacionales. Reescribe ocho cosas del motor de golpe:
         /// el calendario, las ceremonias, las reglas de cambio, los coeficientes, el director,
@@ -555,6 +593,7 @@ namespace Nexus.Core.Sesion {
             Metodologia = perfil.Clone();
             Reglas = new MethodologyRules(Metodologia, Perfil.DiasTotales);
             _razonMetodologia = razonId;
+            _opcionDeCalendario = null;
 
             Coef.MultiplicarPor(Metodologia.ModificadoresModelo);
 
@@ -690,6 +729,7 @@ namespace Nexus.Core.Sesion {
 
             _eventos = new EventDirector(EventosDelNivel(_catalogo, Perfil.Id), Perfil, Reglas, _rng, _scheduler);
             _minijuegos = new MinigameDirector(MinijuegosDelNivel(_catalogo, Perfil.Id), Perfil, _rng);
+            AplicarElBacklogCreado();   // antes del tablero: lo que nadie pidio hace crecer el alcance
             AsegurarTablero();
         }
 
@@ -703,6 +743,8 @@ namespace Nexus.Core.Sesion {
         private void AsegurarTablero() {
             if (R.Tablero != null || !Fase1Cerrada) return;
             R.Tablero = GeneradorDeTarjetas.Crear(Perfil, W.Alcance, _rng.Semilla);
+            // Si el jugador armo el product backlog, las tarjetas son sus historias, en su orden.
+            GeneradorDeTarjetas.AplicarHistorias(R.Tablero, Perfil.Proyecto, R.BacklogElegido);
             // Kanban: el limite de trabajo en curso es el del tablero, y con el que se empieza es el neutro.
             if (Politica != null && Politica.LimiteDeWip && R.LimiteWip > 0)
                 R.Tablero.LimiteEnCurso = R.Tablero.LimiteNeutro = R.LimiteWip;
@@ -738,6 +780,7 @@ namespace Nexus.Core.Sesion {
             _alertas.VaciarDelDia();
             R.MinutoDelDia = _reloj.Minuto;
             R.JornadaProrrogada = false;
+            R.JornadaSimulada = false;
             R.TareasDeOficinaHoy.Clear();
             R.TareaDeOficinaAbierta = null;
             R.ZonaActual = Perfil.Mapa != null && !Perfil.Mapa.Vacio ? Perfil.Mapa.Ancla?.Id : null;
@@ -1002,7 +1045,7 @@ namespace Nexus.Core.Sesion {
         }
 
         private void AbrirPlanning() {
-            var diasDeUnidad = Math.Max(1, Metodologia.Calendario.LongitudIteracion);
+            var diasDeUnidad = DiasDeLaUnidadActual();
             PendingPlanning = new PlanningRequest {
                 Unidad = _planDeHoy.EtiquetaUnidad + " " + (_planDeHoy.IndiceDeUnidad + 1),
                 CapacidadSugerida = Math.Round(VelocidadActual() * diasDeUnidad, 1),
@@ -1153,20 +1196,43 @@ namespace Nexus.Core.Sesion {
         /// la partida; irse a casa desbloquea el interludio de esa noche.
         /// </summary>
         public void TerminarDia(bool horasExtra) {
+            if (horasExtra && !R.JornadaProrrogada) Quedarse();
+            TerminarDia();
+        }
+
+        /// <summary>
+        /// Las 18:00, quedarse: el reloj sigue hasta la hora limite y las horas extra quedan apuntadas. ★ El dia NO se
+        /// simula aqui: se simula cuando de verdad acaba (TerminarDia), para que las barras se muevan una sola vez, al
+        /// final, y el jugador vea pasar el dia cuando pasa.
+        /// </summary>
+        public void Quedarse() {
             ExigirFase2();
             if (!_reloj.LlegoElCierre)
                 throw new InvalidOperationException(
                     $"Todavia no son las {RelojDeJornada.Formatear(_reloj.MinutoDeCierre)}.");
+            if (R.JornadaSimulada == true) throw new InvalidOperationException("El dia ya se cerro.");
+            if (R.JornadaProrrogada) return;
 
-            if (horasExtra) {
-                _reloj.Prorrogar();
-                R.JornadaProrrogada = true;
-                R.DiasConHorasExtra++;
-                R.DiasSeguidosTrabajando++;
-            } else {
+            _reloj.Prorrogar();
+            R.JornadaProrrogada = true;
+            R.DiasConHorasExtra++;
+            R.DiasSeguidosTrabajando++;
+        }
+
+        /// <summary>Cierra el dia: lo simula (con horas extra si el jugador se quedo) y lo da por terminado.</summary>
+        public void TerminarDia() {
+            ExigirFase2();
+            if (!_reloj.LlegoElCierre)
+                throw new InvalidOperationException(
+                    $"Todavia no son las {RelojDeJornada.Formatear(_reloj.MinutoDeCierre)}.");
+            if (R.JornadaSimulada == true) throw new InvalidOperationException("El dia ya se cerro.");
+
+            var horasExtra = R.JornadaProrrogada;
+            if (!horasExtra) {
                 R.DiasSeguidosTrabajando = 0;
                 R.VecesQueSeFueACasa++;
             }
+            R.JornadaSimulada = true;
 
             // El jugador modula al equipo, no lo sustituye: con el piloto automatico el factor vale exactamente 1.
             AsegurarTablero();
@@ -1228,8 +1294,9 @@ namespace Nexus.Core.Sesion {
             var d = Derivadas();
             var config = Metodologia.Lanzamiento ?? new LanzamientoConfig();
 
-            var riesgo = Math.Min(100.0, d.RiesgoLatente * config.FactorRiesgo);
-            var defectos = PronosticoDeLanzamiento.Defectos(W.Cobertura, W.DeudaTecnica, config.EntregaIncremental);
+            // Los despliegues del nivel pesan aqui: lo que se desplego a ciegas o mal enchufado es riesgo y son errores.
+            var riesgo = PronosticoDeLanzamiento.Riesgo(d.RiesgoLatente, config.FactorRiesgo, RiesgoPorDespliegues());
+            var defectos = PronosticoDeLanzamiento.Defectos(W.Cobertura, W.DeudaTecnica, config.EntregaIncremental) + DefectosPorDespliegues();
             var entregado = Math.Min(W.Avance, W.Alcance);
 
             // Cuenta todo lo que el cliente nota, no solo el riesgo (ver CalculoDeLanzamiento).
@@ -1287,10 +1354,11 @@ namespace Nexus.Core.Sesion {
         public CalificacionDeLanzamiento Pronostico() {
             var config = (Metodologia != null ? Metodologia.Lanzamiento : null) ?? new LanzamientoConfig();
             var d = Derivadas();
-            var restantes = Math.Max(0, Perfil.DiasTotales - R.DiaActual + (JornadaTerminada ? 0 : 1));
+            var restantes = Math.Max(0, Perfil.DiasTotales - R.DiaActual + (JornadaSimulada ? 0 : 1));
             return PronosticoDeLanzamiento.Calcular(W.Avance, W.Alcance, d.Velocidad, restantes, W.Cobertura, W.DeudaTecnica,
                                                     d.RiesgoLatente, config.FactorRiesgo, config.EntregaIncremental,
-                                                    W.SatisfaccionCliente, Traza, Perfil.Lanzamiento);
+                                                    W.SatisfaccionCliente, Traza, Perfil.Lanzamiento,
+                                                    RiesgoPorDespliegues(), DefectosPorDespliegues());
         }
 
         /// <summary>¿La metodologia entrega por partes? (escapan menos errores). Para explicar las barras.</summary>
@@ -1459,6 +1527,7 @@ namespace Nexus.Core.Sesion {
                 MetodologiaId = Metodologia == null ? null : Metodologia.Id,
                 RazonMetodologia = _razonMetodologia,
                 ArquitecturaId = _arquitectura, RazonArquitectura = _razonArquitectura,
+                OpcionDeCalendario = _opcionDeCalendario,
                 FichasDeCalidad = new Dictionary<string, int>(_fichasDeCalidad, StringComparer.Ordinal),
                 VelocidadBaseMult = _velocidadBaseMult,
                 ThroughputAcumulado = _throughputAcumulado,
@@ -1467,7 +1536,8 @@ namespace Nexus.Core.Sesion {
                 ColaDeEfectos = _scheduler.CopiaDeCola(),
                 Telegrafiados = _scheduler.CopiaDeTelegrafiados(),
                 Alertas = _alertas.Copia(),
-                ConsumosDelRng = _rng.Consumos
+                ConsumosDelRng = _rng.Consumos,
+                Lanzamiento = Lanzamiento
             };
         }
 
@@ -1505,6 +1575,8 @@ namespace Nexus.Core.Sesion {
             s._throughputAcumulado = nivel.ThroughputAcumulado;
             s._avanceAlEmpezarUnidad = nivel.AvanceAlEmpezarUnidad;
             s._unidadAnterior = nivel.UnidadAnterior;
+            // El lanzamiento ya ocurrido viaja en el guardado: recalcularlo al recargar cobraria sus efectos dos veces.
+            s.Lanzamiento = nivel.Lanzamiento;
             s._fichasDeCalidad = nivel.FichasDeCalidad ?? new Dictionary<string, int>(StringComparer.Ordinal);
             s.ReaplicarPesosDeCalidad();   // ← lo unico de la Fase 1 que SI hay que reaplicar
 
@@ -1520,6 +1592,10 @@ namespace Nexus.Core.Sesion {
                     throw new SaveException($"La partida usa la metodologia '{nivel.MetodologiaId}', que no esta en el catalogo.");
 
                 s.Metodologia = metodologia.Clone();
+                // La duracion elegida en la Fase 1 es parte del calendario: sin reaplicarla, al recargar volverian
+                // los sprints de serie y los dias de despliegue cambiarian a mitad de partida.
+                s._opcionDeCalendario = nivel.OpcionDeCalendario;
+                OpcionesDeCalendario.Aplicar(s.Metodologia, s._opcionDeCalendario, s.Perfil.DiasTotales);
                 s.Reglas = new MethodologyRules(s.Metodologia, s.Perfil.DiasTotales);
             }
 

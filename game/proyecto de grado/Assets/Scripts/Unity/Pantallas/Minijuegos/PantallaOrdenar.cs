@@ -85,11 +85,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private string QuienPide { get { return string.IsNullOrEmpty(Def.Presentacion.QuienEspera) || Def.Presentacion.QuienEspera == "Tú mismo" ? "el cliente" : Def.Presentacion.QuienEspera; } }
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
-            // Barajado y nunca ya resuelto: el JSON trae las tarjetas en el orden bueno. Guiado no hace falta (Marisol
-            // dice el puesto de cada una, y un tablero lleno de avisos rojos distrae del recorrido). El dia entra en
-            // la semilla para que repetir la practica no sea calcarla.
-            _orden = Guiado ? Cfg.Tarjetas.Select(t => t.Id).ToList()
-                            : OrdenarEvaluador.OrdenInicial(Cfg, App.Sesion != null ? App.Sesion.R.DiaActual : 0);
+            // Barajado y nunca ya resuelto: el JSON trae las tarjetas en el orden bueno. ★ Tambien en el modo guiado:
+            // con el orden del JSON, Marisol pedia poner cada tarjeta donde ya estaba, no se movia nada y no se
+            // aprendia a mover. El dia entra en la semilla para que repetir la practica no sea calcarla.
+            _orden = OrdenarEvaluador.OrdenInicial(Cfg, App.Sesion != null ? App.Sesion.R.DiaActual : 0);
             _ordenDeLaFase1 = null;
             _contestando = false;
             _respuesta = null;
@@ -295,6 +294,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var ver = resultado || VerDependencias;
             var rotas = ver ? Rotas() : new List<KeyValuePair<string, string>>();
             var pasoGuiado = Guiado ? Guia.Actual : null;
+            // Guiado: el hueco al que hay que llevar la tarjeta del paso, marcado, para que se vea a donde va.
+            if (!resultado && !_contestando && pasoGuiado != null && pasoGuiado.Accion == AccionGuiada.Mover &&
+                pasoGuiado.Valor < _orden.Count && _orden.IndexOf(pasoGuiado.Objetivo) != pasoGuiado.Valor) {
+                var yHueco = YDe(pasoGuiado.Valor, linea);
+                l.Dibujo.Rect(Izq - 8, yHueco - 5, Ancho + 16, Fila, Tema.papelAviso, 4, null, true, 10);
+                l.Dibujo.Flecha(Izq - 46, yHueco + Fila / 2 - 5, Izq - 12, yHueco + Fila / 2 - 5, Tema.papelAviso, 4);
+            }
             for (var i = 0; i < _orden.Count; i++) {
                 var t = porId[_orden[i]];
                 var dentro = i < linea;
@@ -362,11 +368,24 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 if (_contestando) continue;   // en la fase 2 el tablero no se toca
                 var indice = i;
                 if (Guiado) {
-                    // Guiado: solo se mueve la tarjeta del paso, con un boton que dice a donde.
+                    // Guiado: solo se mueve la tarjeta del paso. Se puede arrastrar al hueco marcado o subirla y
+                    // bajarla con las flechas, que es como se jugara despues; el boton la lleva de un toque.
                     if (pasoGuiado != null && pasoGuiado.Accion == AccionGuiada.Mover && pasoGuiado.Objetivo == t.Id) {
-                        var destino = pasoGuiado.Valor;
-                        var poner = Ui.Boton(tarjeta, $"Ponla en el puesto {destino + 1}", () => MoverGuiado(t.Id, destino), VarianteBoton.Primario);
-                        Lamina.Colocar((RectTransform)poner.transform, Ancho - 250, 8, 238, Fila - 26);
+                        var destino = Math.Min(pasoGuiado.Valor, _orden.Count - 1);
+                        var yaEsta = indice == destino;
+                        var poner = Ui.Boton(tarjeta, yaEsta ? $"Ya está en el puesto {destino + 1}: seguir" : $"Llévala al puesto {destino + 1}",
+                                             () => MoverGuiado(t.Id, destino), VarianteBoton.Primario);
+                        Lamina.Colocar((RectTransform)poner.transform, Ancho - 380, 8, 248, Fila - 26);
+                        if (!yaEsta) {
+                            var subeG = Ui.Boton(tarjeta, "▲", () => PasoGuiadoHacia(t.Id, indice - 1, destino));
+                            Lamina.Colocar((RectTransform)subeG.transform, Ancho - 124, 8, 52, Fila - 26);
+                            subeG.interactable = indice > 0;
+                            var bajaG = Ui.Boton(tarjeta, "▼", () => PasoGuiadoHacia(t.Id, indice + 1, destino));
+                            Lamina.Colocar((RectTransform)bajaG.transform, Ancho - 64, 8, 52, Fila - 26);
+                            bajaG.interactable = indice < _orden.Count - 1;
+                            tarjeta.gameObject.AddComponent<TarjetaArrastrable>().AlSoltar =
+                                yCentro => PasoGuiadoHacia(t.Id, DondeCae(indice, yCentro, linea), destino);
+                        }
                     }
                     continue;
                 }
@@ -388,10 +407,28 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         private void Soltar(int desde, float yCentro, int linea) {
+            Mover(desde, DondeCae(desde, yCentro, linea));
+        }
+
+        /// <summary>El puesto en el que queda una tarjeta soltada a esa altura.</summary>
+        private int DondeCae(int desde, float yCentro, int linea) {
             var hasta = 0;
             for (var i = 0; i < _orden.Count; i++)
                 if (i != desde && yCentro > YDe(i, linea) + Fila / 2) hasta++;
-            Mover(desde, Mathf.Clamp(hasta, 0, _orden.Count - 1));
+            return Mathf.Clamp(hasta, 0, _orden.Count - 1);
+        }
+
+        /// <summary>
+        /// Guiado: la tarjeta del paso se mueve a mano (arrastrando o con las flechas). El paso se da por hecho cuando
+        /// llega a su puesto; mientras tanto se queda donde el jugador la dejo.
+        /// </summary>
+        private void PasoGuiadoHacia(string id, int hasta, int destino) {
+            if (!Guia.Permite(AccionGuiada.Mover, id)) { Guia.Rechazar(); return; }
+            if (hasta < 0 || hasta >= _orden.Count) { Repintar(); return; }
+            _orden.Remove(id);
+            _orden.Insert(hasta, id);
+            if (hasta == destino) Guia.Hecho(AccionGuiada.Mover, id);
+            Repintar();
         }
 
         private void Mover(int desde, int hasta) {

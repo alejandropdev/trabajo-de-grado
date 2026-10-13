@@ -44,24 +44,34 @@
     "modulos": [
       {
         "id": "recepcion",
+        "pantalla": "formulario",
+        "accion": "Registrar visita",
+        "datos": ["Nombre del visitante", "A quién viene a ver", "¿Trae cita?"],
         "nombre": "Pantalla de recepción",
         "queHace": "Lo que ve la recepcionista en el navegador: el formulario de visita y los botones de entrada y salida.",
         "peso": 1
       },
       {
         "id": "registro",
+        "pantalla": "lista",
+        "datos": ["09:02  Ana R.  ·  con cita", "09:15  Luis M.  ·  sin cita", "09:40  Eva T.  ·  con cita"],
         "nombre": "Registro de visitas",
         "queHace": "Guarda cada visita: quién es, a qué hora entra, a quién viene a ver y cuándo sale.",
         "peso": 1.5
       },
       {
         "id": "aviso",
+        "pantalla": "aviso",
+        "datos": ["Para: Carlos P., Compras", "«Tu visita, Ana R., ha llegado»"],
         "nombre": "Aviso al anfitrión",
         "queHace": "Manda un correo a la persona a la que viene a ver el visitante.",
         "peso": 1
       },
       {
         "id": "dentro",
+        "pantalla": "lista",
+        "accion": "Marcar salida",
+        "datos": ["Ana R.  ·  entró 09:02", "Luis M.  ·  entró 09:15", "Eva T.  ·  entró 09:40"],
         "nombre": "Quién sigue dentro",
         "queHace": "La lista de visitas que entraron y aún no han salido, para el vigilante al cerrar.",
         "peso": 1
@@ -133,41 +143,144 @@
         }
       ]
     },
+    "papeles": [
+      {
+        "id": "PAP-0-1",
+        "dia": 1,
+        "tipo": "cuaderno",
+        "titulo": "Una hoja del cuaderno de visitas",
+        "de": "La recepción",
+        "lineas": [
+          "08:55  Ana R.  →  Carlos P.      sale: ____",
+          "09:02  Luis M.  →  ¿?             sale: 09:40",
+          "09:10  (no se lee)  →  Compras    sale: ____",
+          "09:31  Eva T.  →  sin cita        sale: ____"
+        ],
+        "queTeDice": "Faltan salidas y hay letra que nadie entiende: por eso al final del día nadie sabe quién sigue dentro.",
+        "modulo": "registro"
+      },
+      {
+        "id": "PAP-0-2",
+        "dia": 2,
+        "tipo": "queja",
+        "titulo": "Una queja en el buzón",
+        "de": "Un visitante",
+        "lineas": [
+          "«Llegué a las 9:00 a una reunión de las 9:15.»",
+          "«Me registraron a las 9:40.»",
+          "«La persona a la que iba a ver ya se había ido.»"
+        ],
+        "queTeDice": "La espera no es solo una molestia: hace perder reuniones. Registrar a alguien tiene que tomar segundos.",
+        "modulo": "recepcion"
+      },
+      {
+        "id": "PAP-0-3",
+        "dia": 3,
+        "tipo": "correo",
+        "titulo": "Un correo de un anfitrión",
+        "de": "Carlos P., Compras",
+        "lineas": [
+          "Asunto: ¿llegó mi visita?",
+          "«Bajé tres veces a preguntar si había llegado mi proveedor.»",
+          "«Llevaba veinte minutos en la recepción y nadie me avisó.»"
+        ],
+        "queTeDice": "El anfitrión no puede estar bajando a mirar: el aviso tiene que llegarle solo.",
+        "modulo": "aviso"
+      },
+      {
+        "id": "PAP-0-4",
+        "dia": 4,
+        "tipo": "nota",
+        "titulo": "Una nota del vigilante de noche",
+        "de": "El vigilante de noche",
+        "lineas": [
+          "«Anoche el cuaderno decía que quedaban 3 visitas dentro.»",
+          "«Recorrí cuatro pisos. No había nadie.»",
+          "«Se habían ido sin firmar la salida.»"
+        ],
+        "queTeDice": "Saber quién sigue dentro es un asunto de seguridad, y depende de que las salidas queden registradas.",
+        "modulo": "dentro"
+      },
+      {
+        "id": "PAP-0-5",
+        "dia": 5,
+        "tipo": "hoja",
+        "titulo": "Un día normal, en números",
+        "de": "La recepción",
+        "lineas": [
+          "Visitas del día: 62",
+          "Con cita: 31      Sin cita: 31",
+          "La hora con más gente: de 9:00 a 10:00",
+          "Personas atendiendo: 1"
+        ],
+        "queTeDice": "La mitad llega sin cita y casi todos a la misma hora. El sistema tiene que servir justo en ese momento."
+      }
+    ],
+    "backlogInicial": "crear",
+    "historias": [
+      {"id": "H-REC-1", "modulo": "recepcion", "titulo": "Registrar una visita en segundos", "como": "recepcionista", "quiero": "apuntar a un visitante con tres datos", "para": "que la fila no se alargue", "valor": 3, "tipo": "pedida", "porque": "es lo que más tiempo le quita hoy a la recepcionista."},
+      {"id": "H-REC-2", "modulo": "recepcion", "titulo": "Marcar la salida con un clic", "como": "recepcionista", "quiero": "marcar que un visitante se va", "para": "que quede dicho quién ya no está", "valor": 2, "tipo": "pedida", "porque": "sin las salidas, nadie sabe quién sigue dentro."},
+      {"id": "H-REC-3", "modulo": "recepcion", "titulo": "Elegir el color de la pantalla", "como": "recepcionista", "quiero": "cambiar los colores de la pantalla", "para": "que se vea a mi gusto", "valor": 1, "tipo": "nadie", "porque": "nadie lo pidió, y la fila sigue igual de larga con otro color."},
+      {"id": "H-REG-1", "modulo": "registro", "titulo": "Guardar cada visita", "como": "recepcionista", "quiero": "que cada visita quede guardada con su hora", "para": "poder consultarla después", "valor": 3, "tipo": "pedida", "porque": "si no se guarda, el sistema no es mejor que el cuaderno."},
+      {"id": "H-REG-2", "modulo": "registro", "titulo": "Buscar una visita por nombre", "como": "recepcionista", "quiero": "buscar a un visitante por su nombre", "para": "contestar rápido cuando preguntan por él", "valor": 2, "tipo": "pedida", "porque": "preguntan por las visitas a todas horas, y hoy hay que hojear el cuaderno."},
+      {"id": "H-REG-3", "modulo": "registro", "titulo": "Crear las tablas de la base de datos", "como": "programador", "quiero": "crear las tablas de visitas", "para": "tener dónde guardar", "valor": 1, "tipo": "no-historia", "porque": "es una tarea técnica: no dice qué necesita nadie. Va dentro de «Guardar cada visita»."},
+      {"id": "H-AVI-1", "modulo": "aviso", "titulo": "Avisar al anfitrión cuando llega su visita", "como": "anfitrión", "quiero": "recibir un correo cuando llega mi visita", "para": "no tener que bajar a preguntar", "valor": 3, "tipo": "pedida", "porque": "el anfitrión bajó tres veces a preguntar: es su queja."},
+      {"id": "H-AVI-2", "modulo": "aviso", "titulo": "Avisar también por el teléfono móvil", "como": "anfitrión", "quiero": "que me llegue un aviso al móvil con una app", "para": "enterarme aunque no mire el correo", "valor": 1, "tipo": "nadie", "porque": "pide instalar una app, y el encargo decía que nadie instala nada."},
+      {"id": "H-AVI-3", "modulo": "aviso", "titulo": "Mandar un correo al anfitrión", "como": "anfitrión", "quiero": "que me escriban al llegar mi visita", "para": "saber que ya está abajo", "valor": 2, "tipo": "repetida", "porque": "es la misma historia que «Avisar al anfitrión», con otras palabras."},
+      {"id": "H-DEN-1", "modulo": "dentro", "titulo": "Ver quién sigue dentro al cerrar", "como": "vigilante de noche", "quiero": "ver la lista de quienes entraron y no han salido", "para": "no recorrer cuatro pisos buscando a nadie", "valor": 3, "tipo": "pedida", "porque": "es un asunto de seguridad: el vigilante lo pidió por escrito."},
+      {"id": "H-DEN-2", "modulo": "dentro", "titulo": "Avisar si alguien lleva demasiado tiempo dentro", "como": "vigilante de noche", "quiero": "que se marque a quien lleva más de ocho horas", "para": "revisar primero esos casos", "valor": 1, "tipo": "pedida", "porque": "lo pidió el vigilante; vale menos que la lista, pero es suyo."},
+      {"id": "H-DEN-3", "modulo": "dentro", "titulo": "Informe mensual con gráficas", "como": "jefe", "quiero": "ver gráficas de visitas por mes", "para": "presentarlas en la reunión", "valor": 1, "tipo": "nadie", "porque": "nadie lo pidió en este encargo, y en cinco días no cabe."}
+    ],
     "vocabulario": [
       {
         "termino": "Visitante",
         "definicion": "Persona de fuera de la empresa que entra al edificio un rato, con cita o sin ella.",
-        "dondeLoVeras": "el formulario de visita y el registro."
+        "dondeLoVeras": "el formulario de visita y el registro.",
+        "dibujo": "of-visitante",
+        "dibujoDonde": "of-visitante-donde"
       },
       {
         "termino": "Anfitrión",
         "definicion": "La persona de la empresa a la que viene a ver el visitante: es quien recibe el aviso.",
-        "dondeLoVeras": "el módulo «Aviso al anfitrión» y el diagrama de tu propuesta."
+        "dondeLoVeras": "el módulo «Aviso al anfitrión» y el diagrama de tu propuesta.",
+        "dibujo": "of-anfitrion",
+        "dibujoDonde": "of-anfitrion-donde"
       },
       {
         "termino": "Cita",
         "definicion": "Una visita acordada de antemano. El visitante sin cita también existe, y alguien tiene que decidir qué se hace con él.",
-        "dondeLoVeras": "el registro de visitas y los comentarios del ticket."
+        "dondeLoVeras": "el registro de visitas y los comentarios del ticket.",
+        "dibujo": "of-cita",
+        "dibujoDonde": "of-cita-donde"
       },
       {
         "termino": "Registro de entrada y salida",
         "definicion": "Anotar a qué hora entra y sale cada persona. Sin la salida, no se puede saber quién sigue dentro.",
-        "dondeLoVeras": "el backlog y la lista «Quién sigue dentro»."
+        "dondeLoVeras": "el backlog y la lista «Quién sigue dentro».",
+        "dibujo": "of-registro",
+        "dibujoDonde": "of-registro-donde"
       },
       {
         "termino": "Credencial",
         "definicion": "La tarjeta o pegatina que se da al visitante para que se vea que está autorizado a estar dentro.",
-        "dondeLoVeras": "las charlas de la recepción."
+        "dondeLoVeras": "las charlas de la recepción.",
+        "dibujo": "of-credencial",
+        "dibujoDonde": "of-credencial-donde"
       },
       {
         "termino": "Aforo",
         "definicion": "El número máximo de personas que puede haber a la vez en el edificio. Por seguridad hay que saber cuántas hay.",
-        "dondeLoVeras": "la lista «Quién sigue dentro»."
+        "dondeLoVeras": "la lista «Quién sigue dentro».",
+        "dibujo": "of-aforo",
+        "dibujoDonde": "of-aforo-donde"
       },
       {
         "termino": "MVP",
         "definicion": "Producto mínimo viable: la versión más pequeña que ya resuelve el problema de verdad. Aquí, registrar, avisar y saber quién sigue dentro, sin adornos.",
-        "dondeLoVeras": "el comentario de Marisol: «que funcione el viernes»."
+        "dondeLoVeras": "el comentario de Marisol: «que funcione el viernes».",
+        "dibujo": "of-mvp",
+        "dibujoDonde": "of-mvp-donde",
+        "glosario": "mvp"
       }
     ],
     "artefactos": [
@@ -205,8 +318,12 @@
   "alcanceInicial": 12,
   "equipoInicial": 1,
   "equipo": [
-    { "id": "valeria", "nombre": "Valeria", "rol": "Interfaz", "habilidades": {"interfaz": 1.3, "datos": 0.8, "logica": 1.0, "pruebas": 1.0} },
-    { "id": "mateo", "nombre": "Mateo", "rol": "Datos y lógica", "habilidades": {"interfaz": 0.8, "datos": 1.3, "logica": 1.1, "pruebas": 0.9} }
+    { "id": "valeria",
+      "descripcion": "Diseña y programa lo que se ve: las pantallas, los formularios, lo que toca el usuario. Lleva dos años en Nexus y pregunta mucho antes de dibujar.",
+      "frase": "Si el usuario tiene que pensar dónde hacer clic, lo hice mal.", "nombre": "Valeria", "rol": "Interfaz", "habilidades": {"interfaz": 1.3, "datos": 0.8, "logica": 1.0, "pruebas": 1.0} },
+    { "id": "mateo",
+      "descripcion": "Se ocupa de dónde se guardan los datos y de las reglas que los mueven. Es callado, ordenado, y desconfía de todo lo que no esté guardado.",
+      "frase": "Lo que no queda guardado, no pasó.", "nombre": "Mateo", "rol": "Datos y lógica", "habilidades": {"interfaz": 0.8, "datos": 1.3, "logica": 1.1, "pruebas": 0.9} }
   ],
   "deudaHeredada": 0,
   "coberturaHeredada": 20,
@@ -258,7 +375,8 @@
         "minutosDeVisita": 20,
         "quienEsta": [
           "Marta Oyola",
-          "otros concursantes"
+          "otros concursantes",
+          "Rosa Villamil, la recepcionista del edificio (desde el segundo día)"
         ],
         "coleccionables": [
           "COL-ADV-01"
@@ -649,5 +767,190 @@
         "Cansancio": 2
       }
     }
-  ]
+  ],
+  "despliegue": {
+    "segundos": 300,
+    "umbralDeModulo": 60,
+    "tuberia": {
+      "huecos": 6,
+      "tramos": [
+        {
+          "id": "compilar",
+          "nombre": "Compilar",
+          "queHace": "Convierte el código en un programa que la máquina puede ejecutar.",
+          "obligatorio": true,
+          "porque": "Es la primera puerta: si no compila, no hay nada que desplegar."
+        },
+        {
+          "id": "pruebas",
+          "nombre": "Pruebas automáticas",
+          "queHace": "Ejecuta solas todas las pruebas, en un par de minutos.",
+          "obligatorio": true,
+          "despuesDe": [
+            "compilar"
+          ],
+          "atrapaErrores": true,
+          "porque": "Atrapan los errores antes de que salgan. Sin ellas, lo que esté roto llega a la recepción."
+        },
+        {
+          "id": "empaquetar",
+          "nombre": "Empaquetar",
+          "queHace": "Guarda una versión cerrada y con número.",
+          "obligatorio": false,
+          "despuesDe": [
+            "pruebas"
+          ],
+          "porque": "Así lo que se probó es exactamente lo que sale, y se puede volver a la versión anterior."
+        },
+        {
+          "id": "entorno-de-pruebas",
+          "nombre": "Entorno de pruebas",
+          "queHace": "Un ensayo en un sitio igual al de verdad, pero sin visitantes.",
+          "obligatorio": true,
+          "despuesDe": [
+            "pruebas"
+          ],
+          "porque": "Es el ensayo general: lo que falle aquí no lo ve nadie de fuera."
+        },
+        {
+          "id": "produccion",
+          "nombre": "Producción",
+          "queHace": "El equipo de la recepción: aquí lo usa el cliente de verdad.",
+          "obligatorio": true,
+          "despuesDe": [
+            "entorno-de-pruebas"
+          ],
+          "porque": "Es el destino. Tiene que ir después del ensayo, no antes."
+        },
+        {
+          "id": "vigilancia",
+          "nombre": "Vigilancia",
+          "queHace": "Mira si lo desplegado sigue funcionando y avisa si se cae.",
+          "obligatorio": true,
+          "despuesDe": [
+            "produccion"
+          ],
+          "porque": "Sin ella, la primera en enterarse de un fallo es la recepcionista, con la fila delante."
+        },
+        {
+          "id": "directo",
+          "nombre": "Subir directo a producción",
+          "queHace": "Manda el código tal cual al cliente, sin pasar por nada.",
+          "obligatorio": false,
+          "trampa": true,
+          "porque": "Se salta todas las comprobaciones: lo que falle, fallará delante del cliente."
+        },
+        {
+          "id": "a-mano",
+          "nombre": "Copiar los archivos a mano",
+          "queHace": "Alguien arrastra los archivos al servidor.",
+          "obligatorio": false,
+          "trampa": true,
+          "porque": "Nadie sabe qué versión quedó puesta, y la próxima vez no saldrá igual."
+        }
+      ]
+    },
+    "tomas": [
+      {
+        "id": "equipo-recepcion",
+        "nombre": "Equipo de la recepción",
+        "entorno": "produccion"
+      },
+      {
+        "id": "tu-computador",
+        "nombre": "Tu computador",
+        "entorno": "pruebas",
+        "trampa": true,
+        "porque": "Solo funcionaría en tu computador: en la recepción no habría nada que abrir."
+      },
+      {
+        "id": "bd-produccion",
+        "nombre": "Base de datos de producción",
+        "entorno": "produccion"
+      },
+      {
+        "id": "bd-pruebas",
+        "nombre": "Base de datos de pruebas",
+        "entorno": "pruebas",
+        "trampa": true,
+        "porque": "Las visitas de hoy se guardarían mezcladas con datos inventados: mañana nadie sabrá quién entró de verdad."
+      },
+      {
+        "id": "caja-de-secretos",
+        "nombre": "Caja de secretos",
+        "entorno": "produccion"
+      },
+      {
+        "id": "clave-a-la-vista",
+        "nombre": "Clave escrita en el código",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "La clave queda donde cualquiera que vea el código puede leerla."
+      },
+      {
+        "id": "correo-nexus",
+        "nombre": "Correo de Nexus",
+        "entorno": "produccion"
+      },
+      {
+        "id": "correo-de-pruebas",
+        "nombre": "Buzón de pruebas",
+        "entorno": "pruebas",
+        "trampa": true,
+        "porque": "Los avisos irían a un buzón que nadie lee: ningún anfitrión se entera de que llegó su visita."
+      }
+    ],
+    "modulos": {
+      "recepcion": [
+        {
+          "id": "pantalla",
+          "nombre": "Dónde se abre",
+          "toma": "equipo-recepcion",
+          "porque": "La pantalla tiene que abrirse en el único equipo con navegador que hay en la recepción."
+        }
+      ],
+      "registro": [
+        {
+          "id": "datos",
+          "nombre": "Dónde guarda",
+          "toma": "bd-produccion",
+          "porque": "Las visitas de verdad van a la base de datos de producción."
+        },
+        {
+          "id": "clave",
+          "nombre": "Su clave de acceso",
+          "toma": "caja-de-secretos",
+          "porque": "Las claves se guardan en la caja de secretos, nunca escritas en el código."
+        }
+      ],
+      "aviso": [
+        {
+          "id": "correo",
+          "nombre": "Por dónde avisa",
+          "toma": "correo-nexus",
+          "porque": "El aviso tiene que llegar al correo real del anfitrión."
+        },
+        {
+          "id": "necesita",
+          "nombre": "Necesita el registro",
+          "toma": "modulo:registro",
+          "porque": "Solo puede avisar de una visita que ya se registró."
+        }
+      ],
+      "dentro": [
+        {
+          "id": "datos",
+          "nombre": "De dónde lee",
+          "toma": "bd-produccion",
+          "porque": "La lista de quién sigue dentro sale de las visitas reales."
+        },
+        {
+          "id": "necesita",
+          "nombre": "Necesita el registro",
+          "toma": "modulo:registro",
+          "porque": "Sin entradas y salidas registradas no hay lista que mostrar."
+        }
+      ]
+    }
+  }
 }

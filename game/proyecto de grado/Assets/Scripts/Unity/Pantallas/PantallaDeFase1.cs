@@ -28,7 +28,10 @@ namespace Nexus.Unity.Pantallas {
     /// Ningun veredicto se enseña aqui: se leen en el Dashboard de Lecciones.
     /// </summary>
     public sealed class PantallaDeFase1 : Pantalla {
-        private enum Paso { Encargo, Recoleccion, Metodologia, Calidad, Arquitectura, Resumen }
+        private enum Paso { Encargo, Recoleccion, Metodologia, Calidad, Arquitectura, Backlog, Resumen }
+
+        /// <summary>El product backlog que se va armando: ids de historias, en el orden en que se haran.</summary>
+        private readonly List<string> _backlog = new List<string>();
 
         private GameSession S { get { return App.Sesion; } }
         private LevelProfile Perfil { get { return S.Perfil; } }
@@ -46,6 +49,8 @@ namespace Nexus.Unity.Pantallas {
         private ScrollRect _scroll;
 
         private string _metodologia, _razonMetodologia, _arquitectura, _razonArquitectura;
+        /// <summary>Cuanto dura cada sprint, etapa o revision (OpcionesDeCalendario). null = la de serie.</summary>
+        private string _duracion;
         private readonly Dictionary<string, int> _fichas = new Dictionary<string, int>();
 
         public override bool PuedeVolver { get { return false; } }
@@ -100,11 +105,12 @@ namespace Nexus.Unity.Pantallas {
         private void GuardarBorrador() {
             if (S == null || S.Fase1Cerrada) return;
             S.R.Fase1Borrador = new Fase1Borrador {
-                Paso = _paso.ToString(), SubPaso = _subPaso, Metodologia = _metodologia, RazonMetodologia = _razonMetodologia,
+                Paso = _paso.ToString(), SubPaso = _subPaso, Metodologia = _metodologia, RazonMetodologia = _razonMetodologia, DuracionDeUnidad = _duracion,
                 Arquitectura = _arquitectura, RazonArquitectura = _razonArquitectura,
                 Fichas = new Dictionary<string, int>(_fichas),
                 Comprobacion = new Dictionary<string, int>(_comprobacion),
-                FalladasAlguna = _falladas.ToList()
+                FalladasAlguna = _falladas.ToList(),
+                Backlog = _backlog.ToList()
             };
         }
 
@@ -113,12 +119,14 @@ namespace Nexus.Unity.Pantallas {
             if (b == null) return;
             _metodologia = b.Metodologia;
             _razonMetodologia = b.RazonMetodologia;
+            _duracion = b.DuracionDeUnidad;
             _arquitectura = b.Arquitectura;
             _razonArquitectura = b.RazonArquitectura;
             if (b.Fichas != null)
                 foreach (var kv in b.Fichas) if (_fichas.ContainsKey(kv.Key)) _fichas[kv.Key] = kv.Value;
             if (b.Comprobacion != null) foreach (var kv in b.Comprobacion) _comprobacion[kv.Key] = kv.Value;
             if (b.FalladasAlguna != null) foreach (var id in b.FalladasAlguna) _falladas.Add(id);
+            if (b.Backlog != null) foreach (var id in b.Backlog) if (Perfil.Proyecto != null && Perfil.Proyecto.Historia(id) != null && !_backlog.Contains(id)) _backlog.Add(id);
             Paso paso;
             if (!string.IsNullOrEmpty(b.Paso) && System.Enum.TryParse(b.Paso, out paso) && Pasos().Contains(paso)) _paso = paso;
             _subPaso = Mathf.Clamp(b.SubPaso, 0, PartesDelPaso - 1);
@@ -133,6 +141,7 @@ namespace Nexus.Unity.Pantallas {
             yield return Paso.Metodologia;
             yield return Paso.Calidad;
             yield return Paso.Arquitectura;
+            if (Perfil.Proyecto != null && !string.IsNullOrEmpty(Perfil.Proyecto.BacklogInicial)) yield return Paso.Backlog;
             yield return Paso.Resumen;
         }
 
@@ -143,6 +152,7 @@ namespace Nexus.Unity.Pantallas {
                 case Paso.Metodologia: return "Metodología";
                 case Paso.Calidad: return "Calidad";
                 case Paso.Arquitectura: return "Arquitectura";
+                case Paso.Backlog: return "Backlog";
                 default: return "Resumen";
             }
         }
@@ -190,6 +200,7 @@ namespace Nexus.Unity.Pantallas {
                 case Paso.Metodologia: Metodologia(); break;
                 case Paso.Calidad: Calidad(); break;
                 case Paso.Arquitectura: Arquitectura(); break;
+                case Paso.Backlog: Backlog(); break;
                 case Paso.Resumen: Resumen(); break;
             }
             PintarNavegacion();
@@ -205,6 +216,7 @@ namespace Nexus.Unity.Pantallas {
                 case Paso.Metodologia: return _metodologia != null && _razonMetodologia != null;
                 case Paso.Calidad: return true;
                 case Paso.Arquitectura: return _arquitectura != null && _razonArquitectura != null;
+                case Paso.Backlog: return !S.SeCreaElBacklog || _backlog.Count >= MinimoDeHistorias;
                 case Paso.Resumen: return false;
                 case Paso.Encargo: return ComprobacionHecha;
                 default: return true;
@@ -302,11 +314,27 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Texto(cliente, "QUIÉN LO VA A USAR", EstiloTexto.Leyenda, Tema.cyan);
                 foreach (var u in f.Usuarios) Ui.Texto(cliente, $"· <b>{u.Nombre}</b>: {u.QueNecesita}", EstiloTexto.Pequeno, Tema.ink);
             }
+            PantallaDeGlosario.Palabras(App, cliente, "Si alguna palabra no te suena:", "cliente", "interesados", "alcance");
+
+            // Con quien se va a trabajar: se presenta desde el principio, no cuando ya hay confianza.
+            if (Perfil.Equipo != null && Perfil.Equipo.Count > 0) {
+                var equipo = _hoja.Tarjeta("Tu equipo en este proyecto");
+                foreach (var m in Perfil.Equipo) {
+                    Ui.FilaDeEquipo(equipo, m.Nombre, m.Rol, EstadoDeEquipo.Activo);
+                    if (!string.IsNullOrEmpty(m.Descripcion)) Ui.Texto(equipo, m.Descripcion, EstiloTexto.Pequeno, Tema.ink);
+                    if (!string.IsNullOrEmpty(m.Frase)) Ui.Texto(equipo, "«" + m.Frase + "»", EstiloTexto.Pequeno, Tema.inkMuted);
+                }
+                Ui.Texto(equipo, "Durante el desarrollo los tienes en «Equipo»: qué lleva cada uno, qué terminó y cómo va.", EstiloTexto.Pequeno, Tema.cyan);
+            }
 
             _hoja.Nota($"{Perfil.DiasTotales} días · equipo de {Perfil.EquipoInicial} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
             _hoja.Nota("Léelo con calma: las tres decisiones que vienen se juzgan contra lo que dice aquí.");
             if (Perfil.Briefing != null && Perfil.Briefing.Length > 0)
-                Ui.Boton(_hoja.Fila(), "Leer el ticket original", () => DialogosDelExpediente.Ticket(App, Perfil), VarianteBoton.Fantasma);
+            {
+                var filaDelTicket = _hoja.Fila();
+                Ui.Boton(filaDelTicket, "Leer el ticket original", () => DialogosDelExpediente.Ticket(App, Perfil), VarianteBoton.Fantasma);
+                PantallaDeGlosario.Chip(App, filaDelTicket, "ticket");
+            }
         }
 
         /// <summary>El sistema en una imagen y, al lado, sus partes: lo que se dibuja y lo que significa, juntos.</summary>
@@ -598,7 +626,7 @@ namespace Nexus.Unity.Pantallas {
             foreach (var m in disponibles) {
                 var met = m;
                 var tarjeta = Ui.BotonDeOpcion(opciones, met.Nombre, met.Resumen, () => {
-                    if (_metodologia != met.Id) _razonMetodologia = null;   // otra metodologia, otros motivos
+                    if (_metodologia != met.Id) { _razonMetodologia = null; _duracion = null; }   // otra metodologia, otros motivos y otro calendario
                     _metodologia = met.Id;
                     Repintar();
                 });
@@ -617,6 +645,44 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(detalle, $"¿Por qué {elegida.Nombre}?", EstiloTexto.Subtitulo);
             var motivos = elegida.TextosDeRazones.OrderBy(x => x.Value, System.StringComparer.Ordinal).ToList();
             PintarRazones(detalle, motivos, _razonMetodologia, id => { _razonMetodologia = id; Repintar(); });
+            PintarDuraciones(detalle, elegida);
+        }
+
+        /// <summary>
+        /// Cuanto dura cada sprint, como se reparten las etapas o cada cuanto se entrega. Cada opcion enseña su
+        /// calendario dibujado: las unidades a escala y los dias que cierran con un despliegue.
+        /// </summary>
+        private void PintarDuraciones(Transform padre, Nexus.Core.Metodologia.MethodologyProfile elegida) {
+            var opciones = Nexus.Core.Metodologia.OpcionesDeCalendario.Para(elegida, Perfil.DiasTotales);
+            if (opciones.Count < 2) return;
+            var tipo = elegida.Calendario.Tipo;
+            var pregunta = tipo == Nexus.Core.Metodologia.TiposDeCalendario.Iterativo ? $"¿Cuánto dura cada {elegida.Calendario.EtiquetaUnidad.ToLowerInvariant()}?"
+                         : tipo == Nexus.Core.Metodologia.TiposDeCalendario.Continuo ? "¿Cada cuánto se revisa el flujo y se entrega?"
+                         : "¿Cómo repartes los días entre las etapas?";
+            var tarjeta = Ui.Tarjeta(padre, pregunta);
+            GuiaView.Registrar("fase1.duracion", tarjeta);
+            Ui.Texto(tarjeta, $"El nivel dura {Perfil.DiasTotales} días. No hay una opción correcta: cada una cambia cuántas veces planificas, enseñas y entregas.",
+                     EstiloTexto.Pequeno, Tema.inkMuted);
+            foreach (var o in opciones) {
+                var opcion = o;
+                var marcada = _duracion == null ? o.EsLaDeSerie : _duracion == o.Id;
+                var boton = Ui.BotonDeOpcion(tarjeta, o.Titulo + (o.EsLaDeSerie ? "  ·  lo habitual" : ""), o.Detalle, () => {
+                    _duracion = opcion.EsLaDeSerie ? null : opcion.Id;
+                    Repintar();
+                });
+                Ui.Resaltar(boton, marcada);
+                // El calendario, a escala: una caja por unidad y, debajo, los dias en que se despliega.
+                var tira = Ui.Fila(tarjeta, "Calendario", 4);
+                for (var i = 0; i < o.Unidades.Count; i++) {
+                    var caja = Ui.PanelColumna(tira, "Unidad", Tema.Espacio(2), 0, marcada ? Tema.surfaceRaised : Tema.surfaceSunken);
+                    UiKit.Tamano(caja, ancho: 0, flexAncho: o.Unidades[i]);
+                    var nombre = o.Unidades.Count > 3 && o.Nombres[i].Length > 9 ? (i + 1).ToString() : o.Nombres[i];
+                    Ui.Texto(caja, $"{nombre} · {o.Unidades[i]} d", EstiloTexto.Leyenda, marcada ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Center);
+                }
+                Ui.Texto(tarjeta, o.Despliegues.Count == 1 ? $"Un solo despliegue, el día {o.Despliegues[0]}."
+                                                           : $"{o.Despliegues.Count} despliegues: al cerrar los días {string.Join(", ", o.Despliegues)}.",
+                         EstiloTexto.Leyenda, Tema.inkFaint);
+            }
         }
 
         // ==================================================================== 4 · calidad
@@ -675,7 +741,10 @@ namespace Nexus.Unity.Pantallas {
                 });
                 Ui.Resaltar(boton, _arquitectura == arq.Id);
                 var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, arq.Id);
-                if (e != null) Ui.Boton(opciones, "¿Qué es " + arq.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
+                var ayudas = Ui.Fila(opciones, "Ayudas", Tema.Espacio(2));
+                if (e != null) Ui.Boton(ayudas, "¿Qué es?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
+                // Como quedaria ESTE sistema con esa forma: el plano con los modulos del proyecto.
+                if (Perfil.Proyecto != null) Ui.Boton(ayudas, "Ver cómo quedaría", () => PantallaDelProducto.AbrirPlano(App, arq.Id, false), VarianteBoton.Fantasma);
             }
 
             var detalle = Ui.Columna(escena, "Razones", Tema.espacio);
@@ -691,7 +760,96 @@ namespace Nexus.Unity.Pantallas {
             PintarRazones(detalle, razones, _razonArquitectura, id => { _razonArquitectura = id; Repintar(); });
         }
 
-        // ==================================================================== 6 · resumen
+        // ==================================================================== 6 · el product backlog
+
+        /// <summary>Con menos historias que modulos no hay sistema que construir.</summary>
+        private int MinimoDeHistorias { get { return Perfil.Proyecto == null ? 1 : Mathf.Max(1, Perfil.Proyecto.Modulos.Count); } }
+
+        /// <summary>
+        /// El product backlog inicial. Si el proyecto empieza de cero, se arma: a la izquierda las historias candidatas
+        /// de cada parte del sistema (unas las pidio el cliente; otras no deberian entrar), a la derecha el backlog en
+        /// el orden en que se hara. Si el proyecto ya estaba en marcha, se enseña el que hay y por que ya existe.
+        /// </summary>
+        private void Backlog() {
+            var f = Perfil.Proyecto;
+            _hoja.Etiqueta("Antes de construir");
+            if (!S.SeCreaElBacklog) {
+                _hoja.Titulo("El product backlog ya existe");
+                _hoja.Parrafo("Este proyecto no empieza de cero: ya hay trabajo hecho y una lista de lo que falta. Entras a un backlog que escribió otra persona; " +
+                              "tu trabajo es entenderlo y decidir en qué orden se hace.");
+                PantallaDeGlosario.Palabras(App, _hoja.Raiz, "Si alguna palabra no te suena:", "backlog", "historia-de-usuario", "mvp");
+                var heredado = _hoja.Tarjeta("Lo que falta, por partes del sistema");
+                foreach (var m in f.Modulos)
+                    Ui.Texto(heredado, $"· <b>{m.Nombre}</b>: " + (m.AvanceInicial > 0 ? $"{m.AvanceInicial:0} % ya hecho, falta el resto." : "por hacer.") + " " + m.QueHace,
+                             EstiloTexto.Pequeno, Tema.ink);
+                _hoja.Nota("Durante el desarrollo lo ves entero en «Tablero», y ahí puedes cambiar el orden.");
+                return;
+            }
+
+            _hoja.Titulo("Arma el product backlog");
+            _hoja.Parrafo("El proyecto empieza de cero: todavía no hay lista de trabajo. Elige qué historias entran y en qué orden se hacen. " +
+                          "No todas las candidatas deberían entrar: mira qué pidió el cliente y qué no.");
+            PantallaDeGlosario.Palabras(App, _hoja.Raiz, "Si alguna palabra no te suena:", "backlog", "historia-de-usuario", "mvp", "alcance");
+
+            var escena = Ui.Fila(_hoja.Raiz, "Backlog", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            var candidatas = Ui.Columna(escena, "Candidatas", Tema.espacio);
+            UiKit.Tamano(candidatas, ancho: 0, flexAncho: 3);
+            GuiaView.Registrar("fase1.historias", candidatas);
+            foreach (var m in f.Modulos) {
+                var delModulo = f.Historias.Where(x => x.Modulo == m.Id).ToList();
+                if (delModulo.Count == 0) continue;
+                var tarjeta = Ui.Tarjeta(candidatas, m.Nombre);
+                Ui.Texto(tarjeta, m.QueHace, EstiloTexto.Pequeno, Tema.inkMuted);
+                foreach (var historia in delModulo) {
+                    var h = historia;
+                    var dentro = _backlog.Contains(h.Id);
+                    var boton = Ui.BotonDeOpcion(tarjeta, (dentro ? "√  " : "＋  ") + h.Titulo, h.Texto, () => {
+                        if (!_backlog.Remove(h.Id)) _backlog.Add(h.Id);
+                        _mantenerScroll = true;
+                        Repintar();
+                    });
+                    Ui.Resaltar(boton, dentro);
+                }
+            }
+
+            var lado = Ui.Columna(escena, "Elegidas", Tema.espacio);
+            UiKit.Tamano(lado, ancho: 0, flexAncho: 2);
+            var mio = Ui.Tarjeta(lado, $"Tu product backlog · {_backlog.Count} historia{(_backlog.Count == 1 ? "" : "s")}");
+            GuiaView.Registrar("fase1.mibacklog", mio);
+            if (_backlog.Count == 0) Ui.Texto(mio, "Vacío. Pulsa una historia, a la izquierda, para meterla.", EstiloTexto.Pequeno, Tema.inkMuted);
+            else Ui.Texto(mio, "Arriba, lo que se hace primero: lo que más le vale al cliente. Súbelas y bájalas con ▲▼.", EstiloTexto.Pequeno, Tema.inkMuted);
+            for (var i = 0; i < _backlog.Count; i++) {
+                var indice = i;
+                var h = f.Historia(_backlog[i]);
+                var fila = Ui.Fila(mio, "Historia", Tema.Espacio(2));
+                UiKit.Tamano(Ui.Texto(fila, $"{i + 1}. {h.Titulo}", EstiloTexto.Cuerpo, Tema.ink), flexAncho: 1);
+                var sube = Ui.Boton(fila, "▲", () => MoverHistoria(indice, -1), VarianteBoton.Fantasma);
+                sube.interactable = i > 0;
+                var baja = Ui.Boton(fila, "▼", () => MoverHistoria(indice, 1), VarianteBoton.Fantasma);
+                baja.interactable = i < _backlog.Count - 1;
+                Ui.Boton(fila, "×", () => { _backlog.RemoveAt(indice); _mantenerScroll = true; Repintar(); }, VarianteBoton.Fantasma);
+            }
+            if (_backlog.Count < MinimoDeHistorias)
+                Ui.Texto(mio, $"Hacen falta al menos {MinimoDeHistorias}: una por cada parte del sistema.", EstiloTexto.Pequeno, Tema.warning);
+
+            // Los papeles del cliente son la pista de lo que pidio de verdad: se pueden releer desde aqui.
+            var pistas = Ui.Tarjeta(lado, "¿Qué pidió el cliente?");
+            foreach (var u in f.Usuarios) Ui.Texto(pistas, $"· <b>{u.Nombre}</b>: {u.QueNecesita}", EstiloTexto.Pequeno, Tema.ink);
+            Ui.Texto(pistas, "Lo que nadie de esta lista necesita, nadie lo pidió. Y una historia dice qué necesita alguien, no qué hay que programar.",
+                     EstiloTexto.Pequeno, Tema.cyan);
+        }
+
+        private void MoverHistoria(int indice, int delta) {
+            var j = indice + delta;
+            if (j < 0 || j >= _backlog.Count) return;
+            var id = _backlog[indice];
+            _backlog[indice] = _backlog[j];
+            _backlog[j] = id;
+            _mantenerScroll = true;
+            Repintar();
+        }
+
+        // ==================================================================== 7 · resumen
 
         private void Resumen() {
             _hoja.Etiqueta("Antes de empezar");
@@ -699,13 +857,19 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Parrafo("Revísalo. Puedes cambiar cualquier cosa; cuando confirmes, ya no hay vuelta atrás: empieza el día 1.");
 
             var met = S.MetodologiasDisponibles().FirstOrDefault(m => m.Id == _metodologia);
-            Linea("Metodología", met == null ? null : $"{met.Nombre} — porque «{met.TextoDe(_razonMetodologia)}»", Paso.Metodologia,
-                  _razonMetodologia != null);
+            var duracion = met == null ? null : Nexus.Core.Metodologia.OpcionesDeCalendario.Para(met, Perfil.DiasTotales)
+                               .FirstOrDefault(o => _duracion == null ? o.EsLaDeSerie : o.Id == _duracion);
+            Linea("Metodología", met == null ? null : $"{met.Nombre} — porque «{met.TextoDe(_razonMetodologia)}»" +
+                                                       (duracion != null && !string.IsNullOrEmpty(duracion.Titulo) ? $"\n{duracion.Titulo}" : ""),
+                  Paso.Metodologia, _razonMetodologia != null);
             var reparto = string.Join(" · ", Perfil.Fase1.Calidad.Atributos.Where(a => _fichas[a.Id] > 0).Select(a => $"{a.Nombre} {_fichas[a.Id]}"));
             Linea("Calidad", string.IsNullOrEmpty(reparto) ? "sin fichas repartidas" : reparto, Paso.Calidad, true);
             var arq = Perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == _arquitectura);
             var razon = Perfil.Fase1.RazonesDisponibles.FirstOrDefault(r => r.Id == _razonArquitectura);
             Linea("Arquitectura", arq == null ? null : $"{arq.Nombre} — porque «{razon?.Texto}»", Paso.Arquitectura, razon != null);
+            if (S.SeCreaElBacklog)
+                Linea("Product backlog", _backlog.Count == 0 ? null : $"{_backlog.Count} historias; la primera, «{Perfil.Proyecto.Historia(_backlog[0]).Titulo}»",
+                      Paso.Backlog, _backlog.Count >= MinimoDeHistorias);
             if (HayRecoleccion)
                 Linea("Recorrido", S.RecoleccionHecha ? $"{S.HallazgosRecogidos().Count} hallazgos en {S.R.MinutosDeRecoleccion} min" : null,
                       Paso.Recoleccion, S.RecoleccionHecha);
@@ -731,8 +895,10 @@ namespace Nexus.Unity.Pantallas {
             if (Preguntas.Count > 0)
                 S.RegistrarComprensionDelProyecto(Preguntas.Count(p => _comprobacion.ContainsKey(p.Id) && !_falladas.Contains(p.Id)), Preguntas.Count);
             S.ElegirMetodologia(_metodologia, _razonMetodologia);
+            if (!string.IsNullOrEmpty(_duracion) && S.OpcionesDeCalendarioDisponibles().Exists(o => o.Id == _duracion)) S.AjustarCalendario(_duracion);
             S.RepartirCalidad(_fichas.Where(kv => kv.Value > 0).ToDictionary(kv => kv.Key, kv => kv.Value));
             S.ElegirArquitectura(_arquitectura, _razonArquitectura);
+            if (S.SeCreaElBacklog && _backlog.Count > 0) S.CrearBacklog(_backlog);
             S.R.Fase1Borrador = null;
             // La historia reacciona a la arquitectura (Voss, en N1) con la variante «tras-<id>» del guion de la fase.
             ReproducirGuionesDeFase1("tras-" + _arquitectura, () => {

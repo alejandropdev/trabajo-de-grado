@@ -51,7 +51,9 @@ namespace Nexus.Core.Datos
         /// </summary>
         private static void ValidarDetectar(MinijuegoDef def, List<string> e)
         {
-            if (def.Zonas.Count == 0) e.Add("Un V1 sin zonas no tiene nada que detectar.");
+            if (def.Zonas.Count == 0 && !def.SinDefectos) e.Add("Un V1 sin zonas no tiene nada que detectar (si es a proposito, 'sinDefectos': true).");
+            if (def.SinDefectos && def.Zonas.Count > 0) e.Add("'sinDefectos' y zonas a la vez: o hay defectos o no los hay.");
+            if (def.SinDefectos && def.Senuelos.Count < 2) e.Add("Una escena sin defectos necesita al menos dos señuelos: si nada parece raro, aprobarla no es una decision.");
 
             var commits = new HashSet<string>(def.Artefacto.Commits.Select(c => c.Id));
             if (commits.Count != def.Artefacto.Commits.Count) e.Add("Hay ids de commit repetidos.");
@@ -171,8 +173,19 @@ namespace Nexus.Core.Datos
                 // Con rangos a la vista, quien razona tiene que ganar seguro: el reparto prudente no puede depender
                 // de que haya menos errores de los que cabia esperar.
                 else if (r.Depositos.Any(d => d.EstimadoMax > 0) &&
-                         Evaluador.EscapesEsperados(r, Evaluador.RepartoPrudente(r), true) > r.ToleranciaDeEscapes)
+                         (Evaluador.EscapesEsperados(r, Evaluador.RepartoPrudente(r), true) > r.ToleranciaDeEscapes ||
+                          Evaluador.PuedeEscaparAlgoCritico(r, Evaluador.RepartoPrudente(r), true)))
                     e.Add("Ni el reparto prudente (cubrir lo maximo esperado, renunciando a lo mas caro) gana seguro: acertar seria cuestion de suerte.");
+            }
+            foreach (var d in r.Depositos)
+                if (d.Critico && string.IsNullOrEmpty(d.PorQueEsCritico))
+                    e.Add($"El deposito '{d.Id}' es critico pero no dice por que ('porQueEsCritico'): el jugador tiene que poder razonarlo.");
+            if (r.Propuesta != null) {
+                if (r.Propuesta.Keys.Any(k => r.Depositos.All(d => d.Id != k))) e.Add("'repartir.propuesta' habla de un deposito que no existe.");
+                else if (r.Propuesta.Values.Sum() > r.Presupuesto || r.Propuesta.Values.Any(h => h < 0 || (r.Paso > 0 && h % r.Paso != 0)))
+                    e.Add("'repartir.propuesta' no se puede hacer con los botones: se pasa del presupuesto o no va de paso en paso.");
+                else if (Evaluador.EscapesEsperados(r, r.Propuesta, true) > r.ToleranciaDeEscapes || Evaluador.PuedeEscaparAlgoCritico(r, r.Propuesta, true))
+                    e.Add("'repartir.propuesta' no gana seguro: una propuesta se pone para que aceptarla sea lo correcto.");
             }
         }
     }

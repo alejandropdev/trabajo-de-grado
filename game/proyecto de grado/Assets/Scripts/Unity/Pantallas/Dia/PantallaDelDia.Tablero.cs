@@ -151,6 +151,7 @@ namespace Nexus.Unity.Pantallas {
         private void PintarColumnasDelTablero(RectTransform hoja) {
             var t = S.Tablero;
             var p = Politica;
+            PantallaDeGlosario.Palabras(App, hoja, "Palabras del tablero:", "columnas-del-tablero", "historia-de-usuario", "punto-de-historia", "dependencia");
             if (p != null && !string.IsNullOrEmpty(p.LoQueNoHay)) Ui.Texto(hoja, p.LoQueNoHay, EstiloTexto.Pequeno, Tema.inkMuted);
 
             // Lo propio de cada metodologia, arriba del tablero.
@@ -253,6 +254,7 @@ namespace Nexus.Unity.Pantallas {
             var t = S.Tablero;
             Ui.Texto(hoja, $"Darle una tarjeta a quien se le da bien ese tipo de trabajo la hace rendir más; a quien le cuesta, menos. Asignar cuesta {GameSession.MinutosDeAsignar} min. " +
                            "Si no tocas nada, el equipo se reparte solo, por turnos y sin mirar a quién se le da mejor.", EstiloTexto.Pequeno, Tema.ink);
+            PantallaDeGlosario.Palabras(App, hoja, "Los roles:", "desarrollador", "rol-interfaz", "rol-datos", "rol-servidor", "tester");
             var fila = Ui.Fila(hoja, "Equipo", Tema.espacio, alineacion: TextAnchor.UpperLeft);
             foreach (var m in t.Miembros) {
                 var ficha = Ui.Tarjeta(fila, m.Nombre);
@@ -272,6 +274,7 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>Scrum: lo que no esta en el sprint. Su orden decide que entra en el siguiente; meterlo en este cuesta.</summary>
         private void PintarBacklog(RectTransform hoja) {
             var t = S.Tablero;
+            PantallaDeGlosario.Palabras(App, hoja, "Si alguna palabra no te suena:", "backlog", "sprint", "planificacion-de-sprint");
             Ui.Texto(hoja, "Lo que está arriba entra primero en el próximo sprint: ordénalo ANTES de planificar. Meter algo en el sprint que ya está en marcha se puede, " +
                            "pero el equipo se había comprometido con otra cosa: cuesta moral y genera sobrecompromiso.", EstiloTexto.Pequeno, Tema.ink);
             var fuera = t.Tarjetas.Where(c => !c.EsBug && !c.Terminada && (t.SprintActual < 0 || c.Sprint != t.SprintActual)).OrderBy(c => c.Orden).ToList();
@@ -292,6 +295,52 @@ namespace Nexus.Unity.Pantallas {
 
         // ==================================================================== revisar un cambio de codigo
 
+        /// <summary>Inspeccionar un documento de la etapa: se lee un trozo y se firma o se piden cambios.</summary>
+        private void AbrirInspeccion(string documento) {
+            var extracto = S.ExtractoDeHoy(documento);
+            if (extracto == null) {
+                Actuar(() => S.InspeccionarDocumento(documento), $"Inspeccionasteis el {documento}: documentación +3 y mejor calidad del documento.");
+                return;
+            }
+            CerrarPanel();
+            ResultadoDeRevision resultado = null;
+            _escenaApilada = true;
+            Runner.EnEscena = true;
+            App.Router.Apilar<PantallaDeFicha>(p => {
+                p.Titulo = $"Inspección del {documento} · {extracto.Titulo}";
+                p.AnchoDeLaFicha = 1100;
+                p.AlCerrar = () => _escenaApilada = false;
+                p.Pintar = h => {
+                    PantallaDeGlosario.Palabras(App, h.Raiz, "¿Qué documento es?", documento.ToLowerInvariant());
+                    h.Parrafo("Leed esta parte con calma. Si lo que dice se puede construir y comprobar tal cual, está bien: se firma. Si deja algo sin decir o se contradice, se piden cambios.");
+                    var hoja = Ui.PanelColumna(h.Raiz, "Extracto", Tema.Espacio(4), Tema.Espacio(2), Tema.surfaceRaised);
+                    for (var i = 0; i < extracto.Secciones.Count; i++) Ui.Texto(hoja, $"{i + 1}. {extracto.Secciones[i]}", EstiloTexto.Cuerpo, Tema.ink);
+                    if (resultado == null) {
+                        h.Nota($"Inspeccionarlo cuesta {GameSession.MinutosDeInspeccionar} min. No todo lo que se inspecciona está mal.");
+                        var botones = h.Fila();
+                        Ui.Boton(botones, "Firmarlo: está bien", () => Inspeccionar(documento, VeredictosDePr.Aprobar, r => { resultado = r; App.Router.Repintar(); }), VarianteBoton.Primario);
+                        Ui.Boton(botones, "Pedir cambios: algo falla", () => Inspeccionar(documento, VeredictosDePr.PedirCambios, r => { resultado = r; App.Router.Repintar(); }));
+                        return;
+                    }
+                    var t = h.Tarjeta(resultado.Titulo, resultado.Acierto ? Tono.Exito : Tono.Aviso);
+                    Ui.Texto(t, resultado.Explicacion, EstiloTexto.Cuerpo, Tema.ink);
+                    if (resultado.Cambios.Count > 0) Ui.Texto(t, "Lo que cambió: " + Textos.Previsualizar(resultado.Cambios), EstiloTexto.Pequeno, Tema.warning);
+                };
+            });
+        }
+
+        private void Inspeccionar(string documento, string veredicto, Action<ResultadoDeRevision> alDecidir) {
+            try {
+                ResultadoDeAvance avance;
+                var r = S.InspeccionarDocumento(documento, veredicto, out avance);
+                Runner.Notificar(avance);
+                Anotar($"{S.HoraActual} · Inspección del {documento}: {r.Titulo.ToLowerInvariant()}.");
+                alDecidir(r);
+            } catch (InvalidOperationException e) {
+                Anotar("No se pudo inspeccionar: " + e.Message);
+            }
+        }
+
         private void AbrirRevision() {
             var pr = S.PrPendiente;
             if (pr == null) return;
@@ -308,6 +357,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void PintarRevision(Hoja h, MicroPr pr, Func<ResultadoDeRevision> leer, Action<ResultadoDeRevision> alDecidir) {
+            PantallaDeGlosario.Palabras(App, h.Raiz, "¿Primera vez?", "revision-de-codigo");
             if (!string.IsNullOrEmpty(pr.Descripcion)) h.Parrafo("Lo que dice quien lo escribió: «" + pr.Descripcion + "»");
             var codigo = Ui.PanelColumna(h.Raiz, "Diff", Tema.Espacio(4), 2, Tema.bg950);
             foreach (var linea in pr.Lineas) {
@@ -368,6 +418,7 @@ namespace Nexus.Unity.Pantallas {
 
         /// <summary>Scrum: lo que queda del sprint, dia a dia, contra la linea ideal.</summary>
         private void PintarBurndown(RectTransform hoja) {
+            PantallaDeGlosario.Palabras(App, hoja, "Para leer esta gráfica:", "burndown", "velocidad", "sprint");
             var r = S.R;
             if (r.BurndownDelSprint.Count == 0) {
                 Ui.Texto(hoja, "Todavía no hay sprint planificado.", EstiloTexto.Cuerpo);
@@ -398,6 +449,7 @@ namespace Nexus.Unity.Pantallas {
 
         /// <summary>Kanban: las tres bandas (por hacer, en curso, terminado) y lo que dicen del flujo.</summary>
         private void PintarFlujoAcumulado(RectTransform hoja) {
+            PantallaDeGlosario.Palabras(App, hoja, "Para leer esta gráfica:", "flujo-acumulado", "wip");
             var r = S.R;
             if (r.SerieTerminado.Count < 2) {
                 Ui.Texto(hoja, "El flujo se dibuja a partir del segundo día.", EstiloTexto.Cuerpo);
@@ -425,6 +477,7 @@ namespace Nexus.Unity.Pantallas {
 
         /// <summary>Cascada: lo planificado, con forma de S, contra lo hecho. Y cuanto se va por detras.</summary>
         private void PintarCurvaS(RectTransform hoja) {
+            PantallaDeGlosario.Palabras(App, hoja, "Para leer esta gráfica:", "curva-s", "avance", "alcance");
             var r = S.R;
             var dias = Math.Max(2, S.Perfil.DiasTotales);
             Ui.Texto(hoja, "CURVA S · LO PLANIFICADO CONTRA LO HECHO", EstiloTexto.Leyenda, Tema.cyan);
@@ -462,7 +515,7 @@ namespace Nexus.Unity.Pantallas {
                     Ui.Resorte(cabecera);
                     if (hoy.Contains(d)) {
                         var motivo = S.PorQueNoSePuedeInspeccionar(d);
-                        var inspeccionar = Ui.Boton(cabecera, "Inspeccionarlo", () => Actuar(() => S.InspeccionarDocumento(d), $"Inspeccionasteis el {d}: documentación +3 y mejor calidad del documento."));
+                        var inspeccionar = Ui.Boton(cabecera, "Inspeccionarlo", () => AbrirInspeccion(d));
                         inspeccionar.interactable = motivo == null;
                     }
                     if (art != null && !string.IsNullOrEmpty(art.ParaQueAqui)) Ui.Texto(ficha, art.ParaQueAqui, EstiloTexto.Pequeno);

@@ -126,6 +126,51 @@ namespace Nexus.Unity.Pantallas {
                 default: t.Texto(80, 70, "?", 40, c, true); break;
             }
         }
+
+        /// <summary>
+        /// Los mismos iconos, en el mismo cuadro de 160×130, pero hechos con las piezas que crecen con el tizador:
+        /// los de arriba tienen la persona, el check, la cruz, el reloj y el bicho de tamaño fijo, y dentro de una
+        /// columna (donde el dibujo se agranda o se encoge) quedarian pequeños y descolocados.
+        /// </summary>
+        public static void DibujarAEscala(Tizador t, string icono, Color c) {
+            switch (icono) {
+                case "persona": t.Figura(80, 42, c); break;
+                case "equipo": t.Figura(40, 52, c); t.Figura(80, 36, c); t.Figura(120, 52, c); break;
+                case "caja": t.Caja(20, 35, 120, 60, null, c); break;
+                case "base-de-datos": t.Elipse(80, 28, 40, 10, c); t.Linea(40, 28, 40, 102, c); t.Linea(120, 28, 120, 102, c); t.Curva(40, 102, 80, 122, 120, 102, c, false); break;
+                case "servidor": t.Servidor(45, 10, 70, 110, c); break;
+                case "documento": t.Hoja(45, 8, 72, 112, c); break;
+                case "tablero":
+                    t.Tablero(8, 12, 144, 106, c, "", "", "");
+                    t.Caja(16, 46, 32, 20, null, Tizador.Cian); t.Caja(64, 46, 32, 20, null, Tizador.Mostaza); t.Caja(112, 46, 32, 20, null, Tizador.Cian);
+                    t.Caja(16, 76, 32, 20, null, Tizador.Cian);
+                    break;
+                case "tarjeta": t.Tarjeta(28, 38, 104, 54, c); break;
+                case "pila": t.Pila(55, 12, 50, 110, 0.6f); break;
+                case "commit": t.Linea(80, 8, 80, 122, c); t.Punto(80, 38, 11, c); t.Punto(80, 92, 11, c); break;
+                case "rama":
+                    t.Linea(45, 8, 45, 122, c); t.Punto(45, 30, 11, c);
+                    t.Curva(45, 45, 110, 45, 110, 90, Tizador.Mostaza, false); t.Punto(110, 100, 11, Tizador.Mostaza); break;
+                case "bicho":
+                    t.Elipse(80, 66, 16, 22, Tizador.Roja);
+                    foreach (var s in new[] { -1, 1 })
+                        foreach (var dy in new[] { -10, 2, 14 }) t.Linea(80 + s * 15, 66 + dy, 80 + s * 30, 60 + dy, Tizador.Roja, 2);
+                    break;
+                case "check": t.Si(80, 68, c == Tizador.Tiza ? Tizador.Cian : c, 26); break;
+                case "cruz": t.No(80, 65, Tizador.Roja, 24); break;
+                case "reloj": t.Esfera(80, 65, 40, c); break;
+                case "barra-subiendo":
+                    for (var i = 0; i < 4; i++) t.Bloque(20 + i * 32, 110 - 25 * (i + 1), 24, 25 * (i + 1), Tizador.Relleno);
+                    break;
+                case "barra-bajando":
+                    for (var i = 0; i < 4; i++) t.Bloque(20 + i * 32, 110 - 25 * (4 - i), 24, 25 * (4 - i), Tizador.Relleno);
+                    break;
+                case "mano": t.Trazo(c, 62, 30, 62, 96, 78, 82, 92, 110, 106, 104, 92, 76, 114, 74, 62, 30); break;
+                case "candado": t.Candado(80, 62, 30, c); break;
+                case "flecha": t.Flecha(20, 65, 140, 65, c); break;
+                default: Dibujar(t, icono, c); break;
+            }
+        }
     }
 
     /// <summary>
@@ -139,6 +184,11 @@ namespace Nexus.Unity.Pantallas {
         public List<PaginaDePizarra> Paginas = new List<PaginaDePizarra>();
         /// <summary>Dibujos a medida para algunas paginas (el diagrama del proyecto): reciben el tizador y la y libre.</summary>
         public Dictionary<PaginaDePizarra, Action<Tizador, float>> Dibujos = new Dictionary<PaginaDePizarra, Action<Tizador, float>>();
+        /// <summary>El termino cuyo curso se ofrece con «Aprender a fondo». null = sin boton.</summary>
+        public EntradaDeGlosario ConCurso;
+        /// <summary>Lo que va delante de «Página N de M» (el capitulo de un curso).</summary>
+        public string Contador;
+        public string TextoDeCerrar = "Cerrar";
 
         public override bool EsModal { get { return true; } }
         public override bool PuedeVolver { get { return true; } }
@@ -146,7 +196,7 @@ namespace Nexus.Unity.Pantallas {
         private Lamina _lamina;
         private int _pagina;
         private Button _anterior, _siguiente;
-        private TMP_Text _contador;
+        private TMP_Text _contador, _nota;
         private bool _pausadoAntes;
 
         /// <summary>Abre el pizarron de un termino del glosario.</summary>
@@ -156,19 +206,23 @@ namespace Nexus.Unity.Pantallas {
                 p.Etiqueta = "¿QUÉ ES?";
                 p.Tema = e.Tema;
                 p.Paginas = Glosario.PaginasDe(e);
+                p.ConCurso = e.Curso != null && e.Curso.Count > 0 ? e : null;
             });
         }
 
         protected override void Construir() {
             if (App.Runner != null) { _pausadoAntes = App.Runner.Pausado; App.Runner.Pausado = true; }
             var marco = MarcoDePizarra.Construir(Ui, Raiz, Etiqueta, out _lamina);
+            _nota = marco.Find("Nota").GetComponentInChildren<TMP_Text>();
             _anterior = MarcoDePizarra.Boton(Ui, marco, "◄ Anterior", () => Ir(_pagina - 1), new Vector2(0, 0), new Vector2(52, 44), 220, VarianteBoton.Secundario);
             _siguiente = MarcoDePizarra.Boton(Ui, marco, "Siguiente ►", () => Ir(_pagina + 1), new Vector2(1, 0), new Vector2(-300, 44), 220);
-            MarcoDePizarra.Boton(Ui, marco, "Cerrar", () => App.Router.Volver(), new Vector2(1, 0), new Vector2(-52, 44), 220, VarianteBoton.Secundario);
+            MarcoDePizarra.Boton(Ui, marco, TextoDeCerrar, () => App.Router.Volver(), new Vector2(1, 0), new Vector2(-52, 44), 220, VarianteBoton.Secundario);
+            if (ConCurso != null)
+                MarcoDePizarra.Boton(Ui, marco, "Aprender a fondo", () => PantallaDeCurso.Abrir(App, ConCurso), new Vector2(0, 0), new Vector2(290, 44), 250);
             var contador = Ui.Nodo(marco, "Contador");
             contador.anchorMin = contador.anchorMax = contador.pivot = new Vector2(0.5f, 0);
-            contador.anchoredPosition = new Vector2(-120, 52);
-            contador.sizeDelta = new Vector2(300, 44);
+            contador.anchoredPosition = new Vector2(-90, 52);
+            contador.sizeDelta = new Vector2(360, 44);
             _contador = Ui.Texto(contador, "", EstiloTexto.Cuerpo, Tizador.Gris, TextAlignmentOptions.Center);
             _contador.font = Ui.FuenteTiza;
             UiKit.Rellenar((RectTransform)_contador.transform);
@@ -180,9 +234,59 @@ namespace Nexus.Unity.Pantallas {
             _pagina = Mathf.Clamp(pagina, 0, Paginas.Count - 1);
             _anterior.interactable = _pagina > 0;
             _siguiente.interactable = _pagina < Paginas.Count - 1;
-            _contador.text = $"Página {_pagina + 1} de {Paginas.Count}";
+            _contador.text = (string.IsNullOrEmpty(Contador) ? "" : Contador + " · ") + $"Página {_pagina + 1} de {Paginas.Count}";
+            _nota.text = string.IsNullOrEmpty(Paginas[_pagina].Etiqueta) ? Etiqueta : Paginas[_pagina].Etiqueta;
             MarcoDePizarra.Limpiar(_lamina);
             Pintar(new Tizador(_lamina, Ui.FuenteTiza), Paginas[_pagina]);
+        }
+
+        /// <summary>Hasta donde se puede dibujar: debajo estan los botones.</summary>
+        private const float Fondo = 812;
+
+        /// <summary>Una escena a pagina completa, tan grande como deje el texto de encima.</summary>
+        private static void PintarEscena(Tizador t, string id, float y) {
+            var y0 = y + 34;
+            var k = Mathf.Min(1.6f, (Fondo - y0) / DibujosDeEscena.Alto);
+            DibujosDeEscena.Dibujar(t.En((MarcoDePizarra.W - DibujosDeEscena.Ancho * k) / 2, y0, k), id);
+        }
+
+        /// <summary>De 2 a 4 columnas, cada una en su caja: el dibujo arriba, y debajo su titulo y su texto.</summary>
+        private static void PintarColumnas(Tizador t, List<ColumnaDePizarra> columnas, float y) {
+            const float hueco = 24;
+            var n = Math.Min(4, columnas.Count);
+            var ancho = (MarcoDePizarra.W - 120 - hueco * (n - 1)) / n;
+            var y0 = y + 34;
+            // Las cajas miden lo que ocupa la columna mas larga, no todo el hueco: el dibujo, el titulo y sus renglones.
+            var porRenglon = Mathf.FloorToInt((ancho - 36) / 13.3f);
+            var renglones = columnas.Take(n).Max(c => Partir(c.Texto ?? "", porRenglon).Count);
+            var altoTexto = 64 + renglones * 32 + 22;
+            var altoDibujo = Mathf.Min(Fondo - y0 - altoTexto, 300);
+            var alto = altoDibujo + altoTexto;
+            y0 += (Fondo - y0 - alto) * 0.35f;
+            for (var i = 0; i < n; i++) {
+                var col = columnas[i];
+                var x = 60 + i * (ancho + hueco);
+                var color = DibujosDePizarra.ColorDe(col.Color);
+                t.Caja(x, y0, ancho, alto, null, Tizador.Gris, true);
+
+                var escena = DibujosDeEscena.Existe(col.Dibujo);
+                var bw = escena ? DibujosDeEscena.Ancho : 160; var bh = escena ? DibujosDeEscena.Alto : 130;
+                var k = Mathf.Min((ancho - 32) / bw, (altoDibujo - 16) / bh);
+                if (!escena) k = Mathf.Min(k, 1.7f);
+                var lapiz = t.En(x + (ancho - bw * k) / 2, y0 + 12 + (altoDibujo - 16 - bh * k) / 2, k);
+                if (escena) DibujosDeEscena.Dibujar(lapiz, col.Dibujo);
+                else DibujosDePizarra.DibujarAEscala(lapiz, col.Dibujo, color);
+
+                var ty = y0 + altoDibujo + 34;
+                if (!string.IsNullOrEmpty(col.Titulo)) {
+                    t.Texto(x + ancho / 2, ty, col.Titulo, 28, color == Tizador.Tiza ? Tizador.Mostaza : color, true);
+                    ty += 12;
+                }
+                foreach (var linea in Partir(col.Texto ?? "", porRenglon)) {
+                    ty += 32;
+                    t.Texto(x + ancho / 2, ty, linea, 23, Tizador.Tiza, true);
+                }
+            }
         }
 
         private void Pintar(Tizador t, PaginaDePizarra p) {
@@ -192,7 +296,8 @@ namespace Nexus.Unity.Pantallas {
             t.Linea(360, 116, W - 360, 116, null, 2);
 
             var vinetas = p.Vinetas ?? new List<VinetaDePizarra>();
-            var conDibujos = vinetas.Count > 0;
+            var columnas = p.Columnas ?? new List<ColumnaDePizarra>();
+            var conDibujos = vinetas.Count > 0 || columnas.Count > 0 || !string.IsNullOrEmpty(p.Dibujo);
             float y = 170;
             if (p.EnElJuego) {
                 t.Texto(60, y, "EN NEXUS", 24, Tizador.Mostaza);
@@ -207,7 +312,9 @@ namespace Nexus.Unity.Pantallas {
             }
             Action<Tizador, float> dibujo;
             if (Dibujos != null && Dibujos.TryGetValue(p, out dibujo)) dibujo(t, y);
-            if (!conDibujos) return;
+            if (!string.IsNullOrEmpty(p.Dibujo)) { PintarEscena(t, p.Dibujo, y); return; }
+            if (columnas.Count > 0) { PintarColumnas(t, columnas, y); return; }
+            if (vinetas.Count == 0) return;
 
             // Las viñetas, en fila y unidas con curvas de tiza, como los pasos de la receta.
             var n = Math.Min(4, vinetas.Count);

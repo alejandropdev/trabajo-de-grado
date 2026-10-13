@@ -113,8 +113,10 @@ namespace Nexus.Unity.Juego {
             if (_sesion.R.Fase != 2) { Estado = EstadoDelDia.DesarrolloTerminado; return; }
             if (_sesion.R.DiaActual == 0) { Estado = EstadoDelDia.Parado; return; }
 
-            if (_sesion.JornadaTerminada) Estado = EstadoDelDia.DiaTerminado;
-            else if (_sesion.JornadaProrrogada) Estado = EstadoDelDia.Prorroga;
+            // ★ «Dia cerrado» lo dice la sesion, no el reloj: a las 18:00 sin prorrogar el reloj ya marca el final, y
+            // una partida guardada ahi, antes de elegir, se recargaba como dia terminado y ese dia no se simulaba nunca.
+            if (_sesion.JornadaSimulada) Estado = EstadoDelDia.DiaTerminado;
+            else if (_sesion.JornadaProrrogada) { Estado = EstadoDelDia.Prorroga; ComprobarCierre(); }
             else if (_sesion.JornadaLlegoAlCierre) Estado = EstadoDelDia.EnElCierre;
             else Estado = EstadoDelDia.Corriendo;
         }
@@ -145,6 +147,20 @@ namespace Nexus.Unity.Juego {
 
             Notificar(_sesion.AvanzarReloj(siguiente - ahora));
             ComprobarCierre();
+            return true;
+        }
+
+        /// <summary>
+        /// «Adelantar el reloj»: salta hasta lo siguiente que pase hoy. Si queda un aviso por sonar, hasta el; si no
+        /// queda ninguno, hasta el cierre de la jornada. El jugador no sabe de antemano cual de las dos cosas sera:
+        /// el dia no anuncia sus avisos. Devuelve true si lo que llego fue el cierre.
+        /// </summary>
+        public bool AdelantarHastaQuePaseAlgo() {
+            ExigirSesion();
+            if (Estado != EstadoDelDia.Corriendo) return false;
+            if (AdelantarHastaElSiguienteAviso()) return false;
+            if (!_sesion.SePuedeCerrarLaJornada) return false;
+            CerrarJornada();
             return true;
         }
 
@@ -229,20 +245,21 @@ namespace Nexus.Unity.Juego {
         /// <summary>Las 18:00: irse a casa. El dia se simula y termina.</summary>
         public void Irse() {
             ExigirEstado(EstadoDelDia.EnElCierre);
-            _sesion.TerminarDia(false);
+            _sesion.TerminarDia();
             TerminarElDia();
         }
 
         /// <summary>
-        /// Las 18:00: quedarse. El dia se simula YA con horas extra (+25 % de avance, y lo que cuesta). Si
-        /// quedan dias, el reloj sigue hasta la hora limite para explorar; si era el ultimo, el nivel pasa
-        /// directamente al lanzamiento.
+        /// Las 18:00: quedarse. El reloj sigue hasta la hora limite. ★ El dia se simula al ACABAR las horas extra
+        /// (con su +25 % de avance y lo que cuesta), no ahora: asi las barras se mueven cuando el dia termina a la
+        /// vista, y no dos horas antes.
         /// </summary>
         public void Quedarse() {
             ExigirEstado(EstadoDelDia.EnElCierre);
-            _sesion.TerminarDia(true);
-            if (_sesion.R.Fase != 2) { TerminarElDia(); return; }
+            _sesion.Quedarse();
             Estado = EstadoDelDia.Prorroga;
+            // Un nivel sin horas extra configuradas no tiene prorroga que jugar: el dia acaba ya.
+            ComprobarCierre();
         }
 
         /// <summary>Suelta la sesion. El reloj deja de correr.</summary>
@@ -282,6 +299,7 @@ namespace Nexus.Unity.Juego {
                 Estado = EstadoDelDia.EnElCierre;
                 AlLlegarElCierre?.Invoke();
             } else if (Estado == EstadoDelDia.Prorroga && _sesion.JornadaTerminada) {
+                if (!_sesion.JornadaSimulada) _sesion.TerminarDia();
                 TerminarElDia();
             }
         }

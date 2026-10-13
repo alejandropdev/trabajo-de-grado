@@ -202,6 +202,14 @@ Cuando termines, **borra `PruebaM4.cs`**.
 
 ---
 
+## El noveno bloque: el tablero (2026-10-05)
+
+Después de la beta se añadió un bloque opcional, `tablero` (`PoliticaDeTablero`), para que la metodología se note en la Fase 2 y no solo en coeficientes. Dice cómo se llaman las columnas, si el sprint es cerrado, si hay límite de WIP, en qué etapas se puede probar, qué vistas enseña Monitoreo y —en `loQueNoHay`— lo que esa metodología no tiene. Una metodología sin el bloque recibe `PoliticaDeTablero.PorDefecto(calendario.tipo)`, así que «una metodología nueva entra solo con un JSON» sigue valiendo.
+
+También son nuevos: `Ceremonia.opciones` (formas de llevar la ceremonia si el jugador asiste), `duracionMinutos`, `muestra` y `paraQueSirve`; `cuando: inicioNivel | finNivel`; `Etapa.documentos`; `calendario.ajustarEtapasAlNivel` (reparte las etapas en proporción a los días del nivel: antes, Cascada en un nivel de 5 días no salía de la primera); y `AccionRetro.ajusteDeLimiteWip` (la acción «bajar el WIP» ahora baja el límite de verdad).
+
+Detalle y decisiones: `docs/02-diseno/propuesta-mecanica-tablero-vivo.md`, sección «Cómo quedó». Tests: `MetodologiasEnElTableroTests`.
+
 ## Lo que falta
 
 - **`ModificadoresModelo` no se aplica todavía.** Lo hará `GameSession.ElegirMetodologia` (M9) con `Coeficientes.MultiplicarPor`.

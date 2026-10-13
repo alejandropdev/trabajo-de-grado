@@ -31,20 +31,25 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private HashSet<string> _candidatas = new HashSet<string>();
         private Action _repintarLienzo;
         private RectTransform _marcas, _detalle;
+        private Button _aprobar;
         private TMP_Text _seleccion, _aviso;
         private Func<string, EstadoPieza> _estadoDe;
         private string _pista;
         private string _dudaAvisada;
         private readonly Dictionary<string, RectTransform> _piezas = new Dictionary<string, RectTransform>();
         private readonly Dictionary<string, Button> _botonesEtiqueta = new Dictionary<string, Button>();
-        private Button _entregar, _limpiar;
+        private Button _entregar, _limpiar, _botonDePista;
+        private TMP_Text _textoDePista;
+        private int _pistasPedidas;
+        private string _seguro;   // la pieza que la segunda pista dio por mala (en el diagrama, con doble borde)
 
         protected override void ConstruirJuego(RectTransform cuerpo) {
             _estado = new DetectarState(Def.Presentacion.SegundosReloj);
             AndamiajeCfg cfg;
             _andamiaje = Def.Andamiaje != null && Def.Andamiaje.TryGetValue(Pendiente.NivelAndamiaje.ToString(), out cfg) ? cfg : null;
-            if (_andamiaje != null && _andamiaje.ResaltarZonasCandidatas)
-                _candidatas = new HashSet<string>(Def.Zonas.SelectMany(z => z.Commits));
+            // Lo «sospechoso» son los problemas Y los señuelos juntos: acota donde mirar sin decir la respuesta. Antes
+            // se resaltaban solo los problemas (y tan tenue que no se veia): o no ayudaba, o lo regalaba.
+            if (_andamiaje != null && _andamiaje.ResaltarZonasCandidatas) _candidatas = Sospechosas();
             // La ayuda de un compañero: una pieza con un problema de verdad, señalada.
             if (Pendiente != null && Pendiente.TieneAyuda(Nexus.Core.Relaciones.TiposDeAyuda.PistaDetectar) && Def.Zonas.Count > 0)
                 _pista = Def.Zonas[0].Commits.FirstOrDefault();
@@ -56,6 +61,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             ConstruirLienzos(cuerpo);
             ConstruirPanelDeMarcas(cuerpo);
             Repintar();
+        }
+
+        private HashSet<string> Sospechosas() {
+            return new HashSet<string>(Def.Zonas.SelectMany(z => z.Commits).Concat(Def.Senuelos.SelectMany(s => s.Commits)));
         }
 
         private void ConstruirLienzos(RectTransform cuerpo) {
@@ -107,7 +116,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             switch (e) {
                 case EstadoPieza.Seleccionada: return Tema.papelCyan;
                 case EstadoPieza.Marcada: return Tema.papelAviso;
-                case EstadoPieza.Candidata: return Color.Lerp(normal, Tema.papelAviso, 0.45f);
+                case EstadoPieza.Candidata: return Color.Lerp(normal, Tema.papelAviso, 0.8f);
                 case EstadoPieza.Acertada: return Tema.papelExito;
                 case EstadoPieza.Fallada: return Tema.papelPeligro;
                 case EstadoPieza.Senuelo: return Tema.paperMuted;
@@ -118,6 +127,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private Color? FondoDeFila(EstadoPieza e) {
             switch (e) {
                 case EstadoPieza.Seleccionada: return NexusTheme.Alfa(Tema.papelCyan, 0.16f);
+                case EstadoPieza.Candidata: return NexusTheme.Alfa(Tema.papelAviso, 0.07f);
                 case EstadoPieza.Marcada: return NexusTheme.Alfa(Tema.papelAviso, 0.18f);
                 case EstadoPieza.Acertada: return NexusTheme.Alfa(Tema.papelExito, 0.16f);
                 case EstadoPieza.Fallada: return NexusTheme.Alfa(Tema.papelPeligro, 0.16f);
@@ -166,6 +176,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             Limpiar(l);
             var art = Def.Artefacto;
             var layout = GrafoLayout.Calcular(art);
+            // Commits distintos con la misma fecha y el mismo mensaje: no dice que sea un problema, dice donde mirar.
+            var repetidos = new HashSet<string>(GrafoLayout.FechasDuplicadas(art).SelectMany(g => g));
             const float W = 1330;
             Func<int, float> X = i => 70 + i * 110;
             Func<int, float> Y = i => 70 + i * 62;
@@ -203,6 +215,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 l.Texto(590, y - 14, 520, 28, c.Mensaje, 19, Tema.paperInk);
                 l.Texto(W - 260, y - 13, 200, 26, $"{c.Autor} · {(c.Fecha ?? "").Replace('T', ' ').Substring(Math.Min(5, (c.Fecha ?? "").Length))}", 16,
                         Tema.paperMuted, TextAlignmentOptions.MidlineRight);
+                if (repetidos.Contains(c.Id)) l.Pastilla(W - 300, y, "= fecha", 13, Tema.papelCaja, Tema.papelAviso, Tema.papelAviso);
                 var id = c.Id;
                 _piezas[id] = (RectTransform)l.Zona(20, y - 26, W - 40, 52, () => Pinchar(id, () => MostrarCommit(c))).transform;
             }
@@ -241,7 +254,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var p1 = Corte(a, b); var p2 = Corte(b, a);
                 var e = _estadoDe(c.Id);
                 var col = e == EstadoPieza.Normal ? Tema.paperMuted : ColorDe(e, Tema.paperMuted);
-                l.Dibujo.Flecha(p1.x, p1.y, p2.x, p2.y, col, e == EstadoPieza.Normal ? 3 : 4);
+                // El trazo dice que hace la flecha: fina = le pide algo, gruesa = escribe, discontinua = solo lee.
+                var grosorDeFlecha = (c.Tipo == "escribe" ? 5 : 3) + (e == EstadoPieza.Normal ? 0 : 1);
+                l.Dibujo.Flecha(p1.x, p1.y, p2.x, p2.y, col, grosorDeFlecha, c.Tipo == "lee");
                 var ancho = c.Texto.Length * 16 * 0.55f + 26;
                 var hueco = Hueco(p1, p2, ancho, ocupados);
                 var con = c;
@@ -250,7 +265,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     if (e == EstadoPieza.Seleccionada) { fondo = Tema.papelCyan; texto = Color.white; }
                     else if (e == EstadoPieza.Marcada) { fondo = Tema.papelAviso; texto = Color.white; }
                     else if (e != EstadoPieza.Normal && e != EstadoPieza.Candidata) { fondo = ColorDe(e, Tema.papelCaja); texto = Color.white; }
-                    l.Pastilla(hueco.x, hueco.y, con.Texto, 16, fondo, texto);
+                    l.Pastilla(hueco.x, hueco.y, con.Texto, 16, fondo, texto, e == EstadoPieza.Candidata ? Tema.papelAviso : (Color?)null);
                     _piezas[con.Id] = (RectTransform)l.Zona(hueco.x - ancho / 2, hueco.y - 15, ancho, 30, () => Pinchar(con.Id, () => MostrarTexto("Flecha", con.Texto))).transform;
                 });
             }
@@ -266,13 +281,44 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 if (el.Tipo == "baseDeDatos") l.Dibujo.Cilindro(p.x, p.y, BW, BH, borde, grosor, Tema.papelCaja);
                 else l.Dibujo.Rect(p.x, p.y, BW, BH, borde, grosor, fondo, el.Tipo == "externo", 10);
                 var db = el.Tipo == "baseDeDatos";
-                l.Texto(p.x + 16, p.y + (db ? 30 : 12), BW - 30, 20, TipoDe(el.Tipo), 13, Tema.paperMuted);
+                // La pieza que la segunda pista dio por mala: un segundo borde por fuera.
+                if (el.Id == _seguro && e != EstadoPieza.Marcada) l.Dibujo.Rect(p.x - 7, p.y - 7, BW + 14, BH + 14, Tema.papelAviso, 3, null, true, 14);
+                // La capa, en una franja de color y en el rotulo: lo habitual es interfaz → logica → datos.
+                var capa = ColorDeCapa(el.Capa);
+                if (capa.HasValue && !db) l.Dibujo.Rect(p.x + 4, p.y + 8, 7, BH - 16, capa.Value, 0, capa.Value, false, 3);
+                l.Texto(p.x + 16, p.y + (db ? 30 : 12), BW - 30, 20, string.IsNullOrEmpty(el.Capa) ? TipoDe(el.Tipo) : RotuloDeCapa(el.Capa), 13,
+                        capa ?? Tema.paperMuted, TextAlignmentOptions.TopLeft, null, capa.HasValue);
+                // Una caja de la que nadie dice que hace lleva su «?»: se ve sin tener que pincharla.
+                if (string.IsNullOrEmpty(el.Detalle)) {
+                    l.Dibujo.Circulo(p.x + 14, p.y, 15, Tema.papelAviso, 0, Tema.papelAviso);
+                    l.Texto(p.x - 1, p.y - 15, 30, 30, "?", 20, Color.white, TextAlignmentOptions.Center, null, true);
+                }
                 l.Texto(p.x + 16, p.y + (db ? 50 : 38), BW - 30, 50, el.Texto, 20, Tema.paperInk, TextAlignmentOptions.TopLeft, null, true);
                 if (!string.IsNullOrEmpty(el.Detalle))
                     l.Texto(p.x + 4, p.y + BH + 6, BW - 8, AltoDetalle, el.Detalle, 14, Tema.paperMuted, TextAlignmentOptions.TopLeft);
                 Chapita(l, p.x + BW - 6, p.y, e);
                 var elem = el;
                 _piezas[elem.Id] = (RectTransform)l.Zona(p.x, p.y, BW, BH, () => Pinchar(elem.Id, () => MostrarTexto(elem.Texto, elem.Detalle))).transform;
+            }
+        }
+
+        private Color? ColorDeCapa(string capa) {
+            switch (capa) {
+                case "interfaz": return Tema.papelCyan;
+                case "logica": return Tema.papelAviso;
+                case "datos": return Tema.papelExito;
+                case "externo": return Tema.paperMuted;
+                default: return null;
+            }
+        }
+
+        private static string RotuloDeCapa(string capa) {
+            switch (capa) {
+                case "interfaz": return "INTERFAZ";
+                case "logica": return "LÓGICA";
+                case "datos": return "DATOS";
+                case "externo": return "↔ DE FUERA";
+                default: return Textos.Humanizar(capa).ToUpperInvariant();
             }
         }
 
@@ -319,6 +365,26 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             }).ToList();
         }
 
+        /// <summary>
+        /// A que paso del diseño corresponde cada fila de lo que paso: el primero sin usar que va de la misma pieza a
+        /// la misma pieza. Las filas que no encuentran ninguno se quedan fuera (pasaron y no estaban en el diseño, o
+        /// pasaron de mas).
+        /// </summary>
+        private Dictionary<string, int> ParejasEnElDiseno(List<FilaDeTraza> filas) {
+            var mensajes = Def.Artefacto.Conexiones.Where(c => c.Grupo == "diagrama").OrderBy(c => c.Orden).ToList();
+            var usados = new HashSet<string>();
+            var parejas = new Dictionary<string, int>();
+            Func<string, string, bool> esLaMisma = (participante, nombre) =>
+                participante != null && nombre != null && participante.EndsWith(nombre.Trim(), StringComparison.OrdinalIgnoreCase);
+            foreach (var f in filas) {
+                var m = mensajes.FirstOrDefault(x => !usados.Contains(x.Id) && esLaMisma(x.Desde, f.De) && esLaMisma(x.Hasta, f.A));
+                if (m == null) continue;
+                usados.Add(m.Id);
+                parejas[f.Id] = m.Orden;
+            }
+            return parejas;
+        }
+
         private void PintarSecuencia(Lamina l) {
             Limpiar(l);
             var parts = Def.Artefacto.Elementos.Where(e => e.Grupo == "diagrama").OrderBy(e => e.Columna).ToList();
@@ -355,6 +421,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var cab = new[] { new { t = "#", x = 10f }, new { t = "HORA", x = 44f }, new { t = "QUIÉN", x = 150f }, new { t = "A QUIÉN", x = 290f }, new { t = "QUÉ PASÓ", x = 410f } };
             foreach (var c in cab) l.Texto(c.x, 8, 140, 22, c.t, 15, Tema.papelCyan);
             var filas = FilasDeTraza();
+            var parejas = ParejasEnElDiseno(filas);
             for (var i = 0; i < filas.Count; i++) {
                 var f = filas[i];
                 var y = 44 + i * 78;
@@ -373,6 +440,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 Chapita(l, 676, y + 14, e);
                 var etiqueta = EtiquetaDe(f.Id);
                 if (etiqueta != null && Resultado == null) l.Pastilla(600, y + 52, etiqueta, 13, Tema.papelAviso, Color.white);
+                // Con que paso del diseño se corresponde esta fila, o si no tiene ninguno: el dato con el que se compara.
+                int paso;
+                if (parejas.TryGetValue(f.Id, out paso)) l.Pastilla(98, y + 52, "= paso " + paso, 13, Tema.papelCaja, Tema.paperMuted, Tema.paperLine);
+                else if (f.De != null) l.Pastilla(110, y + 52, "sin paso en el diseño", 13, Tema.papelCaja, Tema.papelAviso, Tema.papelAviso);
                 var fila = f;
                 _piezas[fila.Id] = (RectTransform)l.Zona(0, y, 710, 66, () => Pinchar(fila.Id, () => MostrarTexto($"Fila {fila.N} · {fila.Hora}", fila.Que))).transform;
             }
@@ -395,9 +466,11 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         // ==================================================================== las marcas
 
-        private void ConstruirPanelDeMarcas(Transform padre) {
-            var panel = Ui.Columna(padre, "Marcas", Tema.espacio);
-            UiKit.Tamano(panel, ancho: 420, flexAlto: 1);
+        private void ConstruirPanelDeMarcas(RectTransform padre) {
+            // La columna va en un scroll y, debajo, fijo, el pie con la pista y «Entregar»: con las etiquetas, lo
+            // marcado, el detalle y la leyenda, la columna no cabia de alto y el boton quedaba fuera de la pantalla.
+            RectTransform pie;
+            var panel = ColumnaLateral(padre, "Marcas", 420, out pie);
 
             var marcar = Ui.Tarjeta(panel, "2 · ¿Qué problema tiene? Elige el nombre");
             GuiaView.Registrar("mj.detectar.etiquetas", marcar);
@@ -414,18 +487,92 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _aviso = Ui.Texto(marcar, "", EstiloTexto.Pequeno, Tema.warning);
 
             var lista = Ui.PanelColumna(panel, "Lista", Tema.margen * 0.75f, Tema.espacio);
-            UiKit.Tamano(lista, flexAlto: 1);
             var titulo = "LO QUE HAS MARCADO" + (_andamiaje != null && _andamiaje.ContadorRestantes ? $" · hay {Def.Zonas.Count} problema(s) en total" : "");
             Ui.Texto(lista, titulo, EstiloTexto.Leyenda, Tema.cyan);
-            var scroll = Ui.Desplazable(lista, out _marcas);
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
+            _marcas = Ui.Columna(lista, "Marcas", Tema.espacio);
 
             var detalle = Ui.Tarjeta(panel, "Detalle");
             _detalle = Ui.Columna(detalle, "Contenido", 4);
             Ui.Texto(_detalle, "Pincha una pieza para verla de cerca.", EstiloTexto.Pequeno);
 
-            _entregar = Ui.Boton(panel, "Entregar", Entregar, VarianteBoton.Primario);
+            // Como se lee el dibujo: sin esto, las señales (el trazo de la flecha, la franja de la caja) no dicen nada.
+            var leyenda = Ui.Tarjeta(panel, "Cómo leer el dibujo");
+            foreach (var linea in Leyenda()) Ui.Texto(leyenda, "· " + linea, EstiloTexto.Pequeno, Tema.ink);
+
+            // La pista se puede pedir siempre, no solo la primera vez; lo que cuesta es reloj.
+            if (!Guiado) {
+                _textoDePista = Ui.Texto(pie, "", EstiloTexto.Pequeno, Tema.warning);
+                _botonDePista = Ui.Boton(pie, "", PedirPista, VarianteBoton.Secundario);
+                PintarBotonDePista();
+            }
+
+            // Siempre esta: que exista no dice si hay algo mal. Aprobar algo que esta bien tambien es revisar.
+            _aprobar = Ui.Boton(pie, "Está bien: lo apruebo", () => {
+                if (_estado.Marcas.Count > 0) { _aviso.text = "Tienes piezas marcadas: quítalas si de verdad lo das por bueno."; return; }
+                _estado.Aprobado = true;
+                Entregar();
+                if (Resultado == null) _estado.Aprobado = false;   // el modo guiado no dejo entregar todavia
+            }, VarianteBoton.Secundario);
+            _entregar = Ui.Boton(pie, Def.SinDefectos && Guiado ? "Entregar" : "Entregar lo marcado", Entregar, VarianteBoton.Primario);
             GuiaView.Registrar("mj.entregar", _entregar);
+        }
+
+        private const int SegundosPorPista = 15;
+
+        private IEnumerable<string> Leyenda() {
+            switch (Def.Lienzo) {
+                case "grafo_commits":
+                    yield return "Cada columna es una rama; cada punto, un commit.";
+                    yield return "«= fecha»: hay otro commit con la misma fecha y el mismo mensaje.";
+                    yield return "Un «!» rojo en el punto: ese commit no sale de ningún otro.";
+                    break;
+                case "secuencia":
+                    yield return "Izquierda, lo diseñado; derecha, lo que pasó.";
+                    yield return "«= paso N»: esa fila es el paso N del diseño. Mira si llegan en el mismo orden.";
+                    yield return "«sin paso en el diseño»: pasó, y el diseño no lo tenía (o lo tenía una sola vez).";
+                    break;
+                default:
+                    yield return "La franja de cada caja es su capa. Lo habitual: interfaz → lógica → datos.";
+                    yield return "Flecha fina: le pide algo. Gruesa: escribe. Discontinua: solo lee.";
+                    yield return "Un «?» en una caja: nadie ha escrito qué hace.";
+                    break;
+            }
+            yield return "Borde mostaza: merece una segunda mirada. No todo lo sospechoso está mal.";
+        }
+
+        /// <summary>
+        /// Primero, la pregunta que hay que hacerse (no la respuesta). Despues, donde mirar: lo sospechoso; y si ya
+        /// estaba a la vista, una pieza con un problema de verdad.
+        /// </summary>
+        private void PedirPista() {
+            if (Resultado != null || _pistasPedidas >= 2) return;
+            CobrarSegundos(SegundosPorPista);
+            _pistasPedidas++;
+            if (_pistasPedidas == 1) {
+                var pendiente = Def.Zonas.FirstOrDefault(z => !_estado.Marcas.Any(m => m.Etiqueta == z.Defecto && m.Commits.Any(z.Commits.Contains)))
+                                ?? Def.Zonas.FirstOrDefault();
+                _textoDePista.text = "Pregúntate: " + (pendiente != null && !string.IsNullOrEmpty(pendiente.Pista)
+                    ? pendiente.Pista : "¿qué pieza hace algo que el encargo no pidió, o lo hace por donde no debe?");
+            } else if (_candidatas.Count == 0) {
+                _candidatas = Sospechosas();
+                _textoDePista.text += " En mostaza, lo sospechoso: no todo está mal.";
+            } else {
+                var sinMarcar = Def.Zonas.FirstOrDefault(z => !_estado.Marcas.Any(m => m.Commits.Any(z.Commits.Contains))) ?? Def.Zonas.FirstOrDefault();
+                _pista = sinMarcar == null ? null : sinMarcar.Commits.FirstOrDefault();
+                _seguro = _pista;
+                _textoDePista.text += _pista == null ? " Mira bien lo que está en mostaza: que parezca raro no quiere decir que esté mal."
+                                                     : " Una pieza con problema de verdad: «" + Nombre(_pista) + "». Falta decir cuál.";
+            }
+            PintarBotonDePista();
+            Repintar();
+        }
+
+        private void PintarBotonDePista() {
+            if (_botonDePista == null) return;
+            _botonDePista.interactable = _pistasPedidas < 2;
+            _botonDePista.GetComponentInChildren<TMP_Text>().text =
+                _pistasPedidas == 0 ? $"Pedir una pista (−{SegundosPorPista} s)"
+                : _pistasPedidas == 1 ? $"Otra pista: dónde mirar (−{SegundosPorPista} s)" : "No hay más pistas";
         }
 
         /// <summary>
@@ -469,7 +616,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 case AccionGuiada.Etiquetar:
                     Button b;
                     return _botonesEtiqueta.TryGetValue(paso.Objetivo ?? "", out b) ? (RectTransform)b.transform : null;
-                case AccionGuiada.Entregar: return _entregar != null ? (RectTransform)_entregar.transform : null;
+                case AccionGuiada.Entregar:
+                    if (Def.Zonas.Count == 0 && _aprobar != null) return (RectTransform)_aprobar.transform;
+                    return _entregar != null ? (RectTransform)_entregar.transform : null;
                 default: return _piezas.TryGetValue(paso.Objetivo ?? "", out rt) ? rt : null;
             }
         }

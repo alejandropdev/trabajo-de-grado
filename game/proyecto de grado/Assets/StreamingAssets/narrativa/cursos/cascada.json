@@ -1,0 +1,213 @@
+{
+  "version": 1,
+  "id": "cascada",
+  "paginas": [
+    {
+      "titulo": "¿Qué es Cascada?",
+      "texto": "Un modelo secuencial: cada fase se termina antes de empezar la siguiente, como el agua que cae de un escalón al de abajo y no vuelve a subir.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "ca-que",
+      "capitulo": "Qué es Cascada"
+    },
+    {
+      "titulo": "Origen",
+      "texto": "La describió Winston Royce en 1970, aunque él mismo advirtió de sus riesgos y recomendaba iterar. El nombre «cascada» (waterfall, en inglés) llegó después.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "ca-origen",
+      "capitulo": "Qué es Cascada"
+    },
+    {
+      "titulo": "La idea central",
+      "texto": "Todo se planifica al inicio y se entrega completo al final. Como en una obra: primero el plano entero, después el edificio, y solo cuando está terminado entra el cliente.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "ca-idea",
+      "capitulo": "Qué es Cascada"
+    },
+    {
+      "titulo": "Panorama de fases",
+      "texto": "Requisitos, análisis, diseño, implementación (construir), pruebas, despliegue (entregar) y mantenimiento. Siete escalones, siempre en ese orden.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-fases",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Requisitos",
+      "texto": "Se recoge y se escribe TODO lo que el cliente quiere en un documento de requisitos, el SRS. Lo que no quede ahí, no se construirá. Cliente y equipo lo firman.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-requisitos",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Análisis",
+      "texto": "Se estudian los requisitos antes de diseñar nada: si se pueden hacer (viabilidad), qué puede salir mal (riesgos) y qué reglas del negocio hay que respetar.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-analisis",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Diseño",
+      "texto": "Se decide cómo será el sistema. Primero la arquitectura, que es la vista general de las piezas; después, el detalle de cada parte.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-diseno",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Implementación",
+      "texto": "Los programadores construyen siguiendo el diseño al pie de la letra. Cada uno hace su parte por separado; las piezas se juntan más adelante.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-implementacion",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Pruebas",
+      "texto": "Se verifica todo junto, al final. Hay cuatro niveles: unitarias (una pieza), de integración (piezas juntas), de sistema (todo) y de aceptación (el cliente da el visto bueno).",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-pruebas",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Despliegue",
+      "texto": "Se entrega e instala el producto completo donde lo va a usar el cliente. Es la primera vez que lo ve funcionando entero.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-despliegue",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Mantenimiento",
+      "texto": "Lo que viene después de entregar, y suele durar años. Hay cuatro tipos: correctivo (arreglar), adaptativo (ajustarse a cambios), perfectivo (mejorar) y preventivo (evitar fallos).",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-mantenimiento",
+      "capitulo": "Las fases"
+    },
+    {
+      "titulo": "Documentación",
+      "texto": "Cada fase produce documentos formales que sirven de entrada para la siguiente. Quien recibe el documento no necesita haber estado en la fase anterior.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "ca-documentacion",
+      "capitulo": "Cómo se controla"
+    },
+    {
+      "titulo": "Puertas de fase",
+      "texto": "Entre una fase y la siguiente hay una revisión formal. Hasta que no se aprueba y se firma, no se pasa. Así los errores no bajan de escalón sin que nadie los vea.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "ca-puertas",
+      "capitulo": "Cómo se controla"
+    },
+    {
+      "titulo": "Roles",
+      "texto": "Jefe de proyecto, analista, arquitecto, programadores, testers (quienes prueban) y cliente. Cada uno trabaja sobre todo en su fase; el jefe de proyecto vigila el conjunto.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUIÉN?",
+      "dibujo": "ca-roles",
+      "capitulo": "Cómo se controla"
+    },
+    {
+      "titulo": "Planificación",
+      "texto": "Se usan tres herramientas: la EDT (o WBS), que parte el trabajo en trozos; el diagrama de Gantt, que los pone en un calendario; y la ruta crítica: las tareas que, si se retrasan, retrasan todo.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "ca-planificacion",
+      "capitulo": "Cómo se controla"
+    },
+    {
+      "titulo": "Gestión de cambios",
+      "texto": "Un cambio no se hace sin más: pasa por un proceso formal de solicitud, evaluación y aprobación. Protege el plan, pero hace lento responder al cliente.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "ca-cambios",
+      "capitulo": "Cómo se controla"
+    },
+    {
+      "titulo": "El costo del cambio",
+      "texto": "Cuanto más tarde se descubre un error, más caro es arreglarlo. Un fallo en los requisitos que aparece en las pruebas obliga a rehacer diseño y construcción.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "ca-costo",
+      "capitulo": "Cómo se controla"
+    },
+    {
+      "titulo": "Modelo en V",
+      "texto": "Una variante en la que cada fase de definición tiene su fase de pruebas enfrentada. Lo que se decide al bajar por la V se comprueba al subir por el otro lado.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "ca-v",
+      "capitulo": "Variantes"
+    },
+    {
+      "titulo": "Otras variantes",
+      "texto": "Cascada con retroalimentación (se permite volver un paso atrás), Sashimi (las fases se solapan) e Incremental (varias cascadas pequeñas, una tras otra).",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "ca-variantes",
+      "capitulo": "Variantes"
+    },
+    {
+      "titulo": "Ventajas",
+      "texto": "Es fácil de entender y de controlar, da presupuesto y fechas claras desde el principio y deja buena documentación.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "ca-ventajas",
+      "capitulo": "Cuándo usarla"
+    },
+    {
+      "titulo": "Desventajas",
+      "texto": "El cliente ve el producto muy tarde, cambiar algo es difícil y los errores aparecen al final, cuando arreglarlos sale más caro.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "ca-desventajas",
+      "capitulo": "Cuándo usarla"
+    },
+    {
+      "titulo": "¿Cuándo usar Cascada?",
+      "texto": "Cuando los requisitos son estables y claros, hay una regulación estricta o el contrato es cerrado. Si lo que se pide va a cambiar por el camino, conviene un método ágil.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CUÁNDO?",
+      "dibujo": "ca-cuando",
+      "capitulo": "Cuándo usarla"
+    },
+    {
+      "titulo": "Resumen y comparación",
+      "texto": "Cascada es una entrega grande al final. Scrum, entregas en ciclos. Kanban, flujo continuo. Ninguna es mejor siempre: depende de cuánto vaya a cambiar lo que se pide.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "RESUMEN",
+      "dibujo": "ca-resumen",
+      "capitulo": "Resumen"
+    }
+  ]
+}

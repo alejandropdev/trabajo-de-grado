@@ -320,6 +320,72 @@
           ]
         }
       ]
+    },
+    {
+      "id": "rosa",
+      "nombre": "Rosa Villamil",
+      "rol": "Recepcionista del edificio · la que hoy apunta las visitas en el cuaderno",
+      "ayudas": [
+        {
+          "umbral": 4,
+          "tipo": "mostrar-dependencias",
+          "usos": 1,
+          "texto": "Si te toca ordenar tareas, te digo cuál necesita a cuál: en la recepción eso lo vivo cada mañana."
+        }
+      ],
+      "persistente": false,
+      "charlas": [
+        {
+          "estadistica": "SatisfaccionCliente",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "En la recepción sentimos que nadie nos ha preguntado nada (satisfacción del cliente: {valor}). Lo que necesito cabe en dos frases: pregúntame."
+            },
+            {
+              "hasta": 70,
+              "texto": "Vamos bien (satisfacción del cliente: {valor}). Lo que he visto se parece a lo que hago cada mañana, aunque todavía le falta."
+            },
+            {
+              "hasta": 100,
+              "texto": "Satisfacción del cliente en {valor}. Se nota que alguien miró cómo trabajo antes de dibujar pantallas."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "efrain",
+      "nombre": "Efraín Mosquera",
+      "rol": "Guardia de la garita · estaba de turno la noche en que la barrera se abrió sola",
+      "ayudas": [
+        {
+          "umbral": 4,
+          "tipo": "minutos-extra",
+          "usos": 1,
+          "texto": "Si un reto te pilla justo, yo entretengo a Facilities en la garita: tienes un rato más."
+        }
+      ],
+      "persistente": false,
+      "charlas": [
+        {
+          "estadistica": "SatisfaccionCliente",
+          "tramos": [
+            {
+              "hasta": 35,
+              "texto": "En la garita dicen que este sistema lo están haciendo sin nosotros (satisfacción del cliente: {valor}). Baja un día a las seis y lo entiendes."
+            },
+            {
+              "hasta": 70,
+              "texto": "Satisfacción del cliente en {valor}. Lo que me enseñaron sirve, pero todavía no lo he visto con cuarenta carros delante."
+            },
+            {
+              "hasta": 100,
+              "texto": "Satisfacción del cliente en {valor}. Por primera vez alguien hizo algo pensando en el que está de pie en la garita."
+            }
+          ]
+        }
+      ]
     }
   ],
   "conversaciones": [
@@ -1899,6 +1965,326 @@
             "texto": "El de rendimiento.",
             "confianza": 0,
             "respuesta": "Puede que también sea lenta. Pero el problema es de diseño."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-ROSA-1",
+      "nivel": "nivel-00",
+      "personaje": "rosa",
+      "zona": "pasillo",
+      "diaDesde": 2,
+      "diaHasta": 5,
+      "orden": 1,
+      "minutos": 20,
+      "tema": "requisitos",
+      "lineas": [
+        {
+          "quien": "Rosa Villamil",
+          "texto": "Subo por un café y vuelvo: yo soy la que apunta las visitas en el cuaderno. A las nueve tengo quince personas delante y un bolígrafo."
+        }
+      ],
+      "pregunta": {
+        "texto": "«Antes de hacer el sistema, ¿tú qué me preguntarías?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Qué haces, paso a paso, cuando llega alguien, y dónde te atascas.",
+            "confianza": 2,
+            "respuesta": "Nadie me lo había preguntado. Me atasco cuando no sé a quién vienen a ver: ahí pierdo dos minutos por persona. Eso es lo que tiene que resolver el sistema."
+          },
+          {
+            "id": "b",
+            "texto": "Qué colores te gustan para la pantalla.",
+            "confianza": -1,
+            "respuesta": "Me da igual el color si sigo con la fila hasta la puerta. Primero lo que hace, después cómo se ve."
+          },
+          {
+            "id": "c",
+            "texto": "Cuántas visitas hay al día.",
+            "confianza": 0,
+            "respuesta": "Sesenta y pico. Pero el número solo no te dice dónde pierdo el tiempo: para eso hay que mirar cómo trabajo."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-ROSA-2",
+      "nivel": "nivel-00",
+      "personaje": "rosa",
+      "zona": "pasillo",
+      "diaDesde": 3,
+      "diaHasta": 5,
+      "orden": 2,
+      "minutos": 20,
+      "tema": "usabilidad",
+      "lineas": [
+        {
+          "quien": "Rosa Villamil",
+          "texto": "Piensa que lo voy a usar de pie, con gente mirándome y el teléfono sonando."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Cómo tendría que ser registrar a alguien?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Tres datos y un botón grande. Lo demás, después.",
+            "confianza": 2,
+            "respuesta": "Eso sí lo uso. Lo que tarda más que el cuaderno, no lo usa nadie, por muy bonito que sea."
+          },
+          {
+            "id": "b",
+            "texto": "Un formulario completo, con todos los datos del visitante.",
+            "confianza": -1,
+            "respuesta": "Con quince personas en fila no lo relleno: vuelvo al cuaderno. Un sistema que nadie usa no resuelve nada."
+          },
+          {
+            "id": "c",
+            "texto": "Igual que el cuaderno, pero en pantalla.",
+            "confianza": 0,
+            "respuesta": "Mejor que nada. Pero el cuaderno tampoco avisa al anfitrión ni sabe quién sigue dentro: copiar el problema no lo arregla."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-ROSA-3",
+      "nivel": "nivel-00",
+      "personaje": "rosa",
+      "zona": "pasillo",
+      "diaDesde": 4,
+      "diaHasta": 5,
+      "orden": 3,
+      "minutos": 20,
+      "tema": "alcance",
+      "lineas": [
+        {
+          "quien": "Rosa Villamil",
+          "texto": "Me dijeron que el viernes entregas. No va a dar tiempo a todo, ¿verdad?"
+        }
+      ],
+      "pregunta": {
+        "texto": "«Si solo pudieras entregarme una cosa, ¿cuál sería?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Registrar la visita y avisar al anfitrión: lo que hoy te hace perder más tiempo.",
+            "confianza": 2,
+            "respuesta": "Con eso ya trabajo mejor el lunes. Lo más pequeño que de verdad sirve: eso es lo que tu gente llama un MVP, ¿no?"
+          },
+          {
+            "id": "b",
+            "texto": "Los informes del mes, con sus gráficas.",
+            "confianza": -1,
+            "respuesta": "Los informes los pide mi jefe una vez al mes. La fila la tengo yo todos los días a las nueve."
+          },
+          {
+            "id": "c",
+            "texto": "Todo, aunque quede a medias.",
+            "confianza": -1,
+            "respuesta": "A medias no me sirve nada: un registro que a veces guarda y a veces no es peor que el cuaderno."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-ROSA-4",
+      "nivel": "nivel-00",
+      "personaje": "rosa",
+      "zona": "pasillo",
+      "diaDesde": 5,
+      "diaHasta": 5,
+      "orden": 4,
+      "minutos": 20,
+      "tema": "devops",
+      "lineas": [
+        {
+          "quien": "Rosa Villamil",
+          "texto": "Dicen que hoy lo ponen a funcionar de verdad. Yo mañana tengo la fila igual, funcione o no."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Y si falla con toda la gente delante?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Antes se prueba con visitas de mentira, y si falla se vuelve a la versión anterior en minutos.",
+            "confianza": 2,
+            "respuesta": "Eso me deja tranquila: probar donde no hay clientes y tener cómo volver atrás. Así sí lo enciendo."
+          },
+          {
+            "id": "b",
+            "texto": "No va a fallar.",
+            "confianza": -1,
+            "respuesta": "Eso mismo dijeron de la impresora. Quien no tiene pensado qué hacer si falla, no ha terminado."
+          },
+          {
+            "id": "c",
+            "texto": "Guarda el cuaderno por si acaso.",
+            "confianza": 1,
+            "respuesta": "Lo voy a guardar, sí. Pero ese plan es el mío: dime también cuál es el tuyo para volver atrás."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-EFRAIN-1",
+      "nivel": "nivel-01",
+      "personaje": "efrain",
+      "zona": "cafeteria",
+      "diaDesde": 2,
+      "diaHasta": 20,
+      "orden": 1,
+      "minutos": 30,
+      "tema": "requisitos",
+      "lineas": [
+        {
+          "quien": "Efraín Mosquera",
+          "texto": "Yo estaba en la garita la noche en que la barrera se abrió sola. Nadie me creyó hasta que vieron la grabación."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué sacas de esa noche para tu sistema?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Que cada apertura quede registrada: quién, cuándo y con qué permiso.",
+            "confianza": 2,
+            "respuesta": "Eso. Si aquella noche hubiera habido un registro, no habría sido mi palabra contra la de una máquina."
+          },
+          {
+            "id": "b",
+            "texto": "Que hay que poner una barrera más fuerte.",
+            "confianza": -1,
+            "respuesta": "La barrera aguanta un camión. Lo que falló fue quién le daba la orden de abrirse."
+          },
+          {
+            "id": "c",
+            "texto": "Que hace falta otra cámara.",
+            "confianza": 0,
+            "respuesta": "La cámara me dio la razón después. Pero no impidió nada: el sistema tiene que decidir antes de abrir."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-EFRAIN-2",
+      "nivel": "nivel-01",
+      "personaje": "efrain",
+      "zona": "cafeteria",
+      "diaDesde": 6,
+      "diaHasta": 20,
+      "orden": 2,
+      "minutos": 30,
+      "tema": "usabilidad",
+      "lineas": [
+        {
+          "quien": "Efraín Mosquera",
+          "texto": "A las seis de la mañana tengo cuarenta carros. La pantalla la miro un segundo, no más."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué pondrías en esa pantalla?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Dos cosas, y grandes: quién está en la barrera y si puede pasar.",
+            "confianza": 2,
+            "respuesta": "Con eso trabajo. Lo demás que lo vea Facilities en su oficina, sentados y con café."
+          },
+          {
+            "id": "b",
+            "texto": "Todos los datos del edificio, para que no te falte nada.",
+            "confianza": -1,
+            "respuesta": "Si tengo que buscar un botón entre veinte, abro a mano y ya. Y entonces el sistema no sirve."
+          },
+          {
+            "id": "c",
+            "texto": "Un manual para aprender a usarlo.",
+            "confianza": -1,
+            "respuesta": "Si necesita manual para abrir una barrera, está mal hecho. En la garita no se lee: se mira."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-EFRAIN-3",
+      "nivel": "nivel-01",
+      "personaje": "efrain",
+      "zona": "cafeteria",
+      "diaDesde": 10,
+      "diaHasta": 20,
+      "orden": 3,
+      "minutos": 30,
+      "tema": "calidad",
+      "lineas": [
+        {
+          "quien": "Efraín Mosquera",
+          "texto": "Aquí la red se cae cada vez que llueve. Y llueve."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Qué pasa en la garita si se cae a las seis de la mañana?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "La garita sigue con la lista de matrículas que ya tenía, y lo que abras a mano queda anotado.",
+            "confianza": 2,
+            "respuesta": "Eso es pensar en el día malo. Un sistema que solo funciona cuando todo va bien no es para una garita."
+          },
+          {
+            "id": "b",
+            "texto": "Se espera a que vuelva.",
+            "confianza": -1,
+            "respuesta": "Cuarenta carros en la avenida y la policía pitando. No se espera."
+          },
+          {
+            "id": "c",
+            "texto": "Se deja la barrera abierta mientras tanto.",
+            "confianza": -1,
+            "respuesta": "Así empezó todo esto: una barrera abierta sin que nadie supiera por qué."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CV-EFRAIN-4",
+      "nivel": "nivel-01",
+      "personaje": "efrain",
+      "zona": "cafeteria",
+      "diaDesde": 14,
+      "diaHasta": 20,
+      "orden": 4,
+      "minutos": 30,
+      "tema": "devops",
+      "lineas": [
+        {
+          "quien": "Efraín Mosquera",
+          "texto": "Me contaron que lo van a ir poniendo por partes. Yo pensaba que era mejor todo de una vez, cuando esté terminado."
+        }
+      ],
+      "pregunta": {
+        "texto": "«¿Por partes o todo al final?»",
+        "opciones": [
+          {
+            "id": "a",
+            "texto": "Por partes: lo pruebas tú con carros de verdad y corregimos pronto.",
+            "confianza": 2,
+            "respuesta": "Visto así, sí. Prefiero quejarme en la segunda semana que descubrir el último día que no sirve."
+          },
+          {
+            "id": "b",
+            "texto": "Todo al final, para no molestarte antes.",
+            "confianza": -1,
+            "respuesta": "Molesta más enterarse el último día de que la pantalla no se ve con el sol de las seis."
+          },
+          {
+            "id": "c",
+            "texto": "Da igual, el resultado es el mismo.",
+            "confianza": 0,
+            "respuesta": "No es el mismo: si sale por partes, lo que falla se nota cuando todavía es barato arreglarlo."
           }
         ]
       }

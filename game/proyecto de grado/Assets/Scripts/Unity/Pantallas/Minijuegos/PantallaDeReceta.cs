@@ -14,7 +14,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
     /// Dibuja en una Lamina con coordenadas «de prototipo» (las del mockup de pizarra) desplazadas y a escala.
     /// Asi cada viñeta se escribe en su propio cuadro de 330×190 y se coloca donde toque.
     /// </summary>
-    public sealed class Tizador {
+    public sealed partial class Tizador {
         public static readonly Color Tiza = new Color32(0xEE, 0xF3, 0xF1, 0xFF);
         public static readonly Color Cian = new Color32(0x8F, 0xEA, 0xFF, 0xFF);
         public static readonly Color Mostaza = new Color32(0xE3, 0xC2, 0x4F, 0xFF);
@@ -188,7 +188,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private Lamina _lamina;
         private bool _viendoProyecto;
-        private TMPro.TMP_Text _textoCambiar;
+        private TMPro.TMP_Text _textoPrincipal;
+        private GameObject _volverAlProyecto;
 
         /// <summary>El expediente del nivel y el modulo de este reto, si los hay (para la pagina «Dónde estamos»).</summary>
         private Nexus.Core.Proyecto.FichaDelProyecto Proyecto {
@@ -201,24 +202,21 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var marco = MarcoDePizarra.Construir(Ui, Raiz, Inicio ? "¡NUEVO RETO!" : "RECETA", out _lamina);
             // Al empezar un reto, lo primero es saber en qué parte del proyecto estamos (ronda 4); después, cómo se juega.
             _viendoProyecto = Inicio && HayDondeEstamos;
-            if (HayDondeEstamos) {
-                var cambiar = MarcoDePizarra.Boton(Ui, marco, "", CambiarPagina, new Vector2(0, 1), new Vector2(52, -40), 300, VarianteBoton.Secundario);
-                _textoCambiar = cambiar.GetComponentInChildren<TMPro.TMP_Text>();
-            }
+            // Un solo boton principal, siempre abajo a la derecha, que es por donde se avanza: en «Dónde estamos» lleva
+            // a «Cómo se juega», y alli es «¡A jugar!». Volver atras queda a su izquierda, mas discreto.
+            var principal = MarcoDePizarra.Boton(Ui, marco, "", Avanzar, new Vector2(1, 0), new Vector2(-52, 44), 260);
+            _textoPrincipal = principal.GetComponentInChildren<TMPro.TMP_Text>();
+            if (HayDondeEstamos)
+                _volverAlProyecto = MarcoDePizarra.Boton(Ui, marco, "◄  Dónde estamos", CambiarPagina, new Vector2(1, 0), new Vector2(-330, 44), 260,
+                                                         VarianteBoton.Secundario).gameObject;
             PintarPagina();
-
-            var boton = Ui.Boton(marco, Inicio ? "¡A jugar!" : "Volver al reto", Cerrar, VarianteBoton.Primario);
-            var rb = (RectTransform)boton.transform;
-            rb.anchorMin = rb.anchorMax = rb.pivot = new Vector2(1, 0);
-            rb.anchoredPosition = new Vector2(-52, 44);
-            rb.sizeDelta = new Vector2(220, 60);
 
             // Las ayudas de los compañeros que confian en ti: se eligen aqui, antes de empezar.
             if (Inicio && Ayudas != null && Ayudas.Count > 0 && AlUsarAyuda != null) {
                 var fila = Ui.Fila(marco, "Ayudas", 10);
                 fila.anchorMin = fila.anchorMax = fila.pivot = new Vector2(0, 0);
                 fila.anchoredPosition = new Vector2(52, 44);
-                fila.sizeDelta = new Vector2(1240, 60);
+                fila.sizeDelta = new Vector2(HayDondeEstamos ? 960 : 1240, 60);
                 var titulo = Ui.Texto(fila, "Te ofrecen ayuda:", EstiloTexto.Cuerpo, Tema.mostazaClara);
                 titulo.font = Ui.FuenteTiza;
                 foreach (var tipo in Ayudas) {
@@ -248,6 +246,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             AlCerrar?.Invoke();
         }
 
+        private void Avanzar() {
+            if (_viendoProyecto) CambiarPagina(); else Cerrar();
+        }
+
         private void CambiarPagina() {
             _viendoProyecto = !_viendoProyecto;
             PintarPagina();
@@ -257,7 +259,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             MarcoDePizarra.Limpiar(_lamina);
             var t = new Tizador(_lamina, Ui.FuenteTiza);
             if (_viendoProyecto) PintarDondeEstamos(t); else Pintar(t);
-            if (_textoCambiar != null) _textoCambiar.text = _viendoProyecto ? "Cómo se juega  ►" : "◄  Dónde estamos";
+            if (_textoPrincipal != null) _textoPrincipal.text = _viendoProyecto ? "Cómo se juega  ►" : Inicio ? "¡A jugar!" : "Volver al reto";
+            if (_volverAlProyecto != null) _volverAlProyecto.SetActive(!_viendoProyecto);
         }
 
         /// <summary>El sistema del proyecto, con la parte de este reto en mostaza.</summary>
@@ -268,8 +271,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             t.Linea(420, 88, 1190, 88, null, 2);
             t.Texto(60, 140, $"{f.Nombre} · para {f.Cliente.Nombre}", 26, Tizador.Gris);
             if (!string.IsNullOrEmpty(Def.EnElProyecto)) t.Texto(60, 182, Def.EnElProyecto, 26, Tizador.Tiza, false, W - 120);
-            ExpedienteView.DibujarContexto(t, f, 60, 250, W - 120, 600, Def.Modulo);
-            t.Texto(W / 2, 912, $"EN MOSTAZA, LA PARTE DE ESTE RETO: «{modulo.Nombre.ToUpperInvariant()}»", 26, Tizador.Mostaza, true);
+            // Los botones del marco ocupan de 842 hacia abajo: el diagrama y su pie acaban antes.
+            ExpedienteView.DibujarContexto(t, f, 60, 250, W - 120, 530, Def.Modulo);
+            t.Texto(W / 2, 820, $"EN MOSTAZA, LA PARTE DE ESTE RETO: «{modulo.Nombre.ToUpperInvariant()}»", 26, Tizador.Mostaza, true);
         }
 
         private void Pintar(Tizador t) {
@@ -286,10 +290,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 c.Texto(70, 32, $"{Def.Presentacion.QuienEspera} espera · {Def.Presentacion.TextoPresion}", 24, Tizador.Mostaza);
                 y0 += 70;
             }
-            t.Texto(60, y0 + 10, "CÓMO SE JUEGA", 26, Tizador.Cian);
-
             var una = paleta.Count <= 4;
-            var kP = verbo == Verbos.Detectar && !una && Inicio ? 1f : 1.18f;
+            var kP = verbo == Verbos.Detectar && !una ? (Inicio ? 0.9f : 1f) : 1.18f;
             var pasos = t.En(70, y0 + 30, kP);
             if (verbo == Verbos.Ordenar) PasosOrdenar(pasos);
             else if (verbo == Verbos.Repartir) PasosRepartir(pasos);
@@ -330,8 +332,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 t.Texto(60, yL, "¿CUÁNDO ES CADA COSA?  (ejemplos de otra tienda, no de tu reto)", 26, Tizador.Cian);
                 var cols = paleta.Count > 4 ? 3 : Math.Max(1, paleta.Count);
                 var w = 1500f / cols;
-                var hc = una ? 330f : 210f;
-                var esc = una ? 1f : 0.8f;
+                // Dos filas de cuadros tienen que acabar antes de los botones del marco.
+                var filas = Mathf.CeilToInt(paleta.Count / (float)cols);
+                var hc = una ? 330f : Mathf.Min(210f, (Fondo - (yL + 20) - 15 * (filas - 1)) / filas);
+                var esc = una ? 1f : 0.8f * hc / 210f;
                 for (var i = 0; i < paleta.Count; i++) {
                     var id = paleta[i];
                     var cx = 60 + (i % cols) * w;
@@ -346,8 +350,11 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     cuadro.Texto((w - 30) / 2, hc - 14, Recetas.QueEs.TryGetValue(id, out que) ? que : "", una ? 22 : 19, null, true);
                 }
             }
-            t.Texto(700, 912, pie, 26, null, true);
+            t.Texto(60, y0 + 10, "CÓMO SE JUEGA · " + pie, 22, Tizador.Cian);
         }
+
+        /// <summary>Hasta donde se puede dibujar: debajo estan los botones del marco.</summary>
+        private const float Fondo = 830;
 
         private static void PasosDetectar(Tizador p, List<string> paleta) {
             var a = p.En(0, 0); a.Caja(0, 30, 150, 70, "pieza"); a.Mano(110, 70); a.Texto(75, 150, "1 · Pincha lo raro", 22, null, true);

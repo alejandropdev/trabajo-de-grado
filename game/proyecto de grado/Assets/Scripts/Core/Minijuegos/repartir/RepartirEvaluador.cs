@@ -59,8 +59,23 @@ namespace Nexus.Core.Minijuegos.Repartir {
         }
 
         /// <summary>
+        /// Si con este reparto podria escaparse algo de una pila critica, contando lo mas (o lo menos) que cabe
+        /// esperar en ella. Con lo que el jugador ve.
+        /// </summary>
+        public static bool PuedeEscaparAlgoCritico(RepartirCfg cfg, IDictionary<string, int> asignacion, bool peorCaso) {
+            foreach (var d in cfg.Depositos) {
+                if (!d.Critico) continue;
+                int horas;
+                if (asignacion == null || !asignacion.TryGetValue(d.Id, out horas)) horas = 0;
+                if ((peorCaso ? MaximoEsperado(d) : MinimoEsperado(d)) > horas / Math.Max(1, d.CostePorDefecto)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// El reparto de quien razona con lo que ve: cubrir lo mas que cabe esperar en cada tipo y, como las horas
-        /// no alcanzan, renunciar primero a los errores mas caros de atrapar. Es el que enseña el modo guiado, y el
+        /// no alcanzan, renunciar primero a los errores mas caros de atrapar (pero nunca a los de una pila critica
+        /// mientras quede otra de la que ceder). Es el que enseña el modo guiado, y el
         /// validador exige que gane: si ni el prudente gana, ganar seria cuestion de suerte.
         /// </summary>
         public static Dictionary<string, int> RepartoPrudente(RepartirCfg cfg) {
@@ -69,7 +84,7 @@ namespace Nexus.Core.Minijuegos.Repartir {
             var reparto = horas();
             while (reparto.Values.Sum() > cfg.Presupuesto) {
                 // Se renuncia a UN error del tipo mas caro que aun tenga alguno cubierto (a igual coste, el ultimo).
-                var cede = cfg.Depositos.Where(d => cubre[d.Id] > 0).OrderByDescending(d => d.CostePorDefecto)
+                var cede = cfg.Depositos.Where(d => cubre[d.Id] > 0).OrderBy(d => d.Critico ? 1 : 0).ThenByDescending(d => d.CostePorDefecto)
                               .ThenByDescending(d => cfg.Depositos.IndexOf(d)).FirstOrDefault();
                 if (cede == null) break;
                 cubre[cede.Id]--;
@@ -122,8 +137,13 @@ namespace Nexus.Core.Minijuegos.Repartir {
             var sobrecompra = reparto.Any(r => r.Horas > HorasParaCubrir(cfg, porId[r.DepositoId], MaximoEsperado(porId[r.DepositoId])));
             var desatendido = reparto.Any(r => r.Horas == 0 && porId[r.DepositoId].DefectosOcultos > 0);
 
+            // Lo critico manda: un solo error escapado ahi pierde, aunque en total sean pocos.
+            var criticos = reparto.Where(r => r.Escapan > 0 && porId[r.DepositoId].Critico).Select(r => porId[r.DepositoId]).ToList();
+            foreach (var d in criticos)
+                detalle.Add($"{d.Nombre} no podía fallar: {d.PorQueEsCritico} Se escapó un error justo ahí, y con eso da igual lo bien que saliera lo demás.");
+
             string clave;
-            if (escapan <= cfg.ToleranciaDeEscapes) clave = ResultadosDeMinijuego.Todos;
+            if (escapan <= cfg.ToleranciaDeEscapes && criticos.Count == 0) clave = ResultadosDeMinijuego.Todos;
             else if (sobrecompra && desatendido) clave = ResultadosDeMinijuego.FalsoPositivo;
             else clave = ResultadosDeMinijuego.Parcial;
 
@@ -152,8 +172,10 @@ namespace Nexus.Core.Minijuegos.Repartir {
             Action<int, int> probar = null;
             probar = (i, restante) => {
                 if (i == cfg.Depositos.Count) {
-                    var escapan = Calcular(cfg, actual).Sum(r => r.Escapan);
-                    if (actual.Values.Sum() > 0 && escapan <= cfg.ToleranciaDeEscapes)
+                    var calculo = Calcular(cfg, actual);
+                    var escapan = calculo.Sum(r => r.Escapan);
+                    var critico = calculo.Any(r => r.Escapan > 0 && cfg.Depositos.First(d => d.Id == r.DepositoId).Critico);
+                    if (actual.Values.Sum() > 0 && escapan <= cfg.ToleranciaDeEscapes && !critico)
                         ganadores.Add(new Dictionary<string, int>(actual));
                     return;
                 }

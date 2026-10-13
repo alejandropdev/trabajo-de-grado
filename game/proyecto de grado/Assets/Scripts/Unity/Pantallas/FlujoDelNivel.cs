@@ -68,11 +68,27 @@ namespace Nexus.Unity.Pantallas {
             app.Router.IrA<PantallaDelDia>();
         }
 
-        /// <summary>Se acabaron los dias: el lanzamiento, el cierre, las lecciones y el nivel siguiente.</summary>
+        /// <summary>
+        /// La Fase 3: desplegar lo que esta listo. Se llega al cerrar un dia de despliegue; al acabar se guarda (el
+        /// resultado ya movio el proyecto, y recargar no puede servir para repetirlo) y se sigue por donde diga quien llama.
+        /// </summary>
+        public static void Desplegar(AppRoot app, Action alTerminar) {
+            app.Router.IrA<PantallaDeDespliegue>(p => p.AlTerminar = () => {
+                app.Guardar(AutoGuardado.Motivos.FinDeJornada);
+                alTerminar?.Invoke();
+            });
+        }
+
+        /// <summary>Se acabaron los dias: el ultimo despliegue, el lanzamiento, el cierre, las lecciones y el nivel siguiente.</summary>
         public static void Lanzar(AppRoot app) {
             var s = app.Sesion;
             var nivel = s.NivelId;
             var pasos = new List<Action<Action>>();
+
+            // Antes de que el cliente lo vea, lo construido tiene que llegar a produccion: el despliegue del ultimo dia.
+            pasos.Add(siguiente => {
+                if (s.DesplieguePendiente) Desplegar(app, siguiente); else siguiente();
+            });
 
             // El resultado se calcula ANTES de la escena del lanzamiento: la escena cuenta como salio.
             pasos.Add(siguiente => {

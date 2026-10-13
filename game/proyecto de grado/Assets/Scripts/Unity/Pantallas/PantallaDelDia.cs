@@ -164,6 +164,13 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(avisos, ancho: 260);   // su rotulo cambia («Avisos · 2 esperando»): ancho fijo para que quepa
             _textoAvisos = avisos.GetComponentInChildren<TMP_Text>();
             var diario = Ui.Boton(riel, "Diario", AbrirDiario);
+            // La carpeta del cliente: sus papeles, que van llegando, y lo que dice del producto quien lo va a usar.
+            if (S.Perfil.Proyecto != null && S.Perfil.Proyecto.Papeles.Count > 0) {
+                var cliente = Ui.Boton(riel, "Cliente", AbrirCarpetaDelCliente);
+                UiKit.Tamano(cliente, ancho: 230);
+                _textoCliente = cliente.GetComponentInChildren<TMP_Text>();
+                GuiaView.Registrar("dia.cliente", cliente);
+            }
             Ui.Resorte(riel);
             GuiaView.BotonDeAyuda(App, riel);
 
@@ -224,7 +231,19 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Separador(contenido);
                 var modulos = Ui.Columna(contenido, "Modulos", Tema.Espacio(2));
                 GuiaView.Registrar("dia.modulos", modulos);
-                Ui.Texto(modulos, "LAS PARTES DEL SISTEMA", EstiloTexto.Leyenda, Tema.cyan);
+                var titulo = Ui.Fila(modulos, "Titulo");
+                UiKit.Tamano(Ui.Texto(titulo, "LAS PARTES DEL SISTEMA", EstiloTexto.Leyenda, Tema.cyan), flexAncho: 1);
+                // La maqueta viva: como se ve hoy cada parte (boceto, mockup, prototipo, MVP), para tocarla.
+                var producto = Ui.Boton(titulo, "Ver el producto", () => PantallaDelProducto.Abrir(App));
+                GuiaView.Registrar("dia.producto", producto);
+                // La arquitectura elegida no se queda en la Fase 1: aqui esta, con su plano y lo que le hace al dia.
+                var arq = S.Perfil.Fase1 == null ? null : S.Perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == S.ArquitecturaElegida);
+                if (arq != null) {
+                    var filaArq = Ui.Fila(modulos, "Arquitectura", Tema.Espacio(2));
+                    UiKit.Tamano(Ui.Texto(filaArq, "Arquitectura: <b>" + arq.Nombre + "</b>", EstiloTexto.Pequeno, Tema.ink), flexAncho: 1);
+                    Ui.Boton(filaArq, "Ver el plano", () => PantallaDelProducto.AbrirPlano(App, arq.Id, true), VarianteBoton.Fantasma);
+                    Ui.Texto(modulos, DibujosDeArquitectura.EnElDia(arq.Id), EstiloTexto.Leyenda, Tema.inkMuted);
+                }
                 foreach (var m in ficha.Modulos) {
                     var fila = Ui.Fila(modulos, "Modulo", Tema.Espacio(3));
                     UiKit.Tamano(Ui.Texto(fila, m.Nombre, EstiloTexto.Pequeno, Tema.ink), ancho: 220);
@@ -273,7 +292,7 @@ namespace Nexus.Unity.Pantallas {
 
             var paso = PasoActual();
             var clave = $"{paso}|{S.R.DiaActual}|{S.ZonaActual}|{string.Join(",", AlertasSonando().Select(a => a.Id))}|" +
-                        $"{S.SePuedeCerrarLaJornada}|{QuedaAlgunAviso()}|{_compromiso}|{Runner.PuedeMoverse}|" +
+                        $"{_compromiso}|{string.Join(",", _alSprint)}|{Runner.PuedeMoverse}|" +
                         string.Join(",", S.TareasDeOficina.Select(t => S.PorQueNoSePuedeHacer(t.Id) == null ? "1" : "0")) +
                         $"|{S.R.CeremoniasHechasHoy.Count}|{S.PrPendiente != null}";
             if (clave != _claveAhora) {
@@ -313,18 +332,13 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>El boton «Avisos» dice cuantos esperan: es lo unico del riel que cambia solo.</summary>
         private void PintarRiel() {
             var sonando = AlertasSonando().Count;
-            var deHoy = AvisosDeHoy();
-            var clave = sonando + "|" + deHoy;
+            var papeles = _textoCliente == null ? 0 : S.PapelesSinLeer();
+            var clave = sonando + "|" + papeles;
             if (clave == _claveRiel) return;
             _claveRiel = clave;
-            _textoAvisos.text = sonando > 0 ? $"Avisos · {sonando} esperando" : deHoy > 0 ? $"Avisos · {deHoy} de hoy" : "Avisos";
-        }
-
-        /// <summary>Lo que hoy trae de serie para leer: la consecuencia del estado y los anuncios de lo que viene.</summary>
-        private int AvisosDeHoy() {
-            var brief = S.BriefDeHoy;
-            if (brief == null) return 0;
-            return brief.Avisos.Count + (brief.Incidencia != null ? 1 : 0);
+            if (_textoCliente != null) _textoCliente.text = papeles > 0 ? $"Cliente · {papeles} nuevo{(papeles == 1 ? "" : "s")}" : "Cliente";
+            // Solo cuenta lo que YA sono y espera: lo que vaya a llegar hoy no se anuncia, llega.
+            _textoAvisos.text = sonando > 0 ? $"Avisos · {sonando} esperando" : "Avisos";
         }
 
         private ZonaDeNivel ZonaDondeEstoy() {
@@ -467,6 +481,20 @@ namespace Nexus.Unity.Pantallas {
                            "escritorio. Si lo dejas caducar, alguien decide por ti, y casi nunca bien.");
             _ahora.Parrafo("Mientras tanto, el edificio es tuyo: con «Mapa», arriba, vas a otras zonas, y cada una tiene algo que no " +
                            "está en ninguna otra. Pero ir cuesta tiempo, y estar lejos cuando suena un aviso también.");
+            // El product backlog que armo el jugador: que entro bien, que sobraba y que falto, antes de empezar.
+            var backlog = S.BacklogCreado;
+            if (backlog != null) {
+                var limpio = backlog.Dejadas == 0 && backlog.DeMas == 0;
+                var t = _ahora.Tarjeta("Tu product backlog, revisado con el cliente", limpio ? Tono.Exito : Tono.Aviso);
+                foreach (var r in backlog.Renglones)
+                    Ui.Texto(t, (r.Tipo == "bien" ? "√ " : r.Tipo == "falta" ? "× " : "! ") + r.Texto, EstiloTexto.Pequeno,
+                             r.Tipo == "bien" ? Tema.success : r.Tipo == "falta" ? Tema.danger : Tema.warning);
+                if (backlog.Cambios.Count > 0)
+                    Ui.Texto(t, "Lo que eso le hizo al proyecto: " + string.Join(" · ", backlog.Cambios.Select(kv => $"{Textos.NombreDeStock(kv.Key)} {Textos.Cambio(kv.Value)}")) + ".",
+                             EstiloTexto.Pequeno, Tema.ink);
+                if (backlog.Dejadas > 0)
+                    Ui.Texto(t, "Lo que faltaba está en el tablero, al final de la fila, como «Se descubrió tarde».", EstiloTexto.Pequeno, Tema.inkMuted);
+            }
             _ahora.Accion("Empezar el día 1", EmpezarDia);
         }
 
@@ -486,7 +514,63 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
+        private readonly HashSet<string> _alSprint = new HashSet<string>();
+        private int _diaDelSprintBacklog = -1;
+
+        /// <summary>
+        /// La planificacion cuando hay mas de un sprint: se arma el sprint backlog tarjeta a tarjeta. A la izquierda de
+        /// cada una, si entra; arriba, la capacidad que se va llenando.
+        /// </summary>
+        private void ArmarElSprintBacklog() {
+            var plan = S.PendingPlanning;
+            var candidatas = S.CandidatasAlSprint();
+            if (_diaDelSprintBacklog != S.R.DiaActual) {
+                // Se parte de lo que cabria: las primeras del backlog hasta la capacidad. El jugador quita y pone.
+                _diaDelSprintBacklog = S.R.DiaActual;
+                _alSprint.Clear();
+                var cabe = 0.0;
+                foreach (var c in candidatas) {
+                    if (!c.Empezada && cabe + c.Restante > plan.CapacidadSugerida + 0.005) continue;
+                    _alSprint.Add(c.Id); cabe += c.Restante;
+                }
+            }
+            var suma = candidatas.Where(c => _alSprint.Contains(c.Id) || c.Empezada).Sum(c => c.Restante);
+            var pasado = suma > plan.CapacidadSugerida + 0.5;
+
+            _ahora.Etiqueta("Ceremonia · planificación de " + plan.Unidad);
+            _ahora.Titulo("Arma el sprint backlog");
+            _ahora.Parrafo($"Del product backlog, elige lo que el equipo se compromete a terminar en este sprint. Caben unos {plan.CapacidadSugerida:0.#} puntos; quedan {plan.PuntosPendientes:0} por hacer en total.");
+            PantallaDeGlosario.Palabras(App, _ahora.Raiz, "Si alguna palabra no te suena:", "backlog", "sprint", "planificacion-de-sprint");
+
+            var capacidad = _ahora.Tarjeta($"Llevas {suma:0.#} de {plan.CapacidadSugerida:0.#} puntos", pasado ? Tono.Aviso : Tono.Exito);
+            Ui.Barra(capacidad, plan.CapacidadSugerida <= 0 ? 1 : Mathf.Clamp01((float)(suma / plan.CapacidadSugerida)), pasado ? Tema.warning : Tema.success);
+            Ui.Texto(capacidad, pasado ? "Te pasas de lo que cabe: no da error, pero genera sobrecompromiso, y el sobrecompromiso genera deuda técnica cada día hasta que el sprint se cierra."
+                                       : "Lo que no entre se queda en el product backlog para el siguiente sprint.", EstiloTexto.Pequeno, Tema.ink);
+
+            var lista = _ahora.Tarjeta("El product backlog, en su orden");
+            foreach (var c in candidatas) {
+                var id = c.Id;
+                var dentro = _alSprint.Contains(id) || c.Empezada;
+                var modulo = S.Perfil.Proyecto == null ? null : S.Perfil.Proyecto.Modulo(c.Modulo);
+                var boton = Ui.BotonDeOpcion(lista, (dentro ? "√  " : "＋  ") + c.Titulo + $"  ·  {c.Restante:0.#} pts",
+                    (c.Empezada ? "Ya está empezada: entra sí o sí. " : dentro ? "Entra en el sprint. " : "Se queda en el product backlog. ") +
+                    (modulo != null ? "Módulo: " + modulo.Nombre + "." : ""),
+                    () => { if (!_alSprint.Remove(id)) _alSprint.Add(id); });
+                boton.interactable = !c.Empezada;
+                Ui.Resaltar(boton, dentro);
+            }
+
+            var comprometer = _ahora.Accion($"Comprometerse a estas tarjetas ({suma:0.#} puntos)", () => {
+                var n = S.CandidatasAlSprint().Count(c => _alSprint.Contains(c.Id) || c.Empezada);
+                S.ComprometerTarjetas(_alSprint);
+                _diaDelSprintBacklog = -1;
+                Anotar($"Planificación: el equipo se compromete a {n} tarjetas ({suma:0.#} puntos).");
+            });
+            comprometer.interactable = suma > 0.005;
+        }
+
         private void Planificacion() {
+            if (S.SeArmaElSprintBacklog) { ArmarElSprintBacklog(); return; }
             var plan = S.PendingPlanning;
             if (_diaDelCompromiso != S.R.DiaActual) {
                 _diaDelCompromiso = S.R.DiaActual;
@@ -523,12 +607,10 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void Jornada() {
-            var porSonar = QuedaAlgunAviso();
             _ahora.Etiqueta("La jornada corre");
             _ahora.Titulo(S.HoraActual.StartsWith("0") ? "Buenos días" : "Trabajando");
-            _ahora.Parrafo(porSonar
-                ? "Hoy va a llegar algún aviso, y no sabes cuándo. Mientras tanto puedes recorrer el mapa, hablar con la gente o adelantar trabajo en tu escritorio."
-                : "Hoy ya no queda ningún aviso por llegar. Puedes explorar, adelantar trabajo, o dar la jornada por terminada.");
+            // El dia no dice si hoy va a sonar algo ni cuando: los avisos llegan, no se anuncian.
+            _ahora.Parrafo("Puedes recorrer el mapa, hablar con la gente o adelantar trabajo en tu escritorio. Si surge algo que tengas que atender, te llegará un aviso.");
 
             // Lo que hoy trae para leer cabe en una linea cada cosa; entero, en «Avisos».
             var brief = S.BriefDeHoy;
@@ -555,12 +637,11 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Espacio();
             var botones = _ahora.Fila();
             if (S.TareasDeOficina.Count > 0) Ui.Boton(botones, "Trabajar en tu escritorio", AbrirEscritorio);
-            if (porSonar) Ui.Boton(botones, "Esperar al siguiente aviso", () => Runner.AdelantarHastaElSiguienteAviso());
-            var cerrar = Ui.Boton(botones, "Cerrar la jornada", () => { Runner.CerrarJornada(); GuiaView.Hecho(App, "cerrar-jornada"); },
-                                  porSonar ? VarianteBoton.Secundario : VarianteBoton.Primario);
-            cerrar.interactable = S.SePuedeCerrarLaJornada;
-            if (!S.SePuedeCerrarLaJornada)
-                _ahora.Nota("«Cerrar la jornada» salta al final del día, y solo se puede cuando no queda nada pendiente: saltar nunca te ahorra una consecuencia.");
+            // Un solo boton para dejar correr el tiempo, que no delata nada: salta hasta lo siguiente que pase, sea un
+            // aviso o el cierre de la jornada.
+            Ui.Boton(botones, "Adelantar el reloj", () => { if (Runner.AdelantarHastaQuePaseAlgo()) GuiaView.Hecho(App, "cerrar-jornada"); },
+                     VarianteBoton.Secundario);
+            _ahora.Nota("«Adelantar el reloj» salta hasta lo siguiente que pase: un aviso, si surge alguno, o el cierre de la jornada. Saltar nunca te ahorra una consecuencia.");
         }
 
         private void EmpezarTarea(Nexus.Core.Oficina.TareaDeOficina tarea) {
@@ -638,7 +719,8 @@ namespace Nexus.Unity.Pantallas {
         private void Prorroga() {
             _ahora.Etiqueta("Horas extra");
             _ahora.Titulo("Te has quedado");
-            _ahora.Parrafo("El día ya contó con las horas extra. Hasta la hora límite no llegan avisos: abre el «Mapa», habla con quien quede y busca lo que no has encontrado.");
+            _ahora.Parrafo("Hasta la hora límite no llegan avisos: abre el «Mapa», habla con quien quede y busca lo que no has encontrado.");
+            _ahora.Nota("Las barras del proyecto se moverán cuando el día termine, con las horas extra ya contadas.");
             _ahora.Accion("Irme ya", () => { Runner.TerminarLaProrroga(); GuiaView.Hecho(App, "irse"); });
         }
 
@@ -646,14 +728,29 @@ namespace Nexus.Unity.Pantallas {
             var w = S.W;
             _ahora.Etiqueta("Fin del día");
             _ahora.Titulo($"Día {S.R.DiaActual} de {S.Perfil.DiasTotales}, terminado");
-            if (_tengoElInicioDelDia) _ahora.Parrafo($"Hoy: avance {Textos.Cambio(w.Avance - _alEmpezarElDia[0])} · deuda {Textos.Cambio(w.DeudaTecnica - _alEmpezarElDia[1])} · " +
-                           $"moral {Textos.Cambio(w.MoralEquipo - _alEmpezarElDia[2])} · cobertura {Textos.Cambio(w.Cobertura - _alEmpezarElDia[3])} · " +
-                           $"cansancio {Textos.Cambio(w.Cansancio - _alEmpezarElDia[4])}.");
+            if (_tengoElInicioDelDia) {
+                // De como empezo el dia a como acaba: es aqui, y no a las 18:00, donde se ve pasar el dia.
+                var t = _ahora.Tarjeta(S.JornadaProrrogada ? "Cómo cambió el proyecto hoy (con las horas extra)" : "Cómo cambió el proyecto hoy");
+                var nombres = new[] { "Avance", "Deuda técnica", "Moral del equipo", "Cobertura de pruebas", "Cansancio" };
+                var ahora = new[] { w.Avance, w.DeudaTecnica, w.MoralEquipo, w.Cobertura, w.Cansancio };
+                for (var i = 0; i < nombres.Length; i++)
+                    Ui.Texto(t, $"· {nombres[i]}: {_alEmpezarElDia[i]:0.#} → {ahora[i]:0.#}  ({Textos.Cambio(ahora[i] - _alEmpezarElDia[i])})", EstiloTexto.Pequeno, Tema.ink);
+            }
             if (_tengoElInicioDelDia) PintarPorQueAvanzaste(w.Avance - _alEmpezarElDia[0]);
             if (_tengoElInicioDelDia) PintarQueSeConstruyo(_alEmpezarElDia[0], w.Avance, w.Alcance);
             if (_tengoElInicioDelDia) _ahora.Parrafo(_decisionesDeHoy == 0 ? "Hoy no tomaste ninguna decisión." :
                            _decisionesDeHoy == 1 ? "Hoy tomaste 1 decisión." : $"Hoy tomaste {_decisionesDeHoy} decisiones.");
             _ahora.Nota("La partida se ha guardado.");
+            // Dia de despliegue: antes de seguir construyendo, lo que esta listo sale a produccion (Fase 3).
+            if (S.DesplieguePendiente) {
+                var t = _ahora.Tarjeta("Hoy toca desplegar", Tono.Aviso);
+                Ui.Texto(t, "Cerraste una etapa de trabajo: lo que ya está listo puede llegar al cliente. Es la Fase 3, con el reloj en cuenta atrás. " +
+                            "Después se vuelve al desarrollo.", EstiloTexto.Pequeno, Tema.ink);
+                _ahora.Accion("Ir al despliegue (Fase 3)  ►", () => FlujoDelNivel.Desplegar(App, () => App.Router.IrA<PantallaDelDia>()));
+                return;
+            }
+            var proximo = S.DiasDeDespliegue().Where(d => d > S.R.DiaActual).Select(d => (int?)d).FirstOrDefault();
+            if (proximo.HasValue) _ahora.Nota($"Próximo despliegue: al cerrar el día {proximo.Value}.", Tema.inkMuted);
             _ahora.Accion($"Empezar el día {S.R.DiaActual + 1}", EmpezarDia);
         }
 
@@ -667,6 +764,33 @@ namespace Nexus.Unity.Pantallas {
                 .Select(i => $"{ahora[i].Key.Nombre} ({antes[i].Value:0} → {ahora[i].Value:0} %)").ToList();
             _ahora.Parrafo(cambios.Count == 0 ? "Hoy no avanzó ninguna parte del sistema."
                                               : "Hoy se construyó: " + string.Join(" · ", cambios) + ".", Tema.cyan);
+            // Cuando la arquitectura elegida pesa sobre el modelo (o venia con un coste), se dice: no es mala suerte.
+            var arqDelDia = S.Perfil.Fase1 == null ? null : S.Perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == S.ArquitecturaElegida);
+            if (arqDelDia != null && (!arqDelDia.EsLaAdecuada || (arqDelDia.ModificadoresModelo != null && arqDelDia.ModificadoresModelo.Count > 0)))
+                _ahora.Nota($"Por tu arquitectura ({arqDelDia.Nombre}): {DibujosDeArquitectura.EnElDia(arqDelDia.Id)}", Tema.warning);
+
+            // Lo que cambio a la vista: una parte que deja de ser un dibujo y empieza a responder, o a funcionar.
+            var subieron = Nexus.Core.Proyecto.MaquetaDelProducto.QueSubieron(f, avanceAntes, avanceAhora, alcance, S.R.ModulosDesplegados);
+            var plan = S.PlanDeHoy;
+            var hayDemo = plan != null && plan.EsUltimoDiaDeUnidad && S.VocesDelProducto().Count > 0;
+            if (subieron.Count > 0) {
+                var t = _ahora.Tarjeta("El producto cambió de etapa", Tono.Exito);
+                foreach (var m in subieron)
+                    Ui.Texto(t, $"· «{m.Modulo.Nombre}» ya es un {Nexus.Core.Proyecto.EtapasDelProducto.Nombre(m.Etapa)}: " +
+                                Nexus.Core.Proyecto.EtapasDelProducto.QueEs(m.Etapa), EstiloTexto.Pequeno, Tema.ink);
+                var voz = S.VocesDelProducto().FirstOrDefault(v => subieron.Any(m => m.Modulo.Id == v.ModuloId));
+                if (voz != null && !hayDemo) Ui.Texto(t, $"{voz.Quien}: «{voz.Frase}»", EstiloTexto.Dialogo, Tema.cyan);
+                if (!hayDemo) Ui.Boton(Ui.Fila(t), "Ver el producto", () => PantallaDelProducto.Abrir(App), VarianteBoton.Fantasma);
+            }
+
+            // La demo: al cerrar un sprint, una etapa o un tramo del flujo, quienes van a usar el sistema lo miran
+            // tal y como esta hoy, y cada uno habla de su parte.
+            if (!hayDemo) return;
+            var demo = _ahora.Tarjeta("La demo con el cliente", Tono.Neutro);
+            Ui.Texto(demo, "Les enseñaste el producto como está hoy. Esto es lo que dijeron:", EstiloTexto.Pequeno, Tema.inkMuted);
+            foreach (var v in S.VocesDelProducto().Take(3))
+                Ui.Texto(demo, $"{v.Quien}: «{v.Frase}»", EstiloTexto.Dialogo, Tema.cyan);
+            Ui.Boton(Ui.Fila(demo), "Ver el producto", () => PantallaDelProducto.Abrir(App), VarianteBoton.Fantasma);
         }
 
         /// <summary>
@@ -694,11 +818,15 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void FinDelDesarrollo() {
-            _ahora.Etiqueta("Fase 3 · el lanzamiento");
+            var falta = S.DesplieguePendiente;
+            _ahora.Etiqueta(falta ? "Fase 3 · el último despliegue" : "Fase 4 · el lanzamiento");
             _ahora.Titulo("Se acabaron los días");
-            _ahora.Parrafo("El desarrollo ha terminado. Ahora el cliente ve lo que has hecho, y el riesgo que acumulaste durante todos " +
-                           "estos días decide si sale bien. Después, el nivel se cierra y se evalúa.");
-            _ahora.Accion("Ir al lanzamiento", () => FlujoDelNivel.Lanzar(App));
+            _ahora.Parrafo(falta
+                ? "El desarrollo ha terminado. Queda llevar a producción todo lo construido: el último despliegue, con el reloj en cuenta atrás. " +
+                  "Cómo salga pesa en la evaluación."
+                : "El desarrollo ha terminado. Ahora el cliente ve lo que has hecho, y el riesgo que acumulaste durante todos " +
+                  "estos días decide si sale bien. Después, el nivel se cierra y se evalúa.");
+            _ahora.Accion(falta ? "Ir al despliegue (Fase 3)  ►" : "Ir al lanzamiento", () => FlujoDelNivel.Lanzar(App));
         }
 
         // ==================================================================== acciones
@@ -729,6 +857,8 @@ namespace Nexus.Unity.Pantallas {
             }
             foreach (var origen in brief.EfectosQueVencieronHoy.Distinct())
                 Anotar("Hoy se cobra algo de antes: " + NombreDeOrigen(origen) + ".");
+            foreach (var papel in S.PapelesDelCliente().Where(p => p.Dia == brief.Dia))
+                Anotar($"Llegó un papel del cliente: «{papel.Titulo}». Está en «Cliente».");
 
             if (S.Beat != null) {
                 var guion = App.Catalogo.Guiones.FirstOrDefault(g => g.Id == S.Beat.BeatId);
@@ -840,6 +970,56 @@ namespace Nexus.Unity.Pantallas {
             GuiaView.Avisar(App, "coleccionable");
         }
 
+        private TMP_Text _textoCliente;
+
+        /// <summary>
+        /// La carpeta del cliente, en un pizarron: quien es y que le duele, los papeles que han ido llegando (cada uno
+        /// dibujado como lo que es) y lo que dicen hoy del producto quienes lo van a usar.
+        /// </summary>
+        private void AbrirCarpetaDelCliente() {
+            var ficha = S.Perfil.Proyecto;
+            if (ficha == null) return;
+            var paginas = new List<Nexus.Core.Narrativa.PaginaDePizarra>();
+            var dibujos = new Dictionary<Nexus.Core.Narrativa.PaginaDePizarra, Action<Nexus.Unity.Pantallas.Minijuegos.Tizador, float>>();
+
+            foreach (var papel in S.PapelesDelCliente()) {
+                var p = papel;
+                var nuevo = !S.R.PapelesLeidos.Contains(p.Id);
+                var pagina = new Nexus.Core.Narrativa.PaginaDePizarra {
+                    Titulo = p.Titulo,
+                    Texto = $"{(nuevo ? "NUEVO · " : "")}De: {p.De} · llegó el día {p.Dia}\n{p.QueTeDice}"
+                };
+                // El papel, dibujado debajo del texto, tan grande como quepa.
+                dibujos[pagina] = (t, y) => {
+                    var k = Mathf.Min(1.5f, (800 - (y + 30)) / DibujosDelProducto.Alto);
+                    DibujosDelProducto.Papel(t.En((MarcoDePizarra.W - DibujosDelProducto.Ancho * k) / 2, y + 30, k), p);
+                };
+                paginas.Add(pagina);
+            }
+            // Quien es el cliente y lo que dicen sus usuarios, dibujado: tres cuadros y una fila de caras, no parrafos.
+            var cliente = new Nexus.Core.Narrativa.PaginaDePizarra { Titulo = "Quién es tu cliente" };
+            dibujos[cliente] = (t, y) => DibujosDelProducto.Cliente(t, ficha, y);
+            paginas.Add(cliente);
+            var voces = S.VocesDelProducto();
+            if (voces.Count > 0) {
+                var modulos = S.Producto();
+                var dicen = new Nexus.Core.Narrativa.PaginaDePizarra {
+                    Titulo = "Lo que dicen hoy del producto",
+                    Texto = "Cada uno mira su parte del sistema, tal como está hoy."
+                };
+                dibujos[dicen] = (t, y) => DibujosDelProducto.Voces(t, voces, modulos, y);
+                paginas.Add(dicen);
+            }
+
+            S.MarcarPapelesLeidos();
+            App.Router.Apilar<PantallaDePizarra>(p => {
+                p.Etiqueta = "EL CLIENTE";
+                p.Tema = "La carpeta del cliente · " + ficha.Cliente.Nombre;
+                p.Paginas = paginas;
+                p.Dibujos = dibujos;
+            });
+        }
+
         private void AbrirDiario() {
             Runner.Pausado = true;
             App.Router.Apilar<PantallaDelDiario>(p => p.AlCerrar = () => Runner.Pausado = false);
@@ -877,12 +1057,6 @@ namespace Nexus.Unity.Pantallas {
             return S.AlertasDeHoy.Where(a => a.EstaPendiente && a.YaSono(ahora)).ToList();
         }
 
-        private bool QuedaAlgunAviso() {
-            if (Runner.Estado != EstadoDelDia.Corriendo) return false;
-            var ahora = S.MinutoDelDia;
-            return S.AlertasDeHoy.Any(a => a.EstaPendiente && a.MinutoDeLaAlerta > ahora);
-        }
-
         private static string NombreDeEstadistica(string stock) {
             switch (stock) {
                 case "DeudaTecnica": return "deuda técnica";
@@ -902,6 +1076,7 @@ namespace Nexus.Unity.Pantallas {
         private string NombreDeOrigen(string origen) {
             var ev = App.Catalogo.Eventos.FirstOrDefault(e => e.Id == origen);
             if (ev != null) return "«" + ev.Nombre + "»";
+            if (origen == Nexus.Core.Sesion.GameSession.OrigenDeDespliegue) return "arreglar lo que salió mal en el último despliegue";
             return origen;
         }
 

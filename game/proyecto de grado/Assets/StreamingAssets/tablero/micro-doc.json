@@ -1,0 +1,112 @@
+{
+  "extractos": [
+    {
+      "id": "DOC-SRS-1",
+      "documento": "SRS",
+      "titulo": "Requisito de registro",
+      "tieneDefecto": false,
+      "secciones": [
+        "El sistema registrará a cada visitante con su nombre, a quién visita y la hora de entrada.",
+        "El registro de un visitante tomará menos de 30 segundos, contados desde que llega al mostrador.",
+        "Se comprobará cronometrando diez registros seguidos con la recepcionista."
+      ],
+      "explicacion": "Estaba bien: dice qué hace, pone un número y dice cómo se va a comprobar. Un requisito así se puede construir y se puede probar. No había nada que cambiar."
+    },
+    {
+      "id": "DOC-SRS-2",
+      "documento": "SRS",
+      "titulo": "Requisito de rendimiento",
+      "tieneDefecto": true,
+      "secciones": [
+        "El sistema deberá ser rápido y fácil de usar.",
+        "La pantalla de recepción deberá responder de forma ágil en las horas punta.",
+        "Los usuarios deberán quedar satisfechos con la velocidad."
+      ],
+      "explicacion": "«Rápido», «ágil» y «satisfechos» no se pueden comprobar: ¿cuántos segundos?, ¿medidos cómo? Un requisito sin número ni forma de probarlo es una opinión, y cada uno la va a entender distinto."
+    },
+    {
+      "id": "DOC-SRS-3",
+      "documento": "SRS",
+      "titulo": "Visitantes sin cita",
+      "tieneDefecto": false,
+      "secciones": [
+        "Un visitante con cita se registra buscándolo por su nombre en la lista del día.",
+        "Un visitante sin cita se registra escribiendo sus datos; el anfitrión recibe un aviso y decide si lo recibe.",
+        "Si el anfitrión no contesta en cinco minutos, la recepcionista lo ve marcado en amarillo."
+      ],
+      "explicacion": "Estaba bien: cubre los dos casos (con cita y sin cita) y dice qué pasa cuando nadie contesta. Lo que suele faltar en un requisito es justo el caso raro, y aquí está."
+    },
+    {
+      "id": "DOC-SAD-1",
+      "documento": "SAD",
+      "titulo": "Decisión de arquitectura",
+      "tieneDefecto": false,
+      "secciones": [
+        "Se elige un único programa con módulos separados por dentro, y no varios servicios.",
+        "Motivo: el equipo es de cuatro personas y nadie ha operado servicios en producción.",
+        "Consecuencia aceptada: si el uso crece mucho, habrá que separar el módulo de lectura de matrículas."
+      ],
+      "explicacion": "Estaba bien: una decisión de arquitectura bien escrita dice qué se eligió, por qué y qué se pierde con ello. Las tres cosas están."
+    },
+    {
+      "id": "DOC-SAD-2",
+      "documento": "SAD",
+      "titulo": "Módulos y sus conexiones",
+      "tieneDefecto": true,
+      "secciones": [
+        "El módulo de reservas guarda sus datos en su propia parte de la base de datos.",
+        "El informe mensual lee directamente las tablas de reservas para ir más rápido.",
+        "Ningún módulo conoce los datos internos de otro."
+      ],
+      "explicacion": "La segunda línea contradice a la tercera: el informe lee por dentro las tablas de reservas. El día que reservas cambie una tabla, el informe se rompe sin que nadie lo vea venir."
+    },
+    {
+      "id": "DOC-SDD-1",
+      "documento": "SDD",
+      "titulo": "Diseño del control de acceso",
+      "tieneDefecto": false,
+      "secciones": [
+        "Al leer una matrícula, el control de acceso consulta la lista de vehículos autorizados.",
+        "Si está autorizada y dentro de su horario, ordena abrir la barrera y guarda la entrada.",
+        "Si no lo está, no abre, guarda el intento y avisa al guardia en su pantalla."
+      ],
+      "explicacion": "Estaba bien: dice qué pasa en el caso bueno y en el malo, y en los dos queda registro. Es justo lo que faltaba la noche del incidente."
+    },
+    {
+      "id": "DOC-SDD-2",
+      "documento": "SDD",
+      "titulo": "Diseño de la reserva de ascensores",
+      "tieneDefecto": true,
+      "secciones": [
+        "Una reserva tiene ascensor, franja de inicio y fin, y quién la pide.",
+        "Al guardar una reserva se comprueba que el ascensor existe.",
+        "Las reservas se muestran en el portal ordenadas por hora."
+      ],
+      "explicacion": "No dice qué pasa si la franja ya está ocupada: se comprueba que el ascensor existe, pero no que esté libre. Dos reservas pueden pisarse, que es exactamente la queja de Facilities."
+    },
+    {
+      "id": "DOC-PTP-1",
+      "documento": "PTP",
+      "titulo": "Plan de pruebas de extremo a extremo",
+      "tieneDefecto": false,
+      "secciones": [
+        "Se probará el camino entero: un vehículo llega, se lee su matrícula, se decide y la barrera responde.",
+        "Casos: matrícula autorizada, no autorizada, fuera de horario y matrícula que no se lee.",
+        "Cada caso dice el resultado esperado y quién lo ejecuta."
+      ],
+      "explicacion": "Estaba bien: cubre el camino crítico con sus casos raros y dice qué se espera de cada uno. Un plan de pruebas así se puede ejecutar sin preguntar nada."
+    },
+    {
+      "id": "DOC-PTP-2",
+      "documento": "PTP",
+      "titulo": "Plan de pruebas de regresión",
+      "tieneDefecto": true,
+      "secciones": [
+        "Se volverá a probar lo que ya funcionaba antes de este cambio.",
+        "Las pruebas las hará quien tenga tiempo la última semana.",
+        "Si no da tiempo, se probará lo más importante."
+      ],
+      "explicacion": "No dice qué se prueba, quién, ni qué es «lo más importante»: eso se decide el último día y con prisa. Un plan que deja la decisión para cuando ya no hay tiempo no es un plan."
+    }
+  ]
+}

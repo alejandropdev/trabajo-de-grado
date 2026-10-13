@@ -47,7 +47,11 @@ namespace Nexus.Core.Minijuegos.Detectar
             }
 
             string clave;
-            if (st.Marcas.Count == 0) clave = OMITIDO;
+            // Darlo por bueno a proposito: acierto si de verdad no habia nada, y defectos escapados si lo habia.
+            if (st.Marcas.Count == 0 && st.Aprobado) clave = def.Zonas.Count == 0 ? TODOS : PARCIAL;
+            else if (st.Marcas.Count == 0) clave = OMITIDO;
+            // En una escena limpia, cualquier marca acusa a algo que estaba bien.
+            else if (def.Zonas.Count == 0) clave = senuelosTocados.Count > 0 ? FALSO_POSITIVO : PARCIAL;
             // Acusar lo que esta bien manda sobre acertar... a partir de la tolerancia de la escena. Por debajo, un
             // señuelo marcado deja el resultado en parcial como mucho: nunca en «todos».
             else if (senuelosTocados.Count > def.ToleranciaDeSenuelos) clave = FALSO_POSITIVO;
@@ -93,6 +97,12 @@ namespace Nexus.Core.Minijuegos.Detectar
                 res.Detalle.Add(acertadas.Contains(z.Id)
                     ? "Encontraste «" + Humanizar(z.Defecto) + "»: " + z.Explicacion
                     : "Se te escapó «" + Humanizar(z.Defecto) + "»: " + z.Explicacion);
+
+            // Una escena limpia bien aprobada: se explica por que lo que parecia raro no lo era.
+            if (def.Zonas.Count == 0 && clave == TODOS)
+                foreach (var s in def.Senuelos) res.Detalle.Add("Parecía raro, pero estaba bien: " + s.RazonNoEsDefecto);
+            if (def.Zonas.Count == 0 && clave != TODOS && traza.Count > 0 && traza.All(m => m.SenueloTocado == null))
+                res.Detalle.Add("Marcaste una pieza que estaba bien: en este diseño no había ningún problema.");
 
             foreach (var id in traza.Where(m => m.SenueloTocado != null).Select(m => m.SenueloTocado).Distinct())
             {

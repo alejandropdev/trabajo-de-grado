@@ -112,6 +112,9 @@ namespace Nexus.Unity.Aplicacion {
             try {
                 Catalogo = CatalogLoader.CargarTodo(new CatalogoDeArchivos(RutasDeGuardado.Contenido));
                 Debug.Log("[Nexus] Catalogo cargado: " + Catalogo);
+                // El contenido se valida contra la lista de escenas de Core; aqui se comprueba que cada una tiene su dibujo.
+                foreach (var desajuste in Nexus.Unity.Pantallas.DibujosDeEscena.Desajustes())
+                    Debug.LogWarning("[Nexus] Escenas de pizarrón, " + desajuste);
             } catch (SchemaException ex) {
                 ErroresDeCarga = ex.Errores != null && ex.Errores.Count > 0
                     ? ex.Errores

@@ -12,6 +12,7 @@ sobre la Tríada de Hierro (tiempo, costo, calidad), la deuda técnica y el equi
 docs/       Documentación del trabajo de grado (PMP, SRS, GDD, arquitectura, QA)
 game/       Proyecto de Unity 6
 tools/      Scripts auxiliares y hojas de balanceo
+3D/         Proyecto 3D tal como se recibió (no versionado; ya integrado en game/)
 builds/     Compilaciones locales (no versionado)
 ```
 
@@ -23,6 +24,10 @@ UI     ──> App ──> Data ──> Domain
                               ^
                             Core
 ```
+
+El mundo 3D de la recolección de la Fase 1 está en `game/proyecto de grado/Assets/Mundo3D/` y se enchufa al
+juego por una interfaz (`IModuloDeRecoleccion`). Cómo se integró y cómo comprobar que no se perdió nada:
+`docs/02-diseno/adr/0008-integracion-del-mundo-3d.md` y `tools/integracion-3d/README.md`.
 
 `Domain` es C# puro y no referencia `UnityEngine`; esa restricción está impuesta por su
 assembly definition (`noEngineReferences: true`), de modo que el motor de simulación pueda

@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "id": "kanban",
+  "paginas": [
+    {
+      "titulo": "¿Qué es Kanban?",
+      "texto": "Un método para ver el trabajo, limitar cuánto se hace a la vez y mejorar poco a poco la forma en que avanza. «Kanban» es una palabra japonesa que significa «tarjeta visual».",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-que",
+      "capitulo": "Qué es Kanban"
+    },
+    {
+      "titulo": "Origen",
+      "texto": "Nació en las fábricas de Toyota (Taiichi Ohno, años 40 y 50), inspirado en los supermercados: solo se repone lo que se ha gastado. David J. Anderson lo adaptó al software entre 2007 y 2010.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "kb-origen",
+      "capitulo": "Qué es Kanban"
+    },
+    {
+      "titulo": "La diferencia clave",
+      "texto": "No hay Sprints. En Scrum el trabajo sale por lotes, cada cierto tiempo. En Kanban fluye de forma continua: cada cosa se entrega en cuanto está lista.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-diferencia",
+      "capitulo": "Qué es Kanban"
+    },
+    {
+      "titulo": "Principios de cambio",
+      "texto": "Empieza con lo que haces hoy, sin cambiarlo todo de golpe. Mejora poco a poco. Y respeta los roles y cargos que ya existen: Kanban se añade, no reemplaza.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-cambio",
+      "capitulo": "Qué es Kanban"
+    },
+    {
+      "titulo": "Principios de servicio",
+      "texto": "Entender lo que necesita el cliente, dejar que la gente se organice sola alrededor del trabajo y revisar a menudo cómo se está dando el servicio.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-servicio",
+      "capitulo": "Qué es Kanban"
+    },
+    {
+      "titulo": "Las 6 prácticas",
+      "texto": "Visualizar el trabajo, limitar el trabajo en curso (WIP), gestionar el flujo, hacer explícitas las reglas, usar ciclos de feedback y mejorar en colaboración.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "kb-practicas",
+      "capitulo": "El tablero y las tarjetas"
+    },
+    {
+      "titulo": "El tablero",
+      "texto": "Columnas que muestran cada etapa por la que pasa el trabajo. Los nombres no vienen dados: reflejan tu proceso real. En una cocina serían estos.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "kb-tablero",
+      "capitulo": "El tablero y las tarjetas"
+    },
+    {
+      "titulo": "Anatomía de la tarjeta",
+      "texto": "Cada tarjeta es una unidad de trabajo. Lleva lo justo para entenderla de un vistazo: título, responsable, fecha, tipo de trabajo y si está bloqueada.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-tarjeta",
+      "capitulo": "El tablero y las tarjetas"
+    },
+    {
+      "titulo": "Visualizar el flujo",
+      "texto": "Lo que no se ve no se puede gestionar. El trabajo de oficina es invisible hasta que alguien lo pone en una pared: entonces se ve qué hay, dónde está y qué se atasca.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "kb-visualizar",
+      "capitulo": "El tablero y las tarjetas"
+    },
+    {
+      "titulo": "Límite WIP",
+      "texto": "WIP viene de «work in progress»: trabajo en curso. El límite dice cuántas cosas puede haber a la vez en una columna. Si se llena, no se empieza nada nuevo hasta terminar algo.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-wip",
+      "capitulo": "Limitar y jalar"
+    },
+    {
+      "titulo": "¿Por qué limitar el WIP?",
+      "texto": "Hacer muchas cosas a la vez vuelve todo más lento y produce más errores: se pierde tiempo saltando de una a otra y nada se termina.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "kb-porque-wip",
+      "capitulo": "Limitar y jalar"
+    },
+    {
+      "titulo": "Sistema Pull",
+      "texto": "El trabajo se «jala» cuando hay capacidad, en vez de empujarlo. Nadie te carga tareas encima: tú tomas la siguiente cuando terminas la que tenías.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "kb-pull",
+      "capitulo": "Limitar y jalar"
+    },
+    {
+      "titulo": "Gestionar el flujo",
+      "texto": "El objetivo es que el trabajo avance suave y de forma predecible, no que todo el mundo esté ocupado. Un equipo muy ocupado puede no estar entregando nada.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "kb-flujo",
+      "capitulo": "Cuidar el flujo"
+    },
+    {
+      "titulo": "Cuellos de botella",
+      "texto": "La etapa más lenta marca la velocidad de todo. Se reconoce en el tablero: las tarjetas se amontonan justo antes de ella, y después no hay casi nada.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "kb-cuello",
+      "capitulo": "Cuidar el flujo"
+    },
+    {
+      "titulo": "Bloqueos",
+      "texto": "Una tarjeta que no puede avanzar se marca a la vista, con el motivo, para resolverla rápido. Un bloqueo escondido frena a todos sin que nadie sepa por qué.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¡OJO!",
+      "dibujo": "kb-bloqueo",
+      "capitulo": "Cuidar el flujo"
+    },
+    {
+      "titulo": "Políticas explícitas",
+      "texto": "Reglas claras y escritas, a la vista de todos. Por ejemplo, qué debe cumplir una tarjeta para pasar a la siguiente columna. Así nadie tiene que adivinar.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-politicas",
+      "capitulo": "Cuidar el flujo"
+    },
+    {
+      "titulo": "Clases de servicio",
+      "texto": "No todo el trabajo se trata igual. Hay cuatro clases habituales, cada una con sus reglas: lo urgente pasa primero, lo de fecha fija se planea hacia atrás desde esa fecha.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUÉ ES?",
+      "dibujo": "kb-clases",
+      "capitulo": "Cuidar el flujo"
+    },
+    {
+      "titulo": "Carriles (swimlanes)",
+      "texto": "Filas horizontales que cruzan el tablero para separar tipos de trabajo o equipos. Un carril rápido para lo urgente evita que se mezcle con lo demás.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CÓMO?",
+      "dibujo": "kb-carriles",
+      "capitulo": "Cuidar el flujo"
+    },
+    {
+      "titulo": "Lead time, cycle time y throughput",
+      "texto": "Lead time: lo que tarda algo desde que se pide hasta que se entrega. Cycle time: desde que se empieza hasta que se termina. Throughput: cuántas cosas se terminan por semana.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "kb-metricas",
+      "capitulo": "Medir"
+    },
+    {
+      "titulo": "Diagrama de flujo acumulado",
+      "texto": "Una gráfica de bandas de colores (CFD, por sus siglas en inglés) que muestra cuánto trabajo hay en cada etapa a lo largo del tiempo. Una banda que engorda delata un atasco.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "kb-cfd",
+      "capitulo": "Medir"
+    },
+    {
+      "titulo": "Ley de Little",
+      "texto": "El tiempo promedio de entrega es igual al trabajo en curso dividido entre lo que se termina por semana. Por eso, con menos cosas empezadas, cada una sale antes.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "DATO",
+      "dibujo": "kb-little",
+      "capitulo": "Medir"
+    },
+    {
+      "titulo": "Cadencias",
+      "texto": "Las reuniones de Kanban, cada una con su ritmo: reabastecer la lista, la reunión diaria, planear la entrega y revisar el servicio, las operaciones, los riesgos y la estrategia.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿CUÁNDO?",
+      "dibujo": "kb-cadencias",
+      "capitulo": "Reuniones y roles"
+    },
+    {
+      "titulo": "Roles y Scrumban",
+      "texto": "Kanban no exige roles, aunque suelen usarse dos: quien gestiona las solicitudes y quien cuida el flujo. Scrumban mezcla los Sprints de Scrum con el límite WIP de Kanban.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "¿QUIÉN?",
+      "dibujo": "kb-roles",
+      "capitulo": "Reuniones y roles"
+    },
+    {
+      "titulo": "Resumen de Kanban",
+      "texto": "Visualiza, limita, fluye, mide y mejora. Sirve especialmente bien para soporte, mantenimiento y cualquier trabajo que llega de forma continua.",
+      "vinetas": [],
+      "enElJuego": false,
+      "etiqueta": "RESUMEN",
+      "dibujo": "kb-resumen",
+      "capitulo": "Resumen"
+    }
+  ]
+}

@@ -299,6 +299,25 @@ namespace Nexus.Core.Metodologia {
             return plan;
         }
 
+        /// <summary>Cada cuantos dias se despliega en un calendario continuo: con la revision del flujo.</summary>
+        public const int DiasEntreDesplieguesContinuos = 5;
+
+        /// <summary>
+        /// Si ese dia cierra con un despliegue (Fase 3), sin contar el ultimo del nivel, que despliega siempre:
+        ///   · iterativo (Scrum)  — al cerrar cada sprint: lo terminado sale y el cliente lo ve.
+        ///   · continuo (Kanban)  — cada pocos dias, con la revision del flujo: se entrega de a poco.
+        ///   · secuencial (Cascada) — nunca antes del final: todo sale junto.
+        /// </summary>
+        public bool EsDiaDeDespliegue(int dia) {
+            if (dia <= 0 || dia >= DiasTotales) return false;
+            switch (Profile.Calendario.Tipo) {
+                case TiposDeCalendario.Iterativo: return PlanFor(dia).EsUltimoDiaDeUnidad;
+                case TiposDeCalendario.Continuo:
+                    return dia % (Profile.Calendario.CadaCuantosDias > 0 ? Profile.Calendario.CadaCuantosDias : DiasEntreDesplieguesContinuos) == 0;
+                default: return false;
+            }
+        }
+
         /// <summary>Que dice la metodologia si hoy el cliente quiere cambiar el alcance.</summary>
         public VeredictoCambio EvaluarCambioDeAlcance(int dia) {
             var plan = PlanFor(dia);

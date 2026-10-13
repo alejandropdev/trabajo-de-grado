@@ -104,12 +104,32 @@ Qué hace el motor con un resultado válido:
 
 ---
 
-## Cómo se simula hoy
+## Cómo está integrado hoy
+
+El proyecto 3D vive dentro del proyecto del juego (ADR-0008): lo recibido está en
+`Assets/Mundo3D/Externo/`, y la escena que abre el juego es `Assets/Mundo3D/Escenas/Recoleccion3D.unity`.
+
+1. En el paso «Recorrido» de la Fase 1, el botón **«Empezar recolección»** llama a
+   `IModuloDeRecoleccion.Empezar(app, entrada, alTerminar)` con la `EntradaDeRecoleccion` de arriba.
+2. `Nexus.Mundo3D` (`Assets/Scripts/Mundo3D/`) carga la escena del recorrido junto a la del juego y pone
+   encima el botón **«Dejar de recolectar»** (`PantallaDeRecoleccion3D`).
+3. Al pulsarlo, descarga la escena, vuelve a la Fase 1 y entrega un `ResultadoDeRecoleccion`, que la pantalla
+   pasa a `GameSession.AplicarRecoleccion`.
+
+**Lo que es provisional.** El 3D todavía no recoge nada, así que ese resultado no sale de lo que hizo el
+jugador: `ResultadoProvisional.Para(entrada)` devuelve el del simulador en intensidad `"normal"`. Para que el
+3D entregue el resultado de verdad, es la única pieza que hay que cambiar: armar el `ResultadoDeRecoleccion`
+con las zonas pisadas y los hallazgos recogidos. La `EntradaDeRecoleccion` ya llega a la pantalla
+(`PantallaDeRecoleccion3D.Entrada`); falta que la escena la use para colocar los hallazgos.
+
+Si `Nexus.Mundo3D` no está en la build, la Fase 1 vuelve sola al recorrido simulado de abajo.
+
+## Cómo se simula (cuando no hay 3D)
 
 `SimuladorDeRecoleccion.Simular(entrada, intensidad)`, con `"rapida"`, `"normal"` o `"a-fondo"`. Usa el 40 %,
 el 70 % o el 100 % del tiempo, recoge cada hallazgo de las zonas visitadas con probabilidad 0,5, 0,8 o 1, y
-los riesgos con 0,2, 0,35 o 0,6. Es determinista: misma semilla e intensidad, mismo resultado. En pantalla
-son los tres botones «Simular recolección 3D» del paso «Recorrido» de la Fase 1.
+los riesgos con 0,2, 0,35 o 0,6. Es determinista: misma semilla e intensidad, mismo resultado. Son los tres botones
+«Simular recolección 3D» del paso «Recorrido», que solo aparecen si el mundo 3D no está en la build.
 
 ## Dónde está el contenido
 

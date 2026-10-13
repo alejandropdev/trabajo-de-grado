@@ -19,6 +19,7 @@ namespace Nexus.Unity.Pantallas {
         public Action<Hoja> Pintar;
         public Func<string> Clave;
         public Action AlCerrar;
+        public Action<PanelDelDia> AlReabrir;
 
         private Hoja _cuerpo;
         private string _clave;
@@ -57,6 +58,18 @@ namespace Nexus.Unity.Pantallas {
             if (_cerrado) return;
             _cerrado = true;
             AlCerrar?.Invoke();
+        }
+
+        /// <summary>
+        /// Otra pantalla lo tapo sin cerrarlo (el diario se abre encima) y ahora vuelve a estar a la vista: avisa a
+        /// quien lo abrio, que al taparse lo dio por cerrado y solto el reloj.
+        /// </summary>
+        public override void AlMostrar() {
+            if (_cerrado) {
+                _cerrado = false;
+                AlReabrir?.Invoke(this);
+            }
+            base.AlMostrar();
         }
     }
 }

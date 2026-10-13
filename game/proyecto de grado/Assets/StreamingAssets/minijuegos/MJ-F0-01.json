@@ -17,6 +17,7 @@
     "elementos": [
       {
         "id": "pantalla",
+        "capa": "interfaz",
         "texto": "Pantalla de recepción",
         "tipo": "componente",
         "fila": 0,
@@ -25,6 +26,7 @@
       },
       {
         "id": "registro",
+        "capa": "logica",
         "texto": "Registro de visitas",
         "tipo": "componente",
         "fila": 1,
@@ -33,6 +35,7 @@
       },
       {
         "id": "aviso",
+        "capa": "logica",
         "texto": "Aviso al anfitrión",
         "tipo": "componente",
         "fila": 1,
@@ -41,6 +44,7 @@
       },
       {
         "id": "bd",
+        "capa": "datos",
         "texto": "Base de datos",
         "tipo": "baseDeDatos",
         "fila": 2,
@@ -49,6 +53,7 @@
       },
       {
         "id": "correo",
+        "capa": "externo",
         "texto": "Correo de Nexus",
         "tipo": "externo",
         "fila": 2,
@@ -59,24 +64,28 @@
     "conexiones": [
       {
         "id": "c1",
+        "tipo": "pide",
         "desde": "pantalla",
         "hasta": "registro",
         "texto": "datos del visitante"
       },
       {
         "id": "c2",
+        "tipo": "escribe",
         "desde": "registro",
         "hasta": "bd",
         "texto": "guarda la visita"
       },
       {
         "id": "c3",
+        "tipo": "pide",
         "desde": "registro",
         "hasta": "aviso",
         "texto": "visita registrada"
       },
       {
         "id": "c4",
+        "tipo": "pide",
         "desde": "aviso",
         "hasta": "correo",
         "texto": "envía el aviso"

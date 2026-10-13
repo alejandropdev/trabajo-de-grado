@@ -145,6 +145,15 @@
       "resaltar": "fase1.razones"
     },
     {
+      "id": "F1-MET-DURACION",
+      "nivel": "nivel-00",
+      "disparador": "fase1.metodologia",
+      "orden": 105,
+      "titulo": "¿Y cuánto dura cada parte?",
+      "texto": "Cuando elijas la forma de trabajar y el motivo, debajo te pregunto cuánto dura cada sprint, cómo repartes las etapas o cada cuánto entregas. No hay una respuesta correcta: partes más cortas son más ocasiones de enseñar y corregir, pero también más reuniones y más despliegues.",
+      "resaltar": "fase1.razones"
+    },
+    {
       "id": "F1-CAL-1",
       "nivel": "nivel-00",
       "disparador": "fase1.calidad",
@@ -172,6 +181,25 @@
       "titulo": "La pista está en el encargo",
       "texto": "Relee el encargo (tienes el botón arriba): ¿cuántas personas lo van a usar? ¿Hay alguien que sepa de sistemas? ¿Se puede instalar algo? La respuesta está ahí. Cuando elijas una opción, a su derecha salen SUS razones: elige la que de verdad la justifica.",
       "resaltar": "fase1.razones"
+    },
+    {
+      "id": "F1-BL-1",
+      "nivel": "nivel-00",
+      "disparador": "fase1.backlog",
+      "orden": 132,
+      "titulo": "El product backlog",
+      "texto": "El product backlog es la lista de todo lo que hay que construir, ordenada por importancia. Este proyecto empieza de cero, así que la lista la armas tú. Cada renglón es una historia: dice quién necesita qué, y para qué.",
+      "mas": "Una historia se escribe así: «Como recepcionista, quiero registrar una visita con tres datos, para que la fila no se alargue». No dice cómo se programa: dice qué necesita alguien.",
+      "resaltar": "fase1.historias"
+    },
+    {
+      "id": "F1-BL-2",
+      "nivel": "nivel-00",
+      "disparador": "fase1.backlog",
+      "orden": 134,
+      "titulo": "No todo debe entrar",
+      "texto": "Entre las candidatas hay cosas que nadie pidió, una que dice lo mismo que otra y una que es una tarea de programación, no una historia. Mira a la derecha quién necesita qué: lo que no le sirve a ninguno de ellos, sobra. Después ordena: arriba, lo que más le vale al cliente.",
+      "resaltar": "fase1.mibacklog"
     },
     {
       "id": "F1-RES-1",
@@ -357,7 +385,7 @@
       "disparador": "dia.2",
       "orden": 290,
       "titulo": "Los avisos",
-      "texto": "Hoy puede llegar un aviso. Lo verás en «La jornada», con una cuenta atrás, y el botón «Avisos» dirá cuántos esperan. Si lo dejas caducar, alguien decide por ti, y casi nunca bien."
+      "texto": "Cuando surja algo que tengas que atender, te llegará un aviso: nadie te dice antes qué día ni a qué hora. Lo verás en «La jornada», con una cuenta atrás, y el botón «Avisos» dirá cuántos esperan. Si lo dejas caducar, alguien decide por ti, y casi nunca bien."
     },
     {
       "id": "ALERTA-1",
@@ -465,6 +493,41 @@
       "texto": "Te quedaste. Hasta la hora límite no llegan avisos: aprovecha para explorar o hablar con quien quede. Cuando quieras, pulsa «Irme ya»."
     },
     {
+      "id": "DESP-1",
+      "nivel": "nivel-00",
+      "disparador": "despliegue.intro",
+      "orden": 431,
+      "titulo": "La Fase 3: desplegar",
+      "texto": "Tu sistema está construido, pero todavía vive en tu computador. Desplegar es llevarlo a donde lo va a usar el cliente: aquí, al equipo de la recepción. Tienes cinco minutos para todo.",
+      "mas": "Al sitio donde lo usan los clientes de verdad se le llama «producción». Antes de llegar ahí, el código pasa por una serie de comprobaciones automáticas: eso es la tubería (en inglés, pipeline)."
+    },
+    {
+      "id": "DESP-2",
+      "nivel": "nivel-00",
+      "disparador": "despliegue.tuberia",
+      "orden": 432,
+      "titulo": "Arma la tubería",
+      "texto": "Arrastra un tramo a cada hueco, de izquierda a derecha, en el orden en que debe pasar. Pulsa un tramo para leer qué hace. Ojo: no todos los tramos convienen, y lo que no pongas no ocurre.",
+      "mas": "Piensa en una fila de puertas: primero se comprueba que el programa arranca, después que no tiene errores, después se ensaya en un sitio de pruebas, y solo entonces llega al cliente. Y al final, alguien se queda mirando que siga funcionando."
+    },
+    {
+      "id": "DESP-3",
+      "nivel": "nivel-00",
+      "disparador": "despliegue.modulos",
+      "orden": 433,
+      "titulo": "Enchufa cada módulo",
+      "texto": "Cada módulo necesita cosas para funcionar: dónde guardar, por dónde avisar, su clave. Arrastra cada cable a su toma. Fíjate en la etiqueta de cada toma: PRODUCCIÓN es lo de verdad; PRUEBAS, no.",
+      "mas": "Un programa que en tu computador hablaba con una base de datos de mentira tiene que hablar ahora con la de verdad. Si se queda apuntando a la de pruebas, funciona… pero los datos van al sitio equivocado. Y las claves nunca se escriben a la vista."
+    },
+    {
+      "id": "DESP-4",
+      "nivel": "nivel-00",
+      "disparador": "despliegue.resultado",
+      "orden": 434,
+      "titulo": "Cómo salió el despliegue",
+      "texto": "Renglón a renglón, qué estuvo bien y qué faltó, con su porqué. A la derecha, lo que le hace al proyecto: lo que notó el cliente hoy y lo que se suma al riesgo y a los errores del lanzamiento."
+    },
+    {
       "id": "LANZ-1",
       "nivel": "nivel-00",
       "disparador": "lanzamiento",
@@ -550,6 +613,14 @@
       "titulo": "Una ayuda nueva",
       "texto": "Alguien del equipo te ofrece una ayuda. Está en «Equipo», arriba; las de los retos se eligen en la receta.",
       "resaltar": "dia.equipo"
+    },
+    {
+      "id": "N1-DESP-1",
+      "nivel": "nivel-01",
+      "disparador": "despliegue.intro",
+      "orden": 55,
+      "titulo": "Desplegar, según cómo trabajas",
+      "texto": "Aquí la metodología decide cada cuánto se despliega. Entregando por partes, el cliente ve el sistema funcionar antes y el final pesa menos; todo junto al final es más barato hoy y más arriesgado ese día."
     },
     {
       "id": "N1-LANZ-1",

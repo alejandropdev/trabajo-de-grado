@@ -5,11 +5,45 @@
       "presionDiegetica": "Marisol recoge las propuestas revisadas a las 12:00", "reloj": 90,
       "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
       "precondiciones": ["diaActual >= 3"], "soloNiveles": ["nivel-00"] },
+    {
+      "id": "MJ-F0-02",
+      "verbo": "V1_DETECTAR",
+      "archivo": "minijuegos/MJ-F0-02.json",
+      "objetivoAprendizaje": "OA-DOC-01",
+      "presionDiegetica": "Mateo empieza a programarlo a las 11:00",
+      "reloj": 90,
+      "pesoBase": 10,
+      "enfriamiento": 6,
+      "maxOcurrencias": 1,
+      "precondiciones": [
+        "diaActual >= 2"
+      ],
+      "soloNiveles": [
+        "nivel-00"
+      ]
+    },
 
     { "id": "MJ-F1-07", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F1-07.json", "objetivoAprendizaje": "OA-DOC-01",
       "presionDiegetica": "Javier empieza a programar sobre este diagrama a las 11:00", "reloj": 120,
       "pesoBase": 12, "enfriamiento": 6, "maxOcurrencias": 1,
       "precondiciones": ["diaActual >= 2", "diaActual <= 8"], "soloNiveles": ["nivel-01"] },
+    {
+      "id": "MJ-F1-10",
+      "verbo": "V1_DETECTAR",
+      "archivo": "minijuegos/MJ-F1-10.json",
+      "objetivoAprendizaje": "OA-DOC-01",
+      "presionDiegetica": "Andrés empieza a programarlo mañana",
+      "reloj": 120,
+      "pesoBase": 12,
+      "enfriamiento": 6,
+      "maxOcurrencias": 1,
+      "precondiciones": [
+        "diaActual >= 9"
+      ],
+      "soloNiveles": [
+        "nivel-01"
+      ]
+    },
 
     { "id": "MJ-F1-08", "verbo": "V3_ORDENAR", "archivo": "minijuegos/MJ-F1-08.json", "objetivoAprendizaje": "OA-SCRUM-01",
       "presionDiegetica": "Facilities espera respuesta antes de la reunión de las 12:00", "reloj": 150,
@@ -29,6 +63,23 @@
     { "id": "MJ-F2-08", "verbo": "V2_REPARTIR", "archivo": "minijuegos/MJ-F2-08.json", "objetivoAprendizaje": "OA-TEST-01",
       "presionDiegetica": "El release candidato sale el viernes", "reloj": 120,
       "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
-      "precondiciones": ["diaActual >= 8"], "soloNiveles": ["nivel-01"] }
+      "precondiciones": ["diaActual >= 8"], "soloNiveles": ["nivel-01"] },
+    {
+      "id": "MJ-F2-09",
+      "verbo": "V2_REPARTIR",
+      "archivo": "minijuegos/MJ-F2-09.json",
+      "objetivoAprendizaje": "OA-TEST-01",
+      "presionDiegetica": "Camila empieza a probar a las 14:00",
+      "reloj": 120,
+      "pesoBase": 10,
+      "enfriamiento": 6,
+      "maxOcurrencias": 1,
+      "precondiciones": [
+        "diaActual >= 11"
+      ],
+      "soloNiveles": [
+        "nivel-01"
+      ]
+    }
   ]
 }

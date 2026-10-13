@@ -17,6 +17,7 @@
     "elementos": [
       {
         "id": "formulario",
+        "capa": "interfaz",
         "texto": "Formulario de visita",
         "tipo": "componente",
         "fila": 0,
@@ -25,6 +26,7 @@
       },
       {
         "id": "pantalla-seguridad",
+        "capa": "interfaz",
         "texto": "Pantalla del vigilante",
         "tipo": "componente",
         "fila": 0,
@@ -33,6 +35,7 @@
       },
       {
         "id": "validacion",
+        "capa": "logica",
         "texto": "Validación de datos",
         "tipo": "componente",
         "fila": 1,
@@ -41,6 +44,7 @@
       },
       {
         "id": "dentro",
+        "capa": "logica",
         "texto": "Quién sigue dentro",
         "tipo": "componente",
         "fila": 1,
@@ -49,6 +53,7 @@
       },
       {
         "id": "bd",
+        "capa": "datos",
         "texto": "Base de datos",
         "tipo": "baseDeDatos",
         "fila": 2,
@@ -59,30 +64,35 @@
     "conexiones": [
       {
         "id": "c1",
+        "tipo": "pide",
         "desde": "formulario",
         "hasta": "validacion",
         "texto": "datos escritos"
       },
       {
         "id": "c2",
+        "tipo": "escribe",
         "desde": "validacion",
         "hasta": "bd",
         "texto": "guarda la visita"
       },
       {
         "id": "c3",
+        "tipo": "lee",
         "desde": "dentro",
         "hasta": "bd",
         "texto": "lee las visitas abiertas"
       },
       {
         "id": "c4",
+        "tipo": "pide",
         "desde": "dentro",
         "hasta": "pantalla-seguridad",
         "texto": "envía la lista"
       },
       {
         "id": "c5",
+        "tipo": "lee",
         "desde": "pantalla-seguridad",
         "hasta": "formulario",
         "texto": "lee lo que se está escribiendo"

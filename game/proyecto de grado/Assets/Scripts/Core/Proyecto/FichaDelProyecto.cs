@@ -29,6 +29,24 @@ namespace Nexus.Core.Proyecto {
         public List<string> LoNuevo = new List<string>();
         /// <summary>Los temas de la asignatura que se practican aqui.</summary>
         public List<string> TemasDelNivel = new List<string>();
+        /// <summary>Los papeles del cliente que van llegando durante el desarrollo.</summary>
+        public List<PapelDelCliente> Papeles = new List<PapelDelCliente>();
+
+        /// <summary>
+        /// "crear" = el proyecto empieza de cero y el product backlog lo arma el jugador con las Historias;
+        /// "heredado" (o vacio) = ya viene hecho, porque el proyecto ya estaba en marcha.
+        /// </summary>
+        public string BacklogInicial;
+
+        /// <summary>Las historias candidatas al product backlog: las que el cliente pidio y las que no deberian entrar.</summary>
+        public List<HistoriaCandidata> Historias = new List<HistoriaCandidata>();
+
+        public HistoriaCandidata Historia(string id) { return Historias.FirstOrDefault(h => h != null && h.Id == id); }
+
+        /// <summary>Los papeles que ya han llegado ese dia, del mas nuevo al mas viejo.</summary>
+        public List<PapelDelCliente> PapelesHasta(int dia) {
+            return Papeles.Where(p => p != null && p.Dia <= dia).OrderByDescending(p => p.Dia).ToList();
+        }
 
         public ModuloDelProyecto Modulo(string id) {
             return string.IsNullOrEmpty(id) ? null : Modulos.FirstOrDefault(m => m.Id == id);
@@ -44,6 +62,46 @@ namespace Nexus.Core.Proyecto {
 
         /// <summary>La ficha no se modifica durante la partida: basta una copia superficial.</summary>
         public FichaDelProyecto Clone() { return (FichaDelProyecto)MemberwiseClone(); }
+    }
+
+    public static class BacklogsIniciales {
+        public const string Crear = "crear";
+        public const string Heredado = "heredado";
+    }
+
+    public static class TiposDeHistoria {
+        /// <summary>El cliente la pidio: tiene que estar.</summary>
+        public const string Pedida = "pedida";
+        /// <summary>Suena bien, pero nadie la pidio: es trabajo de mas.</summary>
+        public const string NadieLaPidio = "nadie";
+        /// <summary>Es una tarea tecnica, no algo que alguien necesite: no es una historia.</summary>
+        public const string NoEsHistoria = "no-historia";
+        /// <summary>Dice lo mismo que otra con otras palabras.</summary>
+        public const string Repetida = "repetida";
+
+        public static readonly string[] Todos = { Pedida, NadieLaPidio, NoEsHistoria, Repetida };
+    }
+
+    /// <summary>
+    /// Una historia que podria entrar al product backlog. «Como [quien], quiero [que], para [para que]»: asi se
+    /// escribe lo que alguien necesita, no lo que hay que programar.
+    /// </summary>
+    public sealed class HistoriaCandidata {
+        public string Id;
+        /// <summary>El modulo al que pertenece (id de Modulos).</summary>
+        public string Modulo;
+        /// <summary>El nombre corto, el de la tarjeta.</summary>
+        public string Titulo;
+        public string Como, Quiero, Para;
+        /// <summary>1 a 3: lo que vale para el cliente. Es lo que deberia decidir el orden.</summary>
+        public int Valor = 2;
+        public string Tipo = TiposDeHistoria.Pedida;
+        /// <summary>Por que tenia que estar, o por que sobraba. Se dice al cerrar.</summary>
+        public string Porque;
+
+        public string Texto {
+            get { return string.IsNullOrEmpty(Como) ? Titulo : $"Como {Como}, quiero {Quiero}, para {Para}."; }
+        }
     }
 
     public sealed class SectorDelProyecto {
@@ -75,6 +133,14 @@ namespace Nexus.Core.Proyecto {
         public double Peso = 1;
         /// <summary>0-100: lo que ya estaba hecho al llegar.</summary>
         public double AvanceInicial;
+
+        // --- como se ve esta parte en «El producto» (la maqueta viva) ---
+        /// <summary>"formulario" | "lista" | "aviso" | "lector" | "calendario" | "grafica": la pantalla con que se dibuja.</summary>
+        public string Pantalla;
+        /// <summary>Lo que se hace en ella («Registrar visita»). Vacio = solo se mira.</summary>
+        public string Accion;
+        /// <summary>Datos de ejemplo: los campos de un formulario, las filas de una lista, las lineas de un aviso.</summary>
+        public List<string> Datos = new List<string>();
     }
 
     public sealed class ContextoDelProyecto {
@@ -100,6 +166,12 @@ namespace Nexus.Core.Proyecto {
         public string Definicion;
         /// <summary>Donde aparece en el juego (que diagrama, que tarjeta).</summary>
         public string DondeLoVeras;
+        /// <summary>La escena de tiza (EscenasDePizarra) que lo explica.</summary>
+        public string Dibujo;
+        /// <summary>La escena de tiza de «Dónde lo verás».</summary>
+        public string DibujoDonde;
+        /// <summary>El termino del glosario de la asignatura que lo amplia (opcional): sus paginas van a continuacion.</summary>
+        public string Glosario;
     }
 
     public sealed class ArtefactoDelProyecto {

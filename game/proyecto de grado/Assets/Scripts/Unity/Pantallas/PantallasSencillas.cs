@@ -161,6 +161,21 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(b, ancho: 44);
             return b;
         }
+
+        /// <summary>
+        /// Una fila de «palabra ?»: las palabras que salen en esa pantalla y que alguien que empieza no tiene por que
+        /// conocer. Cada una abre su pizarron. Las que el glosario no tenga, no salen.
+        /// </summary>
+        public static RectTransform Palabras(AppRoot app, Transform padre, string leyenda, params string[] ids) {
+            var fila = app.Ui.Fila(padre);
+            if (!string.IsNullOrEmpty(leyenda)) app.Ui.Texto(fila, leyenda, EstiloTexto.Pequeno, app.Ui.Tema.inkMuted);
+            foreach (var id in ids) {
+                var e = Nexus.Core.Narrativa.Glosario.Buscar(app.Catalogo.Glosario, id);
+                if (e == null) continue;
+                app.Ui.Boton(fila, e.Termino + " ?", () => PantallaDePizarra.AbrirConcepto(app, e), VarianteBoton.Fantasma);
+            }
+            return fila;
+        }
     }
 
     /// <summary>

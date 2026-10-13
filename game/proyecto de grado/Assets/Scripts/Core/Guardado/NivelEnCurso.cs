@@ -53,5 +53,10 @@ namespace Nexus.Core.Guardado {
 
         // --- el estado del azar: se queman estas tiradas al restaurar DeterministicRng ---
         public int ConsumosDelRng;
+
+        /// <summary>El resultado del lanzamiento, si ya ocurrio. null mientras el nivel sigue en desarrollo.</summary>
+        public Nexus.Core.Sesion.LaunchResult Lanzamiento;
+        /// <summary>La duracion de sprints, etapas o cadencia elegida en la Fase 1 (OpcionesDeCalendario). null = la de serie.</summary>
+        public string OpcionDeCalendario;
     }
 }
