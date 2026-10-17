@@ -144,7 +144,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 29138}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.10223916, y: -0.000000079044995, z: 0.000000010951224, w: 0.99475986}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -18364,9 +18364,9 @@ MonoBehaviour:
   walkSpeed: 2
   gravity: 9.8
   mass: 2
-  jumpForce: 6
-  jumpsMax: 1
-  inAirDelay: 0.2
+  jumpForce: 0
+  jumpsMax: 0
+  inAirDelay: 0
   cameraPlayer: {fileID: 963194227}
   cinemachineLook: {fileID: 2002179220}
   cineMachineSpeed: 1
