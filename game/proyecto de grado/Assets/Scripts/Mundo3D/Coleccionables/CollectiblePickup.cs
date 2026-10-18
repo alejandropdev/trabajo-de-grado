@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 namespace Mundo3D.Coleccionables {
@@ -8,6 +7,10 @@ namespace Mundo3D.Coleccionables {
         [SerializeField]
         private string playerTag = "Player";
 
+        [Header("Efectos de recogida")]
+        [SerializeField]
+        private CollectibleFeedback feedback;
+
         private bool isCollected;
 
         private void Reset() {
@@ -15,22 +18,30 @@ namespace Mundo3D.Coleccionables {
             pickupCollider.isTrigger = true;
         }
 
+        private void Awake() {
+            if (feedback == null)
+                feedback = GetComponent<CollectibleFeedback>();
+        }
+
         private void OnTriggerEnter(Collider other) {
-            // Evita recoger el mismo objeto más de una vez.
             if (isCollected)
                 return;
 
-            // Solo permite recogerlo al jugador.
             if (!other.CompareTag(playerTag))
                 return;
-
-            // Marca el objeto antes de ejecutar la recolección.
-            isCollected = true;
 
             Collect();
         }
 
         private void Collect() {
+            if (isCollected)
+                return;
+
+            isCollected = true;
+
+            if (feedback != null)
+                feedback.PlayPickupFeedback();
+
             Destroy(gameObject);
         }
     }
