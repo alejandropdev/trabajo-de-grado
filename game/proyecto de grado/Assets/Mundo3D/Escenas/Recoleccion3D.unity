@@ -18208,8 +18208,8 @@ MonoBehaviour:
   walkSpeed: 2
   gravity: 9.8
   mass: 2
-  jumpForce: 4.5
-  jumpsMax: 45
+  jumpForce: 4.35
+  jumpsMax: 1
   inAirDelay: 0.2
   cameraPlayer: {fileID: 963194227}
   cinemachineLook: {fileID: 2002179220}
@@ -18843,15 +18843,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnZone: {fileID: 2096815721}
   collectibleEntries:
-  - prefab: {fileID: 3761346109657121774, guid: d1e3fc8506bd95640b592f8cb861a2a0, type: 3}
+  - prefab: {fileID: 487975301258553822, guid: 36462eba9acc64d4fad67f55193d32e5, type: 3}
+    isRequired: 0
+    allowMultiple: 1
+    maxInstances: 2
+  - prefab: {fileID: 2675223557350048909, guid: 721db687b1245d044b173757adf62ba0, type: 3}
     isRequired: 0
     allowMultiple: 1
     maxInstances: 2
   - prefab: {fileID: 5954285378098098992, guid: dc9f90105137a924291a6cd8a88f81a9, type: 3}
     isRequired: 0
     allowMultiple: 1
-    maxInstances: 3
+    maxInstances: 2
   - prefab: {fileID: 740176935732820791, guid: c687b2d819a824c43abb21f02a4ac4c7, type: 3}
+    isRequired: 0
+    allowMultiple: 1
+    maxInstances: 1
+  - prefab: {fileID: 3761346109657121774, guid: d1e3fc8506bd95640b592f8cb861a2a0, type: 3}
     isRequired: 0
     allowMultiple: 1
     maxInstances: 1
@@ -18859,12 +18867,22 @@ MonoBehaviour:
     isRequired: 1
     allowMultiple: 0
     maxInstances: 1
+  - prefab: {fileID: 131174598592727675, guid: d9700b61a8e121f4e852fa9a9f0f9bb2, type: 3}
+    isRequired: 1
+    allowMultiple: 0
+    maxInstances: 1
   - prefab: {fileID: 2882996098786731372, guid: 05d4eaf502c2dbe4dbb3a986fa344184, type: 3}
     isRequired: 1
     allowMultiple: 0
     maxInstances: 1
-  collectibleCount: 6
+  collectibleCount: 8
   spawnOnStart: 1
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  obstacleCheckPadding: 0.3
+  minDistanceBetweenCollectibles: 2
+  maxPositionAttempts: 40
 --- !u!64 &556357947
 MeshCollider:
   m_ObjectHideFlags: 0

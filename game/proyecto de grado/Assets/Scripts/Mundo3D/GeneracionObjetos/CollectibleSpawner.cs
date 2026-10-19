@@ -34,6 +34,21 @@ namespace Mundo3D.GeneracionObjetos {
         [SerializeField]
         private bool spawnOnStart = true;
 
+        [Header("Validación de obstáculos")]
+        [SerializeField]
+        private LayerMask obstacleLayers;
+
+        [SerializeField, Min(0f)]
+        private float obstacleCheckPadding = 0.03f;
+
+        [Header("Separación entre coleccionables")]
+        [SerializeField, Min(0f)]
+        private float minDistanceBetweenCollectibles = 1f;
+
+        [Header("Intentos de aparición")]
+        [SerializeField, Min(1)]
+        private int maxPositionAttempts = 20;
+
         private readonly List<GameObject> spawnedCollectibles =
             new List<GameObject>();
 
@@ -68,7 +83,7 @@ namespace Mundo3D.GeneracionObjetos {
 
             int totalSpawned = 0;
 
-            // Primera pasada: generar todos los objetos obligatorios.
+            // Primero intentamos generar todos los obligatorios.
             for (int i = 0; i < collectibleEntries.Count; i++) {
                 SpawnableCollectible entry = collectibleEntries[i];
 
@@ -86,14 +101,13 @@ namespace Mundo3D.GeneracionObjetos {
             if (totalSpawned > collectibleCount) {
                 Debug.LogWarning(
                     "CollectibleSpawner: los objetos obligatorios " +
-                    "superan la cantidad total objetivo. Se generarán " +
-                    "todos los obligatorios.",
+                    "superan la cantidad objetivo. Se priorizan " +
+                    "los objetos obligatorios.",
                     this
                 );
             }
 
-            // Segunda pasada: completar la cantidad objetivo
-            // con objetos opcionales o repetibles disponibles.
+            // Después completamos la cantidad con objetos elegibles.
             while (totalSpawned < collectibleCount) {
                 List<int> eligibleEntries = new List<int>();
 
@@ -132,16 +146,18 @@ namespace Mundo3D.GeneracionObjetos {
 
             if (totalSpawned < collectibleCount) {
                 Debug.LogWarning(
-                    "CollectibleSpawner: solo se pudieron generar " +
+                    "CollectibleSpawner: se generaron " +
                     totalSpawned + " de " + collectibleCount +
-                    " objetos porque se alcanzaron los límites " +
-                    "configurados.",
+                    " objetos. No se encontraron suficientes " +
+                    "posiciones válidas o se alcanzaron los límites.",
                     this
                 );
             }
         }
 
-        private bool TrySpawn(int entryIndex, int[] instanceCounts) {
+        private bool TrySpawn(
+            int entryIndex,
+            int[] instanceCounts) {
             SpawnableCollectible entry =
                 collectibleEntries[entryIndex];
 
@@ -155,29 +171,126 @@ namespace Mundo3D.GeneracionObjetos {
             if (instanceCounts[entryIndex] >= maximum)
                 return false;
 
-            Vector3 spawnPosition =
-                spawnZone.GetRandomSpawnPoint();
+            for (int attempt = 0;
+                 attempt < maxPositionAttempts;
+                 attempt++) {
+                Vector3 position =
+                    spawnZone.GetRandomSpawnPoint();
 
-            GameObject instance = Instantiate(
-                entry.prefab,
-                spawnPosition,
-                entry.prefab.transform.rotation
+                GameObject instance = Instantiate(
+                    entry.prefab,
+                    position,
+                    entry.prefab.transform.rotation
+                );
+
+                // Conservamos la escala raíz del prefab.
+                instance.transform.localScale =
+                    entry.prefab.transform.localScale;
+
+                Physics.SyncTransforms();
+
+                if (IsPositionValid(instance)) {
+                    spawnedCollectibles.Add(instance);
+                    instanceCounts[entryIndex]++;
+                    return true;
+                }
+
+                instance.SetActive(false);
+                Destroy(instance);
+            }
+
+            Debug.LogWarning(
+                "CollectibleSpawner: no se encontró una posición " +
+                "válida para " + entry.prefab.name +
+                " después de " + maxPositionAttempts + " intentos.",
+                this
             );
 
-            // Conserva la escala raíz configurada en el prefab.
-            instance.transform.localScale =
-                entry.prefab.transform.localScale;
+            return false;
+        }
 
-            spawnedCollectibles.Add(instance);
-            instanceCounts[entryIndex]++;
+        private bool IsPositionValid(GameObject candidate) {
+            if (OverlapsObstacle(candidate))
+                return false;
+
+            if (IsTooCloseToAnotherCollectible(candidate))
+                return false;
 
             return true;
         }
 
+        private bool OverlapsObstacle(GameObject candidate) {
+            Collider[] candidateColliders =
+                candidate.GetComponentsInChildren<Collider>();
+
+            foreach (Collider candidateCollider in candidateColliders) {
+                if (!candidateCollider.enabled ||
+                    candidateCollider.isTrigger) {
+                    continue;
+                }
+
+                Bounds bounds = candidateCollider.bounds;
+
+                Vector3 halfExtents = bounds.extents +
+                    Vector3.one * obstacleCheckPadding;
+
+                Collider[] overlaps = Physics.OverlapBox(
+                    bounds.center,
+                    halfExtents,
+                    Quaternion.identity,
+                    obstacleLayers,
+                    QueryTriggerInteraction.Ignore
+                );
+
+                foreach (Collider overlap in overlaps) {
+                    if (overlap == candidateCollider)
+                        continue;
+
+                    if (overlap.transform.IsChildOf(
+                        candidate.transform)) {
+                        continue;
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsTooCloseToAnotherCollectible(
+            GameObject candidate) {
+            float minimumDistanceSquared =
+                minDistanceBetweenCollectibles *
+                minDistanceBetweenCollectibles;
+
+            foreach (GameObject existing in spawnedCollectibles) {
+                if (existing == null)
+                    continue;
+
+                Vector3 difference =
+                    candidate.transform.position -
+                    existing.transform.position;
+
+                // Se mide en el plano horizontal.
+                difference.y = 0f;
+
+                if (difference.sqrMagnitude <
+                    minimumDistanceSquared) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void ClearSpawnedCollectibles() {
             foreach (GameObject collectible in spawnedCollectibles) {
-                if (collectible != null)
-                    Destroy(collectible);
+                if (collectible == null)
+                    continue;
+
+                collectible.SetActive(false);
+                Destroy(collectible);
             }
 
             spawnedCollectibles.Clear();
