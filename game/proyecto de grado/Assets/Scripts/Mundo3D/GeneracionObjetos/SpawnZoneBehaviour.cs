@@ -23,10 +23,6 @@ namespace Mundo3D.GeneracionObjetos {
                 zoneBounds = GetComponent<BoxCollider>();
         }
 
-        /// <summary>
-        /// Obtiene un punto aleatorio dentro de los límites
-        /// horizontales de la zona, a una altura configurable.
-        /// </summary>
         public Vector3 GetRandomSpawnPoint() {
             Vector3 center = zoneBounds.center;
             Vector3 size = zoneBounds.size;
