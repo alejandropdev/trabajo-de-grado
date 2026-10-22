@@ -272,7 +272,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTag: Player
-  feedback: {fileID: 0}
+  itemDefinition: {fileID: 11400000, guid: 7c3af78e18d7b8c4f9196a0aa09df8f0, type: 2}
+  feedback: {fileID: 8872546393503425268}
 --- !u!114 &8872546393503425268
 MonoBehaviour:
   m_ObjectHideFlags: 0

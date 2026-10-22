@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7f54b5c3cd8d43b156ab261c63827, type: 3}
+  m_Name: CvMarta
+  m_EditorClassIdentifier: 
+  id: cv_marta
+  displayName: Marta Ayala
+  category: 1
+  description: "Product Owner Mid-Level muy amable y servicial. Aumenta el avance
+    y la satisfacci\xF3n, pero acumula deuda t\xE9cnica por complacer peticiones."
