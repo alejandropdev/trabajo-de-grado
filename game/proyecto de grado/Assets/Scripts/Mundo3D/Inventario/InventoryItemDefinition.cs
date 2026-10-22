@@ -32,10 +32,15 @@ namespace Mundo3D.Inventario {
         [SerializeField]
         private string description;
 
+        [Header("Interfaz")]
+        [SerializeField]
+        private Sprite icon;
+
         public string Id => id;
         public string DisplayName => displayName;
         public InventoryItemCategory Category => category;
         public string Description => description;
+        public Sprite Icon => icon;
 
 #if UNITY_EDITOR
         private void OnValidate() {
