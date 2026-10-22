@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 1
   description: Desarrolladora Senior cercana a la gerencia. Excelente en Git, aumenta
     el avance y la cobertura, pero su frialdad reduce la moral del equipo.
+  icon: {fileID: 21300000, guid: d971c08df58337b4c98cc51dd9b97dc3, type: 3}

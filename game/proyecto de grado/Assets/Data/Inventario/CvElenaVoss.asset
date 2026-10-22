@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 1
   description: "L\xEDder de QA ex-auditora. Eleva la cobertura y la satisfacci\xF3n
     del cliente al m\xE1ximo, aunque sus pruebas exhaustivas aumentan el cansancio."
+  icon: {fileID: 21300000, guid: d83b2b3d1a54fd44e9cc4a44fd04bb30, type: 3}

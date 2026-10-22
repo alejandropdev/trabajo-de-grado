@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 0
   description: "Tarjeta del ingeniero R\xEDos. Permite el ingreso a la zona de servidores
     y laboratorios de prueba."
+  icon: {fileID: 21300000, guid: 6d4b09fb7f132d84c85d212b46d144b8, type: 3}

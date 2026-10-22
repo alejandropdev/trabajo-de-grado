@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 0
   description: Credencial para acceder a las oficinas de control administrativo y
     las salas de reuniones principales.
+  icon: {fileID: 21300000, guid: 6d624d7c24038334fb8b6f13cb4834e0, type: 3}

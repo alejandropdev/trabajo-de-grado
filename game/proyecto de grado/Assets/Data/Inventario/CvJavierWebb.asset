@@ -18,3 +18,4 @@ MonoBehaviour:
   description: "Consultor Master aislado en su oficina. Brinda ayuda en cualquier
     \xE1rea, disparando la moral y el avance, pero usa est\xE1ndares antiguos que
     generan deuda."
+  icon: {fileID: 21300000, guid: aa71b1afee44c0a478b14b4bed28d2c3, type: 3}

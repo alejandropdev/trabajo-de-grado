@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 7
   description: Dispositivo con sectores de memoria intactos. Contiene la clave para
     descifrar el archivo oculto que Javier intenta abrir en secreto.
+  icon: {fileID: 21300000, guid: 5338225cf64c4f649822d394d6b895bc, type: 3}

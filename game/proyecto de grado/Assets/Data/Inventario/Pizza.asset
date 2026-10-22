@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 4
   description: "Comida r\xE1pida reconfortante encontrada en la cafeter\xEDa. Eleva
     la moral del equipo y reduce un poco la fatiga."
+  icon: {fileID: 21300000, guid: c71ce8122c734834db9cb3f26ca100c4, type: 3}

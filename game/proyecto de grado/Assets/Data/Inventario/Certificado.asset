@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: cert_acreditation
   displayName: "Certificado de Acreditaci\xF3n"
-  category: 6
+  category: 4
   description: "Documento oficial de validaci\xF3n acad\xE9mica o t\xE9cnica. Aumenta
     la satisfacci\xF3n del cliente y mejora la cobertura percibida del proyecto."
+  icon: {fileID: 21300000, guid: 18537da84c7a09b468416c6454ebf111, type: 3}

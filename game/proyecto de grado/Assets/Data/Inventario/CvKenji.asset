@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 1
   description: Arquitecto de Software Senior. Optimiza el avance y la cobertura mediante
     diagramas impecables, pero su arrogancia baja la moral.
+  icon: {fileID: 21300000, guid: 0434195b67a4c8945a462386b5587cfc, type: 3}

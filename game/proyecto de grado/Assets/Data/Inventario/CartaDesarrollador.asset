@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 2
   description: "Colecci\xF3n de 7 cartas interactivas con consejos pr\xE1cticos de
     ingenier\xEDa de software, arquitectura y trabajo en equipo."
+  icon: {fileID: 21300000, guid: 30dc9e2555788614285051e952f24030, type: 3}

@@ -17,3 +17,4 @@ MonoBehaviour:
   category: 3
   description: "Conjunto de 6 notas adhesivas con mensajes an\xF3nimos, advertencias
     y pistas sobre los secretos de la oficina."
+  icon: {fileID: 21300000, guid: 3783ea7a16e1e19478587313967a7d58, type: 3}
