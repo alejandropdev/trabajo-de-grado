@@ -1,12 +1,18 @@
 using UnityEngine;
+using Mundo3D.Inventario;
 
 namespace Mundo3D.Puertas {
     public sealed class DoorAccessRequirementTest : MonoBehaviour {
+        [Header("Referencias")]
         [SerializeField]
         private DoorAccessRequirement accessRequirement;
 
         [SerializeField]
-        private bool testAuthorization;
+        private InventoryController inventory;
+
+        [Header("Prueba")]
+        [SerializeField]
+        private bool registerRequiredCard;
 
         private void Start() {
             if (accessRequirement == null) {
@@ -18,27 +24,40 @@ namespace Mundo3D.Puertas {
                 return;
             }
 
-            bool canAccess = accessRequirement.CanAccess();
-
-            Debug.Log(
-                $"Acceso inicial permitido: {canAccess}",
-                this
-            );
-
-            if (testAuthorization) {
-                accessRequirement.GrantAccess();
-
-                Debug.Log(
-                    $"Acceso después de autorizar: " +
-                    $"{accessRequirement.CanAccess()}",
+            if (inventory == null) {
+                Debug.LogError(
+                    "Asigna InventoryController al script de prueba.",
                     this
                 );
 
-                accessRequirement.RevokeAccess();
+                return;
+            }
+
+            Debug.Log(
+                $"Acceso inicial permitido: " +
+                $"{accessRequirement.CanAccess(inventory)}",
+                this
+            );
+
+            if (registerRequiredCard) {
+                InventoryItemDefinition requiredCard =
+                    accessRequirement.RequiredAccessCard;
+
+                if (requiredCard == null) {
+                    Debug.LogWarning(
+                        "La puerta no tiene una tarjeta requerida asignada.",
+                        this
+                    );
+
+                    return;
+                }
+
+                bool registered = inventory.RegisterItem(requiredCard);
 
                 Debug.Log(
-                    $"Acceso después de revocar: " +
-                    $"{accessRequirement.CanAccess()}",
+                    $"Tarjeta registrada: {registered}. " +
+                    $"Acceso después de registrar la tarjeta: " +
+                    $"{accessRequirement.CanAccess(inventory)}",
                     this
                 );
             }

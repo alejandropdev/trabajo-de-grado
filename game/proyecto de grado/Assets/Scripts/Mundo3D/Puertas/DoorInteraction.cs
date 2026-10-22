@@ -1,12 +1,16 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using Mundo3D.Inventario;
 
 namespace Mundo3D.Puertas {
     public sealed class DoorInteraction : MonoBehaviour {
         [Header("Referencias")]
         [SerializeField]
         private DoorController doorController;
+
+        [SerializeField]
+        private DoorAccessRequirement accessRequirement;
 
         [SerializeField]
         private GameObject interactionPrompt;
@@ -18,33 +22,28 @@ namespace Mundo3D.Puertas {
         [SerializeField]
         private string playerTag = "Player";
 
-        private Transform playerInRange;
+        private bool playerInRange;
+        private InventoryController playerInventory;
 
         private void Awake() {
             if (doorController == null) {
-                doorController =
-                    GetComponentInParent<DoorController>();
-            }
-
-            if (doorController == null) {
                 Debug.LogError(
-                    $"[{nameof(DoorInteraction)}] No se encontró " +
-                    $"DoorController en {gameObject.name}.",
+                    "Asigna DoorController al script DoorInteraction.",
                     this
                 );
+            }
 
-                enabled = false;
-                return;
+            if (accessRequirement == null) {
+                accessRequirement =
+                    GetComponent<DoorAccessRequirement>();
             }
 
             SetPromptVisible(false);
         }
 
         private void Update() {
-            if (playerInRange == null) {
-                SetPromptVisible(false);
+            if (!playerInRange || doorController == null)
                 return;
-            }
 
             if (doorController.IsMoving) {
                 SetPromptVisible(false);
@@ -57,30 +56,77 @@ namespace Mundo3D.Puertas {
             if (Keyboard.current == null)
                 return;
 
-            if (Keyboard.current.eKey.wasPressedThisFrame) {
-                doorController.ToggleDoor();
-            }
+            if (!Keyboard.current.eKey.wasPressedThisFrame)
+                return;
+
+            InteractWithDoor();
         }
 
         private void OnTriggerEnter(Collider other) {
             if (!other.CompareTag(playerTag))
                 return;
 
-            playerInRange = other.transform;
+            InventoryController inventory =
+                other.GetComponentInParent<InventoryController>();
+
+            if (inventory == null) {
+                Debug.LogWarning(
+                    "No se encontró InventoryController en el jugador.",
+                    this
+                );
+
+                return;
+            }
+
+            playerInventory = inventory;
+            playerInRange = true;
+
+            UpdatePromptText();
+
+            if (doorController != null && !doorController.IsMoving)
+                SetPromptVisible(true);
         }
 
         private void OnTriggerExit(Collider other) {
-            if (playerInRange == null)
+            if (!other.CompareTag(playerTag))
                 return;
 
-            if (other.transform == playerInRange) {
-                playerInRange = null;
+            playerInRange = false;
+            playerInventory = null;
+
+            SetPromptVisible(false);
+        }
+
+        private void InteractWithDoor() {
+            if (doorController == null)
+                return;
+
+            // Una puerta abierta siempre se puede cerrar.
+            if (doorController.IsOpen) {
+                doorController.CloseDoor();
                 SetPromptVisible(false);
+                return;
             }
+
+            // Si existe un requisito, se valida antes de abrir.
+            if (accessRequirement != null) {
+                if (!accessRequirement.CanAccess(playerInventory)) {
+                    Debug.Log(
+                        "Acceso denegado: necesitas la tarjeta requerida.",
+                        this
+                    );
+
+                    UpdatePromptText();
+                    return;
+                }
+            }
+
+            doorController.OpenDoor();
+            SetPromptVisible(false);
         }
 
         private void UpdatePromptText() {
-            if (promptText == null)
+            if (promptText == null || doorController == null)
                 return;
 
             promptText.text = doorController.IsOpen
@@ -89,10 +135,8 @@ namespace Mundo3D.Puertas {
         }
 
         private void SetPromptVisible(bool visible) {
-            if (interactionPrompt != null &&
-                interactionPrompt.activeSelf != visible) {
+            if (interactionPrompt != null)
                 interactionPrompt.SetActive(visible);
-            }
         }
     }
 }

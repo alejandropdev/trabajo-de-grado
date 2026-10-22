@@ -1,4 +1,5 @@
 using UnityEngine;
+using Mundo3D.Inventario;
 
 namespace Mundo3D.Puertas {
     public sealed class DoorAccessRequirement : MonoBehaviour {
@@ -6,30 +7,27 @@ namespace Mundo3D.Puertas {
         [SerializeField]
         private bool requiresAuthorization = false;
 
-        [Header("Estado de autorización")]
+        [Header("Tarjeta requerida")]
         [SerializeField]
-        private bool authorizationGranted = false;
+        private InventoryItemDefinition requiredAccessCard;
 
         public bool RequiresAuthorization => requiresAuthorization;
 
-        public bool AuthorizationGranted => authorizationGranted;
+        public InventoryItemDefinition RequiredAccessCard =>
+            requiredAccessCard;
 
-        /// Indica si la puerta permite el acceso según su configuración actual.
-        public bool CanAccess() {
+        /// Indica si el jugador puede acceder según la configuración de la puerta y su inventario.
+        public bool CanAccess(InventoryController inventory) {
             if (!requiresAuthorization)
                 return true;
 
-            return authorizationGranted;
-        }
+            if (requiredAccessCard == null)
+                return false;
 
-        /// Concede autorización a través de otro componente.
-        public void GrantAccess() {
-            authorizationGranted = true;
-        }
+            if (inventory == null)
+                return false;
 
-        /// Revoca la autorización concedida.
-        public void RevokeAccess() {
-            authorizationGranted = false;
+            return inventory.HasItem(requiredAccessCard.Id);
         }
     }
 }
