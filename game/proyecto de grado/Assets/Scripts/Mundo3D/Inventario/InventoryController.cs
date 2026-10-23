@@ -15,17 +15,23 @@ namespace Mundo3D.Inventario {
         private readonly List<InventoryItemDefinition> recentItems =
             new List<InventoryItemDefinition>(HotbarSize);
 
+        private readonly List<InventoryItemDefinition> collectedItems =
+            new List<InventoryItemDefinition>();
+
         public event Action HotbarChanged;
+        public event Action InventoryChanged;
 
         public IReadOnlyList<InventoryItemDefinition> RecentItems =>
             recentItems;
+
+        public IReadOnlyList<InventoryItemDefinition> CollectedItems =>
+            collectedItems;
 
         public bool RegisterItem(InventoryItemDefinition definition) {
             if (definition == null) {
                 Debug.LogWarning(
                     "No se puede registrar un objeto sin una definición."
                 );
-
                 return false;
             }
 
@@ -35,7 +41,6 @@ namespace Mundo3D.Inventario {
                 Debug.LogWarning(
                     $"El objeto '{definition.name}' no tiene un ID válido."
                 );
-
                 return false;
             }
 
@@ -47,7 +52,13 @@ namespace Mundo3D.Inventario {
                 quantities.Add(itemId, 1);
             }
 
+            // Cada recogida ocupa una entrada individual.
+            collectedItems.Add(definition);
+
             UpdateRecentItems(definition);
+
+            // Notifica a la interfaz completa del inventario.
+            InventoryChanged?.Invoke();
 
             return true;
         }
@@ -55,15 +66,12 @@ namespace Mundo3D.Inventario {
         private void UpdateRecentItems(
             InventoryItemDefinition definition
         ) {
-            // El objeto recién recogido ocupa la primera posición.
             recentItems.Insert(0, definition);
 
-            // La barra rápida conserva como máximo cuatro objetos.
             if (recentItems.Count > HotbarSize) {
                 recentItems.RemoveAt(recentItems.Count - 1);
             }
 
-            // Notifica a la interfaz que debe actualizarse.
             HotbarChanged?.Invoke();
         }
 
