@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7f54b5c3cd8d43b156ab261c63827, type: 3}
+  m_Name: "Caf\xE9"
+  m_EditorClassIdentifier: 
+  id: consumable_coffee
+  displayName: "Taza de Caf\xE9"
+  category: 4
+  description: Bebida caliente estimulante. Reduce el cansancio del personaje y otorga
+    un leve incremento temporal en la moral.
+  detailedDescription: "Una taza de bebida caliente estimulante encontrada en las
+    estaciones de descanso. Es el combustible fundamental de los desarrolladores
+    para sobrevivir a las entregas nocturnas y mantener la cordura dentro del edificio
+    bajo presi\xF3n constante."
+  icon: {fileID: 21300000, guid: 3e295b5ab56b471408c78788106d1fe0, type: 3}

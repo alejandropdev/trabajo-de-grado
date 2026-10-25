@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7f54b5c3cd8d43b156ab261c63827, type: 3}
+  m_Name: CartaDesarrollador5
+  m_EditorClassIdentifier: 
+  id: DEV_CARD_DIAGRAMS
+  displayName: 'Carta: Diagramas que Salvan Vidas'
+  category: 2
+  description: Tip de Arquitectura. Uso de diagramas para prevenir errores estructurales.
+  detailedDescription: "\"Dibujar la arquitectura antes de codificar evita reconstruir
+    el edificio a mitad de camino.\" Los diagramas de secuencia e interacci\xF3n
+    permiten visualizar cuellos de botella en la comunicaci\xF3n de componentes antes
+    de escribir la primera l\xEDnea de c\xF3digo."
+  icon: {fileID: 21300000, guid: 30dc9e2555788614285051e952f24030, type: 3}

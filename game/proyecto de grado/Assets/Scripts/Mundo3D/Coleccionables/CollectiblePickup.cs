@@ -1,4 +1,5 @@
 using UnityEngine;
+using Mundo3D.Inventario;
 
 namespace Mundo3D.Coleccionables {
     [RequireComponent(typeof(Collider))]
@@ -6,6 +7,10 @@ namespace Mundo3D.Coleccionables {
         [Header("Configuración")]
         [SerializeField]
         private string playerTag = "Player";
+
+        [Header("Definición del objeto")]
+        [SerializeField]
+        private InventoryItemDefinition itemDefinition;
 
         [Header("Efectos de recogida")]
         [SerializeField]
@@ -23,6 +28,25 @@ namespace Mundo3D.Coleccionables {
                 feedback = GetComponent<CollectibleFeedback>();
         }
 
+        /// <summary>
+        /// Permite al generador asignar la definición
+        /// correspondiente a esta instancia.
+        /// </summary>
+        public void SetItemDefinition(
+            InventoryItemDefinition definition) {
+            if (definition == null) {
+                Debug.LogWarning(
+                    $"CollectiblePickup: se intentó asignar una " +
+                    $"definición nula a '{gameObject.name}'.",
+                    this
+                );
+
+                return;
+            }
+
+            itemDefinition = definition;
+        }
+
         private void OnTriggerEnter(Collider other) {
             if (isCollected)
                 return;
@@ -30,11 +54,39 @@ namespace Mundo3D.Coleccionables {
             if (!other.CompareTag(playerTag))
                 return;
 
-            Collect();
+            InventoryController inventory =
+                other.GetComponentInParent<InventoryController>();
+
+            if (inventory == null) {
+                Debug.LogWarning(
+                    $"No se encontró InventoryController en el jugador " +
+                    $"al intentar recoger '{gameObject.name}'.",
+                    this
+                );
+
+                return;
+            }
+
+            Collect(inventory);
         }
 
-        private void Collect() {
+        private void Collect(InventoryController inventory) {
             if (isCollected)
+                return;
+
+            if (itemDefinition == null) {
+                Debug.LogWarning(
+                    $"El coleccionable '{gameObject.name}' no tiene " +
+                    "una definición de inventario asignada.",
+                    this
+                );
+
+                return;
+            }
+
+            bool registered = inventory.RegisterItem(itemDefinition);
+
+            if (!registered)
                 return;
 
             isCollected = true;

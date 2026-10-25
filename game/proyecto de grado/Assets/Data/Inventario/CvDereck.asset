@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7f54b5c3cd8d43b156ab261c63827, type: 3}
+  m_Name: CvDereck
+  m_EditorClassIdentifier: 
+  id: cv_dereck
+  displayName: Derek Hartman
+  category: 1
+  description: "Ingeniero Junior met\xF3dico y cauteloso. Disminuye la deuda t\xE9cnica
+    trazando flujos impecables, pero frena el avance por sobrean\xE1lisis."
+  detailedDescription: "Ingeniero de Sistemas Junior empoll\xF3n y t\xEDmido. Derek
+    ingres\xF3 a la compa\xF1\xEDa a trav\xE9s de un programa de becas y vive con
+    el miedo permanente de ser despedido, lo que lo lleva a sobreanalizar absolutamente
+    cada tarea que toca. Pasa horas perfeccionando los diagramas de secuencia para
+    entender c\xF3mo se comunica cada microservicio antes de tocar el teclado. Su
+    prudencia excesiva ayuda a eliminar la deuda t\xE9cnica de ra\xEDz, pero su lentitud
+    para arrancar la fase de desarrollo frena el avance general de las entregas."
+  icon: {fileID: 21300000, guid: 54758de5ee1627d45b8ecc606f4f8af4, type: 3}

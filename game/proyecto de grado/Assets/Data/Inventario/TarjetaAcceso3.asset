@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7f54b5c3cd8d43b156ab261c63827, type: 3}
+  m_Name: TarjetaAcceso3
+  m_EditorClassIdentifier: 
+  id: access_card_03
+  displayName: "Tarjeta de Acceso 3 \u2014 R\xEDos"
+  category: 0
+  description: "Tarjeta del ingeniero R\xEDos. Permite el ingreso a la zona de servidores
+    y laboratorios de prueba."
+  detailedDescription: "Credencial electr\xF3nica del ingeniero R\xEDos. Su c\xF3digo
+    de acceso cifrado permite franquear los cierres de seguridad en la zona de servidores
+    y laboratorios de pruebas del edificio."
+  icon: {fileID: 21300000, guid: 6d4b09fb7f132d84c85d212b46d144b8, type: 3}

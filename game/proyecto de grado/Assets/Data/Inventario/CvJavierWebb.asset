@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7f54b5c3cd8d43b156ab261c63827, type: 3}
+  m_Name: CvJavierWebb
+  m_EditorClassIdentifier: 
+  id: cv_javier
+  displayName: Javier Webb
+  category: 1
+  description: "Consultor Master aislado en su oficina. Brinda ayuda en cualquier
+    \xE1rea, disparando la moral y el avance, pero usa est\xE1ndares antiguos que
+    generan deuda."
+  detailedDescription: "Consultor Master y leyenda de la empresa. Javier es hijo
+    de uno de los fundadores originales de la compa\xF1\xEDa, quien fue despedido
+    a\xF1os atr\xE1s bajo circunstancias extra\xF1as y sospechosas que nunca se aclararon
+    en los registros oficiales. Posee una oficina aislada de todos en las instalaciones,
+    de la cual muy pocos conocen la ubicaci\xF3n exacta o el acceso. A pesar del
+    oscuro historial familiar, Javier guarda un aprecio genuino por los desarrolladores
+    y posee un conocimiento t\xE9cnico global capaz de resolver desde problemas de
+    arquitectura hasta pruebas complejas. Su mentor\xEDa dispara la moral y el avance
+    de inmediato, aunque sus m\xE9todos de programaci\xF3n pertenecen a la vieja
+    escuela y tienden a generar deuda t\xE9cnica moderna."
+  icon: {fileID: 21300000, guid: aa71b1afee44c0a478b14b4bed28d2c3, type: 3}
