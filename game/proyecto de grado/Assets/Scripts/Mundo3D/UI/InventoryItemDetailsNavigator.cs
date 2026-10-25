@@ -13,7 +13,8 @@ namespace Mundo3D.UI {
         [SerializeField] private GameObject detailsPanel;
         [SerializeField] private Image itemImage;
         [SerializeField] private TMP_Text itemNameText;
-        [SerializeField] private TMP_Text itemDescriptionText;
+        [SerializeField] private TMP_Text itemDescriptionText1;
+        [SerializeField] private TMP_Text itemDescriptionText2;
         [SerializeField] private TMP_Text itemCounterText;
 
         [Header("Botones de navegación")]
@@ -21,12 +22,16 @@ namespace Mundo3D.UI {
         [SerializeField] private Button nextButton;
         [SerializeField] private Button closeButton;
 
+        [Header("Botones del panel de inventario")]
+        [SerializeField] private GameObject inventoryCloseButton;
+        [SerializeField] private GameObject moreInfoButton;
+
         private readonly List<InventoryItemDefinition> visibleItems =
             new List<InventoryItemDefinition>();
 
         private InventoryItemCategory currentCategory;
-        private int currentIndex = 0;
-        private bool categorySelected = false;
+        private int currentIndex;
+        private bool categorySelected;
 
         private void Awake() {
             if (detailsPanel != null)
@@ -100,12 +105,17 @@ namespace Mundo3D.UI {
             if (detailsPanel != null)
                 detailsPanel.SetActive(true);
 
+            SetInventoryButtonsVisible(false);
             RefreshDetails();
         }
 
         public void Close() {
+            // Solo se cierra el panel detallado.
+            // No se debe cerrar PanelInventario.
             if (detailsPanel != null)
                 detailsPanel.SetActive(false);
+
+            SetInventoryButtonsVisible(true);
         }
 
         public void ShowPrevious() {
@@ -132,6 +142,14 @@ namespace Mundo3D.UI {
             RefreshDetails();
         }
 
+        private void SetInventoryButtonsVisible(bool visible) {
+            if (inventoryCloseButton != null)
+                inventoryCloseButton.SetActive(visible);
+
+            if (moreInfoButton != null)
+                moreInfoButton.SetActive(visible);
+        }
+
         private void HandleInventoryChanged() {
             if (!categorySelected)
                 return;
@@ -146,7 +164,6 @@ namespace Mundo3D.UI {
 
             RefreshVisibleItems();
 
-            // Conserva la pieza seleccionada si sigue en la colección.
             if (!string.IsNullOrWhiteSpace(currentItemId)) {
                 int newIndex = visibleItems.FindIndex(
                     item => item != null && item.Id == currentItemId
@@ -195,37 +212,32 @@ namespace Mundo3D.UI {
         private void RefreshDetails() {
             bool hasItem = visibleItems.Count > 0;
 
+            InventoryItemDefinition item = hasItem
+                ? visibleItems[currentIndex]
+                : null;
+
             if (itemImage != null) {
-                itemImage.sprite = hasItem
-                    ? visibleItems[currentIndex].Icon
-                    : null;
-
-                itemImage.enabled =
-                    hasItem && visibleItems[currentIndex].Icon != null;
-
+                itemImage.sprite = hasItem ? item.Icon : null;
+                itemImage.enabled = hasItem && item.Icon != null;
                 itemImage.preserveAspect = true;
             }
 
             if (itemNameText != null) {
                 itemNameText.text = hasItem
-                    ? visibleItems[currentIndex].DisplayName
+                    ? item.DisplayName
                     : "Todavía no has encontrado este objeto";
             }
 
-            if (itemDescriptionText != null) {
-                if (!hasItem) {
-                    itemDescriptionText.text =
-                        "Explora el escenario para encontrar nuevas piezas.";
-                }
-                else {
-                    InventoryItemDefinition item =
-                        visibleItems[currentIndex];
+            if (itemDescriptionText1 != null) {
+                itemDescriptionText1.text = hasItem
+                    ? item.Description
+                    : "Explora el escenario para encontrar nuevas piezas.";
+            }
 
-                    itemDescriptionText.text =
-                        !string.IsNullOrWhiteSpace(item.DetailedDescription)
-                            ? item.DetailedDescription
-                            : item.Description;
-                }
+            if (itemDescriptionText2 != null) {
+                itemDescriptionText2.text = hasItem
+                    ? item.DetailedDescription
+                    : string.Empty;
             }
 
             if (itemCounterText != null) {
@@ -234,11 +246,17 @@ namespace Mundo3D.UI {
                     : "0/0";
             }
 
-            if (previousButton != null)
-                previousButton.interactable = visibleItems.Count > 1;
+            bool showArrows = visibleItems.Count > 1;
 
-            if (nextButton != null)
-                nextButton.interactable = visibleItems.Count > 1;
+            if (previousButton != null) {
+                previousButton.gameObject.SetActive(showArrows);
+                previousButton.interactable = showArrows;
+            }
+
+            if (nextButton != null) {
+                nextButton.gameObject.SetActive(showArrows);
+                nextButton.interactable = showArrows;
+            }
         }
     }
 }

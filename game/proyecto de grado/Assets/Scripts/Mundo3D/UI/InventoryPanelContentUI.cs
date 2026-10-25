@@ -30,10 +30,16 @@ namespace Mundo3D.UI {
         [SerializeField] private TMP_Text officeNotesCountText;
         [SerializeField] private TMP_Text usbFragmentCountText;
 
-        [Header("Panel de detalles")]
+        [Header("Panel de detalles del inventario")]
         [SerializeField] private Image selectedItemImage;
         [SerializeField] private TMP_Text selectedItemName;
         [SerializeField] private TMP_Text selectedItemDescription;
+
+        [Header("Más información")]
+        [SerializeField] private Button moreInfoButton;
+        [SerializeField] private InventoryItemDetailsNavigator detailsNavigator;
+
+        private InventoryItemDefinition selectedItem;
 
         private void Awake() {
             ConfigureSlots(collectibleSlots);
@@ -43,6 +49,14 @@ namespace Mundo3D.UI {
 
             ClearDetails();
             UpdateCollectibleCounters(0, 0, 0);
+
+            if (moreInfoButton != null) {
+                moreInfoButton.onClick.AddListener(
+                    OpenSelectedItemDetails
+                );
+
+                moreInfoButton.interactable = false;
+            }
         }
 
         private void OnEnable() {
@@ -61,6 +75,14 @@ namespace Mundo3D.UI {
         private void OnDisable() {
             if (inventory != null)
                 inventory.InventoryChanged -= RefreshInventory;
+        }
+
+        private void OnDestroy() {
+            if (moreInfoButton != null) {
+                moreInfoButton.onClick.RemoveListener(
+                    OpenSelectedItemDetails
+                );
+            }
         }
 
         private void ConfigureSlots(InventorySlotUI[] slots) {
@@ -95,7 +117,6 @@ namespace Mundo3D.UI {
             int officeNotesCount = 0;
             int usbFragmentCount = 0;
 
-            // Cada colección cuenta IDs individuales diferentes.
             HashSet<string> countedDeveloperCards =
                 new HashSet<string>();
 
@@ -176,8 +197,6 @@ namespace Mundo3D.UI {
                 }
             }
 
-            // Los slots de estas colecciones muestran siempre
-            // su definición general, no la primera pieza recogida.
             SetGeneralCollectionSlot(
                 0,
                 developerCardsCollectionDefinition,
@@ -306,6 +325,8 @@ namespace Mundo3D.UI {
             if (item == null)
                 return;
 
+            selectedItem = item;
+
             if (selectedItemImage != null) {
                 selectedItemImage.sprite = item.Icon;
                 selectedItemImage.enabled = item.Icon != null;
@@ -317,9 +338,32 @@ namespace Mundo3D.UI {
 
             if (selectedItemDescription != null)
                 selectedItemDescription.text = item.Description;
+
+            // Ahora cualquier objeto seleccionado puede abrir
+            // su información detallada.
+            if (moreInfoButton != null)
+                moreInfoButton.interactable = true;
+        }
+
+        private void OpenSelectedItemDetails() {
+            if (selectedItem == null)
+                return;
+
+            if (detailsNavigator == null) {
+                Debug.LogError(
+                    "InventoryPanelContentUI: asigna " +
+                    "InventoryItemDetailsNavigator.",
+                    this
+                );
+                return;
+            }
+
+            detailsNavigator.OpenCategory(selectedItem.Category);
         }
 
         private void ClearDetails() {
+            selectedItem = null;
+
             if (selectedItemImage != null) {
                 selectedItemImage.sprite = null;
                 selectedItemImage.enabled = false;
@@ -330,6 +374,9 @@ namespace Mundo3D.UI {
 
             if (selectedItemDescription != null)
                 selectedItemDescription.text = string.Empty;
+
+            if (moreInfoButton != null)
+                moreInfoButton.interactable = false;
         }
     }
 }
