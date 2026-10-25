@@ -17,11 +17,8 @@ MonoBehaviour:
   category: 1
   description: "Ingeniero Junior met\xF3dico y cauteloso. Disminuye la deuda t\xE9cnica
     trazando flujos impecables, pero frena el avance por sobrean\xE1lisis."
-  detailedDescription: "Ingeniero de Sistemas Junior empoll\xF3n y t\xEDmido. Derek
-    ingres\xF3 a la compa\xF1\xEDa a trav\xE9s de un programa de becas y vive con
-    el miedo permanente de ser despedido, lo que lo lleva a sobreanalizar absolutamente
-    cada tarea que toca. Pasa horas perfeccionando los diagramas de secuencia para
-    entender c\xF3mo se comunica cada microservicio antes de tocar el teclado. Su
-    prudencia excesiva ayuda a eliminar la deuda t\xE9cnica de ra\xEDz, pero su lentitud
-    para arrancar la fase de desarrollo frena el avance general de las entregas."
+  detailedDescription: "Ingeniero Junior becario que vive con el miedo constante
+    a ser despedido, lo que lo lleva a sobreanalizar cada tarea. Pasa horas perfeccionando
+    diagramas de secuencia antes de codificar. Su extrema prudencia elimina la deuda
+    de ra\xEDz, pero su lentitud frena el avance general."
   icon: {fileID: 21300000, guid: 54758de5ee1627d45b8ecc606f4f8af4, type: 3}

@@ -17,11 +17,9 @@ MonoBehaviour:
   category: 5
   description: Dispositivo con sectores de memoria intactos. Contiene la clave para
     descifrar el archivo oculto que Javier intenta abrir en secreto.
-  detailedDescription: "Un dispositivo de almacenamiento con la carcasa met\xE1lica
-    parcialmente destruida y marcas de quemaduras. A pesar del da\xF1o f\xEDsico,
-    los sectores de memoria interna permanecen intactos. Al analizar su contenido,
-    se revela un bloque de datos fuertemente encriptado mediante algoritmos de grado
-    militar. Todo indica que este fragmento contiene la llave criptogr\xE1fica faltante
-    que Javier ha estado intentando descifrar en secreto desde su oficina para revelar
-    la verdad detr\xE1s de las anomal\xEDas de la empresa."
+  detailedDescription: "Dispositivo de almacenamiento con la carcasa met\xE1lica
+    parcialmente destruida y marcas de quemaduras, aunque sus sectores internos est\xE1n
+    intactos. Contiene datos encriptados de grado militar: la llave criptogr\xE1fica
+    que Javier intenta descifrar en secreto para revelar la verdad tras las anomal\xEDas
+    de la empresa."
   icon: {fileID: 21300000, guid: 5338225cf64c4f649822d394d6b895bc, type: 3}

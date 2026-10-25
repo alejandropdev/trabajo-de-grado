@@ -17,13 +17,8 @@ MonoBehaviour:
   category: 1
   description: Desarrolladora Senior cercana a la gerencia. Excelente en Git, aumenta
     el avance y la cobertura, pero su frialdad reduce la moral del equipo.
-  detailedDescription: "Desarrolladora Senior de perfil reservado y cortante. Sara
-    es una de las pocas personas en el edificio que mantiene una relaci\xF3n cercana
-    y directa con la alta gerencia (HH), lo que despierta constantes rumores entre
-    los pasillos. Posee una personalidad g\xE9lida y anal\xEDtica; jam\xE1s pierde
-    el tiempo en charlas casuales ni celebra entregas. En el aspecto t\xE9cnico es
-    impecable: domina el control de versiones (Git) como una ciencia exacta y no
-    tolera un solo historial de commits desordenado. Su nivel de exigencia agiliza
-    el avance del proyecto y la cobertura, pero su frialdad y comentarios tajantes
-    destruyen la moral de cualquiera que cometa un error menor."
+  detailedDescription: "Desarrolladora Senior de perfil reservado con acceso directo
+    a la alta gerencia, generando constantes rumores. Es una genio en Git y muy exigente,
+    lo que agiliza el avance, pero su personalidad g\xE9lida y comentarios tajantes
+    destruyen la moral."
   icon: {fileID: 21300000, guid: d971c08df58337b4c98cc51dd9b97dc3, type: 3}
