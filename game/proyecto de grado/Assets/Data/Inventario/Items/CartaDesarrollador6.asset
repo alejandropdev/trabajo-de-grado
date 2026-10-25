@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7f54b5c3cd8d43b156ab261c63827, type: 3}
+  m_Name: CartaDesarrollador6
+  m_EditorClassIdentifier: 
+  id: DEV_CARD_TIME_MANAGEMENT
+  displayName: "Carta: Gesti\xF3n del Tiempo y Pausas Activas"
+  category: 2
+  description: "Consejo de rendimiento. Impacto del cansancio en la calidad del c\xF3digo."
+  detailedDescription: "\"El cansancio acumulado incrementa la tasa de errores en
+    un cincuenta por ciento.\" Tomar descansos breves para despejar la mente entre
+    tareas complejas ayuda a mantener la concentraci\xF3n y evita cometer fallos
+    de l\xF3gica absurdos."
+  icon: {fileID: 21300000, guid: 30dc9e2555788614285051e952f24030, type: 3}

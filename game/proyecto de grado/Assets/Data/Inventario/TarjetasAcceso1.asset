@@ -17,4 +17,7 @@ MonoBehaviour:
   category: 0
   description: Credencial para acceder a las oficinas de control administrativo y
     las salas de reuniones principales.
+  detailedDescription: "Credencial con chip magn\xE9tico perteneciente al inspector
+    Morales. Su nivel de acreditaci\xF3n permite desglosarlo para acceder a las oficinas
+    de control administrativo y las salas de reuniones principales en la planta alta."
   icon: {fileID: 21300000, guid: 6d624d7c24038334fb8b6f13cb4834e0, type: 3}

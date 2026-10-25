@@ -17,4 +17,7 @@ MonoBehaviour:
   category: 0
   description: "Tarjeta de alta jerarqu\xEDa del director Pineda. Abre las puertas
     restringidas del ala ejecutiva."
+  detailedDescription: "Tarjeta de seguridad de alta jerarqu\xEDa perteneciente al
+    director Pineda. Contiene los protocolos de autenticaci\xF3n necesarios para
+    abrir los accesos restringidos del ala ejecutiva y \xE1reas de alta seguridad."
   icon: {fileID: 21300000, guid: bacc5fa1df160184889e8b42bc418a08, type: 3}

@@ -1,12 +1,23 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Mundo3D.Inventario;
+using Mundo3D.Coleccionables;
 
 namespace Mundo3D.GeneracionObjetos {
     [Serializable]
     public sealed class SpawnableCollectible {
         [Header("Prefab")]
         public GameObject prefab;
+
+        [Header("Definiciones individuales")]
+        [Tooltip(
+            "Opcional. Si se configura, se asignará una definición " +
+            "aleatoria a cada instancia generada. Si se deja vacía, " +
+            "se conservará la definición del prefab."
+        )]
+        public List<InventoryItemDefinition> individualDefinitions =
+            new List<InventoryItemDefinition>();
 
         [Header("Reglas de aparición")]
         public bool isRequired;
@@ -93,9 +104,8 @@ namespace Mundo3D.GeneracionObjetos {
                     continue;
                 }
 
-                if (TrySpawn(i, instanceCounts)) {
+                if (TrySpawn(i, instanceCounts))
                     totalSpawned++;
-                }
             }
 
             if (totalSpawned > collectibleCount) {
@@ -171,11 +181,15 @@ namespace Mundo3D.GeneracionObjetos {
             if (instanceCounts[entryIndex] >= maximum)
                 return false;
 
+            // Elegimos una definición para esta instancia.
+            // Si no hay definiciones válidas, se conserva la del prefab.
+            InventoryItemDefinition selectedDefinition =
+                GetRandomDefinition(entry);
+
             for (int attempt = 0;
                  attempt < maxPositionAttempts;
                  attempt++) {
-                Vector3 position =
-                    spawnZone.GetRandomSpawnPoint();
+                Vector3 position = spawnZone.GetRandomSpawnPoint();
 
                 GameObject instance = Instantiate(
                     entry.prefab,
@@ -186,6 +200,30 @@ namespace Mundo3D.GeneracionObjetos {
                 // Conservamos la escala raíz del prefab.
                 instance.transform.localScale =
                     entry.prefab.transform.localScale;
+
+                // Si existe una definición individual, la asignamos
+                // antes de validar y habilitar la recogida.
+                if (selectedDefinition != null) {
+                    CollectiblePickup pickup =
+                        instance.GetComponentInChildren
+                            <CollectiblePickup>(true);
+
+                    if (pickup == null) {
+                        Debug.LogError(
+                            "CollectibleSpawner: el prefab '" +
+                            entry.prefab.name +
+                            "' tiene definiciones individuales, " +
+                            "pero no contiene CollectiblePickup.",
+                            instance
+                        );
+
+                        instance.SetActive(false);
+                        Destroy(instance);
+                        return false;
+                    }
+
+                    pickup.SetItemDefinition(selectedDefinition);
+                }
 
                 Physics.SyncTransforms();
 
@@ -207,6 +245,44 @@ namespace Mundo3D.GeneracionObjetos {
             );
 
             return false;
+        }
+
+        private InventoryItemDefinition GetRandomDefinition(
+            SpawnableCollectible entry) {
+            if (entry.individualDefinitions == null ||
+                entry.individualDefinitions.Count == 0) {
+                return null;
+            }
+
+            // Ignoramos las referencias vacías del Inspector.
+            List<InventoryItemDefinition> validDefinitions =
+                new List<InventoryItemDefinition>();
+
+            foreach (InventoryItemDefinition definition
+                     in entry.individualDefinitions) {
+                if (definition != null)
+                    validDefinitions.Add(definition);
+            }
+
+            if (validDefinitions.Count == 0) {
+                Debug.LogWarning(
+                    "CollectibleSpawner: la entrada para '" +
+                    entry.prefab.name +
+                    "' tiene una lista de definiciones, " +
+                    "pero ninguna es válida. Se conservará la " +
+                    "definición configurada en el prefab.",
+                    this
+                );
+
+                return null;
+            }
+
+            int index = UnityEngine.Random.Range(
+                0,
+                validDefinitions.Count
+            );
+
+            return validDefinitions[index];
         }
 
         private bool IsPositionValid(GameObject candidate) {

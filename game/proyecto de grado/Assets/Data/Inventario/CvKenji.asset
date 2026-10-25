@@ -17,4 +17,13 @@ MonoBehaviour:
   category: 1
   description: Arquitecto de Software Senior. Optimiza el avance y la cobertura mediante
     diagramas impecables, pero su arrogancia baja la moral.
+  detailedDescription: "Arquitecto de Software Senior obsesionado con el orden y
+    la simetr\xEDa. Kenji lleva un diario donde documenta cada fallo de dise\xF1o
+    de la empresa antes de su llegada. Es un genio incomprendido que prefiere comunicarse
+    mediante diagramas de arquitectura antes que cruzar palabras con las personas.
+    Cree firmemente que los humanos son el eslab\xF3n m\xE1s d\xE9bil de la cadena
+    de software, lo que se refleja en su trato distante y despectivo hacia el equipo.
+    Su visi\xF3n preventiva estructurando el sistema acelera el avance y garantiza
+    la cobertura, pero su arrogancia intelectual hace que trabajar a su lado sea
+    una experiencia desmotivadora."
   icon: {fileID: 21300000, guid: 0434195b67a4c8945a462386b5587cfc, type: 3}

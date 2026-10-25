@@ -32,6 +32,10 @@ namespace Mundo3D.Inventario {
         [SerializeField]
         private string description;
 
+        [Header("Información ampliada")]
+        [SerializeField, TextArea(5, 12)]
+        private string detailedDescription;
+
         [Header("Interfaz")]
         [SerializeField]
         private Sprite icon;
@@ -40,6 +44,8 @@ namespace Mundo3D.Inventario {
         public string DisplayName => displayName;
         public InventoryItemCategory Category => category;
         public string Description => description;
+
+        public string DetailedDescription => detailedDescription;
         public Sprite Icon => icon;
 
 #if UNITY_EDITOR

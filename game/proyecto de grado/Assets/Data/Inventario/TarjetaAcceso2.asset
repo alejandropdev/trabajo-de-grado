@@ -17,4 +17,7 @@ MonoBehaviour:
   category: 0
   description: "Tarjeta del supervisor Berr\xEDo. Desbloquea las puertas del sector
     oeste y el \xE1rea de almacenamiento de equipos."
+  detailedDescription: "Tarjeta de identificaci\xF3n asignada al supervisor Berr\xEDo.
+    Cuenta con permisos de seguridad elevados para desbloquear los accesos del sector
+    oeste, incluyendo los pasillos principales de la bodega de equipos."
   icon: {fileID: 21300000, guid: 87ed428775f9e0c47b0abd58b813999d, type: 3}

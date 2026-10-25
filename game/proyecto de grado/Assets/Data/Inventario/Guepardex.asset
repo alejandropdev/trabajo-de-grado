@@ -17,4 +17,8 @@ MonoBehaviour:
   category: 4
   description: "Lata de bebida de alta cafe\xEDna. Reduce dr\xE1sticamente el cansancio
     acumulado para mantener el ritmo de trabajo en momentos cr\xEDticos."
+  detailedDescription: "Lata de bebida energ\xE9tica con un nivel extremadamente
+    alto de cafe\xEDna y taurina. Es el recurso extremo utilizado por los programadores
+    cuando las entregas se vencen y se necesita eliminar el cansancio acumulado de
+    inmediato para mantener el ritmo de trabajo."
   icon: {fileID: 21300000, guid: b9142c7c2e70ab54b9b5fe32abef4881, type: 3}

@@ -17,4 +17,13 @@ MonoBehaviour:
   category: 1
   description: "Desarrollador Generalista veterano y amiguero. Sube la moral del
     equipo al m\xE1ximo, pero genera deuda t\xE9cnica con parches r\xFAsticos."
+  detailedDescription: "Desarrollador Generalista y el empleado m\xE1s antiguo de
+    la planta. \xD3scar ha sobrevivido a tres reestructuraciones masivas de la empresa,
+    cinco cambios de tecnolog\xEDa y decenas de jefes, lo que le ha otorgado una
+    actitud relajada e inquebrantable; parece que absolutamente nada puede perturbarlo
+    o hacer que lo despidan. Es amiguero, le encanta gastar bromas pesadas a los
+    nuevos y organizar pausas activas improvisadas. Ante cualquier alerta del sistema
+    o ausencia en la oficina, \xD3scar salta al rescate con una sonrisa. Es la mayor
+    fuente de moral de la compa\xF1\xEDa, aunque sus arreglos apresurados y parches
+    r\xFAsticos dejan un rastro constante de deuda t\xE9cnica."
   icon: {fileID: 21300000, guid: 924af68ff0406ca459189aa6f38f359c, type: 3}

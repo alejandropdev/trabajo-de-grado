@@ -28,6 +28,25 @@ namespace Mundo3D.Coleccionables {
                 feedback = GetComponent<CollectibleFeedback>();
         }
 
+        /// <summary>
+        /// Permite al generador asignar la definición
+        /// correspondiente a esta instancia.
+        /// </summary>
+        public void SetItemDefinition(
+            InventoryItemDefinition definition) {
+            if (definition == null) {
+                Debug.LogWarning(
+                    $"CollectiblePickup: se intentó asignar una " +
+                    $"definición nula a '{gameObject.name}'.",
+                    this
+                );
+
+                return;
+            }
+
+            itemDefinition = definition;
+        }
+
         private void OnTriggerEnter(Collider other) {
             if (isCollected)
                 return;

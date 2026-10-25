@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,8 +16,16 @@ namespace Mundo3D.Inventario {
         private readonly List<InventoryItemDefinition> recentItems =
             new List<InventoryItemDefinition>(HotbarSize);
 
+        // Mantiene el registro de todas las recogidas.
         private readonly List<InventoryItemDefinition> collectedItems =
             new List<InventoryItemDefinition>();
+
+        // Mantiene una sola definición por cada ID.
+        private readonly List<InventoryItemDefinition> uniqueCollectedItems =
+            new List<InventoryItemDefinition>();
+
+        private readonly HashSet<string> collectedItemIds =
+            new HashSet<string>();
 
         public event Action HotbarChanged;
         public event Action InventoryChanged;
@@ -26,6 +35,9 @@ namespace Mundo3D.Inventario {
 
         public IReadOnlyList<InventoryItemDefinition> CollectedItems =>
             collectedItems;
+
+        public IReadOnlyList<InventoryItemDefinition> UniqueCollectedItems =>
+            uniqueCollectedItems;
 
         public bool RegisterItem(InventoryItemDefinition definition) {
             if (definition == null) {
@@ -52,12 +64,16 @@ namespace Mundo3D.Inventario {
                 quantities.Add(itemId, 1);
             }
 
-            // Cada recogida ocupa una entrada individual.
+            // Conserva el registro individual de cada recogida.
             collectedItems.Add(definition);
+
+            // Agrega la definición a la colección única solo una vez.
+            if (collectedItemIds.Add(itemId)) {
+                uniqueCollectedItems.Add(definition);
+            }
 
             UpdateRecentItems(definition);
 
-            // Notifica a la interfaz completa del inventario.
             InventoryChanged?.Invoke();
 
             return true;

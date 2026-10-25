@@ -17,4 +17,8 @@ MonoBehaviour:
   category: 4
   description: "Comida r\xE1pida reconfortante encontrada en la cafeter\xEDa. Eleva
     la moral del equipo y reduce un poco la fatiga."
+  detailedDescription: "Comida r\xE1pida reconfortante encontrada en la cafeter\xEDa.
+    A pesar de llevar horas en el lugar, sigue siendo una valiosa fuente de energ\xEDa
+    y un cl\xE1sico estimulante an\xEDmico para el equipo de desarrollo durante las
+    jornadas extensas."
   icon: {fileID: 21300000, guid: c71ce8122c734834db9cb3f26ca100c4, type: 3}

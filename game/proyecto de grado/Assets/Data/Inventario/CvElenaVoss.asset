@@ -17,4 +17,12 @@ MonoBehaviour:
   category: 1
   description: "L\xEDder de QA ex-auditora. Eleva la cobertura y la satisfacci\xF3n
     del cliente al m\xE1ximo, aunque sus pruebas exhaustivas aumentan el cansancio."
+  detailedDescription: "L\xEDder de QA con fama de detective. Elena sol\xEDa trabajar
+    en auditor\xEDas gubernamentales antes de unirse a la compa\xF1\xEDa, lo que
+    molde\xF3 su car\xE1cter met\xF3dico y sospechoso. Asume por defecto que todo
+    el c\xF3digo escrito por sus compa\xF1eros est\xE1 roto hasta que se demuestre
+    lo contrario. Es una eminencia planificando la estimaci\xF3n de pruebas y encontrando
+    vac\xEDos l\xF3gicos en los requerimientos. Gracias a su rigor, la satisfacci\xF3n
+    del cliente y la cobertura se mantienen en niveles m\xE1ximos; sin embargo, sus
+    extensas jornadas de revisi\xF3n y pruebas exhaustivas terminan agotando al equipo."
   icon: {fileID: 21300000, guid: d83b2b3d1a54fd44e9cc4a44fd04bb30, type: 3}
