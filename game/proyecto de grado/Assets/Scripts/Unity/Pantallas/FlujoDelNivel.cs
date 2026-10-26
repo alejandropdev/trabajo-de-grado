@@ -41,6 +41,12 @@ namespace Nexus.Unity.Pantallas {
             app.Router.IrA<PantallaDeFase1>();
         }
 
+        /// <summary>«Reiniciar el nivel» desde la pausa: el nivel en curso vuelve a su Fase 1, sin la intro.</summary>
+        public static void ReiniciarNivel(AppRoot app) {
+            app.ReiniciarNivel();
+            app.Router.IrA<PantallaDeFase1>();
+        }
+
         public static void EmpezarNivel(AppRoot app) {
             var nivel = app.Sesion.NivelId;
             var pasos = new List<Action<Action>>();

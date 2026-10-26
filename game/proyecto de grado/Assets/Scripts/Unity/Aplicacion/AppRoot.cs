@@ -51,6 +51,10 @@ namespace Nexus.Unity.Aplicacion {
         public SaveGame PartidaActiva { get; private set; }
         public GameSession Sesion { get; private set; }
 
+        // --- opciones del equipo (SRS CU-05) ---
+        public PreferenciasStore AlmacenDePreferencias { get; private set; }
+        public Preferencias Preferencias { get; private set; } = new Preferencias();
+
         private AutoGuardado _autoGuardado;
 
         // --- modulos que se enchufan desde otro ensamblado ---
@@ -79,11 +83,27 @@ namespace Nexus.Unity.Aplicacion {
             var almacen = new AlmacenDeArchivosAtomico(RutasDeGuardado.Raiz);
             Perfiles = new ProfileStore(almacen);
             Partidas = new SaveStore(almacen);
+            AlmacenDePreferencias = new PreferenciasStore(almacen);
 
             CargarCatalogo();
             Router = new ScreenRouter(this, CrearLienzo());
             CrearEventSystem();
             Runner = gameObject.AddComponent<LevelRunner>();
+            Preferencias = AlmacenDePreferencias.Cargar();
+            AplicarPreferencias();
+        }
+
+        /// <summary>Guarda las opciones y las aplica ya: volumen, modo de ventana y velocidad de la simulacion.</summary>
+        public void CambiarPreferencias(Preferencias nuevas) {
+            Preferencias = (nuevas ?? new Preferencias()).Acotadas();
+            AlmacenDePreferencias.Guardar(Preferencias);
+            AplicarPreferencias();
+        }
+
+        private void AplicarPreferencias() {
+            AudioListener.volume = (float)Preferencias.volumenGeneral;
+            Screen.fullScreenMode = Preferencias.pantallaCompleta ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
+            if (Runner != null) Runner.Velocidad = Preferencias.velocidadDeSimulacion;
         }
 
         private void Start() {
@@ -272,6 +292,21 @@ namespace Nexus.Unity.Aplicacion {
         public void RepetirNivel() {
             if (Sesion == null || !Sesion.NivelTerminado)
                 throw new InvalidOperationException("Solo se puede repetir un nivel ya cerrado.");
+            VolverAlComienzoDelNivel("repetir nivel");
+        }
+
+        /// <summary>
+        /// «Reiniciar el nivel» desde la pausa (SRS RIE-IU-006, RF-08): el nivel en curso vuelve a su Fase 1 sin
+        /// residuos de lo jugado, igual que RepetirNivel pero sin esperar a que el nivel se cierre.
+        /// </summary>
+        public void ReiniciarNivel() {
+            if (Sesion == null || PartidaActiva == null)
+                throw new InvalidOperationException("No hay ningun nivel en curso que reiniciar.");
+            if (Runner != null) Runner.Detener();
+            VolverAlComienzoDelNivel("reiniciar nivel");
+        }
+
+        private void VolverAlComienzoDelNivel(string motivo) {
             var nivel = Sesion.NivelId;
             if (PartidaActiva.FlagsAlEmpezarNivel != null)
                 PartidaActiva.Flags = new Dictionary<string, double>(PartidaActiva.FlagsAlEmpezarNivel);
@@ -283,7 +318,7 @@ namespace Nexus.Unity.Aplicacion {
             Nexus.Unity.Guia.GuiaView.Reiniciar();
             Sesion = new FabricaDeSesion(Catalogo).Nueva(PartidaActiva);
             Sesion.R.IntroVista = true;
-            Guardar("repetir nivel");
+            Guardar(motivo);
         }
 
         /// <summary>El informe del ultimo nivel cerrado, para el Dashboard de Lecciones. Solo vive en memoria.</summary>

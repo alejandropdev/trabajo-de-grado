@@ -23,5 +23,6 @@ Qué se decidió, en una frase.
 Qué se gana, qué se pierde y qué queda condicionado por esta decisión.
 ```
 
-Las decisiones ADR-01 a ADR-07 están consolidadas en el Documento de Arquitectura
-Conceptual y Mecánicas del Videojuego, sección 2.9.
+Las decisiones ADR-01 a ADR-11 están consolidadas en el Documento de Arquitectura y
+Mecánicas del Videojuego (v2), apartado «Decisiones arquitectónicas», y en el GDD v1.3,
+sección 13.4. ADR-08 es el archivo `0008-integracion-del-mundo-3d.md` de este directorio.

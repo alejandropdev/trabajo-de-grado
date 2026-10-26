@@ -23,7 +23,7 @@ jobs:
 
       - name: Verificar que no se subieron carpetas generadas por Unity
         run: |
-          if git ls-files | grep -E '^game/(Library|Temp|Logs|obj)/'; then
+          if git -c core.quotepath=off ls-files | grep -E '^game/proyecto de grado/(Library|Temp|Logs|obj)/'; then
             echo "Se detectaron carpetas generadas por Unity en el control de versiones."
             exit 1
           fi
@@ -39,7 +39,7 @@ jobs:
               echo "Falta el .meta de: $f"
               missing=1
             fi
-          done < <(git ls-files 'game/Assets/**')
+          done < <(git -c core.quotepath=off ls-files 'game/proyecto de grado/Assets/**')
           exit $missing
 
   # Descomentar cuando la licencia de Unity esté configurada como secreto.
@@ -52,11 +52,11 @@ jobs:
   #       with: { lfs: true }
   #     - uses: actions/cache@v4
   #       with:
-  #         path: game/Library
-  #         key: Library-${{ hashFiles('game/Assets/**', 'game/Packages/**') }}
+  #         path: game/proyecto de grado/Library
+  #         key: Library-${{ hashFiles('game/proyecto de grado/Assets/**', 'game/proyecto de grado/Packages/**') }}
   #     - uses: game-ci/unity-test-runner@v4
   #       env:
   #         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
   #       with:
-  #         projectPath: game
+  #         projectPath: game/proyecto de grado
   #         testMode: editmode

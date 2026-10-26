@@ -1,62 +1,47 @@
 flowchart TB
-    subgraph PRES["Capa 1 · Presentación (Nexus.UI · UI Toolkit)"]
+    subgraph PRES["Nexus.Unity · Presentación (uGUI + TextMeshPro)"]
+        AR[AppRoot]
         R[ScreenRouter]
-        D[DashboardView]
-        K[KanbanBoardView]
-        B[BurndownChartView]
-        P[DecisionPanelView]
-        I[InboxView]
-        DB[DebriefView]
+        LR[LevelRunner]
+        FN[FlujoDelNivel]
+        PAN["Pantallas: perfiles, partidas, Fase 1, jornada,<br/>tablero, eventos, minijuegos, despliegue, lecciones, pausa, opciones"]
+        UI[UiKit · NexusTheme]
     end
 
-    subgraph APP["Capa 2 · Aplicación (Nexus.App)"]
-        BS[GameBootstrapper]
-        SC[SessionController]
-        LC[LevelController]
-        PSM[PhaseStateMachine]
-        TC[TurnController]
-        DD[DecisionDispatcher]
+    subgraph M3D["Nexus.Mundo3D · Recorrido 3D de la Fase 1 (URP)"]
+        REC[Módulo de recolección]
     end
 
-    subgraph DOM["Capa 3 · Dominio / Simulación (Nexus.Domain · C# puro)"]
-        PS[ProjectState]
-        SE[SimulationEngine]
-        VM[VelocityModel]
-        TD[TechnicalDebtModel]
-        MM[MoraleModel]
-        QM[QualityModel]
-        EE[EventEngine]
-        CA[ClientAgent]
-        TM[TeamModel]
-        MOD[MethodologyModifier]
-        IM[IntegrityModel]
-        SS[ScoringService]
-        RNG[SimulationRng]
-    end
-
-    subgraph DATA["Capa 4 · Datos e infraestructura (Nexus.Data)"]
-        CR[ContentRepository]
-        SR[SaveRepository]
-        PR[ProfileRepository]
-        TS[TelemetryService]
-        EB[EventBus]
+    subgraph CORE["Nexus.Core · C# puro (noEngineReferences)"]
+        GS["GameSession (fachada; parciales Backlog, Tablero, Equipo, Despliegue)"]
+        C1["C1 Estado: WorldState · RuntimeState · LevelProfile"]
+        C2["C2 Simulación: ForresterModel · Coeficientes · Derived"]
+        C3["C3 Eventos: EventDirector"]
+        C4["C4 Cola temporal: EffectScheduler"]
+        C5["C5 Metodología: MethodologyRules"]
+        C6["C6 Minijuegos: MinigameDirector"]
+        C7["C7 Narrativa: NarrativeDirector · FlagStore"]
+        C8["C8 Evaluación: DecisionTrace · Lecciones · CompetenceProfile"]
+        C9["C9 Persistencia: SaveStore · ProfileStore · AutoGuardado"]
+        C11["C11 Jornada: reloj · alertas · zonas"]
+        C10["C10 Servicios: DeterministicRng (SplitMix64) · EffectApplier · ConditionEvaluator"]
+        DAT["Datos: CatalogLoader · SchemaValidator"]
     end
 
     subgraph EXT["Soporte"]
-        U[Unity 6 · URP · UI Toolkit]
-        NET[.NET Runtime]
-        FS[Sistema de archivos local]
+        U[Unity 6000.0 · URP 17]
+        SA[StreamingAssets · catálogos JSON]
+        FS["persistentDataPath/NexusProtocol"]
     end
 
-    PRES --> APP
-    APP --> DOM
-    APP --> DATA
-    DOM --> DATA
-    SE --> VM & TD & MM & QM & RNG
-    TC --> SE & EE & CA
-    PSM --> TC
-    DD --> DOM
-    SR --> FS
-    PR --> FS
+    AR --> R --> PAN
+    AR --> LR --> FN
+    PAN --> UI
+    FN --> GS
+    REC -- "IModuloDeRecoleccion" --> AR
+    GS --> C1 & C2 & C3 & C4 & C5 & C6 & C7 & C8 & C9 & C11
+    C2 & C3 & C6 --> C10
+    DAT --> SA
+    C9 -- "IAlmacen" --> FS
     PRES -.-> U
-    DOM -.-> NET
+    M3D -.-> U
