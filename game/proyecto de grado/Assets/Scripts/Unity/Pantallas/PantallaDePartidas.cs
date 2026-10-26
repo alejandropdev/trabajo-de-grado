@@ -31,6 +31,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Hero);   // el logotipo: una sola vez por pantalla
             Ui.Texto(titulos, "Hola, " + App.PerfilActivo.nombreEstudiante, EstiloTexto.Titulo);
+            Ui.Boton(cabecera, "Opciones", () => App.Router.Apilar<PantallaDeOpciones>());
             // El diario aparece cuando ya hay algo que leer en el: antes de la primera partida solo confunde.
             if (App.PerfilActivo.coleccionablesGlobales != null && App.PerfilActivo.coleccionablesGlobales.Count > 0)
                 Ui.Boton(cabecera, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());

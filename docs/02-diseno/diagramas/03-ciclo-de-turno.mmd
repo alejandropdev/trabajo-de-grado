@@ -1,22 +1,20 @@
 flowchart TD
-    A([Inicio de semana]) --> B[Briefing: eventos y solicitudes en la bandeja]
-    B --> C[Deliberación: tablero, burndown, informes]
-    C --> D{¿Ejecutar una acción?}
-    D -- Sí --> E[Enviar Decision a DecisionDispatcher]
-    E --> F{¿Válida y hay puntos de acción?}
-    F -- No --> C
-    F -- Sí --> G[Encolar decisión]
-    G --> C
-    D -- No --> H[Cerrar la semana]
-    H --> I[SimulationEngine.AdvanceTick]
-    I --> J[Aplicar efectos de decisiones]
-    J --> K[Aplicar efectos de eventos]
-    K --> L[Calcular flujos del modelo dinámico]
-    L --> M[Saturar acumuladores 0-100]
-    M --> N[Reporte semanal con explicación causal]
-    N --> O{¿Condición de fin?}
-    O -- Sí --> P([Evaluación y reporte de lecciones aprendidas])
-    O -- No --> Q{¿Se cumplió el hito de fase?}
-    Q -- Sí --> R[Revisión de fase y transición]
-    R --> A
-    Q -- No --> A
+    A(["ComenzarDia · 08:00"]) --> B[Aplicar los efectos diferidos que vencen]
+    B --> C["Ceremonias de la metodología y efectos de la etapa (Cascada)"]
+    C --> D["Evento o alerta del día (EventDirector · telegrafiado 1 a 3 días)"]
+    D --> E[Minijuego, avisos, incidencia por umbral y escena narrativa]
+    E --> F["Jornada continua: el reloj avanza por minutos"]
+    F --> G{"¿Acción del jugador?"}
+    G -- "Atender alerta, viajar a una zona,<br/>asignar, probar, revisar PR..." --> H[Descontar los minutos de reloj y aplicar efectos]
+    H --> F
+    G -- "Llegan las 18:00" --> I{"¿Irse o quedarse?"}
+    I -- "Quedarse (hasta 20:00)" --> F
+    I -- Irse --> J["TerminarDia → ForresterModel.AvanzarUnDia"]
+    J --> K[Cierre del tablero y de la unidad de trabajo]
+    K --> L{"¿Toca despliegue?"}
+    L -- Sí --> M[Despliegue según la metodología]
+    L -- No --> N
+    M --> N["Autoguardado (< 500 ms)"]
+    N --> O{"¿Días = diasTotales?"}
+    O -- No --> A
+    O -- Sí --> P(["Fase 3: despliegue y lanzamiento"])

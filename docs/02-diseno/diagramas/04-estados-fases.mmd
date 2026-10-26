@@ -1,19 +1,16 @@
 stateDiagram-v2
-    [*] --> Planificacion
-    Planificacion --> DesarrolloIterativo : plan aprobado
-    DesarrolloIterativo --> DesarrolloIterativo : cierre de iteración
-    DesarrolloIterativo --> Lanzamiento : alcance mínimo alcanzado o plazo vencido
-    Lanzamiento --> Retroalimentacion : producto desplegado
-    Retroalimentacion --> [*] : proyecto cerrado
+    [*] --> Planificacion : nuevo nivel
+    Planificacion : Fase 1 · expediente, recorrido 3D, metodología,\nfichas de calidad, arquitectura, backlog
+    Desarrollo : Fase 2 · días con reloj continuo
+    Lanzamiento : Fase 3 · despliegues y lanzamiento (bien / con problemas / mal)
+    Lecciones : Fase 4 · Lecciones aprendidas (Cerrar → DebriefReport)
 
-    DesarrolloIterativo --> Cancelado : presupuesto agotado
-    DesarrolloIterativo --> Cancelado : satisfacción del cliente < 20
-    Lanzamiento --> Cancelado : incidente crítico no resuelto
-    Cancelado --> [*]
-
-    Retroalimentacion --> Renuncia : el jugador renuncia (F9)
-    DesarrolloIterativo --> Despido : reputación < 15 (F10)
-    DesarrolloIterativo --> Burnout : fatiga > 90 durante 3 ticks (F11)
-    Renuncia --> [*]
-    Despido --> [*]
-    Burnout --> [*]
+    Planificacion --> Desarrollo : Confirmar
+    Desarrollo --> Desarrollo : TerminarDia → ComenzarDia
+    Desarrollo --> Lanzamiento : se agota el plazo (diasTotales)
+    Lanzamiento --> Lecciones : lanzamiento calificado
+    Lecciones --> Completado : umbrales de éxito y lanzamiento «bien»
+    Lecciones --> Fallado : en otro caso, o Deuda ≥ 90, Moral ≤ 15 o Dinero ≤ 0
+    Completado --> [*] : continuar al siguiente nivel
+    Fallado --> Planificacion : repetir el nivel
+    Fallado --> [*] : continuar

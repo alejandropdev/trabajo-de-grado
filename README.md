@@ -10,32 +10,32 @@ sobre la Tríada de Hierro (tiempo, costo, calidad), la deuda técnica y el equi
 
 ```
 docs/       Documentación del trabajo de grado (PMP, SRS, GDD, arquitectura, QA)
-game/       Proyecto de Unity 6
+game/       Proyecto de Unity 6 (en `game/proyecto de grado/`)
 tools/      Scripts auxiliares y hojas de balanceo
 3D/         Proyecto 3D tal como se recibió (no versionado; ya integrado en game/)
 builds/     Compilaciones locales (no versionado)
 ```
 
-Dentro de `game/Assets/_Project/Scripts` el código está separado en cuatro capas con
-dependencia unidireccional descendente:
+Dentro de `game/proyecto de grado/Assets/Scripts` el código está separado en ensamblados con
+dependencia unidireccional:
 
 ```
-UI     ──> App ──> Data ──> Domain
-                              ^
-                            Core
+Unity (pantallas, aplicación, tema) ──> Core (modelo, simulación, eventos, datos, guardado)
+Mundo3D (recorrido 3D de la Fase 1) ──> Unity, por la interfaz IModuloDeRecoleccion
+Tests/editMode ──> Core
 ```
 
 El mundo 3D de la recolección de la Fase 1 está en `game/proyecto de grado/Assets/Mundo3D/` y se enchufa al
 juego por una interfaz (`IModuloDeRecoleccion`). Cómo se integró y cómo comprobar que no se perdió nada:
 `docs/02-diseno/adr/0008-integracion-del-mundo-3d.md` y `tools/integracion-3d/README.md`.
 
-`Domain` es C# puro y no referencia `UnityEngine`; esa restricción está impuesta por su
-assembly definition (`noEngineReferences: true`), de modo que el motor de simulación pueda
+`Core` es C# puro y no referencia `UnityEngine`; esa restricción está impuesta por su
+assembly definition (`Nexus.Core.asmdef`, `noEngineReferences: true`), de modo que el motor de simulación pueda
 ejecutarse y balancearse en pruebas automatizadas sin abrir una escena.
 
 ## Requisitos
 
-- Unity 6 (versión LTS fijada en `game/ProjectSettings/ProjectVersion.txt`)
+- Unity 6 (versión LTS fijada en `game/proyecto de grado/ProjectSettings/ProjectVersion.txt`)
 - Visual Studio 2022 Community o JetBrains Rider
 - Git 2.43 o superior y Git LFS
 
@@ -56,17 +56,18 @@ git config merge.unityyamlmerge.name "Unity SmartMerge"
 git config merge.unityyamlmerge.driver 'UnityYAMLMerge merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"'
 ```
 
-Después, abrir la carpeta `game/` desde Unity Hub.
+Después, abrir la carpeta `game/proyecto de grado/` desde Unity Hub.
 
 ## Flujo de trabajo
 
-- `main` — únicamente versiones entregadas y etiquetadas.
-- `develop` — rama de integración; toda funcionalidad se mezcla aquí.
+- `main` — rama de integración: toda funcionalidad se mezcla aquí por *pull request*. Las versiones
+  entregadas se marcan con etiquetas.
+- `develop` — no se usa desde la estructura inicial del repositorio (22/08/2026).
 - `feature/<modulo>-<descripcion>` — trabajo diario. Ejemplo: `feature/simulation-velocity-model`.
 - `fix/<descripcion>` — corrección de defectos.
 - `docs/<descripcion>` — cambios exclusivos de documentación.
 
-Toda integración a `develop` se hace por *pull request* con revisión de al menos un
+Toda integración a `main` se hace por *pull request* con revisión de al menos un
 compañero. Ver `CONTRIBUTING.md`.
 
 ## Convención de commits

@@ -4,7 +4,7 @@
   "briefing": [
     "HH: «Ah, y arréglame lo de los patios. Alguien hackeó la barrera y me dejó el carro adentro tres horas. Veinte días. No es un proyecto importante. Es una prueba.»",
     "Cliente: Facilities, el departamento interno de instalaciones. Necesita controlar quién entra a los patios de los edificios N1 y N2 y reservar los ascensores de carga.",
-    "El equipo asignado son tres técnicos del Edificio Patch. Ninguno ha operado nunca un sistema repartido en varios servicios.",
+    "El equipo asignado son cuatro técnicos del Edificio Patch. Ninguno ha operado nunca un sistema repartido en varios servicios.",
     "Facilities no tiene personal de sistemas. Lo que se entregue lo va a mantener el propio equipo de mantenimiento, sin ayuda.",
     "Todo ocurre en un único edificio. En la hora punta hay, como mucho, cuarenta vehículos esperando.",
     "La barrera actual la abrieron con el mando genérico del fabricante. Nadie en Nexus tiene su código fuente.",
@@ -409,7 +409,7 @@
   "diasTotales": 20,
   "presupuestoInicial": 18000,
   "alcanceInicial": 34,
-  "equipoInicial": 3,
+  "equipoInicial": 4,
   "equipo": [
     { "id": "valeria",
       "descripcion": "Diseña y programa lo que se ve: las pantallas, los formularios, lo que toca el usuario. Lleva dos años en Nexus y pregunta mucho antes de dibujar.",
@@ -592,7 +592,8 @@
     "OA-DIS-01",
     "OA-CAL-01",
     "OA-GIT-01",
-    "OA-TEST-01"
+    "OA-TEST-01",
+    "OA-DEVOPS-01"
   ],
   "umbrales": {
     "exito": {
@@ -676,7 +677,7 @@
     "razonesDisponibles": [
       {
         "id": "equipo_pequeno",
-        "texto": "El equipo es de tres personas."
+        "texto": "El equipo es de cuatro personas."
       },
       {
         "id": "despliegue_simple",

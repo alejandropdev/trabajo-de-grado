@@ -127,7 +127,15 @@ namespace Nexus.Unity.Pantallas {
             var col = Ui.Columna(Hoja.Raiz, espacio: Tema.espacio);
             Ui.Boton(col, "Seguir jugando", Seguir, VarianteBoton.Primario);
             Ui.Boton(col, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
+            Ui.Boton(col, "Opciones", () => App.Router.Apilar<PantallaDeOpciones>());
             Ui.Boton(col, "Guardar y volver al menú", Salir);
+            if (s != null)
+                Ui.Boton(col, "Reiniciar el nivel", () => App.Router.Apilar<PantallaDeConfirmacion>(c => {
+                    c.Titulo = "¿Reiniciar el nivel?";
+                    c.Texto = "Vuelves a la Fase 1 de este nivel y se pierde lo jugado en él desde entonces. La entrevista y las escenas de apertura no se repiten.";
+                    c.TextoSi = "Reiniciar";
+                    c.AlConfirmar = () => FlujoDelNivel.ReiniciarNivel(App);
+                }), VarianteBoton.Peligro);
             Hoja.Nota("Al volver, elige tu perfil y pulsa «Continuar» en esta partida: sigues justo donde lo dejaste.");
         }
 

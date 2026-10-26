@@ -36,6 +36,8 @@ namespace Nexus.Unity.Juego {
     public sealed class LevelRunner : MonoBehaviour {
         private GameSession _sesion;
         private RelojEnTiempoReal _reloj;
+        /// <summary>La velocidad elegida en las opciones: la toma el reloj de cada nivel al crearse.</summary>
+        private double _velocidadPreferida = 1.0;
         private double _segundosJugados;
 
         public EstadoDelDia Estado { get; private set; } = EstadoDelDia.Parado;
@@ -67,8 +69,11 @@ namespace Nexus.Unity.Juego {
 
         /// <summary>El multiplicador de la simulacion, de 0,25 a 4. El docente puede comprimir una sesion.</summary>
         public double Velocidad {
-            get { return _reloj == null ? 1.0 : _reloj.Velocidad; }
-            set { if (_reloj != null) _reloj.Velocidad = value; }
+            get { return _reloj == null ? _velocidadPreferida : _reloj.Velocidad; }
+            set {
+                _velocidadPreferida = value;
+                if (_reloj != null) _reloj.Velocidad = value;
+            }
         }
 
         /// <summary>Cada tramo en que el reloj avanzo al menos un minuto.</summary>
@@ -86,7 +91,7 @@ namespace Nexus.Unity.Juego {
         /// <summary>Engancha una sesion ya con la Fase 1 cerrada. No empieza el dia: eso es EmpezarDia.</summary>
         public void Usar(GameSession sesion) {
             _sesion = sesion ?? throw new ArgumentNullException(nameof(sesion));
-            var velocidad = _reloj == null ? 1.0 : _reloj.Velocidad;
+            var velocidad = _reloj == null ? _velocidadPreferida : _reloj.Velocidad;
             _reloj = new RelojEnTiempoReal(sesion.Perfil.Jornada) { Velocidad = velocidad };
             Estado = sesion.R.Fase == 2 ? EstadoDelDia.Parado : EstadoDelDia.DesarrolloTerminado;
         }

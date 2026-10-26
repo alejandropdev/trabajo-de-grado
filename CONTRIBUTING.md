@@ -2,7 +2,7 @@
 
 ## Antes de empezar a trabajar
 
-1. Actualizar `develop`: `git checkout develop && git pull`.
+1. Actualizar `main`: `git checkout main && git pull`.
 2. Crear la rama: `git checkout -b feature/<modulo>-<descripcion>`.
 3. Verificar que la tarea existe en el tablero y está asignada.
 
@@ -19,8 +19,8 @@ Estas reglas lo mitigan:
    desde el propio editor de Unity.
 4. **Modo de serialización en texto forzado.** Debe estar activo en Project Settings →
    Editor → Asset Serialization → Force Text.
-5. **Contenido en ScriptableObjects, no en código.** Un evento o un ajuste de balance
-   nuevos son un asset nuevo, no una modificación de un archivo compartido.
+5. **Contenido en datos, no en código.** Un evento o un ajuste de balance nuevos van en los
+   JSON de `Assets/StreamingAssets/` (niveles, eventos, metodologías), no en un archivo C#.
 
 ## Antes de abrir un pull request
 

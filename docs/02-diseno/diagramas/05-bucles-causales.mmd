@@ -1,34 +1,39 @@
 flowchart LR
-    PE[presionEntrega]
-    AT[decisiones de atajo]
-    DT[deudaTecnica]
-    VE[velocidadEfectiva]
-    TR[trabajoRestante]
-    HE[horasExtra]
-    FA[fatiga]
-    MO[moral]
-    RO[rotación]
-    CAP[capacidad del equipo]
-    QA[esfuerzo en QA]
-    DL[defectosLatentes]
-    DP[defectos en producción]
-    SAT[satisfaccionCliente]
-    SOL[solicitudes de cambio]
-    CU[acciones de cuidado]
+    HE[Horas extra]
+    PR[Presión / sobrecompromiso]
+    DT[DeudaTecnica]
+    VE[Velocidad]
+    AV[Avance]
+    FA[Cansancio]
+    MO[MoralEquipo]
+    CO[Cobertura]
+    DO[Documentacion]
+    CP[Competencia]
+    RL[RiesgoLatente]
+    EV[Eventos negativos]
+    QA["Pruebas, programación en pareja, revisión de PR"]
+    DE["Irse a casa a las 18:00"]
 
-    %% B1 · Espiral de presión (refuerzo)
-    PE -->|+| AT --> |+| DT -->|-| VE -->|+| TR -->|+| PE
+    %% R1 · Presión → deuda (refuerzo)
+    HE -->|+| PR -->|+| DT -->|-| VE -->|+| AV
+    %% R2 · Agotamiento (refuerzo)
+    HE -->|+| FA -->|-| MO -->|+| VE
+    FA -->|-| VE
+    %% R3 · Dilución de la calidad (refuerzo)
+    AV -->|-| CO
+    AV -->|-| DO
+    %% R4 · Riesgo → eventos (refuerzo)
+    DT -->|+| RL
+    FA -->|+| RL
+    CO -->|-| RL
+    DO -->|-| RL
+    RL -->|+| EV -->|+| DT
 
-    %% B2 · Espiral de agotamiento (refuerzo)
-    PE -->|+| HE -->|+| FA -->|-| VE
-    HE -->|-| MO -->|+| RO -->|-| CAP -->|+| PE
-
-    %% B3 · Espiral de confianza (refuerzo)
-    DT -->|+| DP -->|-| SAT -->|+| SOL -->|+| PE
-
-    %% B4 · Inversión en calidad (equilibrio)
+    %% B1 · Inversión en calidad (equilibrio)
+    QA -->|+| CO
     QA -->|-| DT
-    QA -->|-| DL -->|+| DP
-
-    %% B5 · Cuidado del equipo (equilibrio)
-    CU -->|+| MO -->|+| VE
+    %% B2 · Cuidado del equipo (equilibrio)
+    DE -->|-| FA
+    DE -->|+| MO
+    %% B3 · Documentación → competencia (equilibrio)
+    DO -->|+| CP -->|+| VE
