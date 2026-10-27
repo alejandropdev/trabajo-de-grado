@@ -1,0 +1,219 @@
+{
+  "id": "MJ-OF-N1-DIAGRAMA-2",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "lectura",
+  "enElProyecto": "Es el diagrama de la lectura de matrículas en la garita: cómo se decide si la barrera se abre.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama del lector de matrículas",
+    "comoSeJuega": "El diagrama de la lectura de matrículas en la garita. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "camara",
+        "capa": "externo",
+        "texto": "Cámara de la garita",
+        "tipo": "externo",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Hace una foto a cada vehículo que llega."
+      },
+      {
+        "id": "lector",
+        "capa": "logica",
+        "texto": "Lector de matrículas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": ""
+      },
+      {
+        "id": "autorizados",
+        "capa": "logica",
+        "texto": "Vehículos autorizados",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Decide si una matrícula puede entrar."
+      },
+      {
+        "id": "barrera",
+        "capa": "externo",
+        "texto": "Controlador de la barrera",
+        "tipo": "externo",
+        "fila": 0,
+        "columna": 2,
+        "detalle": "El aparato del fabricante que sube y baja la barrera."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "La lista de matrículas autorizadas."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "r1",
+        "tipo": "pide",
+        "desde": "camara",
+        "hasta": "lector",
+        "texto": "envía la foto"
+      },
+      {
+        "id": "r2",
+        "tipo": "pide",
+        "desde": "lector",
+        "hasta": "autorizados",
+        "texto": "¿está autorizada?"
+      },
+      {
+        "id": "r3",
+        "tipo": "lee",
+        "desde": "autorizados",
+        "hasta": "bd",
+        "texto": "lee la lista"
+      },
+      {
+        "id": "r4",
+        "tipo": "pide",
+        "desde": "autorizados",
+        "hasta": "barrera",
+        "texto": "abre la barrera"
+      },
+      {
+        "id": "r5",
+        "tipo": "pide",
+        "desde": "camara",
+        "hasta": "barrera",
+        "texto": "abre si ve un vehículo"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "r5"
+      ],
+      "defecto": "falla_de_seguridad",
+      "explicacion": "La cámara abre la barrera sola cada vez que ve un vehículo, sin preguntar si está autorizado. Es el mismo agujero que se usó para colarse en los patios.",
+      "pista": "Busca todos los caminos que llegan a la barrera. ¿Alguno se salta la comprobación de autorizados?"
+    },
+    {
+      "id": "Z2",
+      "tipo": "commit",
+      "commits": [
+        "lector"
+      ],
+      "defecto": "elemento_sin_especificar",
+      "explicacion": "El lector no dice qué hace si no consigue leer la matrícula (barro, lluvia, una placa doblada). Cada uno lo programaría a su manera.",
+      "pista": "¿Qué pasa cuando la foto no se lee bien? Busca la pieza que tendría que decirlo."
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "r3"
+      ],
+      "razonNoEsDefecto": "Que la lista de autorizados se lea de la base de datos es lo esperado: Facilities la actualiza ahí."
+    }
+  ],
+  "paletaEtiquetas": [
+    "falla_de_seguridad",
+    "elemento_sin_especificar",
+    "acoplamiento_indebido",
+    "requisito_ambiguo"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "falla_de_seguridad",
+        "elemento_sin_especificar",
+        "acoplamiento_indebido"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "falla_de_seguridad",
+        "elemento_sin_especificar",
+        "acoplamiento_indebido",
+        "requisito_ambiguo"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "requisito_ambiguo"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Toda decisión de seguridad tiene que pasar por un único sitio. Un atajo que se la salta es una puerta abierta."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "En seguridad no basta con que el camino bueno funcione: no puede haber otro que lo esquive."
+  }
+}

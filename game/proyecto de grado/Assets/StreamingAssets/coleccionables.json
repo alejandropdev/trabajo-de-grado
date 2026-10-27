@@ -4,6 +4,7 @@
 
     {
       "id": "COL-DEV-02", "serie": "carta", "palo": "leyes",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["minutoDelDia >= 600"], "pista": "Voss ordena sus planos a media mañana; antes, el archivo está a oscuras." },
       "titulo": "Ley de Conway",
       "texto": "Las organizaciones que diseñan sistemas acaban produciendo diseños que copian su propia estructura de comunicación. Si dos equipos no se hablan, entre sus dos módulos habrá una frontera rígida, se necesite o no.",
       "preguntaDeAplicacion": "Si dos equipos que no se hablan diseñan el mismo sistema, ¿qué forma tendrá la arquitectura resultante?",
@@ -12,6 +13,7 @@
     },
     {
       "id": "COL-DEV-03", "serie": "carta", "palo": "desastres",
+      "aparicion": { "dificultad": "dificil", "precondiciones": ["prsBienRevisados >= 2"], "pista": "Las máquinas que hicieron daño empezaron con un cambio que nadie miró dos veces." },
       "titulo": "Therac-25",
       "texto": "Entre 1985 y 1987, la máquina de radioterapia Therac-25 administró sobredosis masivas de radiación en seis accidentes; varios pacientes murieron. La causa fue una condición de carrera en su software, en un modelo al que se le habían quitado los enclavamientos de seguridad físicos que tenían las versiones anteriores y que confiaba solo en el código.",
       "preguntaDeAplicacion": "¿Por qué quitar una protección física y confiar solo en un software sin pruebas exhaustivas de concurrencia es una decisión de arquitectura, y no solo de código?",
@@ -28,6 +30,7 @@
     },
     {
       "id": "COL-DEV-05", "serie": "carta", "palo": "desastres",
+      "aparicion": { "dificultad": "dificil", "precondiciones": ["jornadaProrrogada >= 1", "minutoDelDia >= 1110"], "pista": "Los sistemas fallan de verdad cuando ya todos se han ido a casa." },
       "titulo": "Knight Capital",
       "texto": "El 1 de agosto de 2012, Knight Capital desplegó código nuevo en siete de sus ocho servidores de negociación. El octavo conservaba código antiguo que se reactivó con la nueva configuración. En unos 45 minutos la empresa perdió unos 440 millones de dólares.",
       "preguntaDeAplicacion": "¿Qué práctica de despliegue habría evitado esto?",
@@ -44,6 +47,7 @@
     },
     {
       "id": "COL-DEV-07", "serie": "carta", "palo": "practicas",
+      "aparicion": { "dificultad": "media", "precondiciones": ["conversacionesHechas >= 2"], "pista": "Hay cosas que solo una persona sabe. Habla con la gente del edificio." },
       "titulo": "Bus factor",
       "texto": "El número mínimo de personas que, si desaparecieran de golpe, dejarían el proyecto parado por falta de conocimiento que nadie más tiene. Un bus factor de uno es una alarma silenciosa: todo funciona hasta el día en que esa persona no viene.",
       "preguntaDeAplicacion": "Si solo una persona del equipo puede tocar un módulo crítico, ¿qué pasa el día que esa persona no está?",
@@ -60,6 +64,7 @@
     },
     {
       "id": "COL-DEV-09", "serie": "carta", "palo": "oficio",
+      "aparicion": { "dificultad": "media", "precondiciones": ["diasConHorasExtra >= 1"], "pista": "Esta carta solo la ve quien ya se ha quedado de más alguna noche." },
       "titulo": "Burnout",
       "texto": "La Organización Mundial de la Salud lo describe en la CIE-11 como un fenómeno ocupacional, no como una enfermedad: un síndrome causado por estrés laboral crónico que no se ha gestionado bien. Tiene tres dimensiones: agotamiento, distancia mental o cinismo hacia el trabajo, y menor eficacia profesional.",
       "preguntaDeAplicacion": "¿Por qué «el que más entrega» durante meses seguidos es una señal de riesgo para el proyecto, y no solo un elogio?",
@@ -69,6 +74,7 @@
 
     {
       "id": "COL-USB-01", "serie": "usb", "fragmento": 1,
+      "aparicion": { "dificultad": "dificil", "precondiciones": ["coleccionablesRecogidos >= 6"], "pista": "El fragmento solo se deja ver a quien ya ha buscado en todas partes." },
       "titulo": "Fragmento 1/8 del USB de 256 MB",
       "texto": "Un trozo de memoria USB antigua, sin carcasa, encajado detrás de un rack que nadie recuerda haber instalado. Solo no se puede leer.",
       "ubicacion": "Detrás del rack apagado del sótano de los patios."
@@ -76,6 +82,7 @@
 
     {
       "id": "COL-COD-01", "serie": "codigo",
+      "aparicion": { "dificultad": "media", "precondiciones": ["conversacionesHechas >= 1", "minutoDelDia >= 660"], "pista": "La terminal pide un código. Quizá, después de hablar con alguien, la veas distinta a media mañana." },
       "titulo": "Código de terminal #1",
       "comando": "whoami",
       "revela": "nobody",
@@ -84,6 +91,7 @@
     },
     {
       "id": "COL-COD-02", "serie": "codigo",
+      "aparicion": { "dificultad": "media", "precondiciones": ["tareasDeOficinaHechas >= 1"], "pista": "Los registros del servidor se entienden mejor después de haber hecho algo de oficina." },
       "titulo": "Código de terminal #2",
       "comando": "ls -la /var/log/legacy",
       "revela": "Una carpeta de registros con fechas de 1998.",
@@ -93,6 +101,7 @@
 
     {
       "id": "COL-STARTUP-01", "serie": "startup",
+      "aparicion": { "dificultad": "media", "precondiciones": ["diaActual >= 6", "minutoDelDia >= 900"], "pista": "Javier cuenta historias de empresas caídas… a última hora, y no la primera semana." },
       "titulo": "Webvan",
       "nicho": "Supermercado en línea con reparto a domicilio",
       "texto": "Webvan salió a bolsa en noviembre de 1999 y comprometió cerca de mil millones de dólares en construir centros de distribución automatizados antes de tener la demanda que los justificara. Cerró en julio de 2001, menos de dos años después.",
@@ -102,6 +111,7 @@
     },
     {
       "id": "COL-STARTUP-02", "serie": "startup",
+      "aparicion": { "dificultad": "dificil", "precondiciones": ["MoralEquipo >= 70", "diaActual >= 8"], "pista": "Solo quien está de buen ánimo se ríe de los fracasos ajenos." },
       "titulo": "Pets.com",
       "nicho": "Venta en línea de productos para mascotas",
       "texto": "Pets.com vendía comida y arena para mascotas: productos pesados, de poco margen y caros de enviar. Gastó enormes sumas en publicidad, con una famosa mascota-calcetín, y anunció su liquidación en noviembre de 2000, unos nueve meses después de salir a bolsa.",
@@ -111,40 +121,184 @@
     },
 
     { "id": "COL-ADV-01", "serie": "advertencia", "titulo": "UN COMMIT, UNA IDEA.",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["diaActual >= 2"], "pista": "Alguien pega carteles nuevos en el pasillo cada mañana. Hoy todavía no ha pasado." },
       "texto": "Un commit que hace tres cosas a la vez no se puede revertir sin llevarse las otras dos.",
       "ubicacion": "Cartel junto a la máquina de café del pasillo del concurso." },
     { "id": "COL-ADV-02", "serie": "advertencia", "titulo": "SI NO ESTÁ EN EL ADR, NO PASÓ.",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["minutoDelDia >= 840"], "pista": "Por la tarde, cuando el sol da en tu mesa, se lee algo en el corcho." },
       "texto": "La memoria del equipo se va con la gente. El documento se queda.",
       "ubicacion": "Cartel sobre tu escritorio." },
     { "id": "COL-ADV-03", "serie": "advertencia", "titulo": "COBERTURA ALTA NO ES LO MISMO QUE PRUEBAS BUENAS.",
       "texto": "Ejecutar una línea no es lo mismo que comprobar que hizo lo correcto.",
       "ubicacion": "Cartel en la pared del bullpen." },
     { "id": "COL-ADV-04", "serie": "advertencia", "titulo": "EL LÍMITE DE WIP NO ES UNA SUGERENCIA.",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["minutoDelDia >= 720", "minutoDelDia <= 840"], "pista": "A la hora del almuerzo la cafetería se llena… y algo cambia en la nevera." },
       "texto": "Cada tarea a medias que añades hace más lentas a todas las demás.",
       "ubicacion": "Cartel junto a la entrada de la cafetería." },
     { "id": "COL-ADV-05", "serie": "advertencia", "titulo": "UNA PERSONA, UN MÓDULO, UN RIESGO.",
+      "aparicion": { "dificultad": "media", "precondiciones": ["ceremoniasAsistidas >= 1"], "pista": "Quien va a las reuniones encuentra luego algo junto a la cafetera." },
       "texto": "Si solo una persona lo entiende, el proyecto depende de que esa persona no se enferme, no renuncie y no se canse.",
       "ubicacion": "Cartel en la cafetería, sobre el microondas." },
     { "id": "COL-ADV-06", "serie": "advertencia", "titulo": "EL ATAJO DE HOY LO PAGA OTRO, O TÚ, EN TRES SEMANAS.",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["diaActual >= 4"], "pista": "En el Data Hub cuelgan avisos nuevos a partir de la segunda semana." },
       "texto": "La deuda técnica cobra intereses. No se olvida sola.",
       "ubicacion": "Cartel en la puerta del Data Hub." },
     { "id": "COL-ADV-07", "serie": "advertencia", "titulo": "«AH, Y TAMBIÉN» ES UN CAMBIO DE ALCANCE.",
+      "aparicion": { "dificultad": "media", "precondiciones": ["cambiosAceptados >= 1"], "pista": "Alguien deja un recordatorio el día que aceptas el primer «ah, y también…» del cliente." },
       "texto": "Si no se nombra como cambio, no se puede negociar ni la fecha ni los recursos.",
       "ubicacion": "Post-it en el borde de tu monitor." },
     { "id": "COL-ADV-08", "serie": "advertencia", "titulo": "NEGOCIAR NO ES OBEDECER NI RECHAZAR.",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["diaActual >= 2"], "pista": "En el bullpen alguien escribe en la pizarra al final del primer día." },
       "texto": "Hay una tercera opción, y casi nadie la prueba primero.",
       "ubicacion": "Cartel en el bullpen, junto al tablero." },
     { "id": "COL-ADV-09", "serie": "advertencia", "titulo": "UN MERGE TARDE NO CUESTA MENOS. SOLO CUESTA DESPUÉS.",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["minutoDelDia <= 540"], "pista": "Quien llega antes de las nueve ve lo que el bullpen tapa durante el día." },
       "texto": "El viernes «con calma» casi nunca llega con calma.",
       "ubicacion": "Cartel en el bullpen, encima de la impresora." },
     { "id": "COL-ADV-10", "serie": "advertencia", "titulo": "LO QUE NO SE MIDE DE VERDAD, SE INVENTA.",
+      "aparicion": { "dificultad": "dificil", "precondiciones": ["minijuegosJugados >= 3"], "pista": "Lo que no se mide, se inventa. Demuéstralo más de una vez." },
       "texto": "Una métrica que se puede maquillar, tarde o temprano se maquilla.",
       "ubicacion": "Cartel sobre la terminal de Javier." },
     { "id": "COL-ADV-11", "serie": "advertencia", "titulo": "UNA ESTIMACIÓN SIN INCERTIDUMBRE ES UNA PROMESA DISFRAZADA.",
       "texto": "Un rango dice más verdad que un número solo.",
       "ubicacion": "Cartel en la sala del concurso, debajo del reloj." },
     { "id": "COL-ADV-12", "serie": "advertencia", "titulo": "EL SERVIDOR QUE NADIE MONITOREA FALLA SOLO.",
+      "aparicion": { "dificultad": "facil", "precondiciones": ["minutoDelDia >= 960"], "pista": "Al caer la tarde, la luz del sótano deja ver lo que hay en la pared." },
       "texto": "No puedes arreglar lo que no puedes ver.",
-      "ubicacion": "Cartel en el sótano, junto al rack apagado." }
-  ]
+      "ubicacion": "Cartel en el sótano, junto al rack apagado." },
+
+    {
+      "id": "COL-DEV-10",
+      "serie": "carta",
+      "palo": "oficio",
+      "titulo": "La regla del Boy Scout",
+      "texto": "«Deja el código siempre más limpio de como lo encontraste.» Al refactorizar una pequeña función antes de agregar una nueva característica, evitas que la deuda técnica se acumule con el tiempo.",
+      "preguntaDeAplicacion": "Antes de añadir una función a un módulo desordenado, ¿qué pequeño arreglo harías primero y por qué?",
+      "fuente": "Martin, R. C. (2008). Clean Code: A Handbook of Agile Software Craftsmanship. Prentice Hall, cap. 1.",
+      "ubicacion": "Recogida en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-DEV-11",
+      "serie": "carta",
+      "palo": "practicas",
+      "titulo": "Divide y vencerás en Git",
+      "texto": "«Commits pequeños y frecuentes son más fáciles de revertir que un solo commit gigante.» Separa tus cambios por funcionalidades lógicas: si algo se rompe, encontrar el commit defectuoso toma segundos.",
+      "preguntaDeAplicacion": "Si un cambio mezcla un arreglo urgente y una mejora estética, ¿cómo lo separarías en commits?",
+      "fuente": "Chacon, S. y Straub, B. (2014). Pro Git (2.ª ed.). Apress, cap. 5.",
+      "ubicacion": "Recogida en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-DEV-12",
+      "serie": "carta",
+      "palo": "practicas",
+      "titulo": "El poder de la cobertura",
+      "texto": "«Probar no es perder el tiempo, es comprar tranquilidad.» Un conjunto sólido de pruebas unitarias detecta regresiones antes de que lleguen al cliente.",
+      "preguntaDeAplicacion": "¿Qué parte de tu proyecto, si fallara, te costaría más horas de depuración, y cómo la cubrirías con pruebas?",
+      "fuente": "Fowler, M. (2012). TestCoverage. martinfowler.com/bliki/TestCoverage.html",
+      "ubicacion": "Recogida en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-DEV-13",
+      "serie": "carta",
+      "palo": "practicas",
+      "titulo": "Historias de usuario claras",
+      "texto": "«Un requerimiento ambiguo es un bug garantizado en el futuro.» Antes de mover una tarea a «en curso», sus criterios de aceptación tienen que estar definidos y entendidos.",
+      "preguntaDeAplicacion": "Escribe un criterio de aceptación verificable para «el usuario puede reservar un ascensor».",
+      "fuente": "Cohn, M. (2004). User Stories Applied: For Agile Software Development. Addison-Wesley.",
+      "ubicacion": "Recogida en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-DEV-14",
+      "serie": "carta",
+      "palo": "practicas",
+      "titulo": "Diagramas que salvan vidas",
+      "texto": "«Dibujar la arquitectura antes de codificar evita reconstruir el edificio a mitad de camino.» Los diagramas de secuencia muestran los cuellos de botella entre componentes antes de la primera línea de código.",
+      "preguntaDeAplicacion": "¿Qué interacción de tu sistema dibujarías primero como diagrama de secuencia, y qué riesgo destapa?",
+      "fuente": "Fowler, M. (2003). UML Distilled (3.ª ed.). Addison-Wesley, cap. 4.",
+      "ubicacion": "Recogida en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-DEV-15",
+      "serie": "carta",
+      "palo": "oficio",
+      "titulo": "Gestión del tiempo y pausas activas",
+      "texto": "«El cansancio acumulado multiplica los errores.» Tomar descansos breves entre tareas complejas ayuda a mantener la concentración y evita fallos de lógica absurdos.",
+      "preguntaDeAplicacion": "Si llevas tres días con horas extra, ¿qué decisión de hoy reduciría los errores de mañana?",
+      "fuente": "DeMarco, T. y Lister, T. (1987). Peopleware: Productive Projects and Teams. Dorset House.",
+      "ubicacion": "Recogida en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-DEV-16",
+      "serie": "carta",
+      "palo": "oficio",
+      "titulo": "Comunicación en code reviews",
+      "texto": "«Critica el código, nunca a la persona.» Las revisiones de código buscan mejores soluciones y compartir conocimiento, sin hundir la moral de quien escribió el cambio.",
+      "preguntaDeAplicacion": "Reescribe el comentario «esto está mal» para que ayude a quien escribió el código a mejorarlo.",
+      "fuente": "Google (2019). Google Engineering Practices: How to do a code review. google.github.io/eng-practices",
+      "ubicacion": "Recogida en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-USB-02",
+      "serie": "usb",
+      "fragmento": 2,
+      "titulo": "Fragmento 2/8 del USB de 256 MB",
+      "texto": "Carcasa metálica medio quemada, sectores internos intactos. Datos cifrados: otra pieza de la llave que Javier intenta descifrar en secreto.",
+      "ubicacion": "Recogido en el recorrido por el edificio (Fase 1)."
+    },
+
+    {
+      "id": "COL-NOTA-01",
+      "serie": "nota",
+      "titulo": "Advertencia personal",
+      "texto": "«Cuidado con esa chica, en la personalidad se ve que es peligrosa y lo es, mantén distancia. – Anónimo.»",
+      "ubicacion": "Una nota adhesiva del recorrido por el edificio."
+    },
+
+    {
+      "id": "COL-NOTA-02",
+      "serie": "nota",
+      "titulo": "Rumor sobre la gerencia",
+      "texto": "«Nadie sabe por qué Sara entra a la oficina de HH a puerta cerrada a altas horas de la noche. Algo están tramando con el control del repositorio.»",
+      "ubicacion": "Una nota adhesiva del recorrido por el edificio."
+    },
+
+    {
+      "id": "COL-NOTA-03",
+      "serie": "nota",
+      "titulo": "El incidente del pasado",
+      "texto": "«El despido del padre de Javier no fue un error administrativo. Él descubrió la puerta trasera en el sistema antes de que borraran su acceso.»",
+      "ubicacion": "Una nota adhesiva del recorrido por el edificio."
+    },
+
+    {
+      "id": "COL-NOTA-04",
+      "serie": "nota",
+      "titulo": "Queja en la cafetería",
+      "texto": "«Alguien se volvió a comer la pizza de la nevera sin anotar su nombre. Óscar dice que no fue él, pero tenía salsa en la camisa.»",
+      "ubicacion": "Una nota adhesiva del recorrido por el edificio."
+    },
+
+    {
+      "id": "COL-NOTA-05",
+      "serie": "nota",
+      "titulo": "Sobre el aislamiento",
+      "texto": "«Si buscas a Kenji, ni te molestes en tocar su puerta. A menos que le lleves un diagrama bien hecho, te va a ignorar por completo.»",
+      "ubicacion": "Una nota adhesiva del recorrido por el edificio."
+    },
+
+    {
+      "id": "COL-NOTA-06",
+      "serie": "nota",
+      "titulo": "La oficina oculta",
+      "texto": "«Hay un conducto detrás de la bodega que lleva al ala vieja del edificio. Es el único lugar donde la señal de los monitores no llega.»",
+      "ubicacion": "Una nota adhesiva del recorrido por el edificio."
+    }
+]
 }

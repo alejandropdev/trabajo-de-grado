@@ -87,8 +87,25 @@ namespace Nexus.Core.Modelo {
         public bool RecoleccionHecha;
         public int MinutosDeRecoleccion;
 
+        // --- Lo que se trajo del mundo 3D ---
+        /// <summary>Todo lo que se trajo del recorrido 3D: id del objeto -> cuantos. Para el resumen.</summary>
+        public Dictionary<string, int> ObjetosDeRecoleccion = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>Los objetos-candidato (hojas de vida) recogidos, en el orden del catalogo: el equipo del proyecto.</summary>
+        public List<string> EquipoRecogido = new List<string>();
+        /// <summary>
+        /// Si se recogieron mas hojas de vida de las que caben, a quien eligio el jugador (ids de miembro). Vacio = aun no
+        /// ha elegido: entran las primeras, en el orden del catalogo.
+        /// </summary>
+        public List<string> EquipoElegido = new List<string>();
+        /// <summary>Pizza, cafe, Guepardex… que quedan: id del objeto -> cuantos.</summary>
+        public Dictionary<string, int> Suministros = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>Cada suministro gastado: cuando, cual y a quien. De aqui salen las esperas y el rebote.</summary>
+        public List<UsoDeSuministro> UsosDeSuministros = new List<UsoDeSuministro>();
+
         /// <summary>El trabajo de oficina de hoy: cuantas veces se hizo cada tarea, y la que esta abierta.</summary>
         public Dictionary<string, int> TareasDeOficinaHoy = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>Trabajando solo: lo que ya se hizo hoy (ordenar ideas, pausa activa, pato de goma). Una vez al dia.</summary>
+        public List<string> AccionesSoloHoy = new List<string>();
         public string TareaDeOficinaAbierta;
         public int TareasDeOficinaHechas;
 
@@ -202,7 +219,10 @@ namespace Nexus.Core.Modelo {
             "diasConHorasExtra", "diasSeguidosTrabajando", "cambiosAceptados",
             "vecesQueSeFueACasa", "accionesRetroElegidas",
             // del dia continuo: permite precondiciones del tipo "minutoDelDia / 60 >= 15"
-            "minutoDelDia"
+            "minutoDelDia",
+            // lo que el jugador ha hecho: para que un coleccionable aparezca por algo que se hizo, no solo por la hora
+            "jornadaProrrogada", "prsBienRevisados", "tareasDeOficinaHechas", "minijuegosJugados",
+            "conversacionesHechas", "ceremoniasAsistidas", "coleccionablesRecogidos"
         };
 
         /// <summary>Lo unico que una precondicion de un JSON puede consultar de aqui. El resto es interno a proposito.</summary>
@@ -244,6 +264,16 @@ namespace Nexus.Core.Modelo {
                 case "vecesquesefueacasa": valor = VecesQueSeFueACasa; return true;
                 case "accionesretroelegidas": valor = AccionesRetroElegidas; return true;
                 case "minutodeldia": valor = MinutoDelDia; return true;
+                case "jornadaprorrogada": valor = JornadaProrrogada ? 1 : 0; return true;
+                case "prsbienrevisados": valor = PrsBienRevisados; return true;
+                case "tareasdeoficinahechas": valor = TareasDeOficinaHechas; return true;
+                case "minijuegosjugados": valor = MinijuegosJugados; return true;
+                case "conversacioneshechas": valor = ConversacionesHechas == null ? 0 : ConversacionesHechas.Count; return true;
+                case "ceremoniasasistidas":
+                    valor = 0;
+                    if (ActasDeCeremonias != null) foreach (var a in ActasDeCeremonias) if (a != null && a.Asistio) valor++;
+                    return true;
+                case "coleccionablesrecogidos": valor = ColeccionablesRecogidos == null ? 0 : ColeccionablesRecogidos.Count; return true;
                 default: valor = 0; return false;
             }
         }
@@ -284,6 +314,13 @@ namespace Nexus.Core.Modelo {
             if (Despliegues == null) Despliegues = new List<RegistroDeDespliegue>();
             if (ModulosDesplegados == null) ModulosDesplegados = new List<string>();
             if (PapelesLeidos == null) PapelesLeidos = new List<string>();
+            // Guardados anteriores a los objetos del mundo 3D.
+            if (ObjetosDeRecoleccion == null) ObjetosDeRecoleccion = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (EquipoRecogido == null) EquipoRecogido = new List<string>();
+            if (EquipoElegido == null) EquipoElegido = new List<string>();
+            if (Suministros == null) Suministros = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (UsosDeSuministros == null) UsosDeSuministros = new List<UsoDeSuministro>();
+            if (AccionesSoloHoy == null) AccionesSoloHoy = new List<string>();
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,
@@ -305,6 +342,15 @@ namespace Nexus.Core.Modelo {
         public List<string> Caidos = new List<string>();
         public double Riesgo;
         public int Defectos;
+    }
+
+    /// <summary>Un suministro gastado: el dia, cual (id del objeto) y a quien (id del miembro; null = a todo el equipo).</summary>
+    public sealed class UsoDeSuministro {
+        public int Dia;
+        public string Suministro;
+        public string Miembro;
+        /// <summary>Hizo lo contrario de lo que debia: se abuso de el.</summary>
+        public bool Reboto;
     }
 
     /// <summary>Lo que quedo de una ceremonia: si el jugador asistio, como la llevo y que paso por llevarla asi.</summary>

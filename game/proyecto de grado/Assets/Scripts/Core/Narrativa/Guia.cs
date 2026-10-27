@@ -108,6 +108,8 @@ namespace Nexus.Core.Narrativa {
         public string Quien = "Marisol Andrade";
         public string Titulo;
         public string Texto;
+        /// <summary>El mismo paso contado para quien trabaja SOLO (sin hojas de vida, no hay equipo al que hablar). null = Texto.</summary>
+        public string TextoSolo;
         public string Mas;
         /// <summary>La pieza de la pantalla que se señala (la registran las pantallas: «mapa.pasillo», «dia.reloj»…).</summary>
         public string Resaltar;

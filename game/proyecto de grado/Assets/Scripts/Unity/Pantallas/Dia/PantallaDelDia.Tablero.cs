@@ -101,7 +101,7 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(_tableroDelDia, resumen, EstiloTexto.Pequeno, Tema.ink);
 
             if (enCurso.Count == 0)
-                Ui.Texto(_tableroDelDia, S.R.DiaActual == 0 ? "El equipo empieza a trabajar con el día 1." : "Ahora mismo no hay nada a medias.",
+                Ui.Texto(_tableroDelDia, S.R.DiaActual == 0 ? Solo("El equipo empieza a trabajar con el día 1.", "Empiezas a trabajar con el día 1.") : "Ahora mismo no hay nada a medias.",
                          EstiloTexto.Pequeno, Tema.inkMuted);
             foreach (var c in enCurso) {
                 var fila = Ui.Fila(_tableroDelDia, "Tarjeta", Tema.Espacio(3));
@@ -121,14 +121,15 @@ namespace Nexus.Unity.Pantallas {
         private void AbrirTablero(int pestana) {
             _pestanaDelTablero = pestana;
             _ultimoResultado = null;
-            AbrirPanel(S.Metodologia.Nombre + " · " + (S.BriefDeHoy != null ? S.BriefDeHoy.EtiquetaUnidad : ""), "El tablero del equipo", 1560,
+            _tarjetaReasignando = null;
+            AbrirPanel(S.Metodologia.Nombre + " · " + (S.BriefDeHoy != null ? S.BriefDeHoy.EtiquetaUnidad : ""), Solo("El tablero del equipo", "Tu tablero"), 1560,
                        PintarPanelDelTablero, ClaveDelPanelDelTablero);
         }
 
         private string ClaveDelPanelDelTablero() {
             var t = S.Tablero;
             if (t == null) return "";
-            return S.MinutoDelDia + "|" + S.R.LimiteWip + "|" + (S.PrPendiente != null) + "|" + _ultimoResultado + "|" +
+            return S.MinutoDelDia + "|" + S.R.LimiteWip + "|" + (S.PrPendiente != null) + "|" + _ultimoResultado + "|" + _tarjetaReasignando + "|" +
                    string.Join(",", t.Tarjetas.Select(c => c.Id + c.Columna + c.Asignado + c.Orden + c.Sprint)) + "|" + AlertasSonando().Count;
         }
 
@@ -163,7 +164,7 @@ namespace Nexus.Unity.Pantallas {
                 menos.interactable = S.PorQueNoSePuedeAjustarElWip(-1) == null;
                 var mas = Ui.Boton(wip, "+ 1", () => Actuar(() => S.AjustarLimiteWip(1), "Subiste el límite de trabajo en curso."));
                 mas.interactable = S.PorQueNoSePuedeAjustarElWip(1) == null;
-                Ui.Texto(wip, factor > 1.001 ? "El equipo está más enfocado: rinde un poco más."
+                Ui.Texto(wip, factor > 1.001 ? Solo("El equipo está más enfocado: rinde un poco más.", "Vas más enfocado: rindes un poco más.")
                             : factor < 0.999 ? $"Demasiadas cosas a la vez (o gente parada): el equipo rinde un {(1 - factor) * 100:0} % menos."
                             : $"Moverlo cuesta {GameSession.MinutosDeAjustarWip} min. Menos cosas a medias suele ser más cosas terminadas.",
                          EstiloTexto.Pequeno, factor < 0.999 ? Tema.warning : factor > 1.001 ? Tema.success : Tema.inkMuted);
@@ -233,15 +234,40 @@ namespace Nexus.Unity.Pantallas {
             var lleva = t.Miembro(c.Asignado);
             Ui.Texto(ficha, lleva == null ? "Nadie la lleva." : $"La lleva {lleva.Nombre}" + (c.AsignacionManual ? " (se la diste tú): " + ComoSeLeDa(lleva, c.Tipo) : " (reparto automático)"),
                      EstiloTexto.Pequeno, Tema.ink);
-            var quienes = Ui.Fila(ficha, "Asignar", Tema.Espacio(2));
-            Ui.Texto(quienes, "Dársela a:", EstiloTexto.Leyenda, Tema.inkFaint);
+            if (t.Miembros.Count < 2) return;   // trabajando solo no hay a quien pasarsela
+
+            // Un solo boton y, al pulsarlo, la lista de personas en vertical: en una fila, con cuatro o mas, los nombres
+            // se aplastaban en la columna y no se entendia a quien se le daba.
+            var abierta = _tarjetaReasignando == c.Id;
+            Ui.Boton(ficha, abierta ? "Cancelar" : "Cambiar quién la lleva…", () => {
+                _tarjetaReasignando = abierta ? null : c.Id;
+                RepintarElPanel();
+            }, VarianteBoton.Fantasma);
+            if (!abierta) return;
+            Ui.Texto(ficha, $"¿A quién se la das? Cuesta {GameSession.MinutosDeAsignar} min.", EstiloTexto.Leyenda, Tema.cyan);
             foreach (var m in t.Miembros) {
                 var miembro = m;
-                var boton = Ui.Boton(quienes, miembro.Nombre, () => Actuar(() => S.AsignarTarjeta(c.Id, miembro.Id),
-                                     $"«{c.Titulo}» pasa a {miembro.Nombre}: {ComoSeLeDa(miembro, c.Tipo)}."), VarianteBoton.Fantasma);
+                var lleva2 = t.Tarjetas.Count(x => x.Asignado == miembro.Id && x.Empezada && !x.Terminada);
+                var detalle = $"{Capitalizar(ComoSeLeDa(miembro, c.Tipo))} · lleva {lleva2} tarjeta{(lleva2 == 1 ? "" : "s")}" +
+                              (c.Asignado == miembro.Id ? " · la lleva ahora" : "");
+                var boton = Ui.BotonDeOpcion(ficha, miembro.Nombre, detalle, () => {
+                    _tarjetaReasignando = null;
+                    Actuar(() => S.AsignarTarjeta(c.Id, miembro.Id), $"«{c.Titulo}» pasa a {miembro.Nombre}: {ComoSeLeDa(miembro, c.Tipo)}.");
+                });
                 boton.interactable = S.PorQueNoSePuedeAsignar(c.Id, miembro.Id) == null;
-                Ui.Resaltar(boton, c.Asignado == miembro.Id && c.AsignacionManual);
+                Ui.Resaltar(boton, c.Asignado == miembro.Id);
             }
+        }
+
+        private string _tarjetaReasignando;
+
+        private static string Capitalizar(string s) {
+            return string.IsNullOrEmpty(s) ? s : char.ToUpperInvariant(s[0]) + s.Substring(1);
+        }
+
+        /// <summary>Lo que cambia solo en la pantalla (abrir una lista) no cambia la clave del motor: se repinta a mano.</summary>
+        private void RepintarElPanel() {
+            if (_panel != null) _panel.Repintar();
         }
 
         private static string ComoSeLeDa(MiembroDelEquipo m, string tipo) {
@@ -253,10 +279,13 @@ namespace Nexus.Unity.Pantallas {
         private void PintarEquipoDelTablero(RectTransform hoja) {
             var t = S.Tablero;
             Ui.Texto(hoja, $"Darle una tarjeta a quien se le da bien ese tipo de trabajo la hace rendir más; a quien le cuesta, menos. Asignar cuesta {GameSession.MinutosDeAsignar} min. " +
-                           "Si no tocas nada, el equipo se reparte solo, por turnos y sin mirar a quién se le da mejor.", EstiloTexto.Pequeno, Tema.ink);
+                           Solo("Si no tocas nada, el equipo se reparte solo, por turnos y sin mirar a quién se le da mejor.", "Todo lo que hay en curso lo llevas tú: tu soltura con cada tipo de trabajo cuenta en todas las tarjetas."), EstiloTexto.Pequeno, Tema.ink);
             PantallaDeGlosario.Palabras(App, hoja, "Los roles:", "desarrollador", "rol-interfaz", "rol-datos", "rol-servidor", "tester");
-            var fila = Ui.Fila(hoja, "Equipo", Tema.espacio, alineacion: TextAnchor.UpperLeft);
-            foreach (var m in t.Miembros) {
+            // De tres en tres: en una sola fila, con cuatro o mas personas, las fichas se salian por la derecha.
+            RectTransform fila = null;
+            for (var i = 0; i < t.Miembros.Count; i++) {
+                var m = t.Miembros[i];
+                if (i % 3 == 0) fila = Ui.Fila(hoja, "Equipo", Tema.espacio, alineacion: TextAnchor.UpperLeft);
                 var ficha = Ui.Tarjeta(fila, m.Nombre);
                 UiKit.Tamano(ficha, ancho: 260, flexAncho: 1);
                 if (!string.IsNullOrEmpty(m.Rol)) Ui.Texto(ficha, m.Rol, EstiloTexto.Pequeno, Tema.inkMuted);
@@ -358,7 +387,7 @@ namespace Nexus.Unity.Pantallas {
 
         private void PintarRevision(Hoja h, MicroPr pr, Func<ResultadoDeRevision> leer, Action<ResultadoDeRevision> alDecidir) {
             PantallaDeGlosario.Palabras(App, h.Raiz, "¿Primera vez?", "revision-de-codigo");
-            if (!string.IsNullOrEmpty(pr.Descripcion)) h.Parrafo("Lo que dice quien lo escribió: «" + pr.Descripcion + "»");
+            if (!string.IsNullOrEmpty(pr.Descripcion)) h.Parrafo(Solo("Lo que dice quien lo escribió: «", "Lo que pensabas al escribirlo: «") + pr.Descripcion + "»");
             var codigo = Ui.PanelColumna(h.Raiz, "Diff", Tema.Espacio(4), 2, Tema.bg950);
             foreach (var linea in pr.Lineas) {
                 var texto = Ui.Texto(codigo, (linea.Tipo == "add" ? "+ " : linea.Tipo == "del" ? "− " : "  ") + linea.Texto, EstiloTexto.Mono);
@@ -366,7 +395,7 @@ namespace Nexus.Unity.Pantallas {
             }
             var r = leer();
             if (r == null) {
-                h.Nota($"En verde, lo que añade; en rojo, lo que quita. Revisarlo cuesta {GameSession.MinutosDeRevisarPr} min. Si lo cierras sin decidir, el equipo se lo revisa entre ellos.");
+                h.Nota($"En verde, lo que añade; en rojo, lo que quita. Revisarlo cuesta {GameSession.MinutosDeRevisarPr} min. " + Solo("Si lo cierras sin decidir, el equipo se lo revisa entre ellos.", "Si lo cierras sin decidir, nadie más lo revisa: si tiene un fallo, entra tal cual."));
                 var botones = h.Fila();
                 Ui.Boton(botones, "Aprobar: está bien", () => Revisar(VeredictosDePr.Aprobar, alDecidir), VarianteBoton.Primario);
                 Ui.Boton(botones, "Pedir cambios: algo falla", () => Revisar(VeredictosDePr.PedirCambios, alDecidir));
@@ -500,7 +529,7 @@ namespace Nexus.Unity.Pantallas {
         private void PintarDocumentos(RectTransform hoja) {
             var hoy = S.DocumentosDeHoy();
             Ui.Texto(hoja, "Cada etapa deja un documento que se firma al cerrarla. Lo que no quede escrito aquí, alguien lo supondrá más adelante. " +
-                           $"Inspeccionar el de la etapa actual con el equipo cuesta {GameSession.MinutosDeInspeccionar} min y se puede una vez al día.", EstiloTexto.Pequeno, Tema.ink);
+                           $"{Solo("Inspeccionar el de la etapa actual con el equipo", "Releer tú el de la etapa actual")} cuesta {GameSession.MinutosDeInspeccionar} min y se puede una vez al día.", EstiloTexto.Pequeno, Tema.ink);
             foreach (var etapa in S.Metodologia.Calendario.Etapas) {
                 if (etapa.Documentos == null || etapa.Documentos.Count == 0) continue;
                 foreach (var doc in etapa.Documentos) {
@@ -545,7 +574,7 @@ namespace Nexus.Unity.Pantallas {
             var t = Ui.Tarjeta(hoja, "Una ronda de pruebas");
             Ui.Texto(t, $"Cuesta {GameSession.MinutosDeProbar} min de la jornada, una vez al día. Hoy daría: {Textos.Previsualizar(efecto)}. " +
                         "Cuanto menos probado está el sistema, más encuentra cada ronda.", EstiloTexto.Pequeno, Tema.ink);
-            var probar = Ui.Boton(Ui.Fila(t), "Hacer una ronda de pruebas", () => Actuar(() => S.EjecutarPruebas(), "El equipo hizo una ronda de pruebas: " + Textos.Previsualizar(efecto) + "."), VarianteBoton.Primario);
+            var probar = Ui.Boton(Ui.Fila(t), "Hacer una ronda de pruebas", () => Actuar(() => S.EjecutarPruebas(), Solo("El equipo hizo una ronda de pruebas: ", "Hiciste una ronda de pruebas: ") + Textos.Previsualizar(efecto) + "."), VarianteBoton.Primario);
             probar.interactable = motivo == null;
             if (motivo != null) Ui.Texto(t, motivo, EstiloTexto.Pequeno, Tema.warning);
             if (S.R.VecesQueSeProbo > 0) Ui.Texto(hoja, $"Rondas de pruebas hechas en este proyecto: {S.R.VecesQueSeProbo}.", EstiloTexto.Pequeno);
@@ -606,7 +635,7 @@ namespace Nexus.Unity.Pantallas {
                     PintarVistaDeMonitoreo(c.Muestra, delante);
                 }
                 var motivo = S.PorQueNoSePuedeAsistir(c.Id);
-                Ui.Texto(t, motivo ?? "¿Cómo la llevas? Si no asistes, el equipo la hace sin ti: no pasa nada malo, pero tampoco lo que ganarías llevándola bien.",
+                Ui.Texto(t, motivo ?? Solo("¿Cómo la llevas? Si no asistes, el equipo la hace sin ti: no pasa nada malo, pero tampoco lo que ganarías llevándola bien.", "¿Cómo la llevas? Si la saltas, nadie la hace por ti: no pasa nada malo, pero tampoco lo que ganarías llevándola bien."),
                          EstiloTexto.Pequeno, motivo == null ? Tema.inkMuted : Tema.warning);
                 foreach (var opcion in c.Opciones) {
                     var o = opcion;

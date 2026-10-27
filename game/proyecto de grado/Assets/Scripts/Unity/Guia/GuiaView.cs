@@ -323,7 +323,8 @@ namespace Nexus.Unity.Guia {
             _app.Ui.Ilustracion(_retrato, MaterialesNexus.IdDePersonaje(paso.Quien ?? "Marisol Andrade"), null, 120, 140);
             _titulo.text = paso.Titulo ?? "";
             _titulo.gameObject.SetActive(!string.IsNullOrEmpty(paso.Titulo));
-            _texto.text = paso.Texto ?? "";
+            var solo = _app.Sesion != null && _app.Sesion.Fase1Cerrada && _app.Sesion.TrabajasSolo;
+            _texto.text = (solo && !string.IsNullOrEmpty(paso.TextoSolo) ? paso.TextoSolo : paso.Texto) ?? "";
             _mas.text = paso.Mas ?? "";
             _textoMas.gameObject.SetActive(false);
             _botonMas.gameObject.SetActive(!string.IsNullOrEmpty(paso.Mas));

@@ -342,7 +342,11 @@ namespace Nexus.Core.Sesion {
             if (extracto.TieneDefecto && firmo) { calidad = 5; efectos["Documentacion"] = 1.0; efectos["DeudaTecnica"] = 2.0; titulo = "Se firmó con un problema dentro"; }
             else if (extracto.TieneDefecto) { calidad = 25; efectos["Documentacion"] = 3.0; titulo = "Lo viste antes de firmar"; }
             else if (firmo) { calidad = 25; efectos["Documentacion"] = 3.0; efectos["MoralEquipo"] = 0.5; titulo = "Estaba bien, y se firmó"; }
-            else { calidad = 10; efectos["Documentacion"] = 1.0; efectos["MoralEquipo"] = -1.0; titulo = "Estaba bien: pediste cambios que no hacían falta"; }
+            else {
+                calidad = 10; efectos["Documentacion"] = 1.0;
+                if (!TrabajasSolo) efectos["MoralEquipo"] = -1.0;   // solo, el documento es tuyo
+                titulo = "Estaba bien: pediste cambios que no hacían falta";
+            }
 
             EstadoArtefacto estado;
             if (!R.Artefactos.TryGetValue(documento, out estado)) R.Artefactos[documento] = estado = new EstadoArtefacto();
@@ -392,7 +396,13 @@ namespace Nexus.Core.Sesion {
             if (banco == null || banco.Count == 0 || R.Tablero == null || R.DiaActual % 2 != 0) return;
             var enCurso = R.Tablero.Tarjetas.Where(c => !c.EsBug && !c.Terminada).OrderBy(c => c.Empezada ? 0 : 1).ThenBy(c => c.Orden).FirstOrDefault();
             if (enCurso == null) return;
-            R.PrDeHoy = banco[GeneradorDeTarjetas.Hash(_rng.Semilla, "pr:" + R.DiaActual) % banco.Count].Id;
+            // Solo los cambios de este proyecto, barajados con la semilla de la partida y recorridos en orden: no se
+            // repite ninguno hasta que han salido todos (antes se sorteaba cada dia y se repetian).
+            var delNivel = banco.Where(p => p != null && (p.Niveles == null || p.Niveles.Count == 0 || p.Niveles.Contains(Perfil.Id)))
+                                .OrderBy(p => GeneradorDeTarjetas.Hash(_rng.Semilla, "pr:" + p.Id)).ThenBy(p => p.Id, StringComparer.Ordinal).ToList();
+            if (delNivel.Count == 0) return;
+            var cuantosVan = R.DiaActual / 2 - 1;   // dias pares: el 2 es el primero
+            R.PrDeHoy = delNivel[Math.Max(0, cuantosVan) % delNivel.Count].Id;
             R.TarjetaDelPrDeHoy = enCurso.Id;
         }
 
@@ -417,7 +427,11 @@ namespace Nexus.Core.Sesion {
             if (pr.TieneDefecto && aprobo) { efectos["DeudaTecnica"] = 2.0; titulo = "Se coló un defecto"; }
             else if (pr.TieneDefecto) { efectos["DeudaTecnica"] = -1.0; efectos["Cobertura"] = 1.0; titulo = "Lo cazaste antes de que entrara"; }
             else if (aprobo) { efectos["MoralEquipo"] = 0.5; titulo = "Estaba bien, y entró"; }
-            else { efectos["MoralEquipo"] = -1.0; titulo = "Estaba bien: pediste cambios que no hacían falta"; }
+            else {
+                // Solo, el cambio es tuyo: rehacer algo que estaba bien cuesta el tiempo, no la moral de nadie.
+                if (!TrabajasSolo) efectos["MoralEquipo"] = -1.0;
+                titulo = "Estaba bien: pediste cambios que no hacían falta";
+            }
 
             var cambios = EffectApplier.Previsualizar(W, efectos);
             EffectApplier.Aplicar(W, efectos);
@@ -437,8 +451,8 @@ namespace Nexus.Core.Sesion {
             foreach (var c in _planDeHoy.Ceremonias) {
                 if (c.Opciones == null || c.Opciones.Count == 0) continue;
                 lista.Add(new CeremoniaDeHoy {
-                    Id = c.Id, Nombre = c.Nombre ?? c.Id, Texto = c.Texto, ParaQueSirve = c.ParaQueSirve,
-                    DuracionMinutos = c.DuracionMinutos, Muestra = c.Muestra, Opciones = c.Opciones,
+                    Id = c.Id, Nombre = NombreDe(c), Texto = TextoDe(c), ParaQueSirve = ParaQueSirveDe(c),
+                    DuracionMinutos = c.DuracionMinutos, Muestra = c.Muestra, Opciones = OpcionesDe(c),
                     Hecha = R.CeremoniasHechasHoy.Contains(c.Id)
                 });
             }
@@ -460,17 +474,45 @@ namespace Nexus.Core.Sesion {
         public ResultadoDeAvance AsistirACeremonia(string ceremoniaId, string opcionId) {
             Exigir(PorQueNoSePuedeAsistir(ceremoniaId));
             var c = _planDeHoy.Ceremonias.First(x => x.Id == ceremoniaId);
-            var opcion = c.Opciones.FirstOrDefault(o => o.Id == opcionId);
+            var opcion = OpcionesDe(c).FirstOrDefault(o => o.Id == opcionId);
             if (opcion == null) throw new InvalidOperationException($"'{opcionId}' no es una forma de llevar «{c.Nombre}».");
 
             EffectApplier.Aplicar(W, opcion.Efectos);
             if (R.Tablero != null) R.Tablero.BonoDeFlujoHoy += opcion.BonoDeFlujo;
             R.CeremoniasHechasHoy.Add(c.Id);
             R.ActasDeCeremonias.Add(new ActaDeCeremonia {
-                Dia = R.DiaActual, CeremoniaId = c.Id, Nombre = c.Nombre ?? c.Id, Asistio = true,
+                Dia = R.DiaActual, CeremoniaId = c.Id, Nombre = NombreDe(c), Asistio = true,
                 OpcionId = opcion.Id, Opcion = opcion.Texto, Texto = opcion.Acta
             });
             return AvanzarReloj(c.DuracionMinutos);
+        }
+
+        // --- trabajando solo, las ceremonias se cuentan en primera persona (Ceremonia.Solo); lo que provocan no cambia ---
+
+        private string NombreDe(Ceremonia c) {
+            return TrabajasSolo && c.Solo != null && !string.IsNullOrEmpty(c.Solo.Nombre) ? c.Solo.Nombre : c.Nombre ?? c.Id;
+        }
+
+        private string TextoDe(Ceremonia c) {
+            return TrabajasSolo && c.Solo != null && !string.IsNullOrEmpty(c.Solo.Texto) ? c.Solo.Texto : c.Texto;
+        }
+
+        private string ParaQueSirveDe(Ceremonia c) {
+            return TrabajasSolo && c.Solo != null && !string.IsNullOrEmpty(c.Solo.ParaQueSirve) ? c.Solo.ParaQueSirve : c.ParaQueSirve;
+        }
+
+        private List<OpcionDeCeremonia> OpcionesDe(Ceremonia c) {
+            if (!TrabajasSolo || c.Solo == null || c.Solo.Opciones == null || c.Solo.Opciones.Count == 0) return c.Opciones;
+            var lista = new List<OpcionDeCeremonia>();
+            foreach (var o in c.Opciones) {
+                OpcionEnSolitario solo;
+                if (o == null || !c.Solo.Opciones.TryGetValue(o.Id ?? "", out solo)) { lista.Add(o); continue; }
+                var copia = o.Clone();
+                if (!string.IsNullOrEmpty(solo.Texto)) copia.Texto = solo.Texto;
+                if (!string.IsNullOrEmpty(solo.Acta)) copia.Acta = solo.Acta;
+                lista.Add(copia);
+            }
+            return lista;
         }
 
         /// <summary>Al cerrar el dia: las ceremonias a las que no se fue tambien dejan acta.</summary>
@@ -478,7 +520,7 @@ namespace Nexus.Core.Sesion {
             foreach (var c in CeremoniasDeHoy().Where(x => !x.Hecha))
                 R.ActasDeCeremonias.Add(new ActaDeCeremonia {
                     Dia = R.DiaActual, CeremoniaId = c.Id, Nombre = c.Nombre, Asistio = false,
-                    Texto = "No asististe: el equipo la hizo sin ti."
+                    Texto = TrabajasSolo ? "La saltaste: sin equipo, nadie la hizo por ti." : "No asististe: el equipo la hizo sin ti."
                 });
         }
 
@@ -489,7 +531,7 @@ namespace Nexus.Core.Sesion {
             for (var dia = 1; dia <= Perfil.DiasTotales; dia++)
                 foreach (var c in Reglas.PlanFor(dia).Ceremonias)
                     agenda.Add(new CitaDeCeremonia {
-                        Dia = dia, Id = c.Id, Nombre = c.Nombre ?? c.Id,
+                        Dia = dia, Id = c.Id, Nombre = NombreDe(c),
                         SePuedeAsistir = c.Opciones != null && c.Opciones.Count > 0,
                         Cuando = dia < R.DiaActual ? "pasada" : dia == R.DiaActual ? "hoy" : "futura"
                     });
@@ -520,6 +562,10 @@ namespace Nexus.Core.Sesion {
             var t = R.Tablero;
             if (t == null) return;
             LevantarActasDeLasNoAsistidas();
+            // Solo no hay nadie que revise lo que tu no revisaste: un cambio con un defecto entra tal cual.
+            var pr = PrPendiente;
+            if (TrabajasSolo && pr != null && pr.TieneDefecto)
+                EffectApplier.Aplicar(W, new Dictionary<string, object> { { "DeudaTecnica", 1.0 } });
             if (t.SprintActual >= 0 && R.BurndownDelSprint.Count > 0) R.BurndownDelSprint.Add(Math.Round(RestanteDelSprint(), 2));
             if (t.LimiteNeutro > 0 && t.LimiteEnCurso > t.LimiteNeutro) R.VecesExcedioWip++;
         }

@@ -1,0 +1,173 @@
+{
+  "id": "MJ-OF-N1-BACKLOG-2",
+  "verbo": "V3_ORDENAR",
+  "lienzo": "backlog",
+  "temaPrincipal": "Scrum",
+  "objetivoAprendizaje": "OA-SCRUM-01",
+  "modulo": "lectura",
+  "enElProyecto": "Es el backlog de la lectura de matrículas en la garita.",
+  "presentacion": {
+    "titulo": "Práctica: el backlog de la lectura de matrículas",
+    "comoSeJuega": "Ordena el backlog: arrastra las tarjetas (o usa ▲▼), lo más valioso arriba. Solo entra lo que cabe sobre la línea, que es el tiempo que hay. Algunas tarjetas necesitan otra antes. Al final, contesta a Facilities y mira qué cambia en el tablero.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 120
+  },
+  "ordenar": {
+    "capacidad": 12,
+    "umbralDeValor": 0.8,
+    "peticion": "Facilities pregunta si se puede ver en el panel la foto de cada vehículo que entra.",
+    "tarjetaPedida": "t5",
+    "tarjetas": [
+      {
+        "id": "t1",
+        "titulo": "Leer la matrícula",
+        "valor": 8,
+        "esfuerzo": 3
+      },
+      {
+        "id": "t2",
+        "titulo": "Lista de vehículos autorizados",
+        "valor": 7,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t3",
+        "titulo": "Abrir la barrera solo a los autorizados",
+        "valor": 8,
+        "esfuerzo": 3,
+        "dependeDe": [
+          "t2"
+        ]
+      },
+      {
+        "id": "t4",
+        "titulo": "Registro de entradas",
+        "valor": 5,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t5",
+        "titulo": "Foto del vehículo en el panel",
+        "valor": 2,
+        "esfuerzo": 3,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t6",
+        "titulo": "Avisar al guardia si no se lee",
+        "valor": 4,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t1"
+        ]
+      }
+    ],
+    "respuestas": {
+      "obedecer": {
+        "texto": "Le dices que sí, que cabe todo.",
+        "replica": "¡Perfecto! Entonces ponlo lo primero, que es lo que más se va a notar.",
+        "efectoEnBacklog": "forzar-arriba",
+        "consecuencia": {
+          "efectosInmediatos": {
+            "Cansancio": 3
+          },
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Decir que cabe lo que no cabe no lo hace caber: «Foto del vehículo en el panel» subió arriba y empujó fuera algo que valía mucho más."
+          }
+        }
+      },
+      "rechazar": {
+        "texto": "Le dices que no, sin más.",
+        "replica": "Bueno… no entiendo bien por qué, pero vale.",
+        "efectoEnBacklog": "ninguno",
+        "consecuencia": {
+          "efectosInmediatos": {
+            "SatisfaccionCliente": -2
+          },
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Proteges el tiempo, pero sin explicar por qué. Un «no» sin razones cansa la confianza."
+          }
+        }
+      },
+      "negociar": {
+        "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
+        "replica": "Visto así, mejor dejamos «Foto del vehículo en el panel» para más adelante. Gracias por explicármelo.",
+        "efectoEnBacklog": "ninguno",
+        "consecuencia": {
+          "efectosInmediatos": {
+            "SatisfaccionCliente": 2
+          },
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Enseñar lo que cuesta y dejar elegir es negociar: la decisión de dejarlo fuera la tomó quien lo pedía."
+          }
+        }
+      }
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Lo que cierra el agujero de la barrera, primero: leer, comprobar y abrir solo a quien toca."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-SCRUM-01",
+        "razon": "Entró poco de lo que más valía, o la respuesta al cliente empujó fuera algo importante. Mira el «valor»: lo que más vale va arriba."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir. Primero los cimientos, luego lo de encima."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "No se ordenó nada."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "El valor de un sprint es lo que resuelve el problema que dio origen al proyecto."
+  }
+}

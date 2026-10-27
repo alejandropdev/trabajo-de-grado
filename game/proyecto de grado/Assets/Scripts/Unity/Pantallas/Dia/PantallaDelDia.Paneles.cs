@@ -130,6 +130,13 @@ namespace Nexus.Unity.Pantallas {
                 var que = col == null ? "algo" : PantallaDelDiario.NombreDeSerie(col.Serie, true);
                 Ui.BotonDeOpcion(lugar, "Hay algo aquí: " + que, "Mirarlo", () => Recoger(c)).interactable = puedeMoverse;
             }
+            // Lo que todavia no ha aparecido: solo su pista, con un punto del color de lo dificil que es.
+            foreach (var col in S.ColeccionablesPorAparecerAqui()) {
+                var fila = Ui.Fila(lugar, "Por aparecer " + col.Id, Tema.Espacio(2), alineacion: TextAnchor.UpperLeft);
+                Ui.Punto(fila, ColorDeDificultad(col.Aparicion.Dificultad), 10);
+                UiKit.Tamano(Ui.Texto(fila, "Algo podría aparecer aquí… <i>" + col.Aparicion.Pista + "</i>", EstiloTexto.Pequeno, Tema.inkMuted),
+                             flexAncho: 1);
+            }
 
             foreach (var conv in S.ConversacionesAqui()) {
                 var cv = conv;
@@ -138,6 +145,14 @@ namespace Nexus.Unity.Pantallas {
                               $"{cv.Minutos} min · confianza {S.Confianza(cv.Personaje)}";
                 var boton = Ui.BotonDeOpcion(lugar, "Hablar con " + (p?.Nombre ?? cv.Personaje), detalle, () => Hablar(cv));
                 boton.interactable = puedeMoverse;
+            }
+        }
+
+        private Color ColorDeDificultad(string dificultad) {
+            switch (dificultad) {
+                case Nexus.Core.Coleccion.DificultadesDeColeccionable.Dificil: return Tema.danger;
+                case Nexus.Core.Coleccion.DificultadesDeColeccionable.Media: return Tema.warning;
+                default: return Tema.success;
             }
         }
 
@@ -161,6 +176,7 @@ namespace Nexus.Unity.Pantallas {
         private void PintarEquipoDelProyecto(Hoja h) {
             var fichas = S.FichasDelEquipo();
             if (fichas.Count == 0) return;
+            if (S.TrabajasSolo) { PintarTrabajasSolo(h, fichas[0]); return; }
             h.Subtitulo("Tu equipo de proyecto", Tema.cyan);
             h.Nota("Son quienes construyen el sistema contigo. Lo que hagas con cada uno cuesta minutos de la jornada.", Tema.inkMuted);
             DecirLoUltimo(h);
@@ -199,7 +215,9 @@ namespace Nexus.Unity.Pantallas {
                 var tarjeta = Ui.Boton(acciones, "Darle una tarjeta…", () => Alternar(id, "tarjeta"), VarianteBoton.Fantasma);
                 tarjeta.interactable = Runner.PuedeMoverse;
                 var pareja = Ui.Boton(acciones, "En pareja con…", () => Alternar(id, "pareja"), VarianteBoton.Fantasma);
-                pareja.interactable = Runner.PuedeMoverse && string.IsNullOrEmpty(m.ParejaHoy) && !m.DescansaHoy;
+                // Sin nadie mas libre con quien emparejarlo, el boton no abriria nada.
+                var alguienLibre = fichas.Any(x => x.Miembro.Id != id && !x.Miembro.DescansaHoy && string.IsNullOrEmpty(x.Miembro.ParejaHoy));
+                pareja.interactable = Runner.PuedeMoverse && string.IsNullOrEmpty(m.ParejaHoy) && !m.DescansaHoy && alguienLibre;
                 var respiro = Ui.Boton(acciones, "Respiro hoy", () =>
                     Actuar(() => S.DarRespiro(id), $"{nombre} tiene hoy un respiro: baja su cansancio y hoy el equipo avanza menos."), VarianteBoton.Fantasma);
                 respiro.interactable = S.PorQueNoSePuedeDarRespiro(id) == null;
@@ -229,6 +247,42 @@ namespace Nexus.Unity.Pantallas {
                 }
             }
             h.Separador();
+        }
+
+        /// <summary>
+        /// Sin hojas de vida, el equipo eres tu: no hay con quien hablar uno a uno, a quien dar un respiro ni con quien
+        /// programar en pareja. Lo que si se puede es lo que hace quien trabaja solo para no hundirse.
+        /// </summary>
+        private void PintarTrabajasSolo(Hoja h, FichaDeMiembro f) {
+            h.Subtitulo("Trabajas solo", Tema.warning);
+            h.Nota("No encontraste ninguna hoja de vida en el recorrido: el proyecto lo sacas tú. No hay con quién hablar ni con " +
+                   "quién emparejarse, pero sí puedes cuidarte para no hundirte. Cada cosa, una vez al día.", Tema.inkMuted);
+            DecirLoUltimo(h);
+            var ficha = Ui.PanelColumna(h.Raiz, "Tu", Tema.Espacio(4), Tema.Espacio(2), Tema.surfaceRaised);
+            Ui.FilaDeEquipo(ficha, f.Miembro.Nombre, f.Miembro.Rol, f.Cansancio >= 70 ? EstadoDeEquipo.Bloqueado : EstadoDeEquipo.Activo);
+            var enDesarrollo = S.Tablero != null && S.R.Fase == 2 && S.R.DiaActual > 0;
+            if (!enDesarrollo) return;
+            Ui.Texto(ficha, f.Ahora.Count == 0 ? "Ahora: sin tarjeta."
+                                               : "Ahora: " + string.Join(" · ", f.Ahora.Select(c => $"«{c.Titulo}» ({c.Trabajo:0.#} de {c.Puntos:0.#} pts)")), EstiloTexto.Pequeno, Tema.ink);
+            var cansancio = Ui.Fila(ficha, "Cansancio", Tema.Espacio(2));
+            UiKit.Tamano(Ui.Texto(cansancio, $"Tu cansancio {f.Cansancio:0}", EstiloTexto.Pequeno, Tema.ink), ancho: 160);
+            Ui.Barra(cansancio, (float)f.Cansancio / 100f, f.Cansancio >= 70 ? Tema.danger : f.Cansancio >= 45 ? Tema.warning : Tema.success);
+
+            AccionSolo(h, GameSession.AccionOrdenarIdeas, $"Ordenar tus ideas ({GameSession.MinutosDeOrdenarIdeas} min)",
+                       "Escribes en tu bitácora qué vas a hacer y por qué: documentación +1 y la cabeza más clara.",
+                       () => S.OrdenarTusIdeas(), "Ordenaste tus ideas en la bitácora: documentación +1.");
+            AccionSolo(h, GameSession.AccionPausaActiva, $"Pausa activa ({GameSession.MinutosDePausaActiva} min)",
+                       "Te levantas, caminas, respiras: baja tu cansancio, pero hoy avanzas algo menos.",
+                       () => S.PausaActiva(), "Hiciste una pausa activa: baja tu cansancio y hoy avanzas algo menos.");
+            AccionSolo(h, GameSession.AccionPatoDeGoma, $"Explicárselo al pato de goma ({GameSession.MinutosDePatoDeGoma} min)",
+                       "Le explicas tu código, línea a línea, a un pato de goma: al decirlo en voz alta aparecen los fallos. Cobertura +1,5, deuda −1.",
+                       () => S.PatoDeGoma(), "Le explicaste el código al pato: cobertura +1,5 y deuda −1.");
+        }
+
+        private void AccionSolo(Hoja h, string accion, string titulo, string detalle, Func<ResultadoDeAvance> hacer, string hecho) {
+            var motivo = S.PorQueNoSePuedeHacerSolo(accion);
+            var b = Ui.BotonDeOpcion(h.Raiz, titulo, motivo ?? detalle, () => Actuar(hacer, hecho));
+            b.interactable = motivo == null;
         }
 
         private void Alternar(string miembro, string accion) {
@@ -282,6 +336,79 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
+        // ==================================================================== los suministros
+
+        private string _suministroAbierto;
+
+        private void AbrirSuministros() {
+            _suministroAbierto = null; _ultimoResultado = null;
+            AbrirPanel("Lo que trajiste del recorrido: úsalo cuando más falta haga", "Suministros", 900, PintarPanelDeSuministros,
+                () => string.Join(",", S.R.Suministros.Select(kv => kv.Key + kv.Value)) + "|" + S.R.UsosDeSuministros.Count + "|" +
+                      Runner.PuedeMoverse + "|" + _suministroAbierto + "|" + _ultimoResultado + "|" + S.MinutoDelDia);
+        }
+
+        /// <summary>
+        /// La pizza, el cafe y la Guepardex que se trajeron del 3D: cuantos quedan, su regla y a quien darselos. Usar uno
+        /// cuesta minutos de la jornada, como hablar con alguien.
+        /// </summary>
+        private void PintarPanelDeSuministros(Hoja h) {
+            DecirLoUltimo(h);
+            var fichas = S.FichasDeSuministros();
+            if (fichas.Count == 0) {
+                h.Nota("No te queda ningún suministro. Se consiguen recorriendo el edificio en la Fase 1.", Tema.inkMuted);
+                return;
+            }
+            h.Nota("Cada uno tiene su regla. Usarlo cuesta unos minutos de la jornada.", Tema.inkMuted);
+            var equipo = S.FichasDelEquipo();
+            foreach (var f in fichas) {
+                var o = f.Objeto; var id = o.Id; var s = o.Suministro;
+                var ficha = Ui.PanelColumna(h.Raiz, "Suministro " + id, Tema.Espacio(4), Tema.Espacio(2), Tema.surfaceRaised);
+                var cabecera = Ui.Fila(ficha, "Cabecera", Tema.Espacio(2));
+                UiKit.Tamano(Ui.Texto(cabecera, o.Nombre, EstiloTexto.Subtitulo, Tema.ink), flexAncho: 1);
+                Ui.Badge(cabecera, "×" + f.Cantidad, Tono.Cyan, solido: true);
+                if (!string.IsNullOrEmpty(o.Texto)) Ui.Texto(ficha, o.Texto, EstiloTexto.Pequeno, Tema.ink);
+                Ui.Texto(ficha, ReglaDe(s), EstiloTexto.Leyenda, Tema.cyan);
+                if (f.PorQueNo != null) Ui.Texto(ficha, f.PorQueNo, EstiloTexto.Pequeno, Tema.warning);
+
+                if (!f.ParaUnaPersona) {
+                    var repartir = Ui.Boton(ficha, $"{Solo("Repartir al equipo", "Usarlo")} ({s.MinutosDeUso} min)", () => UsarSuministro(id, null, o.Nombre), VarianteBoton.Primario);
+                    repartir.interactable = f.PorQueNo == null && Runner.PuedeMoverse;
+                    continue;
+                }
+                var abierto = _suministroAbierto == id;
+                var elegir = Ui.Boton(ficha, abierto ? "Cancelar" : "Dárselo a…", () => _suministroAbierto = abierto ? null : id,
+                                      abierto ? VarianteBoton.Fantasma : VarianteBoton.Primario);
+                elegir.interactable = f.PorQueNo == null && Runner.PuedeMoverse;
+                if (!abierto) continue;
+                Ui.Texto(ficha, $"¿A quién? Cuesta {s.MinutosDeUso} min.", EstiloTexto.Pequeno, Tema.cyan);
+                foreach (var m in equipo) {
+                    var mid = m.Miembro.Id;
+                    var rebota = S.Rebotaria(id, mid);
+                    var b = Ui.BotonDeOpcion(ficha, $"{m.Miembro.Nombre} · cansancio {m.Cansancio:0}",
+                        rebota ? "Ya tomó demasiadas estos días: le hará el efecto contrario." : "Le quita cansancio a esta persona.",
+                        () => { UsarSuministro(id, mid, o.Nombre); _suministroAbierto = null; });
+                    b.interactable = S.PorQueNoSePuedeUsarSuministro(id, mid) == null;
+                }
+            }
+        }
+
+        private void UsarSuministro(string id, string miembro, string nombre) {
+            ResultadoDeSuministro r = null;
+            Actuar(() => { r = S.UsarSuministro(id, miembro); return r.Avance; }, $"Usaste: {nombre}.");
+            if (r == null) return;
+            _ultimoResultado = r.Texto + (r.Cambios.Count > 0 ? "  (" + Textos.Previsualizar(r.Cambios) + ")" : "");
+        }
+
+        /// <summary>La regla de un suministro, en una linea: para quien es, cada cuanto y si se puede abusar de el.</summary>
+        private static string ReglaDe(Nexus.Core.Fase1.SuministroDef s) {
+            var partes = new List<string> { s.Objetivo == Nexus.Core.Fase1.ObjetivosDeSuministro.Miembro ? "Para una persona" : "Para todo el equipo" };
+            if (s.EnfriamientoDias > 0) partes.Add($"una vez cada {s.EnfriamientoDias} días");
+            if (s.VecesPorDia == 1) partes.Add("una vez al día");
+            else if (s.VecesPorDia > 1) partes.Add($"{s.VecesPorDia} veces al día");
+            if (s.ReboteUsos > 0) partes.Add($"más de {s.ReboteUsos} en {s.ReboteVentanaDias} días a la misma persona y rebota");
+            return string.Join(" · ", partes).ToUpperInvariant();
+        }
+
         // ==================================================================== el escritorio
 
         private void AbrirEscritorio() {
@@ -307,7 +434,9 @@ namespace Nexus.Unity.Pantallas {
             foreach (var t in S.TareasDeOficina) {
                 var tarea = t;
                 var motivo = S.PorQueNoSePuedeHacer(tarea.Id);
-                var detalle = $"{tarea.Minutos} min · mejora: {tarea.Mejora}" + (motivo == null ? "" : "   —   " + motivo);
+                var casos = tarea.Casos().Count;
+                var detalle = $"{tarea.Minutos} min · mejora: {tarea.Mejora}" + (casos > 1 ? $" · cada día un caso distinto ({casos})" : "") +
+                              (motivo == null ? "" : "   —   " + motivo);
                 var boton = Ui.BotonDeOpcion(lista, tarea.Titulo, detalle, () => EmpezarTarea(tarea));
                 boton.interactable = motivo == null && Runner.PuedeMoverse;
             }

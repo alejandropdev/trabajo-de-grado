@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Mundo3D.Inventario;
 using Mundo3D.Coleccionables;
 
@@ -189,13 +190,22 @@ namespace Mundo3D.GeneracionObjetos {
             for (int attempt = 0;
                  attempt < maxPositionAttempts;
                  attempt++) {
-                Vector3 position = spawnZone.GetRandomSpawnPoint();
+                // Solo puntos a los que el jugador puede llegar: suelo de verdad, sitio para una persona y sin estar
+                // encajonado (SpawnZoneBehaviour.TryGetSpawnPoint). El collider del prefab es un trigger diminuto y no
+                // sirve para comprobar si choca con la escena.
+                if (!spawnZone.TryGetSpawnPoint(obstacleLayers, out Vector3 position))
+                    continue;
 
                 GameObject instance = Instantiate(
                     entry.prefab,
                     position,
                     entry.prefab.transform.rotation
                 );
+
+                // Instantiate sin padre deja el objeto en la escena ACTIVA, que al cargar el recorrido junto al
+                // juego todavía es la del juego: sobreviviría al descargar el 3D. Se lleva a la escena del spawner.
+                if (instance.scene != gameObject.scene)
+                    SceneManager.MoveGameObjectToScene(instance, gameObject.scene);
 
                 // Conservamos la escala raíz del prefab.
                 instance.transform.localScale =

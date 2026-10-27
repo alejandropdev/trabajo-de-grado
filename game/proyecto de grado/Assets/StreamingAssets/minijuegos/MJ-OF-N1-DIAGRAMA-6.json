@@ -1,0 +1,206 @@
+{
+  "id": "MJ-OF-N1-DIAGRAMA-6",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "informes",
+  "enElProyecto": "Es el diagrama de los informes que recibe Facilities cada mañana.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de los informes diarios",
+    "comoSeJuega": "El diagrama de los informes diarios. Míralo entero: ¿cada pieza habla con las demás por su sitio? Si encuentras un problema, púlsalo y di cuál es. Si lo revisas todo y no falla nada, pulsa «Está bien: lo apruebo». No todo lo que llega a revisión está mal.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "planificador",
+        "capa": "logica",
+        "texto": "Tarea de las 7:00",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Lanza el informe cada mañana."
+      },
+      {
+        "id": "informes",
+        "capa": "logica",
+        "texto": "Generador de informes",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Calcula reservas, accesos y averías del día anterior."
+      },
+      {
+        "id": "panel",
+        "capa": "interfaz",
+        "texto": "Panel de Facilities",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 2,
+        "detalle": "Desde aquí se puede pedir un informe a mano."
+      },
+      {
+        "id": "correo",
+        "capa": "externo",
+        "texto": "Servidor de correo",
+        "tipo": "externo",
+        "fila": 2,
+        "columna": 2,
+        "detalle": "El correo de Nexus."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 0,
+        "detalle": "Reservas, accesos y averías."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "i1",
+        "tipo": "pide",
+        "desde": "planificador",
+        "hasta": "informes",
+        "texto": "genera el informe diario"
+      },
+      {
+        "id": "i2",
+        "tipo": "lee",
+        "desde": "informes",
+        "hasta": "bd",
+        "texto": "lee lo que pasó ayer"
+      },
+      {
+        "id": "i3",
+        "tipo": "pide",
+        "desde": "informes",
+        "hasta": "correo",
+        "texto": "envía el informe a Facilities"
+      },
+      {
+        "id": "i4",
+        "tipo": "pide",
+        "desde": "panel",
+        "hasta": "informes",
+        "texto": "pide un informe a mano"
+      }
+    ]
+  },
+  "zonas": [],
+  "toleranciaDeSenuelos": 0,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "i2"
+      ],
+      "razonNoEsDefecto": "Leer de la base de datos lo que pasó ayer es justo lo que tiene que hacer un informe."
+    },
+    {
+      "id": "S2",
+      "commits": [
+        "i3"
+      ],
+      "razonNoEsDefecto": "Enviar el informe por el servidor de correo de Nexus está bien: es un servicio externo usado por su puerta."
+    },
+    {
+      "id": "S3",
+      "commits": [
+        "planificador"
+      ],
+      "razonNoEsDefecto": "Una tarea programada a una hora fija es la forma normal de lanzar un informe diario."
+    }
+  ],
+  "paletaEtiquetas": [
+    "acoplamiento_indebido",
+    "dependencia_circular",
+    "falla_de_seguridad",
+    "elemento_sin_especificar"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "falla_de_seguridad",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": false
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "dependencia_circular",
+        "falla_de_seguridad",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": false
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "dependencia_circular"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Lo revisaste entero y estaba bien, y lo aprobaste. Saber cuándo un diseño no necesita cambios también es revisar."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste una pieza que estaba bien, o no viste todo lo que fallaba."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Revisar no es encontrar algo a la fuerza. Un diseño limpio se aprueba."
+  },
+  "sinDefectos": true
+}

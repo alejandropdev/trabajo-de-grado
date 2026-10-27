@@ -368,6 +368,7 @@
       "orden": 255,
       "titulo": "El tablero del equipo",
       "texto": "Mientras tú decides, tu equipo trabaja. Aquí ves qué tiene cada uno entre manos y cuánto lleva: cada tarjeta es un trozo del proyecto. Con «Abrir el tablero» puedes darle una tarjeta a quien mejor se le dé, o cambiar qué se hace primero. Si no tocas nada, se reparten solos.",
+      "textoSolo": "Mientras decides, el trabajo sigue: aquí ves lo que tienes entre manos y cuánto llevas. Cada tarjeta es un trozo del proyecto, y todas son tuyas. Con «Abrir el tablero» decides qué va primero. Trabajando solo, no puedes con todo a la vez: elige bien.",
       "resaltar": "dia.tablero"
     },
     {
@@ -377,6 +378,7 @@
       "orden": 256,
       "titulo": "Las ceremonias",
       "texto": "Cada forma de trabajar tiene sus reuniones: se llaman ceremonias. En «Ceremonias» ves las de hoy. Puedes asistir (cuesta unos minutos) y elegir cómo llevarlas: bien llevadas, el equipo rinde más. Si no vas, el equipo las hace sin ti.",
+      "textoSolo": "Cada forma de trabajar tiene sus reuniones: se llaman ceremonias. Trabajando solo son un rato contigo mismo: repasar el plan, mirar cómo vas. Cuestan unos minutos y, bien llevadas, rindes más. Si las saltas, nadie las hace por ti.",
       "resaltar": "dia.ceremonias"
     },
     {
@@ -447,6 +449,7 @@
       "orden": 380,
       "titulo": "Planificar el sprint",
       "texto": "Empieza un sprint: el equipo promete cuánto va a hacer. Si promete más de lo que puede, se acumula deuda técnica cada día. Lo sugerido suele ser lo sensato.",
+      "textoSolo": "Empieza un sprint: te comprometes a cuánto vas a hacer tú. Si prometes más de lo que puedes, se acumula deuda técnica cada día. Lo sugerido suele ser lo sensato.",
       "mas": "Esto es estimar: calcular cuánto trabajo cabe en un tiempo. Prometer de más es el error más común en los proyectos reales.",
       "resaltar": "dia.ahora"
     },
@@ -457,6 +460,7 @@
       "orden": 390,
       "titulo": "La retrospectiva",
       "texto": "Terminó un sprint: el equipo mira cómo trabajó y elige UNA cosa para mejorar. Lo que elijas cambia cómo trabajan desde hoy.",
+      "textoSolo": "Terminó un sprint: miras cómo trabajaste y eliges UNA cosa para mejorar. Lo que elijas cambia cómo trabajas desde hoy.",
       "resaltar": "dia.ahora"
     },
     {

@@ -1057,19 +1057,28 @@ namespace Nexus.Core.Datos {
                                 foreach (var stock in ef.Value.Keys)
                                     if (!WorldState.EsStock(stock)) e.Add($"{donde}: el efecto '{stock}' no es un stock del proyecto.");
                         }
-                    if (enElIndice.Contains(t.Minijuego ?? ""))
-                        e.Add($"{donde}: la escena '{t.Minijuego}' esta en el indice del director: saldria como alerta evaluada. Las de oficina van aparte.");
-                    if (fuente == null) continue;
-                    if (string.IsNullOrEmpty(t.Archivo) || !fuente.Existe(t.Archivo)) {
-                        e.Add($"{donde}: la escena '{t.Archivo}' no existe.");
-                        continue;
-                    }
-                    try {
-                        var escena = CatalogoMinijuegos.Parsear(fuente.LeerCatalogo(t.Archivo));
-                        if (escena.Id != t.Minijuego) e.Add($"{donde}: el archivo '{t.Archivo}' dice llamarse '{escena.Id}', no '{t.Minijuego}'.");
-                        foreach (var error in CatalogoMinijuegos.Validar(escena)) e.Add($"{donde}: {error}");
-                    } catch (Exception ex) {
-                        e.Add($"{donde}: '{t.Archivo}' no se pudo leer. {ex.Message}");
+                    // Cada caso (el de siempre y sus variantes) se valida igual, y todos son del mismo tipo de practica.
+                    var casos = new HashSet<string>(StringComparer.Ordinal);
+                    string verbo = null;
+                    foreach (var caso in t.Casos()) {
+                        if (!casos.Add(caso.Minijuego ?? "")) e.Add($"{donde}: el caso '{caso.Minijuego}' esta repetido.");
+                        if (enElIndice.Contains(caso.Minijuego ?? ""))
+                            e.Add($"{donde}: la escena '{caso.Minijuego}' esta en el indice del director: saldria como alerta evaluada. Las de oficina van aparte.");
+                        if (fuente == null) continue;
+                        if (string.IsNullOrEmpty(caso.Archivo) || !fuente.Existe(caso.Archivo)) {
+                            e.Add($"{donde}: la escena '{caso.Archivo}' no existe.");
+                            continue;
+                        }
+                        try {
+                            var escena = CatalogoMinijuegos.Parsear(fuente.LeerCatalogo(caso.Archivo));
+                            if (escena.Id != caso.Minijuego) e.Add($"{donde}: el archivo '{caso.Archivo}' dice llamarse '{escena.Id}', no '{caso.Minijuego}'.");
+                            foreach (var error in CatalogoMinijuegos.Validar(escena)) e.Add($"{donde}: {error}");
+                            var v = Nexus.Core.Minijuegos.Verbos.Normalizar(escena.Verbo);
+                            if (verbo == null) verbo = v;
+                            else if (v != verbo) e.Add($"{donde}: '{caso.Minijuego}' es de otro tipo ({escena.Verbo}): todos los casos de una tarea son la misma practica.");
+                        } catch (Exception ex) {
+                            e.Add($"{donde}: '{caso.Archivo}' no se pudo leer. {ex.Message}");
+                        }
                     }
                 }
             }
@@ -1329,6 +1338,13 @@ namespace Nexus.Core.Datos {
                 }
                 if (string.IsNullOrEmpty(c.Titulo)) e.Add($"{c.Id}: falta 'titulo'.");
                 if (string.IsNullOrEmpty(c.Texto)) e.Add($"{c.Id}: falta 'texto'. Un coleccionable vacio no enseña nada.");
+                if (c.Aparicion != null) {
+                    if (!DificultadesDeColeccionable.EsValida(c.Aparicion.Dificultad))
+                        e.Add($"{c.Id}: la dificultad '{c.Aparicion.Dificultad}' no existe. Validas: facil, media, dificil.");
+                    if (c.TieneCondicion && string.IsNullOrEmpty(c.Aparicion.Pista))
+                        e.Add($"{c.Id}: un coleccionable con condicion necesita 'pista': es lo que se ve mientras no aparece.");
+                    ValidarExpresiones(c.Aparicion.Precondiciones, c.Id + "/aparicion", e);
+                }
 
                 switch (c.Serie) {
                     case SeriesDeColeccionables.Carta:

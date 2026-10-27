@@ -1,0 +1,206 @@
+{
+  "id": "MJ-OF-N0-DIAGRAMA-5",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "dentro",
+  "enElProyecto": "Es el diagrama de cómo se marca la salida de una visita y se actualiza la lista «Quién sigue dentro».",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de la salida de las visitas",
+    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza y cada flecha dice quién le habla a quién. Busca lo que no está bien (hay uno), púlsalo y elige a la derecha qué problema tiene. Es práctica: si no te sale, inténtalo otra vez.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "boton",
+        "capa": "interfaz",
+        "texto": "Botón «Ha salido»",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "La recepcionista lo pulsa cuando el visitante se va."
+      },
+      {
+        "id": "salida",
+        "capa": "logica",
+        "texto": "Registrar salida",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Apunta la hora de salida de la visita."
+      },
+      {
+        "id": "dentro",
+        "capa": "logica",
+        "texto": "Quién sigue dentro",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 2,
+        "detalle": "Prepara la lista de visitantes que aún no han salido."
+      },
+      {
+        "id": "pantalla",
+        "capa": "interfaz",
+        "texto": "Pantalla del vigilante",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 2,
+        "detalle": "El vigilante ve quién sigue dentro."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "Guarda entradas y salidas."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "c1",
+        "tipo": "pide",
+        "desde": "boton",
+        "hasta": "salida",
+        "texto": "el visitante se va"
+      },
+      {
+        "id": "c2",
+        "tipo": "escribe",
+        "desde": "salida",
+        "hasta": "bd",
+        "texto": "marca la hora de salida"
+      },
+      {
+        "id": "c3",
+        "tipo": "pide",
+        "desde": "salida",
+        "hasta": "dentro",
+        "texto": "quita al visitante de la lista"
+      },
+      {
+        "id": "c4",
+        "tipo": "pide",
+        "desde": "dentro",
+        "hasta": "salida",
+        "texto": "pregunta si ya salió"
+      },
+      {
+        "id": "c5",
+        "tipo": "pide",
+        "desde": "dentro",
+        "hasta": "pantalla",
+        "texto": "envía la lista"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "c4"
+      ],
+      "defecto": "dependencia_circular",
+      "explicacion": "«Registrar salida» llama a «Quién sigue dentro» y esta vuelve a llamar a «Registrar salida»: cada una espera a la otra. Basta con que la lista lea las salidas de la base de datos.",
+      "pista": "Sigue las flechas entre «Registrar salida» y «Quién sigue dentro». ¿Ves un camino que vuelve a donde empezó?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "c2"
+      ],
+      "razonNoEsDefecto": "Guardar la hora de salida en la base de datos es lo que tiene que hacer «Registrar salida»."
+    }
+  ],
+  "paletaEtiquetas": [
+    "dependencia_circular",
+    "acoplamiento_indebido",
+    "elemento_sin_especificar"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "dependencia_circular",
+        "acoplamiento_indebido"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "dependencia_circular",
+        "acoplamiento_indebido",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "elemento_sin_especificar"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Dos piezas que se llaman la una a la otra no se pueden cambiar ni probar por separado."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Si dos piezas se necesitan mutuamente, en realidad son una sola mal partida. Que una le pregunte a los datos, no a la otra."
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "id": "MJ-OF-N1-DIAGRAMA-4",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "turnos",
+  "enElProyecto": "Es el diagrama de cómo se reparten los turnos de mantenimiento de los ascensores de carga.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de los turnos de mantenimiento",
+    "comoSeJuega": "El diagrama de los turnos de mantenimiento. Encuentra las piezas o flechas con problemas (hay uno) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "tecnicos",
+        "capa": "interfaz",
+        "texto": "Pantalla de los técnicos",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Los técnicos piden aquí su turno."
+      },
+      {
+        "id": "turnos",
+        "capa": "logica",
+        "texto": "Asignación de turnos",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Reparte los turnos entre los técnicos disponibles."
+      },
+      {
+        "id": "calendario",
+        "capa": "logica",
+        "texto": "Calendario de mantenimiento",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Sabe qué ascensor toca revisar cada día."
+      },
+      {
+        "id": "reservas",
+        "capa": "logica",
+        "texto": "Reservas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 2,
+        "detalle": "Las reservas de los ascensores de carga."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "Turnos, calendario y reservas."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "t1",
+        "tipo": "pide",
+        "desde": "tecnicos",
+        "hasta": "turnos",
+        "texto": "pide su turno"
+      },
+      {
+        "id": "t2",
+        "tipo": "lee",
+        "desde": "turnos",
+        "hasta": "calendario",
+        "texto": "mira qué toca revisar"
+      },
+      {
+        "id": "t3",
+        "tipo": "pide",
+        "desde": "calendario",
+        "hasta": "reservas",
+        "texto": "bloquea el ascensor en mantenimiento"
+      },
+      {
+        "id": "t4",
+        "tipo": "pide",
+        "desde": "reservas",
+        "hasta": "turnos",
+        "texto": "pregunta si hay técnico"
+      },
+      {
+        "id": "t5",
+        "tipo": "escribe",
+        "desde": "turnos",
+        "hasta": "bd",
+        "texto": "guarda el turno"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "t4"
+      ],
+      "defecto": "dependencia_circular",
+      "explicacion": "Turnos pregunta al calendario, el calendario a reservas y reservas vuelve a preguntar a turnos: un círculo. Ninguna de las tres se puede cambiar sin las otras dos.",
+      "pista": "Sigue las flechas desde «Asignación de turnos». ¿Puedes volver a ella sin dar marcha atrás?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "t5"
+      ],
+      "razonNoEsDefecto": "Guardar el turno en la base de datos es lo que tiene que hacer la asignación."
+    }
+  ],
+  "paletaEtiquetas": [
+    "dependencia_circular",
+    "acoplamiento_indebido",
+    "elemento_sin_especificar",
+    "requisito_ambiguo"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "dependencia_circular",
+        "acoplamiento_indebido",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "dependencia_circular",
+        "acoplamiento_indebido",
+        "elemento_sin_especificar",
+        "requisito_ambiguo"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "requisito_ambiguo"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Tres piezas en círculo son una sola pieza grande disfrazada de tres."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Un círculo de dependencias se rompe haciendo que una de las piezas pregunte a los datos en lugar de a otra pieza."
+  }
+}

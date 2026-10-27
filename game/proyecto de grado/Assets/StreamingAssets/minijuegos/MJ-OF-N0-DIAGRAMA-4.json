@@ -1,0 +1,199 @@
+{
+  "id": "MJ-OF-N0-DIAGRAMA-4",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "registro",
+  "enElProyecto": "Es el diagrama del registro de visitas con la nueva pantalla de bienvenida del vestíbulo.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de la pantalla del vestíbulo",
+    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza y cada flecha dice quién le habla a quién. Busca lo que no está bien (hay uno), púlsalo y elige a la derecha qué problema tiene. Es práctica: si no te sale, inténtalo otra vez.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "formulario",
+        "capa": "interfaz",
+        "texto": "Formulario de visita",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Nombre, documento y a quién viene a ver."
+      },
+      {
+        "id": "validacion",
+        "capa": "logica",
+        "texto": "Validación de datos",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Comprueba que no falte ningún dato obligatorio."
+      },
+      {
+        "id": "vestibulo",
+        "capa": "interfaz",
+        "texto": "Pantalla del vestíbulo",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 2,
+        "detalle": "Una pantalla grande, a la vista de todo el que entra, que da la bienvenida."
+      },
+      {
+        "id": "dentro",
+        "capa": "logica",
+        "texto": "Quién sigue dentro",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 2,
+        "detalle": "La lista que consulta el vigilante al cerrar."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "Guarda cada visita con su documento de identidad."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "c1",
+        "tipo": "pide",
+        "desde": "formulario",
+        "hasta": "validacion",
+        "texto": "datos escritos"
+      },
+      {
+        "id": "c2",
+        "tipo": "escribe",
+        "desde": "validacion",
+        "hasta": "bd",
+        "texto": "guarda la visita"
+      },
+      {
+        "id": "c3",
+        "tipo": "lee",
+        "desde": "dentro",
+        "hasta": "bd",
+        "texto": "lee las visitas abiertas"
+      },
+      {
+        "id": "c4",
+        "tipo": "lee",
+        "desde": "vestibulo",
+        "hasta": "bd",
+        "texto": "lee nombre y número de documento de cada visita"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "c4"
+      ],
+      "defecto": "falla_de_seguridad",
+      "explicacion": "La pantalla del vestíbulo está a la vista de cualquiera y muestra el número de documento de cada visitante. Para dar la bienvenida basta el nombre.",
+      "pista": "Piensa en quién ve cada pantalla. ¿Qué dato no debería ver cualquiera que pase por la entrada?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "c3"
+      ],
+      "razonNoEsDefecto": "Que «Quién sigue dentro» lea las visitas abiertas es su trabajo: así sabe el vigilante quién queda."
+    }
+  ],
+  "paletaEtiquetas": [
+    "falla_de_seguridad",
+    "acoplamiento_indebido",
+    "requisito_incompleto"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "falla_de_seguridad",
+        "acoplamiento_indebido"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "falla_de_seguridad",
+        "acoplamiento_indebido",
+        "requisito_incompleto"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "requisito_incompleto"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Un dato personal en una pantalla pública es una fuga, aunque nadie lo robe a propósito."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Cada pantalla enseña lo mínimo que necesita quien la mira. Lo demás se queda guardado."
+  }
+}

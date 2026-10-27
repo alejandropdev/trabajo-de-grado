@@ -112,6 +112,7 @@ namespace Nexus.Unity.Pantallas {
                 case SeriesDeColeccionables.Codigo: return singular ? "un código de terminal" : "Códigos";
                 case SeriesDeColeccionables.Startup: return singular ? "una lápida de startup" : "Startups";
                 case SeriesDeColeccionables.Advertencia: return singular ? "una advertencia" : "Advertencias";
+                case SeriesDeColeccionables.Nota: return singular ? "una nota adhesiva" : "Notas";
                 default: return singular ? "algo" : Textos.Humanizar(serie);
             }
         }

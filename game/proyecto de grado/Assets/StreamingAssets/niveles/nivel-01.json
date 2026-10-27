@@ -4,7 +4,7 @@
   "briefing": [
     "HH: «Ah, y arréglame lo de los patios. Alguien hackeó la barrera y me dejó el carro adentro tres horas. Veinte días. No es un proyecto importante. Es una prueba.»",
     "Cliente: Facilities, el departamento interno de instalaciones. Necesita controlar quién entra a los patios de los edificios N1 y N2 y reservar los ascensores de carga.",
-    "El equipo asignado son cuatro técnicos del Edificio Patch. Ninguno ha operado nunca un sistema repartido en varios servicios.",
+    "El equipo lo formas tú: en el recorrido por el edificio encontrarás las hojas de vida de los técnicos disponibles; el proyecto da para cuatro. Ninguno ha operado nunca un sistema repartido en varios servicios.",
     "Facilities no tiene personal de sistemas. Lo que se entregue lo va a mantener el propio equipo de mantenimiento, sin ayuda.",
     "Todo ocurre en un único edificio. En la hora punta hay, como mucho, cuarenta vehículos esperando.",
     "La barrera actual la abrieron con el mando genérico del fabricante. Nadie en Nexus tiene su código fuente.",
@@ -820,6 +820,8 @@
     ],
     "recoleccion": {
       "minutosDisponibles": 120,
+      "equipoDesdeRecoleccion": true,
+      "maxEquipo": 4,
       "texto": "Tienes dos horas para recorrer el plano del encargo (zonas A a F). No da tiempo a verlo todo: elige.",
       "zonas": [
         {
@@ -940,6 +942,7 @@
         "mejora": "Documentación y deuda técnica",
         "minijuego": "MJ-OF-N1-DIAGRAMA",
         "archivo": "minijuegos/MJ-OF-N1-DIAGRAMA.json",
+        "variantes": [{"minijuego": "MJ-OF-N1-DIAGRAMA-2", "archivo": "minijuegos/MJ-OF-N1-DIAGRAMA-2.json"}, {"minijuego": "MJ-OF-N1-DIAGRAMA-3", "archivo": "minijuegos/MJ-OF-N1-DIAGRAMA-3.json"}, {"minijuego": "MJ-OF-N1-DIAGRAMA-4", "archivo": "minijuegos/MJ-OF-N1-DIAGRAMA-4.json"}, {"minijuego": "MJ-OF-N1-DIAGRAMA-5", "archivo": "minijuegos/MJ-OF-N1-DIAGRAMA-5.json"}, {"minijuego": "MJ-OF-N1-DIAGRAMA-6", "archivo": "minijuegos/MJ-OF-N1-DIAGRAMA-6.json"}, {"minijuego": "MJ-OF-N1-DIAGRAMA-7", "archivo": "minijuegos/MJ-OF-N1-DIAGRAMA-7.json"}],
         "minutos": 60,
         "vecesPorDia": 1,
         "efectos": {
@@ -963,6 +966,7 @@
         "mejora": "Avance y cliente",
         "minijuego": "MJ-OF-N1-BACKLOG",
         "archivo": "minijuegos/MJ-OF-N1-BACKLOG.json",
+        "variantes": [{"minijuego": "MJ-OF-N1-BACKLOG-2", "archivo": "minijuegos/MJ-OF-N1-BACKLOG-2.json"}, {"minijuego": "MJ-OF-N1-BACKLOG-3", "archivo": "minijuegos/MJ-OF-N1-BACKLOG-3.json"}, {"minijuego": "MJ-OF-N1-BACKLOG-4", "archivo": "minijuegos/MJ-OF-N1-BACKLOG-4.json"}, {"minijuego": "MJ-OF-N1-BACKLOG-5", "archivo": "minijuegos/MJ-OF-N1-BACKLOG-5.json"}, {"minijuego": "MJ-OF-N1-BACKLOG-6", "archivo": "minijuegos/MJ-OF-N1-BACKLOG-6.json"}, {"minijuego": "MJ-OF-N1-BACKLOG-7", "archivo": "minijuegos/MJ-OF-N1-BACKLOG-7.json"}],
         "minutos": 60,
         "vecesPorDia": 1,
         "efectos": {
@@ -986,6 +990,7 @@
         "mejora": "Cobertura de pruebas",
         "minijuego": "MJ-OF-N1-PRUEBAS",
         "archivo": "minijuegos/MJ-OF-N1-PRUEBAS.json",
+        "variantes": [{"minijuego": "MJ-OF-N1-PRUEBAS-2", "archivo": "minijuegos/MJ-OF-N1-PRUEBAS-2.json"}, {"minijuego": "MJ-OF-N1-PRUEBAS-3", "archivo": "minijuegos/MJ-OF-N1-PRUEBAS-3.json"}, {"minijuego": "MJ-OF-N1-PRUEBAS-4", "archivo": "minijuegos/MJ-OF-N1-PRUEBAS-4.json"}, {"minijuego": "MJ-OF-N1-PRUEBAS-5", "archivo": "minijuegos/MJ-OF-N1-PRUEBAS-5.json"}, {"minijuego": "MJ-OF-N1-PRUEBAS-6", "archivo": "minijuegos/MJ-OF-N1-PRUEBAS-6.json"}, {"minijuego": "MJ-OF-N1-PRUEBAS-7", "archivo": "minijuegos/MJ-OF-N1-PRUEBAS-7.json"}],
         "minutos": 60,
         "vecesPorDia": 1,
         "efectos": {

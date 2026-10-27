@@ -175,7 +175,8 @@ namespace Nexus.Tests {
                     foreach (var tarea in s.TareasDeOficina)
                         if (s.PorQueNoSePuedeHacer(tarea.Id) == null) {
                             s.EmpezarTarea(tarea.Id);
-                            s.ResolverTarea(JugarMinijuego(new PendingMinigame { MinijuegoId = tarea.Minijuego, Archivo = tarea.Archivo }, azar));
+                            var caso = s.CasoDeHoy(tarea.Id);   // cada dia, otro caso de la misma practica
+                            s.ResolverTarea(JugarMinijuego(new PendingMinigame { MinijuegoId = caso.Minijuego, Archivo = caso.Archivo }, azar));
                             p.TareasDeOficina++;
                         }
                 s.CerrarJornada();
@@ -397,6 +398,9 @@ namespace Nexus.Tests {
                 if (n.Fase1 != null && n.Fase1.Recoleccion != null)
                     foreach (var h in n.Fase1.Recoleccion.Hallazgos)
                         if (h.Tipo == Nexus.Core.Fase1.TiposDeHallazgo.Coleccionable) colocados.Add(h.Id);
+            // Y los objetos del mundo 3D que van al diario (objetos-3d.json).
+            foreach (var o in c.Objetos3D.Objetos)
+                if (o.Tipo == Nexus.Core.Fase1.TiposDeObjeto3D.Coleccionable) colocados.Add(o.Coleccionable);
             var huerfanos = c.Coleccionables.Where(col => !colocados.Contains(col.Id)).Select(col => col.Id).ToList();
             Assert.IsEmpty(huerfanos, "un coleccionable que no esta en ninguna zona no se puede encontrar nunca");
         }

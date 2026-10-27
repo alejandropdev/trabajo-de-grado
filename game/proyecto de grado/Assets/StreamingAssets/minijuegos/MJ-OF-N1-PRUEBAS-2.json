@@ -1,0 +1,111 @@
+{
+  "id": "MJ-OF-N1-PRUEBAS-2",
+  "verbo": "V2_REPARTIR",
+  "lienzo": "depositos",
+  "temaPrincipal": "PTP",
+  "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "lectura",
+  "enElProyecto": "Es el plan de pruebas de la lectura de matrículas y de la barrera de la garita.",
+  "presentacion": {
+    "titulo": "Práctica: probar la lectura de matrículas",
+    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 30 horas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. La tarjeta dice también cuántos errores suele haber: planifica para el número más alto. Ganas si al cliente le llega como mucho 1 error, y ninguno de la pila marcada en rojo.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 120
+  },
+  "repartir": {
+    "presupuesto": 30,
+    "paso": 2,
+    "unidad": "horas",
+    "toleranciaDeEscapes": 1,
+    "depositos": [
+      {
+        "id": "unitarias",
+        "nombre": "Unitarias",
+        "costePorDefecto": 2,
+        "defectosOcultos": 4,
+        "estimadoMin": 3,
+        "estimadoMax": 4,
+        "descripcion": "Prueban el reconocimiento de cada formato de matrícula.",
+        "pista": "Muchos formatos distintos."
+      },
+      {
+        "id": "integracion",
+        "nombre": "Integración",
+        "costePorDefecto": 4,
+        "defectosOcultos": 2,
+        "estimadoMin": 2,
+        "estimadoMax": 3,
+        "descripcion": "Prueban la cámara y la barrera hablando con nuestro sistema.",
+        "pista": "Dos aparatos de fabricante."
+      },
+      {
+        "id": "rendimiento",
+        "nombre": "Rendimiento",
+        "costePorDefecto": 4,
+        "defectosOcultos": 1,
+        "estimadoMin": 1,
+        "estimadoMax": 2,
+        "descripcion": "Prueban que se lean 40 vehículos seguidos en la hora punta.",
+        "pista": "La hora punta es exigente."
+      },
+      {
+        "id": "e2e",
+        "nombre": "De extremo a extremo",
+        "costePorDefecto": 6,
+        "defectosOcultos": 1,
+        "estimadoMin": 1,
+        "estimadoMax": 1,
+        "descripcion": "Un vehículo de verdad: de la cámara a la barrera abierta.",
+        "pista": "El camino entero es nuevo.",
+        "critico": true,
+        "porQueEsCritico": "si la barrera se abre a quien no debe, es justo el agujero que motivó el encargo."
+      }
+    ]
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-TEST-01",
+        "razon": "Las horas fueron donde había más errores y más baratos de atrapar, sin dejar sin probar lo imprescindible. Renunciar a algo caro y con pocos errores fue una decisión, no un olvido."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-TEST-01",
+        "razon": "Se escaparon errores de los tipos donde pusiste pocas horas. Primero cubre los tipos baratos con muchos errores; lo caro, al final y solo si sobra, salvo lo marcado en rojo."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "Pusiste más horas de las que servían en un tipo y dejaste otro, con errores, en cero. Esas horas de más no atraparon nada."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "No repartiste ninguna hora: todos los errores le llegan al cliente."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Nunca hay horas para probarlo todo. Planificar las pruebas es elegir qué se prueba primero y qué se deja fuera."
+  }
+}

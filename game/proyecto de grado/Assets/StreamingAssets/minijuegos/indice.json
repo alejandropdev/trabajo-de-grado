@@ -15,7 +15,7 @@
       "pesoBase": 10,
       "enfriamiento": 6,
       "maxOcurrencias": 1,
-      "precondiciones": [
+      "precondiciones": ["tamanoEquipo >= 2",
         "diaActual >= 2"
       ],
       "soloNiveles": [
@@ -26,7 +26,7 @@
     { "id": "MJ-F1-07", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F1-07.json", "objetivoAprendizaje": "OA-DOC-01",
       "presionDiegetica": "Javier empieza a programar sobre este diagrama a las 11:00", "reloj": 120,
       "pesoBase": 12, "enfriamiento": 6, "maxOcurrencias": 1,
-      "precondiciones": ["diaActual >= 2", "diaActual <= 8"], "soloNiveles": ["nivel-01"] },
+      "precondiciones": ["tamanoEquipo >= 2", "diaActual >= 2", "diaActual <= 8"], "soloNiveles": ["nivel-01"] },
     {
       "id": "MJ-F1-10",
       "verbo": "V1_DETECTAR",
@@ -37,7 +37,7 @@
       "pesoBase": 12,
       "enfriamiento": 6,
       "maxOcurrencias": 1,
-      "precondiciones": [
+      "precondiciones": ["tamanoEquipo >= 2",
         "diaActual >= 9"
       ],
       "soloNiveles": [
@@ -53,7 +53,7 @@
     { "id": "MJ-F2-02", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F2-02.json", "objetivoAprendizaje": "OA-GIT-01",
       "presionDiegetica": "Javier necesita esto antes de las 10:00", "reloj": 90,
       "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
-      "precondiciones": ["diaActual >= 6"], "soloNiveles": ["nivel-01"] },
+      "precondiciones": ["tamanoEquipo >= 2", "diaActual >= 6"], "soloNiveles": ["nivel-01"] },
 
     { "id": "MJ-F2-07", "verbo": "V1_DETECTAR", "archivo": "minijuegos/MJ-F2-07.json", "objetivoAprendizaje": "OA-DOC-01",
       "presionDiegetica": "Javier sacó esta traza del log de producción de las 07:58", "reloj": 120,
@@ -63,7 +63,7 @@
     { "id": "MJ-F2-08", "verbo": "V2_REPARTIR", "archivo": "minijuegos/MJ-F2-08.json", "objetivoAprendizaje": "OA-TEST-01",
       "presionDiegetica": "El release candidato sale el viernes", "reloj": 120,
       "pesoBase": 10, "enfriamiento": 6, "maxOcurrencias": 1,
-      "precondiciones": ["diaActual >= 8"], "soloNiveles": ["nivel-01"] },
+      "precondiciones": ["tamanoEquipo >= 2", "diaActual >= 8"], "soloNiveles": ["nivel-01"] },
     {
       "id": "MJ-F2-09",
       "verbo": "V2_REPARTIR",
@@ -74,7 +74,7 @@
       "pesoBase": 10,
       "enfriamiento": 6,
       "maxOcurrencias": 1,
-      "precondiciones": [
+      "precondiciones": ["tamanoEquipo >= 2",
         "diaActual >= 11"
       ],
       "soloNiveles": [

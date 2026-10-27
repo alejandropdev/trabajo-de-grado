@@ -1,0 +1,209 @@
+{
+  "id": "MJ-OF-N1-DIAGRAMA-7",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "reservas",
+  "enElProyecto": "Es el diagrama de cómo se cancela una reserva de un ascensor de carga.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de las cancelaciones",
+    "comoSeJuega": "El diagrama de las cancelaciones de reservas. Encuentra las piezas o flechas con problemas (hay uno) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "portal",
+        "capa": "interfaz",
+        "texto": "Portal de reservas",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 1,
+        "detalle": "Donde los empleados reservan y cancelan."
+      },
+      {
+        "id": "reservas",
+        "capa": "logica",
+        "texto": "Reservas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Crea reservas y programa el ascensor."
+      },
+      {
+        "id": "cancelaciones",
+        "capa": "logica",
+        "texto": "Cancelaciones",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 2,
+        "detalle": "Borra la reserva de la base de datos. Eso es todo lo que dice."
+      },
+      {
+        "id": "ascensor",
+        "capa": "externo",
+        "texto": "Controlador del ascensor",
+        "tipo": "externo",
+        "fila": 2,
+        "columna": 0,
+        "detalle": "Bloquea el ascensor a la hora reservada."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 2,
+        "detalle": "Las reservas."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "k1",
+        "tipo": "pide",
+        "desde": "portal",
+        "hasta": "reservas",
+        "texto": "pide una reserva"
+      },
+      {
+        "id": "k2",
+        "tipo": "escribe",
+        "desde": "reservas",
+        "hasta": "bd",
+        "texto": "guarda la reserva"
+      },
+      {
+        "id": "k3",
+        "tipo": "pide",
+        "desde": "reservas",
+        "hasta": "ascensor",
+        "texto": "programa el ascensor"
+      },
+      {
+        "id": "k4",
+        "tipo": "pide",
+        "desde": "portal",
+        "hasta": "cancelaciones",
+        "texto": "cancela una reserva"
+      },
+      {
+        "id": "k5",
+        "tipo": "escribe",
+        "desde": "cancelaciones",
+        "hasta": "bd",
+        "texto": "borra la reserva"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "cancelaciones"
+      ],
+      "defecto": "requisito_incompleto",
+      "explicacion": "Cancelar borra la reserva, pero nadie le dice al ascensor que ya no hace falta: seguirá bloqueado a esa hora, vacío.",
+      "pista": "Compara lo que pasa al reservar con lo que pasa al cancelar. ¿Falta deshacer algo?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "k3"
+      ],
+      "razonNoEsDefecto": "Que reservas programe el ascensor es su trabajo: para eso se reserva."
+    }
+  ],
+  "paletaEtiquetas": [
+    "requisito_incompleto",
+    "acoplamiento_indebido",
+    "elemento_sin_especificar",
+    "dependencia_circular"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "requisito_incompleto",
+        "acoplamiento_indebido",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "requisito_incompleto",
+        "acoplamiento_indebido",
+        "elemento_sin_especificar",
+        "dependencia_circular"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "dependencia_circular"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Lo que una operación hace, su contraria tiene que deshacerlo entero."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Un requisito incompleto no se ve en lo que está: se ve en lo que falta. Compara siempre una operación con su contraria."
+  }
+}

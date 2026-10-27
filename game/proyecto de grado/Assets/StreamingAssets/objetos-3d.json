@@ -1,0 +1,287 @@
+{
+  "version": 1,
+  "objetos": [
+    {
+      "id": "cv_marta",
+      "tipo": "candidato",
+      "nombre": "Hoja de vida · Marta Ayala",
+      "texto": "Product Owner: sube el avance y la satisfacción del cliente, pero acumula deuda por complacer peticiones.",
+      "miembro": {
+        "id": "marta",
+        "nombre": "Marta Ayala",
+        "rol": "Producto",
+        "descripcion": "Product Owner amable y servicial. Ordena el backlog con claridad, aunque le cuesta decir que no a un cambio de última hora.",
+        "frase": "Eso lo podemos meter, ¿no? Es pequeñito.",
+        "habilidades": {
+          "interfaz": 1.25,
+          "datos": 0.9,
+          "logica": 0.85,
+          "pruebas": 0.95
+        }
+      },
+      "efectos": {
+        "SatisfaccionCliente": 3,
+        "DeudaTecnica": 2
+      }
+    },
+    {
+      "id": "cv_dereck",
+      "tipo": "candidato",
+      "nombre": "Hoja de vida · Derek Hartman",
+      "texto": "Ingeniero junior metódico: baja la deuda técnica, pero frena el avance por sobreanálisis.",
+      "miembro": {
+        "id": "derek",
+        "nombre": "Derek Hartman",
+        "rol": "Desarrollo (junior)",
+        "descripcion": "Becario prudente que perfecciona cada diagrama antes de escribir una línea. Su código casi no deja deuda; su ritmo es lento.",
+        "frase": "Déjame revisar el diagrama una vez más, por si acaso.",
+        "habilidades": {
+          "interfaz": 0.85,
+          "datos": 0.95,
+          "logica": 1.1,
+          "pruebas": 1.2
+        }
+      },
+      "efectos": {
+        "DeudaTecnica": -3,
+        "VelocidadMod": -0.03
+      }
+    },
+    {
+      "id": "cv_elena",
+      "tipo": "candidato",
+      "nombre": "Hoja de vida · Elena Gómez",
+      "texto": "Líder de QA: dispara la cobertura y la satisfacción, aunque sus revisiones cansan al equipo.",
+      "miembro": {
+        "id": "elena",
+        "nombre": "Elena Gómez",
+        "rol": "Calidad (QA)",
+        "descripcion": "Ex auditora que asume que todo el código está roto hasta que se demuestre lo contrario. Nada sale sin pasar por sus pruebas.",
+        "frase": "Si no tiene prueba, no existe.",
+        "habilidades": {
+          "interfaz": 0.85,
+          "datos": 0.95,
+          "logica": 1.0,
+          "pruebas": 1.4
+        }
+      },
+      "efectos": {
+        "Cobertura": 4,
+        "SatisfaccionCliente": 2,
+        "Cansancio": 3
+      }
+    },
+    {
+      "id": "cv_javier",
+      "tipo": "candidato",
+      "nombre": "Hoja de vida · Javier Webb",
+      "texto": "Consultor máster: ayuda en cualquier área y sube la moral, pero sus métodos antiguos dejan deuda.",
+      "miembro": {
+        "id": "javier",
+        "nombre": "Javier Webb",
+        "rol": "Consultoría",
+        "descripcion": "Consultor veterano que lo sabe todo del edificio y de su sistema. Su mentoría anima al equipo; sus atajos de la vieja escuela no envejecen bien.",
+        "frase": "Esto ya lo resolvimos en el 98. Mira, se hace así.",
+        "habilidades": {
+          "interfaz": 1.1,
+          "datos": 1.2,
+          "logica": 1.2,
+          "pruebas": 1.0
+        }
+      },
+      "efectos": {
+        "MoralEquipo": 4,
+        "DeudaTecnica": 2
+      }
+    },
+    {
+      "id": "cv_kenji",
+      "tipo": "candidato",
+      "nombre": "Hoja de vida · Kenji Sato",
+      "texto": "Arquitecto sénior: acelera el proyecto y la cobertura, pero su arrogancia baja la moral.",
+      "miembro": {
+        "id": "kenji",
+        "nombre": "Kenji Sato",
+        "rol": "Arquitectura",
+        "descripcion": "Arquitecto obsesionado con el orden que prefiere un diagrama a una conversación. Su visión evita problemas; su trato los crea.",
+        "frase": "Tráeme un diagrama y hablamos.",
+        "habilidades": {
+          "interfaz": 0.8,
+          "datos": 1.1,
+          "logica": 1.35,
+          "pruebas": 1.1
+        }
+      },
+      "efectos": {
+        "MoralEquipo": -4,
+        "Cobertura": 2
+      }
+    },
+    {
+      "id": "cv_oscar",
+      "tipo": "candidato",
+      "nombre": "Hoja de vida · Óscar Rondón",
+      "texto": "Generalista veterano: la mayor fuente de moral del equipo, aunque sus parches dejan deuda.",
+      "miembro": {
+        "id": "oscar",
+        "nombre": "Óscar Rondón",
+        "rol": "Desarrollo (generalista)",
+        "descripcion": "El empleado más antiguo de la planta: bromista, tranquilo y siempre dispuesto a apagar un incendio… con lo primero que tenga a mano.",
+        "frase": "Tranquilos, que esto lo arreglo yo en un momento.",
+        "habilidades": {
+          "interfaz": 1.1,
+          "datos": 1.0,
+          "logica": 1.0,
+          "pruebas": 0.8
+        }
+      },
+      "efectos": {
+        "MoralEquipo": 6,
+        "DeudaTecnica": 2
+      }
+    },
+    {
+      "id": "cv_zara",
+      "tipo": "candidato",
+      "nombre": "Hoja de vida · Sara Chen",
+      "texto": "Desarrolladora sénior y genio de Git: acelera el avance, pero su frialdad baja la moral.",
+      "miembro": {
+        "id": "sara",
+        "nombre": "Sara Chen",
+        "rol": "Desarrollo (sénior)",
+        "descripcion": "Desarrolladora reservada, exigente y cercana a la gerencia. Sus ramas siempre están limpias; sus comentarios, no tanto.",
+        "frase": "Un commit, una idea. No es tan difícil.",
+        "habilidades": {
+          "interfaz": 1.0,
+          "datos": 1.2,
+          "logica": 1.3,
+          "pruebas": 1.1
+        }
+      },
+      "efectos": {
+        "MoralEquipo": -3,
+        "VelocidadMod": 0.03
+      }
+    },
+    {
+      "id": "consumable_pizza",
+      "tipo": "suministro",
+      "nombre": "Porción de pizza",
+      "texto": "Pizza para todos: sube la moral del equipo y quita un poco de fatiga. Se puede repartir una vez cada 3 días.",
+      "suministro": {
+        "objetivo": "equipo",
+        "efectos": {
+          "MoralEquipo": 8,
+          "Cansancio": -2
+        },
+        "enfriamientoDias": 3,
+        "minutosDeUso": 10
+      }
+    },
+    {
+      "id": "consumable_coffee",
+      "tipo": "suministro",
+      "nombre": "Taza de café",
+      "texto": "Café para el equipo: hoy todos rinden hasta un 15 % más. Una vez al día.",
+      "suministro": {
+        "objetivo": "equipo",
+        "bonoDeFlujo": 0.15,
+        "vecesPorDia": 1,
+        "minutosDeUso": 5
+      }
+    },
+    {
+      "id": "consumable_energy_drink",
+      "tipo": "suministro",
+      "nombre": "Guepardex",
+      "texto": "Bebida energética para una persona: le quita mucho cansancio. Si la toma más de 2 veces en 3 días, el bajón es peor que antes.",
+      "suministro": {
+        "objetivo": "miembro",
+        "desvioDeCansancio": -12,
+        "minutosDeUso": 2,
+        "reboteUsos": 2,
+        "reboteVentanaDias": 3,
+        "reboteDesvio": 10
+      }
+    },
+    {
+      "id": "cert_acreditation",
+      "tipo": "efecto",
+      "nombre": "Certificado de acreditación",
+      "texto": "El equipo cumple los estándares: sube la satisfacción del cliente y la cobertura.",
+      "efectos": {
+        "SatisfaccionCliente": 3,
+        "Cobertura": 2
+      }
+    },
+    {
+      "id": "usb_fragment",
+      "tipo": "coleccionable",
+      "nombre": "Fragmento 2/8 del USB",
+      "coleccionable": "COL-USB-02",
+      "texto": "Una pieza del USB que Javier intenta descifrar. Va a tu diario."
+    },
+    {
+      "id": "EVIDENCE_USB_FRAGMENT",
+      "tipo": "coleccionable",
+      "nombre": "Fragmento 2/8 del USB",
+      "coleccionable": "COL-USB-02",
+      "texto": "Una pieza del USB que Javier intenta descifrar. Va a tu diario."
+    },
+    {"id": "DEV_CARD_DIAGRAMS", "tipo": "coleccionable", "nombre": "Carta: Diagramas que salvan vidas", "coleccionable": "COL-DEV-14"},
+    {"id": "DEV_CARD_BOY_SCOUT", "tipo": "coleccionable", "nombre": "Carta: La regla del Boy Scout", "coleccionable": "COL-DEV-10"},
+    {"id": "DEV_CARD_TIME_MANAGEMENT", "tipo": "coleccionable", "nombre": "Carta: Gestión del tiempo y pausas activas", "coleccionable": "COL-DEV-15"},
+    {"id": "DEV_CARD_GIT_DIVIDE", "tipo": "coleccionable", "nombre": "Carta: Divide y vencerás en Git", "coleccionable": "COL-DEV-11"},
+    {"id": "DEV_CARD_COVERAGE", "tipo": "coleccionable", "nombre": "Carta: El poder de la cobertura", "coleccionable": "COL-DEV-12"},
+    {"id": "DEV_CARD_USER_STORIES", "tipo": "coleccionable", "nombre": "Carta: Historias de usuario claras", "coleccionable": "COL-DEV-13"},
+    {"id": "DEV_CARD_CODE_REVIEWS", "tipo": "coleccionable", "nombre": "Carta: Comunicación en code reviews", "coleccionable": "COL-DEV-16"},
+    {"id": "cards_dev_collection", "tipo": "informativo", "nombre": "Cartas de desarrollador", "texto": "Consejos prácticos de ingeniería de software y trabajo en equipo."},
+    {"id": "postits_collection", "tipo": "informativo", "nombre": "Notas post-it", "texto": "Mensajes anónimos y rumores sobre los secretos de la oficina."},
+    {
+      "id": "NOTE_POSTIT_01",
+      "tipo": "coleccionable",
+      "nombre": "Nota: advertencia personal",
+      "texto": "«Cuidado con esa chica, en la personalidad se ve que es peligrosa y lo es, mantén distancia.»",
+      "coleccionable": "COL-NOTA-01"
+    },
+    {
+      "id": "NOTE_POSTIT_02",
+      "tipo": "coleccionable",
+      "nombre": "Nota: rumor sobre la gerencia",
+      "texto": "«Nadie sabe por qué Sara entra a la oficina de HH a puerta cerrada a altas horas de la noche.»",
+      "coleccionable": "COL-NOTA-02"
+    },
+    {
+      "id": "NOTE_POSTIT_03",
+      "tipo": "coleccionable",
+      "nombre": "Nota: el incidente del pasado",
+      "texto": "«El despido del padre de Javier no fue un error administrativo.»",
+      "coleccionable": "COL-NOTA-03"
+    },
+    {
+      "id": "NOTE_POSTIT_04",
+      "tipo": "coleccionable",
+      "nombre": "Nota: queja en la cafetería",
+      "texto": "«Alguien se volvió a comer la pizza de la nevera sin anotar su nombre.»",
+      "coleccionable": "COL-NOTA-04"
+    },
+    {
+      "id": "NOTE_POSTIT_05",
+      "tipo": "coleccionable",
+      "nombre": "Nota: sobre el aislamiento",
+      "texto": "«Si buscas a Kenji, ni te molestes en tocar su puerta.»",
+      "coleccionable": "COL-NOTA-05"
+    },
+    {
+      "id": "NOTE_POSTIT_06",
+      "tipo": "coleccionable",
+      "nombre": "Nota: la oficina oculta",
+      "texto": "«Hay un conducto detrás de la bodega que lleva al ala vieja del edificio.»",
+      "coleccionable": "COL-NOTA-06"
+    },
+    {"id": "access_card_01", "tipo": "informativo", "nombre": "Tarjeta de acceso · Morales", "oculto": true},
+    {"id": "access_card_02", "tipo": "informativo", "nombre": "Tarjeta de acceso · Berrío", "oculto": true},
+    {"id": "access_card_03", "tipo": "informativo", "nombre": "Tarjeta de acceso · Ríos", "oculto": true},
+    {"id": "access_card_04", "tipo": "informativo", "nombre": "Tarjeta de acceso · Pineda", "oculto": true}
+  ]
+}

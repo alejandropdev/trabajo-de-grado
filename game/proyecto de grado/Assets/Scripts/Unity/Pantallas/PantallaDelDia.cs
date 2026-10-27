@@ -154,6 +154,12 @@ namespace Nexus.Unity.Pantallas {
             var riel = Ui.Fila(padre, "Riel", Tema.Espacio(2));
             var mapa = Ui.Boton(riel, "Mapa", AbrirMapa);
             var equipo = Ui.Boton(riel, "Equipo", AbrirEquipo);
+            // Lo que se trajo del recorrido 3D (pizza, café, Guepardex). Solo si se trajo algo.
+            if (S.R.Suministros.Count > 0) {
+                var suministros = Ui.Boton(riel, "Suministros", AbrirSuministros);
+                UiKit.Tamano(suministros, ancho: 240);   // «Suministros · 5»: ancho fijo, como Avisos
+                _textoSuministros = suministros.GetComponentInChildren<TMP_Text>();
+            }
             var escritorio = Ui.Boton(riel, "Escritorio", AbrirEscritorio);
             var tablero = Ui.Boton(riel, "Tablero", () => AbrirTablero(0));
             Ui.Boton(riel, "Monitoreo", () => AbrirMonitoreo(0));
@@ -333,12 +339,14 @@ namespace Nexus.Unity.Pantallas {
         private void PintarRiel() {
             var sonando = AlertasSonando().Count;
             var papeles = _textoCliente == null ? 0 : S.PapelesSinLeer();
-            var clave = sonando + "|" + papeles;
+            var quedan = _textoSuministros == null ? 0 : S.R.Suministros.Values.Sum();
+            var clave = sonando + "|" + papeles + "|" + quedan;
             if (clave == _claveRiel) return;
             _claveRiel = clave;
             if (_textoCliente != null) _textoCliente.text = papeles > 0 ? $"Cliente · {papeles} nuevo{(papeles == 1 ? "" : "s")}" : "Cliente";
             // Solo cuenta lo que YA sono y espera: lo que vaya a llegar hoy no se anuncia, llega.
             _textoAvisos.text = sonando > 0 ? $"Avisos · {sonando} esperando" : "Avisos";
+            if (_textoSuministros != null) _textoSuministros.text = quedan > 0 ? $"Suministros · {quedan}" : "Suministros";
         }
 
         private ZonaDeNivel ZonaDondeEstoy() {
@@ -504,7 +512,7 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Etiqueta("Ceremonia · " + (ceremonia != null && !string.IsNullOrEmpty(ceremonia.Nombre) ? ceremonia.Nombre : "retrospectiva"));
             _ahora.Titulo("¿Qué cambiamos del proceso?");
             if (!string.IsNullOrEmpty(retro.Texto)) _ahora.Parrafo(retro.Texto);
-            _ahora.Nota("Lo que elijas cambia cómo trabaja el equipo desde hoy. El reloj espera.");
+            _ahora.Nota(Solo("Lo que elijas cambia cómo trabaja el equipo desde hoy. El reloj espera.", "Lo que elijas cambia cómo trabajas desde hoy. El reloj espera."));
             foreach (var accion in retro.Acciones) {
                 var a = accion;
                 _ahora.Opcion(a.Texto, null, () => {
@@ -539,7 +547,7 @@ namespace Nexus.Unity.Pantallas {
 
             _ahora.Etiqueta("Ceremonia · planificación de " + plan.Unidad);
             _ahora.Titulo("Arma el sprint backlog");
-            _ahora.Parrafo($"Del product backlog, elige lo que el equipo se compromete a terminar en este sprint. Caben unos {plan.CapacidadSugerida:0.#} puntos; quedan {plan.PuntosPendientes:0} por hacer en total.");
+            _ahora.Parrafo($"Del product backlog, elige lo que {Solo("el equipo se compromete", "te comprometes")} a terminar en este sprint. Caben unos {plan.CapacidadSugerida:0.#} puntos; quedan {plan.PuntosPendientes:0} por hacer en total.");
             PantallaDeGlosario.Palabras(App, _ahora.Raiz, "Si alguna palabra no te suena:", "backlog", "sprint", "planificacion-de-sprint");
 
             var capacidad = _ahora.Tarjeta($"Llevas {suma:0.#} de {plan.CapacidadSugerida:0.#} puntos", pasado ? Tono.Aviso : Tono.Exito);
@@ -564,7 +572,7 @@ namespace Nexus.Unity.Pantallas {
                 var n = S.CandidatasAlSprint().Count(c => _alSprint.Contains(c.Id) || c.Empezada);
                 S.ComprometerTarjetas(_alSprint);
                 _diaDelSprintBacklog = -1;
-                Anotar($"Planificación: el equipo se compromete a {n} tarjetas ({suma:0.#} puntos).");
+                Anotar($"Planificación: {Solo("el equipo se compromete", "te comprometes")} a {n} tarjetas ({suma:0.#} puntos).");
             });
             comprometer.interactable = suma > 0.005;
         }
@@ -578,7 +586,7 @@ namespace Nexus.Unity.Pantallas {
             }
             _ahora.Etiqueta("Ceremonia · planificación de " + plan.Unidad);
             _ahora.Titulo("¿Con cuánto te comprometes?");
-            _ahora.Parrafo($"El equipo calcula que puede con unos {plan.CapacidadSugerida:0.#} puntos. Quedan {plan.PuntosPendientes:0} puntos por hacer.");
+            _ahora.Parrafo($"{Solo("El equipo calcula que puede", "Calculas que puedes")} con unos {plan.CapacidadSugerida:0.#} puntos. Quedan {plan.PuntosPendientes:0} puntos por hacer.");
             // Lo que se promete son tarjetas de verdad: las primeras del backlog, hasta llenar los puntos.
             if (S.Tablero != null) {
                 var entran = new List<string>();
@@ -602,7 +610,7 @@ namespace Nexus.Unity.Pantallas {
 
             _ahora.Accion($"Comprometerse a {_compromiso:0} puntos", () => {
                 S.Comprometer(_compromiso);
-                Anotar($"Planificación: el equipo se compromete a {_compromiso:0} puntos.");
+                Anotar($"Planificación: {Solo("el equipo se compromete", "te comprometes")} a {_compromiso:0} puntos.");
             });
         }
 
@@ -629,7 +637,7 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Boton(n, "Ir", () => AbrirCeremonias(0), VarianteBoton.Fantasma);
             }
             if (S.PrPendiente != null) {
-                var n = Ui.Notificacion(_ahora.Raiz, "Un compañero ha dejado un cambio de código para que lo revises.", Tono.Cyan);
+                var n = Ui.Notificacion(_ahora.Raiz, Solo("Un compañero ha dejado un cambio de código para que lo revises.", "Tienes un cambio tuyo sin revisar: míralo con ojos frescos antes de integrarlo."), Tono.Cyan);
                 Ui.Boton(n, "Revisar", AbrirRevision, VarianteBoton.Fantasma);
             }
             if (S.TareasDeOficina.Count > 0) GuiaView.Avisar(App, "oficina.disponible");
@@ -648,8 +656,10 @@ namespace Nexus.Unity.Pantallas {
             CerrarPanel();   // el reto se abre sobre el dia, no sobre el panel del escritorio
             if (!Runner.EmpezarTarea(tarea.Id)) return;
             Anotar($"{S.HoraActual} · Trabajo: «{tarea.Titulo}».");
+            // El caso de hoy: cada dia otro (otro diagrama, otro backlog, otro plan de pruebas), sin repetir.
+            var caso = S.CasoDeHoy(tarea.Id);
             var pendiente = new PendingMinigame {
-                MinijuegoId = tarea.Minijuego, Archivo = tarea.Archivo, NivelAndamiaje = S.Perfil.NivelAndamiaje
+                MinijuegoId = caso.Minijuego, Archivo = caso.Archivo, NivelAndamiaje = S.Perfil.NivelAndamiaje
             };
             AbrirEscenaDeMinijuego(pendiente, true, resultado => {
                 var cambios = S.ResolverTarea(resultado);
@@ -707,7 +717,7 @@ namespace Nexus.Unity.Pantallas {
             var j = S.Perfil.Jornada;
             _ahora.Etiqueta("Cierre de la jornada");
             _ahora.Titulo($"Son las {S.HoraActual}");
-            _ahora.Parrafo("Irte a casa: descansas, y el equipo también. Quedarte hasta las " + $"{j.HoraLimite:00}:00" +
+            _ahora.Parrafo(Solo("Irte a casa: descansas, y el equipo también.", "Irte a casa: descansas.") + " Quedarte hasta las " + $"{j.HoraLimite:00}:00" +
                            ": hoy avanzas un 25 % más, pero lo pagas en cansancio, salud y deuda técnica, y se acumula.");
             _ahora.Parrafo("Si te quedas, hasta esa hora no llegan avisos: es tiempo libre para recorrer el mapa.");
             var botones = _ahora.Fila();
@@ -970,7 +980,10 @@ namespace Nexus.Unity.Pantallas {
             GuiaView.Avisar(App, "coleccionable");
         }
 
-        private TMP_Text _textoCliente;
+        private TMP_Text _textoCliente, _textoSuministros;
+
+        /// <summary>La frase de siempre o, si se trabaja solo (sin hojas de vida), la contada en primera persona.</summary>
+        private string Solo(string conEquipo, string trabajandoSolo) { return S.TrabajasSolo ? trabajandoSolo : conEquipo; }
 
         /// <summary>
         /// La carpeta del cliente, en un pizarron: quien es y que le duele, los papeles que han ido llegando (cada uno

@@ -4,6 +4,7 @@
     "references": [
         "Nexus.Core",
         "Nexus.Unity",
+        "Cinemachine",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI"

@@ -61,6 +61,16 @@ namespace Nexus.Core.Fase1 {
     public sealed class RecoleccionConfig {
         public int MinutosDisponibles = 120;
         public string Texto;
+        /// <summary>
+        /// El equipo del proyecto son las hojas de vida que se recojan en el recorrido, y nada mas: sin ninguna, el
+        /// jugador trabaja solo. false = el equipo es el del bloque «equipo» del nivel, se recoja lo que se recoja.
+        /// </summary>
+        public bool EquipoDesdeRecoleccion;
+        /// <summary>
+        /// Cuantas personas caben en el equipo de este proyecto (su tamaño). Si se recogen mas hojas de vida, el
+        /// jugador elige quien entra. 0 = sin limite.
+        /// </summary>
+        public int MaxEquipo;
         public List<ZonaDeRecoleccion> Zonas = new List<ZonaDeRecoleccion>();
         public List<Hallazgo> Hallazgos = new List<Hallazgo>();
 
@@ -100,6 +110,10 @@ namespace Nexus.Core.Fase1 {
         public List<string> ColeccionablesYaEnElPerfil = new List<string>();
         /// <summary>Los stocks al empezar, por si el 3D quiere enseñarlos (el dinero en el HUD, por ejemplo).</summary>
         public Dictionary<string, double> EstadoInicial = new Dictionary<string, double>(StringComparer.Ordinal);
+        /// <summary>Lo que se puede recoger en el mundo 3D (objetos-3d.json) y que es cada cosa para el juego.</summary>
+        public List<Objeto3D> Objetos = new List<Objeto3D>();
+        /// <summary>Si el equipo sale de las hojas de vida recogidas (el 3D puede avisarlo al empezar).</summary>
+        public bool EquipoDesdeRecoleccion;
     }
 
     /// <summary>
@@ -111,6 +125,8 @@ namespace Nexus.Core.Fase1 {
         public int MinutosUsados;
         public List<string> ZonasVisitadas = new List<string>();
         public List<string> Hallazgos = new List<string>();
+        /// <summary>Los objetos del mundo 3D que se trajo: id del objeto (objetos-3d.json) -> cuantos.</summary>
+        public Dictionary<string, int> Objetos = new Dictionary<string, int>(StringComparer.Ordinal);
         /// <summary>El jugador salio antes de agotar el tiempo. No cambia nada; queda anotado.</summary>
         public bool AbandonoAntes;
     }
@@ -158,7 +174,31 @@ namespace Nexus.Core.Fase1 {
                 }
             }
             resultado.AbandonoAntes = resultado.MinutosUsados < entrada.MinutosDisponibles && intensidad == IntensidadesDeSimulacion.Rapida;
+            SimularObjetos(entrada, intensidad, probabilidad, resultado);
             return resultado;
+        }
+
+        /// <summary>
+        /// Los objetos del mundo 3D, con su propio azar: tirar de la misma secuencia moveria los hallazgos de todas las
+        /// partidas ya calibradas. Hojas de vida y piezas del diario, una como mucho; suministros, hasta dos de cada.
+        /// </summary>
+        private static void SimularObjetos(EntradaDeRecoleccion entrada, string intensidad, double probabilidad,
+                                           ResultadoDeRecoleccion resultado) {
+            if (entrada.Objetos == null || entrada.Objetos.Count == 0) return;
+            var rng = new DeterministicRng(entrada.Semilla ^ ("objetos:" + intensidad).GetHashCodeEstable());
+            foreach (var o in entrada.Objetos) {
+                if (o == null || string.IsNullOrEmpty(o.Id) || resultado.Objetos.ContainsKey(o.Id)) continue;
+                var cuantos = 0;
+                switch (o.Tipo) {
+                    case TiposDeObjeto3D.Candidato: if (rng.NextDouble() < probabilidad * 0.7) cuantos = 1; break;
+                    case TiposDeObjeto3D.Suministro:
+                        for (var i = 0; i < 2; i++) if (rng.NextDouble() < probabilidad * 0.6) cuantos++;
+                        break;
+                    case TiposDeObjeto3D.Coleccionable:
+                    case TiposDeObjeto3D.Efecto: if (rng.NextDouble() < probabilidad * 0.4) cuantos = 1; break;
+                }
+                if (cuantos > 0) resultado.Objetos[o.Id] = cuantos;
+            }
         }
 
         private static List<T> Rotar<T>(List<T> lista, int desde) {

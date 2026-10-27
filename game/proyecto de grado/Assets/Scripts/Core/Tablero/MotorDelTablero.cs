@@ -146,6 +146,14 @@ namespace Nexus.Core.Tablero {
         /// tarjeta, cuenta su habilidad para ese tipo de trabajo (0,7 flojo ... 1,3 su fuerte), solo en esas tarjetas.
         /// </summary>
         public static double FactorInstantaneo(TableroDelEquipo t) {
+            // Trabajando solo, todo lo que esta en curso lo lleva la unica persona: su habilidad cuenta en todas las
+            // tarjetas, las haya asignado el jugador o el piloto automatico.
+            if (t.Miembros.Count == 1) {
+                var tu = t.Miembros[0];
+                var mias = t.Tarjetas.Where(x => !x.EsBug && x.Empezada && !x.Terminada).ToList();
+                var mediaSolo = mias.Count == 0 ? 1.0 : mias.Average(c => tu.HabilidadPara(c.Tipo));
+                return Math.Max(FactorMinimo, Math.Min(FactorMaximo, mediaSolo * FactorDelWip(t)));
+            }
             var manuales = t.Tarjetas.Where(x => !x.EsBug && x.AsignacionManual && x.Empezada && !x.Terminada).ToList();
             if (manuales.Count == 0) return Math.Max(FactorMinimo, Math.Min(FactorMaximo, FactorDelWip(t)));
             var enCurso = t.Tarjetas.Count(x => !x.EsBug && x.Empezada && !x.Terminada);

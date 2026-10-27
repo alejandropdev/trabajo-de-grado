@@ -190,14 +190,14 @@
       "opciones": [
         {
           "id": "absorber",
-          "texto": "Absorberlo sin decir nada. Se mete y el equipo se las arregla.",
+          "texto": "Absorberlo sin decir nada. Se mete y ya se sacará adelante como se pueda.",
           "ampliaAlcance": true,
           "efectosInmediatos": { "Alcance": 4, "MoralEquipo": -2 },
           "efectosDiferidos": [ { "enDias": 4, "efectos": { "Cansancio": 6, "MoralEquipo": -4 } } ],
           "rubrica": {
             "veredicto": "incorrecta",
             "oa": "OA-DOC-01",
-            "razon": "Un cambio que no se nombra como cambio no se puede negociar: el alcance crece y el plazo no. El requisito era ambiguo, y la ambigüedad la está pagando el equipo."
+            "razon": "Un cambio que no se nombra como cambio no se puede negociar: el alcance crece y el plazo no. El requisito era ambiguo, y la ambigüedad la está pagando quien programa."
           }
         },
         {
@@ -232,7 +232,7 @@
       "fases": ["desarrollo"],
       "severidad": 2,
       "objetivoAprendizaje": "OA-SCRUM-01",
-      "precondiciones": ["diaActual >= 6", "diaActual <= 9"],
+      "precondiciones": ["tamanoEquipo >= 2", "diaActual >= 6", "diaActual <= 9"],
       "pesoBase": 12,
       "enfriamiento": 8,
       "maxOcurrencias": 1,
@@ -274,7 +274,7 @@
       "fases": ["desarrollo", "lanzamiento"],
       "severidad": 3,
       "objetivoAprendizaje": "OA-SCRUM-01",
-      "precondiciones": ["ocurrencias('SOLO-POR-CADENA') > 0"],
+      "precondiciones": ["tamanoEquipo >= 2", "ocurrencias('SOLO-POR-CADENA') > 0"],
       "pesoBase": 10,
       "enfriamiento": 8,
       "maxOcurrencias": 1,
@@ -316,7 +316,7 @@
       "fases": ["desarrollo"],
       "severidad": 2,
       "objetivoAprendizaje": "OA-GIT-01",
-      "precondiciones": ["diaActual >= 4"],
+      "precondiciones": ["tamanoEquipo >= 2", "diaActual >= 4"],
       "pesoBase": 10,
       "enfriamiento": 8,
       "maxOcurrencias": 1,
@@ -380,7 +380,7 @@
         },
         {
           "id": "pipeline-local",
-          "texto": "Montar un pipeline de respaldo en una máquina del equipo, para no parar.",
+          "texto": "Montar un pipeline de respaldo en otra máquina, para no parar.",
           "efectosInmediatos": { "Cansancio": 3 },
           "efectosDiferidos": [ { "enDias": 5, "efectos": { "DeudaTecnica": 5, "Documentacion": -4 } } ],
           "rubrica": {
@@ -400,7 +400,7 @@
       "fases": ["desarrollo"],
       "severidad": 2,
       "objetivoAprendizaje": "OA-TEST-02",
-      "precondiciones": ["diaActual >= 5"],
+      "precondiciones": ["tamanoEquipo >= 2", "diaActual >= 5"],
       "pesoBase": 10,
       "enfriamiento": 8,
       "maxOcurrencias": 1,
@@ -442,7 +442,7 @@
       "fases": ["desarrollo"],
       "severidad": 0,
       "objetivoAprendizaje": "OA-SCRUM-01",
-      "precondiciones": ["diaActual >= 8"],
+      "precondiciones": ["tamanoEquipo >= 2", "diaActual >= 8"],
       "pesoBase": 8,
       "enfriamiento": 8,
       "maxOcurrencias": 1,
@@ -539,7 +539,7 @@
         "canal": "standup",
         "texto": "En la reunión diaria, Mateo: «Tengo la estimación del módulo de turnos. Quiero que alguien la mire antes de comprometernos.»"
       },
-      "precondiciones": [
+      "precondiciones": ["tamanoEquipo >= 2",
         "diaActual >= 4"
       ],
       "opciones": [
@@ -613,7 +613,7 @@
         "canal": "chat",
         "texto": "Camila, en el chat: «Las pruebas del control de acceso están todas en verde. Antes de darlo por probado quiero que las veas conmigo.»"
       },
-      "precondiciones": [
+      "precondiciones": ["tamanoEquipo >= 2",
         "diaActual >= 6"
       ],
       "opciones": [
@@ -658,6 +658,299 @@
           }
         }
       ]
+    },
+
+    {
+      "id": "EV-SOLO-01",
+      "nombre": "Atascado a las seis",
+      "soloNiveles": [
+        "nivel-01"
+      ],
+      "tags": [
+        "solo",
+        "tecnico"
+      ],
+      "fases": [
+        "desarrollo"
+      ],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-DOC-01",
+      "precondiciones": [
+        "tamanoEquipo == 1",
+        "diaActual >= 2"
+      ],
+      "pesoBase": 12,
+      "enfriamiento": 6,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 1,
+        "canal": "log",
+        "texto": "[build] El mismo error por tercera vez esta tarde. No hay nadie en la mesa de al lado a quien preguntarle."
+      },
+      "opciones": [
+        {
+          "id": "foros",
+          "texto": "Buscar el error en la documentación y en los foros, con calma, y apuntar lo que encuentres.",
+          "efectosInmediatos": {
+            "Cansancio": 2,
+            "Documentacion": 2
+          },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-DOC-01",
+            "razon": "Pedir ayuda no exige compañeros: la documentación y la comunidad son el equipo de quien trabaja solo. Y lo que apuntas hoy ya no tendrás que buscarlo mañana."
+          }
+        },
+        {
+          "id": "edificio",
+          "texto": "Pedirle diez minutos a alguien del edificio que sepa del tema.",
+          "efectosInmediatos": {
+            "MoralEquipo": 2,
+            "Dias": 0.1
+          },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-DOC-01",
+            "razon": "Trabajar solo no es trabajar aislado. Diez minutos de una mirada de fuera suelen valer más que tres horas de mirar lo mismo."
+          }
+        },
+        {
+          "id": "noche",
+          "texto": "Quedarse hasta que salga, cueste lo que cueste.",
+          "efectosInmediatos": {
+            "Avance": 2,
+            "Cansancio": 8
+          },
+          "efectosDiferidos": [
+            {
+              "enDias": 3,
+              "efectos": {
+                "DeudaTecnica": 4
+              }
+            }
+          ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-DOC-01",
+            "razon": "Salió, pero pasada cierta hora no se depura: se escribe el siguiente bug. Y lo que entendiste a las once de la noche no quedó escrito en ningún sitio."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-SOLO-02",
+      "nombre": "El héroe solitario",
+      "soloNiveles": [
+        "nivel-01"
+      ],
+      "tags": [
+        "solo",
+        "gestion"
+      ],
+      "fases": [
+        "desarrollo"
+      ],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "precondiciones": [
+        "tamanoEquipo == 1",
+        "diaActual >= 5"
+      ],
+      "pesoBase": 12,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 2,
+        "canal": "correo",
+        "texto": "Facilities pregunta si «el equipo» llegará a la fecha. El equipo eres tú."
+      },
+      "opciones": [
+        {
+          "id": "negociar",
+          "texto": "Contarle al cliente que trabajas solo y negociar qué entra y qué se queda fuera.",
+          "efectosInmediatos": {
+            "SatisfaccionCliente": -2,
+            "Documentacion": 3
+          },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Una persona no rinde como cuatro. Decirlo a tiempo y escribir qué entra convierte un retraso seguro en un plan; callarlo solo lo aplaza."
+          }
+        },
+        {
+          "id": "fines-de-semana",
+          "texto": "Trabajar también los fines de semana para llegar como sea.",
+          "efectosInmediatos": {
+            "Avance": 4,
+            "Cansancio": 10,
+            "SaludJugador": -6
+          },
+          "efectosDiferidos": [
+            {
+              "enDias": 4,
+              "efectos": {
+                "MoralEquipo": -6,
+                "DeudaTecnica": 3
+              }
+            }
+          ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "El ritmo sostenible no es un lujo de los equipos grandes. Lo que se gana en una semana de héroe se paga después, con intereses, y no hay nadie que te releve."
+          }
+        },
+        {
+          "id": "avisar",
+          "texto": "Seguir al mismo ritmo y dejar el riesgo por escrito.",
+          "efectosInmediatos": {
+            "SatisfaccionCliente": -1,
+            "Documentacion": 1
+          },
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Al menos el riesgo está a la vista. Pero avisar sin proponer nada deja al cliente con el problema, y la fecha sigue siendo la misma."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-SOLO-03",
+      "nombre": "Nadie revisa tu código",
+      "soloNiveles": [
+        "nivel-01"
+      ],
+      "tags": [
+        "solo",
+        "calidad"
+      ],
+      "fases": [
+        "desarrollo"
+      ],
+      "severidad": 2,
+      "objetivoAprendizaje": "OA-TEST-01",
+      "precondiciones": [
+        "tamanoEquipo == 1",
+        "diaActual >= 4"
+      ],
+      "pesoBase": 10,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 1,
+        "canal": "log",
+        "texto": "[merge] 14 cambios integrados esta semana. Revisados por otra persona: 0."
+      },
+      "opciones": [
+        {
+          "id": "pruebas",
+          "texto": "Escribir pruebas automáticas para lo crítico: que las revise la máquina.",
+          "efectosInmediatos": {
+            "Cobertura": 6,
+            "Cansancio": 3
+          },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-TEST-01",
+            "razon": "Sin nadie que revise, las pruebas automáticas son la segunda mirada. Cuestan hoy y ahorran cada día que siguen pasando."
+          }
+        },
+        {
+          "id": "reposar",
+          "texto": "Dejar cada cambio reposar un día y releerlo antes de integrarlo.",
+          "efectosInmediatos": {
+            "DeudaTecnica": -2,
+            "Dias": 0.2
+          },
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-TEST-01",
+            "razon": "Releer con ojos frescos caza bastantes errores. Pero tus ojos siguen siendo los mismos que lo escribieron: lo que no viste ayer tampoco lo verás mañana."
+          }
+        },
+        {
+          "id": "confiar",
+          "texto": "Confiar en que funciona: lo escribiste tú.",
+          "efectosInmediatos": {
+            "DeudaTecnica": 5
+          },
+          "efectosDiferidos": [
+            {
+              "enDias": 4,
+              "efectos": {
+                "SatisfaccionCliente": -4
+              }
+            }
+          ],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-TEST-01",
+            "razon": "Que lo escribieras tú es justamente el problema: nadie encuentra sus propios supuestos. Lo que no se prueba, lo prueba el cliente."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "EV-SOLO-04",
+      "nombre": "El silencio de la oficina",
+      "soloNiveles": [
+        "nivel-01"
+      ],
+      "tags": [
+        "solo",
+        "buenas"
+      ],
+      "fases": [
+        "desarrollo"
+      ],
+      "severidad": 0,
+      "objetivoAprendizaje": "OA-SCRUM-01",
+      "precondiciones": [
+        "tamanoEquipo == 1",
+        "diaActual >= 3"
+      ],
+      "pesoBase": 8,
+      "enfriamiento": 8,
+      "maxOcurrencias": 1,
+      "telegrafiado": {
+        "diasAntes": 1,
+        "canal": "chat",
+        "texto": "Llevas tres días sin hablar con nadie más que con el cliente. En la cafetería se oyen risas."
+      },
+      "opciones": [
+        {
+          "id": "comer-con-gente",
+          "texto": "Comer con la gente del edificio, aunque no sean de tu equipo.",
+          "efectosInmediatos": {
+            "MoralEquipo": 6,
+            "Cansancio": -3
+          },
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Trabajar solo pesa más de lo que parece. Una hora con otra gente no es tiempo perdido: es lo que te deja seguir el resto de la semana."
+          }
+        },
+        {
+          "id": "seguir",
+          "texto": "Comer en tu mesa y seguir con lo tuyo.",
+          "efectosInmediatos": {
+            "Avance": 1,
+            "MoralEquipo": -4
+          },
+          "efectosDiferidos": [{"enDias": 3, "efectos": {"Cansancio": 3, "MoralEquipo": -2}}],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Hoy se avanza un poco más. Pero el ánimo también es un recurso del proyecto, y solo lo repones tú."
+          }
+        }
+      ]
     }
-  ]
+]
 }

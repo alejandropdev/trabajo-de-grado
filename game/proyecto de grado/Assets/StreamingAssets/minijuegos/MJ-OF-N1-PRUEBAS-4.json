@@ -1,0 +1,99 @@
+{
+  "id": "MJ-OF-N1-PRUEBAS-4",
+  "verbo": "V2_REPARTIR",
+  "lienzo": "depositos",
+  "temaPrincipal": "PTP",
+  "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "turnos",
+  "enElProyecto": "Es el plan de pruebas de la asignación de turnos de mantenimiento.",
+  "presentacion": {
+    "titulo": "Práctica: probar los turnos de mantenimiento",
+    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 18 horas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. La tarjeta dice también cuántos errores suele haber: planifica para el número más alto. Ganas si al cliente le llega como mucho 1 error.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 120
+  },
+  "repartir": {
+    "presupuesto": 18,
+    "paso": 2,
+    "unidad": "horas",
+    "toleranciaDeEscapes": 1,
+    "depositos": [
+      {
+        "id": "unitarias",
+        "nombre": "Unitarias",
+        "costePorDefecto": 2,
+        "defectosOcultos": 4,
+        "estimadoMin": 4,
+        "estimadoMax": 5,
+        "descripcion": "Prueban las reglas de reparto de turnos: festivos, bajas, cambios.",
+        "pista": "Mucha lógica de calendario."
+      },
+      {
+        "id": "integracion",
+        "nombre": "Integración",
+        "costePorDefecto": 4,
+        "defectosOcultos": 1,
+        "estimadoMin": 1,
+        "estimadoMax": 2,
+        "descripcion": "Prueban que turnos y reservas se entiendan.",
+        "pista": "Dos módulos que se hablan."
+      },
+      {
+        "id": "e2e",
+        "nombre": "De extremo a extremo",
+        "costePorDefecto": 6,
+        "defectosOcultos": 1,
+        "estimadoMin": 0,
+        "estimadoMax": 1,
+        "descripcion": "Un técnico pide turno y el ascensor queda bloqueado ese día.",
+        "pista": "Si lo demás está probado, aquí queda poco."
+      }
+    ]
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-TEST-01",
+        "razon": "Las horas fueron donde había más errores y más baratos de atrapar. Renunciar a algo caro y con pocos errores fue una decisión, no un olvido."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-TEST-01",
+        "razon": "Se escaparon errores de los tipos donde pusiste pocas horas. Primero cubre los tipos baratos con muchos errores; lo caro, al final y solo si sobra."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "Pusiste más horas de las que servían en un tipo y dejaste otro, con errores, en cero. Esas horas de más no atraparon nada."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "No repartiste ninguna hora: todos los errores le llegan al cliente."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Nunca hay horas para probarlo todo. Planificar las pruebas es elegir qué se prueba primero y qué se deja fuera."
+  }
+}

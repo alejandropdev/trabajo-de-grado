@@ -566,6 +566,8 @@
     ],
     "recoleccion": {
       "minutosDisponibles": 45,
+      "equipoDesdeRecoleccion": true,
+      "maxEquipo": 2,
       "texto": "Antes de decidir nada, recorre el edificio donde se va a usar lo que construyas. Mira, pregunta y recoge lo que te sirva.",
       "zonas": [
         {
@@ -636,6 +638,7 @@
         "mejora": "Documentación y deuda técnica",
         "minijuego": "MJ-OF-N0-DIAGRAMA",
         "archivo": "minijuegos/MJ-OF-N0-DIAGRAMA.json",
+        "variantes": [{"minijuego": "MJ-OF-N0-DIAGRAMA-2", "archivo": "minijuegos/MJ-OF-N0-DIAGRAMA-2.json"}, {"minijuego": "MJ-OF-N0-DIAGRAMA-3", "archivo": "minijuegos/MJ-OF-N0-DIAGRAMA-3.json"}, {"minijuego": "MJ-OF-N0-DIAGRAMA-4", "archivo": "minijuegos/MJ-OF-N0-DIAGRAMA-4.json"}, {"minijuego": "MJ-OF-N0-DIAGRAMA-5", "archivo": "minijuegos/MJ-OF-N0-DIAGRAMA-5.json"}],
         "minutos": 45,
         "vecesPorDia": 1,
         "efectos": {
@@ -659,6 +662,7 @@
         "mejora": "Avance",
         "minijuego": "MJ-OF-N0-BACKLOG",
         "archivo": "minijuegos/MJ-OF-N0-BACKLOG.json",
+        "variantes": [{"minijuego": "MJ-OF-N0-BACKLOG-2", "archivo": "minijuegos/MJ-OF-N0-BACKLOG-2.json"}, {"minijuego": "MJ-OF-N0-BACKLOG-3", "archivo": "minijuegos/MJ-OF-N0-BACKLOG-3.json"}, {"minijuego": "MJ-OF-N0-BACKLOG-4", "archivo": "minijuegos/MJ-OF-N0-BACKLOG-4.json"}, {"minijuego": "MJ-OF-N0-BACKLOG-5", "archivo": "minijuegos/MJ-OF-N0-BACKLOG-5.json"}],
         "minutos": 45,
         "vecesPorDia": 1,
         "efectos": {
@@ -682,6 +686,7 @@
         "mejora": "Cobertura de pruebas",
         "minijuego": "MJ-OF-N0-PRUEBAS",
         "archivo": "minijuegos/MJ-OF-N0-PRUEBAS.json",
+        "variantes": [{"minijuego": "MJ-OF-N0-PRUEBAS-2", "archivo": "minijuegos/MJ-OF-N0-PRUEBAS-2.json"}, {"minijuego": "MJ-OF-N0-PRUEBAS-3", "archivo": "minijuegos/MJ-OF-N0-PRUEBAS-3.json"}, {"minijuego": "MJ-OF-N0-PRUEBAS-4", "archivo": "minijuegos/MJ-OF-N0-PRUEBAS-4.json"}, {"minijuego": "MJ-OF-N0-PRUEBAS-5", "archivo": "minijuegos/MJ-OF-N0-PRUEBAS-5.json"}],
         "minutos": 45,
         "vecesPorDia": 1,
         "efectos": {

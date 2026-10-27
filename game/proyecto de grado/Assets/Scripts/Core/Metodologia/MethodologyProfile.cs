@@ -263,6 +263,12 @@ namespace Nexus.Core.Metodologia {
         /// <summary>Para quien no la conoce: que es esta ceremonia y para que sirve, en una frase.</summary>
         public string ParaQueSirve;
 
+        /// <summary>
+        /// Como se llama y se cuenta cuando el jugador trabaja SOLO (no recogio ninguna hoja de vida): una reunion
+        /// diaria sin nadie es un repaso del plan, una retro es una retro personal. null = igual que en equipo.
+        /// </summary>
+        public CeremoniaEnSolitario Solo;
+
         public Ceremonia Clone() {
             var c = (Ceremonia)MemberwiseClone();
             if (Opciones != null) {
@@ -276,6 +282,20 @@ namespace Nexus.Core.Metodologia {
             }
             return c;
         }
+    }
+
+    /// <summary>La version en solitario de una ceremonia: lo que cambia es como se cuenta, no lo que provoca.</summary>
+    public sealed class CeremoniaEnSolitario {
+        public string Nombre;
+        public string Texto;
+        public string ParaQueSirve;
+        /// <summary>id de opcion -> su texto y su acta cuando no hay equipo. Las que no esten se cuentan igual.</summary>
+        public Dictionary<string, OpcionEnSolitario> Opciones = new Dictionary<string, OpcionEnSolitario>(StringComparer.Ordinal);
+    }
+
+    public sealed class OpcionEnSolitario {
+        public string Texto;
+        public string Acta;
     }
 
     /// <summary>
@@ -298,6 +318,9 @@ namespace Nexus.Core.Metodologia {
 
         /// <summary>Lo que se le explica al jugador. Sin esto la accion es magia.</summary>
         public string Explicacion;
+
+        /// <summary>Solo tiene sentido con compañeros (programar en pareja): no se ofrece a quien trabaja solo.</summary>
+        public bool SoloEnEquipo;
 
         public AccionRetro Clone() { return (AccionRetro)MemberwiseClone(); }
     }

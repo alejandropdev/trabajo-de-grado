@@ -1,0 +1,206 @@
+{
+  "id": "MJ-OF-N0-DIAGRAMA-2",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "recepcion",
+  "enElProyecto": "Es el diagrama de la recepción: cómo la recepcionista encuentra al anfitrión de cada visita y la registra.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama de la recepción",
+    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza y cada flecha dice quién le habla a quién. Busca lo que no está bien (hay uno), púlsalo y elige a la derecha qué problema tiene. Es práctica: si no te sale, inténtalo otra vez.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "pantalla",
+        "capa": "interfaz",
+        "texto": "Pantalla de la recepcionista",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Donde se busca al anfitrión y se registra la visita."
+      },
+      {
+        "id": "buscador",
+        "capa": "logica",
+        "texto": "Buscador de anfitriones",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Encuentra a la persona a la que viene a ver el visitante."
+      },
+      {
+        "id": "directorio",
+        "capa": "externo",
+        "texto": "Directorio de empleados",
+        "tipo": "externo",
+        "fila": 1,
+        "columna": 2,
+        "detalle": "El directorio de Nexus: lo mantiene Recursos Humanos, no nosotros."
+      },
+      {
+        "id": "registro",
+        "capa": "logica",
+        "texto": "Registro de visitas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Apunta cada visita que llega."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "Guarda cada visita."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "c1",
+        "tipo": "pide",
+        "desde": "pantalla",
+        "hasta": "buscador",
+        "texto": "busca al anfitrión"
+      },
+      {
+        "id": "c2",
+        "tipo": "lee",
+        "desde": "buscador",
+        "hasta": "directorio",
+        "texto": "consulta el directorio"
+      },
+      {
+        "id": "c3",
+        "tipo": "pide",
+        "desde": "pantalla",
+        "hasta": "registro",
+        "texto": "registra la visita"
+      },
+      {
+        "id": "c4",
+        "tipo": "escribe",
+        "desde": "registro",
+        "hasta": "bd",
+        "texto": "guarda la visita"
+      },
+      {
+        "id": "c5",
+        "tipo": "escribe",
+        "desde": "directorio",
+        "hasta": "bd",
+        "texto": "copia los empleados en nuestras tablas"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "c5"
+      ],
+      "defecto": "acoplamiento_indebido",
+      "explicacion": "El directorio de Recursos Humanos escribe directamente en nuestras tablas. Si cambiamos una tabla, rompemos su copia; si ellos cambian algo, rompen nuestras visitas.",
+      "pista": "Mira las flechas que llegan a nuestra base de datos. ¿Debería escribir en ella un sistema que no es nuestro?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "c2"
+      ],
+      "razonNoEsDefecto": "Consultar el directorio para encontrar al anfitrión es justo para lo que existe: leer no es meterse en sus tripas."
+    }
+  ],
+  "paletaEtiquetas": [
+    "acoplamiento_indebido",
+    "requisito_incompleto",
+    "elemento_sin_especificar"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "requisito_incompleto"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "requisito_incompleto",
+        "elemento_sin_especificar"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "elemento_sin_especificar"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Un sistema ajeno que escribe en tus tablas queda pegado a ellas: cualquier cambio de un lado rompe el otro."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Cada sistema guarda lo suyo y los demás le preguntan por su puerta. Copiar datos a escondidas en las tablas de otro es pegarlos para siempre."
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "id": "MJ-OF-N0-BACKLOG-4",
+  "verbo": "V3_ORDENAR",
+  "lienzo": "backlog",
+  "temaPrincipal": "Scrum",
+  "objetivoAprendizaje": "OA-SCRUM-01",
+  "modulo": "dentro",
+  "enElProyecto": "Es el backlog de las salidas de las visitas y de la lista «Quién sigue dentro».",
+  "presentacion": {
+    "titulo": "Práctica: ¿qué hacemos primero con las salidas?",
+    "comoSeJuega": "Ordena el backlog: arrastra las tarjetas (o usa ▲▼), lo más valioso arriba. Solo entra lo que cabe sobre la línea, que es el tiempo que hay. Algunas tarjetas necesitan otra antes. Al final, contesta a Marisol y mira qué cambia en el tablero. Es práctica: si no te sale, puedes intentarlo otra vez.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 120
+  },
+  "ordenar": {
+    "capacidad": 8,
+    "umbralDeValor": 0.75,
+    "peticion": "Marisol pregunta si se puede ver un mapa del edificio con dónde está cada visita.",
+    "tarjetaPedida": "t4",
+    "tarjetas": [
+      {
+        "id": "t1",
+        "titulo": "Marcar la salida de una visita",
+        "valor": 7,
+        "esfuerzo": 2
+      },
+      {
+        "id": "t2",
+        "titulo": "Lista de quién sigue dentro",
+        "valor": 6,
+        "esfuerzo": 3,
+        "dependeDe": [
+          "t1"
+        ]
+      },
+      {
+        "id": "t3",
+        "titulo": "Aviso al cerrar si queda alguien",
+        "valor": 5,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t2"
+        ]
+      },
+      {
+        "id": "t4",
+        "titulo": "Mapa del edificio con las visitas",
+        "valor": 2,
+        "esfuerzo": 4
+      },
+      {
+        "id": "t5",
+        "titulo": "Historial de salidas por día",
+        "valor": 2,
+        "esfuerzo": 2,
+        "dependeDe": [
+          "t1"
+        ]
+      }
+    ],
+    "respuestas": {
+      "obedecer": {
+        "texto": "Le dices que sí, que cabe todo.",
+        "replica": "¡Perfecto! Entonces ponlo lo primero, que es lo que más se va a notar.",
+        "efectoEnBacklog": "forzar-arriba",
+        "consecuencia": {
+          "efectosInmediatos": {
+            "Cansancio": 3
+          },
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "incorrecta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Decir que cabe lo que no cabe no lo hace caber: «Mapa del edificio con las visitas» subió arriba y empujó fuera algo que valía mucho más."
+          }
+        }
+      },
+      "rechazar": {
+        "texto": "Le dices que no, sin más.",
+        "replica": "Bueno… no entiendo bien por qué, pero vale.",
+        "efectoEnBacklog": "ninguno",
+        "consecuencia": {
+          "efectosInmediatos": {
+            "SatisfaccionCliente": -2
+          },
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "aceptable",
+            "oa": "OA-SCRUM-01",
+            "razon": "Proteges el tiempo, pero sin explicar por qué. Un «no» sin razones cansa la confianza."
+          }
+        }
+      },
+      "negociar": {
+        "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
+        "replica": "Visto así, mejor dejamos «Mapa del edificio con las visitas» para más adelante. Gracias por explicármelo.",
+        "efectoEnBacklog": "ninguno",
+        "consecuencia": {
+          "efectosInmediatos": {
+            "SatisfaccionCliente": 2
+          },
+          "efectosDiferidos": [],
+          "hallazgos": [],
+          "rubrica": {
+            "veredicto": "correcta",
+            "oa": "OA-SCRUM-01",
+            "razon": "Enseñar lo que cuesta y dejar elegir es negociar: la decisión de dejarlo fuera la tomó quien lo pedía."
+          }
+        }
+      }
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Sin marcar la salida no hay lista, y sin lista no hay aviso al cerrar: el orden lo deciden también las dependencias."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-SCRUM-01",
+        "razon": "Entró poco de lo que más valía, o la respuesta al cliente empujó fuera algo importante. Mira el «valor»: lo que más vale va arriba."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir. Primero los cimientos, luego lo de encima."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "No se ordenó nada."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Las dependencias también ordenan: lo que necesitan las demás va antes, aunque luzca menos."
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "id": "MJ-OF-N0-DIAGRAMA-3",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "aviso",
+  "enElProyecto": "Es el diagrama del aviso: cómo se entera el anfitrión de que su visita ha llegado a la recepción.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama del aviso al anfitrión",
+    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza y cada flecha dice quién le habla a quién. Busca lo que no está bien (hay uno), púlsalo y elige a la derecha qué problema tiene. Es práctica: si no te sale, inténtalo otra vez.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "formulario",
+        "capa": "interfaz",
+        "texto": "Formulario de visita",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "La recepcionista escribe los datos del visitante."
+      },
+      {
+        "id": "registro",
+        "capa": "logica",
+        "texto": "Registro de visitas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Apunta cada visita que llega."
+      },
+      {
+        "id": "avisador",
+        "capa": "logica",
+        "texto": "Avisador al anfitrión",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 2,
+        "detalle": ""
+      },
+      {
+        "id": "correo",
+        "capa": "externo",
+        "texto": "Servidor de correo",
+        "tipo": "externo",
+        "fila": 0,
+        "columna": 2,
+        "detalle": "El correo de Nexus."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "Guarda las visitas y el correo de cada empleado."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "c1",
+        "tipo": "pide",
+        "desde": "formulario",
+        "hasta": "registro",
+        "texto": "datos de la visita"
+      },
+      {
+        "id": "c2",
+        "tipo": "escribe",
+        "desde": "registro",
+        "hasta": "bd",
+        "texto": "guarda la visita"
+      },
+      {
+        "id": "c3",
+        "tipo": "pide",
+        "desde": "registro",
+        "hasta": "avisador",
+        "texto": "avisa de la llegada"
+      },
+      {
+        "id": "c4",
+        "tipo": "pide",
+        "desde": "avisador",
+        "hasta": "correo",
+        "texto": "envía el aviso"
+      },
+      {
+        "id": "c5",
+        "tipo": "lee",
+        "desde": "avisador",
+        "hasta": "bd",
+        "texto": "busca el correo del anfitrión"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "avisador"
+      ],
+      "defecto": "elemento_sin_especificar",
+      "explicacion": "El avisador no dice cómo avisa, ni qué pasa si el anfitrión no contesta. Una pieza sin especificar la programa cada uno a su manera.",
+      "pista": "Pulsa cada caja y lee qué hace. ¿Hay alguna de la que no sabrías decir qué hace exactamente?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "c5"
+      ],
+      "razonNoEsDefecto": "Que el avisador busque el correo del anfitrión en la base de datos es lo esperado: ahí se guarda."
+    }
+  ],
+  "paletaEtiquetas": [
+    "elemento_sin_especificar",
+    "acoplamiento_indebido",
+    "requisito_ambiguo"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "elemento_sin_especificar",
+        "acoplamiento_indebido"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "elemento_sin_especificar",
+        "acoplamiento_indebido",
+        "requisito_ambiguo"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "requisito_ambiguo"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Una pieza de la que nadie escribió qué hace es una pieza que cada uno imaginará distinta."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Antes de programar una pieza hay que poder decir qué hace, con qué y qué pasa cuando falla."
+  }
+}
