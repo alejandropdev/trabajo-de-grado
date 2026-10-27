@@ -28,6 +28,16 @@ namespace Mundo3D.Coleccionables {
                 feedback = GetComponent<CollectibleFeedback>();
         }
 
+        private void Start() {
+            ApplyGlow();
+        }
+
+        /// <summary>La luz del objeto toma el color y el ritmo de su categoría (hoja de vida, ayuda, tarjeta…).</summary>
+        private void ApplyGlow() {
+            if (feedback != null && itemDefinition != null)
+                feedback.ApplyCategory(itemDefinition.Category);
+        }
+
         /// <summary>
         /// Permite al generador asignar la definición
         /// correspondiente a esta instancia.
@@ -45,6 +55,7 @@ namespace Mundo3D.Coleccionables {
             }
 
             itemDefinition = definition;
+            ApplyGlow();
         }
 
         private void OnTriggerEnter(Collider other) {

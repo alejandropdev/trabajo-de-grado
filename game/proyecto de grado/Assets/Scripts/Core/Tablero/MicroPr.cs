@@ -15,6 +15,8 @@ namespace Nexus.Core.Tablero {
         public bool TieneDefecto;
         /// <summary>Lo que habia que ver (o por que estaba bien). Se enseña despues de decidir.</summary>
         public string Explicacion;
+        /// <summary>En que niveles sale (es codigo de ese proyecto: visitas, reservas, accesos…). Vacio = en todos.</summary>
+        public List<string> Niveles = new List<string>();
     }
 
     /// <summary>

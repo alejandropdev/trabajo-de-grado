@@ -1,0 +1,219 @@
+{
+  "id": "MJ-OF-N1-DIAGRAMA-3",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "acceso",
+  "enElProyecto": "Es el diagrama del control de acceso a los patios N1 y N2 con tarjeta.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama del acceso a los patios",
+    "comoSeJuega": "El diagrama de el acceso a los patios. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "lectorTarjeta",
+        "capa": "externo",
+        "texto": "Lector de tarjetas del patio",
+        "tipo": "externo",
+        "fila": 0,
+        "columna": 0,
+        "detalle": "Lee la tarjeta del conductor."
+      },
+      {
+        "id": "acceso",
+        "capa": "logica",
+        "texto": "Control de acceso",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": "Decide si se abre la puerta del patio."
+      },
+      {
+        "id": "permisos",
+        "capa": "logica",
+        "texto": "Permisos por patio",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 1,
+        "detalle": "Deja pasar a «quien tenga permiso»."
+      },
+      {
+        "id": "guardia",
+        "capa": "interfaz",
+        "texto": "Panel del guardia",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 2,
+        "detalle": "El guardia ve quién entra a cada patio."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 1,
+        "detalle": "Tarjetas, permisos y registro de entradas."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "a1",
+        "tipo": "pide",
+        "desde": "lectorTarjeta",
+        "hasta": "acceso",
+        "texto": "lee la tarjeta"
+      },
+      {
+        "id": "a2",
+        "tipo": "pide",
+        "desde": "acceso",
+        "hasta": "permisos",
+        "texto": "¿puede entrar a este patio?"
+      },
+      {
+        "id": "a3",
+        "tipo": "lee",
+        "desde": "permisos",
+        "hasta": "bd",
+        "texto": "lee los permisos"
+      },
+      {
+        "id": "a4",
+        "tipo": "pide",
+        "desde": "acceso",
+        "hasta": "guardia",
+        "texto": "avisa de cada entrada"
+      },
+      {
+        "id": "a5",
+        "tipo": "escribe",
+        "desde": "guardia",
+        "hasta": "bd",
+        "texto": "da permisos nuevos, sin dejar registro"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "a5"
+      ],
+      "defecto": "falla_de_seguridad",
+      "explicacion": "Desde el panel del guardia se pueden dar permisos sin que quede registrado quién ni cuándo. Nadie podrá saber después por qué entró alguien.",
+      "pista": "Mira quién puede cambiar los permisos. ¿Queda rastro de cada cambio?"
+    },
+    {
+      "id": "Z2",
+      "tipo": "commit",
+      "commits": [
+        "permisos"
+      ],
+      "defecto": "requisito_ambiguo",
+      "explicacion": "«Quien tenga permiso» no dice quién da los permisos ni cuánto duran. Un requisito así lo interpreta cada uno distinto.",
+      "pista": "Lee lo que dice cada pieza. ¿Hay alguna regla que se pueda entender de dos maneras?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "a4"
+      ],
+      "razonNoEsDefecto": "Que el guardia vea cada entrada es justo lo que pidió Facilities: así vigila los patios."
+    }
+  ],
+  "paletaEtiquetas": [
+    "falla_de_seguridad",
+    "requisito_ambiguo",
+    "acoplamiento_indebido",
+    "dependencia_circular"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "falla_de_seguridad",
+        "requisito_ambiguo",
+        "acoplamiento_indebido"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "falla_de_seguridad",
+        "requisito_ambiguo",
+        "acoplamiento_indebido",
+        "dependencia_circular"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "dependencia_circular"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Un permiso que se da sin dejar rastro es un permiso que nadie puede auditar."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Quién puede entrar es una regla de negocio: tiene que estar escrita sin ambigüedad y cada cambio tiene que dejar huella."
+  }
+}

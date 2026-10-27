@@ -23,12 +23,15 @@ namespace Nexus.Core.Servicios {
         /// <summary>Cuanto se va el proyecto del plan: (esperado − avance) / esperado.</summary>
         public const string RetrasoRelativo = "retrasoRelativo";
 
+        /// <summary>Cuantas personas hay en el equipo del proyecto. 1 = trabajas solo.</summary>
+        public const string TamanoEquipo = "tamanoEquipo";
+
         /// <summary>Las dos funciones que una precondicion puede llamar.</summary>
         public const string FuncionDiasDesde = "diasDesde";
         public const string FuncionOcurrencias = "ocurrencias";
 
         private static readonly string[] _nombres = {
-            DiasTotales, VolatilidadReal, RiesgoLatente, RetrasoRelativo
+            DiasTotales, VolatilidadReal, RiesgoLatente, RetrasoRelativo, TamanoEquipo
         };
 
         private static readonly string[] _funciones = { FuncionDiasDesde, FuncionOcurrencias };

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Mundo3D.UI {
@@ -8,6 +9,14 @@ namespace Mundo3D.UI {
         [Header("Botón de inventario del HUD")]
         [SerializeField] private GameObject inventoryButton;
 
+        /// <summary>El inventario se abrió: quien maneja el recorrido para el reloj y el mundo.</summary>
+        public event Action Opened;
+
+        /// <summary>El inventario se cerró.</summary>
+        public event Action Closed;
+
+        public bool IsOpen => inventoryPanel != null && inventoryPanel.activeSelf;
+
         public void OpenInventory() {
             if (inventoryPanel == null) {
                 Debug.LogWarning(
@@ -17,11 +26,16 @@ namespace Mundo3D.UI {
                 return;
             }
 
+            if (inventoryPanel.activeSelf)
+                return;
+
             inventoryPanel.SetActive(true);
 
             if (inventoryButton != null) {
                 inventoryButton.SetActive(false);
             }
+
+            Opened?.Invoke();
         }
 
         public void CloseInventory() {
@@ -33,11 +47,21 @@ namespace Mundo3D.UI {
                 return;
             }
 
+            if (!inventoryPanel.activeSelf)
+                return;
+
             inventoryPanel.SetActive(false);
 
             if (inventoryButton != null) {
                 inventoryButton.SetActive(true);
             }
+
+            Closed?.Invoke();
+        }
+
+        public void ToggleInventory() {
+            if (IsOpen) CloseInventory();
+            else OpenInventory();
         }
     }
 }

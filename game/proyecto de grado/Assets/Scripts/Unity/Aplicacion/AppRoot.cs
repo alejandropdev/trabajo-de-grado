@@ -368,15 +368,16 @@ namespace Nexus.Unity.Aplicacion {
             foreach (var m in Catalogo.Minijuegos)
                 if (m.Id == id) return m.Verbo;
             foreach (var nivel in Catalogo.Niveles.Values)
-                foreach (var tarea in nivel.Oficina.Tareas) {
-                    if (tarea.Minijuego != id) continue;
-                    try {
-                        return CatalogoMinijuegos.Parsear(new CatalogoDeArchivos(RutasDeGuardado.Contenido).LeerCatalogo(tarea.Archivo)).Verbo;
-                    } catch (Exception e) {
-                        Debug.LogException(e);
-                        return null;
+                foreach (var tarea in nivel.Oficina.Tareas)
+                    foreach (var caso in tarea.Casos()) {
+                        if (caso.Minijuego != id) continue;
+                        try {
+                            return CatalogoMinijuegos.Parsear(new CatalogoDeArchivos(RutasDeGuardado.Contenido).LeerCatalogo(caso.Archivo)).Verbo;
+                        } catch (Exception e) {
+                            Debug.LogException(e);
+                            return null;
+                        }
                     }
-                }
             return null;
         }
 

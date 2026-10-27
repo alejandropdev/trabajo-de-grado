@@ -47,6 +47,9 @@ namespace Nexus.Core.Datos {
         /// <summary>Con quien se habla en la Fase 2 y que se dice. Vacio = nadie habla.</summary>
         public Nexus.Core.Relaciones.CatalogoDeRelaciones Relaciones = new Nexus.Core.Relaciones.CatalogoDeRelaciones();
 
+        /// <summary>Que es para el juego cada objeto del mundo 3D (hojas de vida, suministros…). Vacio = no hay 3D.</summary>
+        public Nexus.Core.Fase1.CatalogoDeObjetos3D Objetos3D = new Nexus.Core.Fase1.CatalogoDeObjetos3D();
+
         public override string ToString() {
             return $"{Eventos.Count} eventos, {Niveles.Count} niveles, {Metodologias.Count} metodologias, " +
                    $"{Minijuegos.Count} minijuegos, {Beats.Count} beats, {Flags.Count} flags, " +
@@ -87,6 +90,7 @@ namespace Nexus.Core.Datos {
         public const string ArchivoGlosario = "narrativa/glosario.json";
         public const string ArchivoConversaciones = "narrativa/conversaciones.json";
         public const string CarpetaCursos = "narrativa/cursos";
+        public const string ArchivoObjetos3D = "objetos-3d.json";
 
         public static JsonSerializerSettings Settings { get { return JsonDeGuardado.Settings; } }
 
@@ -155,6 +159,11 @@ namespace Nexus.Core.Datos {
         private sealed class ArchivoDeColeccionables {
             public int Version { get; set; }
             public List<Coleccionable> Coleccionables { get; set; }
+        }
+
+        private sealed class ArchivoDeObjetos3D {
+            public int Version { get; set; }
+            public List<Nexus.Core.Fase1.Objeto3D> Objetos { get; set; }
         }
 
         // ------------------------------------------------------------------ uno a uno
@@ -336,6 +345,9 @@ namespace Nexus.Core.Datos {
                         if (pr == null || string.IsNullOrEmpty(pr.Id) || !ids.Add(pr.Id)) errores.Add(ArchivoMicroPrs + ": hay un cambio sin id o repetido.");
                         else if (pr.Lineas == null || pr.Lineas.Count == 0) errores.Add($"{ArchivoMicroPrs}: '{pr.Id}' no tiene lineas que revisar.");
                         else if (string.IsNullOrEmpty(pr.Explicacion)) errores.Add($"{ArchivoMicroPrs}: '{pr.Id}' no explica nada. Sin explicacion no hay leccion.");
+                        else if (pr.Niveles != null)
+                            foreach (var nivel in pr.Niveles)
+                                if (!catalogo.Niveles.ContainsKey(nivel ?? "")) errores.Add($"{ArchivoMicroPrs}: '{pr.Id}' es del nivel '{nivel}', que no existe.");
                     }
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
@@ -410,9 +422,71 @@ namespace Nexus.Core.Datos {
                 }
             }
 
+            if (fuente.Existe(ArchivoObjetos3D)) {
+                try {
+                    var archivo = Parsear<ArchivoDeObjetos3D>(fuente.LeerCatalogo(ArchivoObjetos3D), ArchivoObjetos3D);
+                    catalogo.Objetos3D = new Nexus.Core.Fase1.CatalogoDeObjetos3D {
+                        Objetos = archivo.Objetos ?? new List<Nexus.Core.Fase1.Objeto3D>()
+                    };
+                    errores.AddRange(ValidarObjetos3D(catalogo));
+                } catch (SchemaException ex) {
+                    errores.Add(ex.Message);
+                }
+            }
+
             errores.AddRange(SchemaValidator.ValidarCatalogo(catalogo, fuente));
             Exigir("El catalogo", errores);
             return catalogo;
+        }
+
+        /// <summary>
+        /// Lo que romperia la partida si pasara: un objeto sin id o repetido, de un tipo que no existe, una hoja de vida
+        /// sin persona, un suministro sin reglas, un efecto sobre algo que no es un stock, un coleccionable que no esta.
+        /// </summary>
+        private static List<string> ValidarObjetos3D(Catalogo c) {
+            var e = new List<string>();
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            var miembros = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var o in c.Objetos3D.Objetos) {
+                if (o == null || string.IsNullOrEmpty(o.Id) || !ids.Add(o.Id)) { e.Add(ArchivoObjetos3D + ": hay un objeto sin id o repetido."); continue; }
+                var donde = ArchivoObjetos3D + "/" + o.Id;
+                if (!Nexus.Core.Fase1.TiposDeObjeto3D.EsValido(o.Tipo))
+                    e.Add($"{donde}: el tipo '{o.Tipo}' no existe. Validos: {string.Join(", ", new List<string>(Nexus.Core.Fase1.TiposDeObjeto3D.Todos).ToArray())}.");
+                if (string.IsNullOrEmpty(o.Nombre)) e.Add($"{donde}: falta 'nombre'.");
+                foreach (var ef in (o.Efectos ?? new Dictionary<string, double>()).Keys)
+                    if (!WorldState.EsStock(ef)) e.Add($"{donde}: el efecto '{ef}' no es un stock del proyecto.");
+                switch (o.Tipo) {
+                    case Nexus.Core.Fase1.TiposDeObjeto3D.Candidato:
+                        if (o.Miembro == null || string.IsNullOrEmpty(o.Miembro.Id) || string.IsNullOrEmpty(o.Miembro.Nombre))
+                            e.Add($"{donde}: una hoja de vida tiene que traer 'miembro' con 'id' y 'nombre'.");
+                        else if (!miembros.Add(o.Miembro.Id)) e.Add($"{donde}: la persona '{o.Miembro.Id}' ya tiene otra hoja de vida.");
+                        break;
+                    case Nexus.Core.Fase1.TiposDeObjeto3D.Suministro:
+                        var s = o.Suministro;
+                        if (s == null) { e.Add($"{donde}: un suministro tiene que traer 'suministro'."); break; }
+                        if (s.Objetivo != Nexus.Core.Fase1.ObjetivosDeSuministro.Equipo && s.Objetivo != Nexus.Core.Fase1.ObjetivosDeSuministro.Miembro)
+                            e.Add($"{donde}: 'objetivo' es «equipo» o «miembro», no '{s.Objetivo}'.");
+                        if (s.MinutosDeUso <= 0) e.Add($"{donde}: 'minutosDeUso' tiene que ser mayor que 0.");
+                        if (s.EnfriamientoDias < 0 || s.VecesPorDia < 0 || s.ReboteUsos < 0 || s.ReboteVentanaDias < 0)
+                            e.Add($"{donde}: las esperas, los usos por dia y el rebote no pueden ser negativos.");
+                        if (s.ReboteUsos > 0 && s.ReboteVentanaDias <= 0) e.Add($"{donde}: un rebote necesita 'reboteVentanaDias'.");
+                        foreach (var ef in (s.Efectos ?? new Dictionary<string, double>()).Keys)
+                            if (!WorldState.EsStock(ef)) e.Add($"{donde}: el efecto '{ef}' no es un stock del proyecto.");
+                        break;
+                    case Nexus.Core.Fase1.TiposDeObjeto3D.Coleccionable:
+                        if (c.Coleccionables.Count > 0 && !c.Coleccionables.Exists(x => x != null && x.Id == o.Coleccionable))
+                            e.Add($"{donde}: el coleccionable '{o.Coleccionable}' no esta en el catalogo.");
+                        // Una pieza, un sitio: lo que se trae del 3D no puede estar tambien en una zona del mapa 2D.
+                        foreach (var nivel in c.Niveles.Values) {
+                            if (nivel == null || nivel.Mapa == null || nivel.Mapa.Zonas == null) continue;
+                            foreach (var zona in nivel.Mapa.Zonas)
+                                if (zona != null && zona.Coleccionables != null && zona.Coleccionables.Contains(o.Coleccionable))
+                                    e.Add($"{donde}: '{o.Coleccionable}' tambien esta en {nivel.Id}/{zona.Id}. Cada coleccionable se encuentra en un solo sitio.");
+                        }
+                        break;
+                }
+            }
+            return e;
         }
 
         // ------------------------------------------------------------------ interno

@@ -132,7 +132,7 @@ namespace Nexus.Tests {
                     foreach (var tarea in s.TareasDeOficina)
                         if (s.PorQueNoSePuedeHacer(tarea.Id) == null) {
                             s.EmpezarTarea(tarea.Id);
-                            s.ResolverTarea(JugarBien(tarea.Archivo));
+                            s.ResolverTarea(JugarBien(s.CasoDeHoy(tarea.Id).Archivo));
                         }
                 s.CerrarJornada();
                 s.TerminarDia(!bien);   // el malo se queda todas las noches

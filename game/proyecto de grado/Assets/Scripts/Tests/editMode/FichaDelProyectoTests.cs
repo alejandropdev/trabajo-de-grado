@@ -39,7 +39,7 @@ namespace Nexus.Tests {
             var ids = indice["minijuegos"]
                 .Where(m => m["soloNiveles"] != null && m["soloNiveles"].Values<string>().Contains(nivel.Id))
                 .Select(m => (string)m["id"]).ToList();
-            if (nivel.Oficina != null) ids.AddRange(nivel.Oficina.Tareas.Select(t => t.Minijuego));
+            if (nivel.Oficina != null) ids.AddRange(nivel.Oficina.Tareas.SelectMany(t => t.Casos()).Select(c => c.Minijuego));
             return ids.Where(i => !string.IsNullOrEmpty(i)).Distinct().ToList();
         }
 

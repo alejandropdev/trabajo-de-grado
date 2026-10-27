@@ -1,0 +1,101 @@
+{
+  "id": "MJ-OF-N0-PRUEBAS-5",
+  "verbo": "V2_REPARTIR",
+  "lienzo": "depositos",
+  "temaPrincipal": "PTP",
+  "objetivoAprendizaje": "OA-TEST-01",
+  "modulo": "registro",
+  "enElProyecto": "Es el plan de pruebas de cómo se guardan los datos personales de cada visita.",
+  "presentacion": {
+    "titulo": "Práctica: probar los datos de las visitas",
+    "comoSeJuega": "Un plan de pruebas decide cuántas horas va a cada tipo de prueba, porque nunca alcanzan para todo. Tienes 9 horas: súbelas o bájalas con + y − en cada tipo. Cada tipo solo atrapa sus propios errores y cada error cuesta las horas que dice la tarjeta. La tarjeta dice también cuántos errores suele haber: planifica para el número más alto. Ganas si al cliente le llega como mucho 1 error, y ninguno de la pila marcada en rojo.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 90
+  },
+  "repartir": {
+    "presupuesto": 9,
+    "paso": 1,
+    "unidad": "horas",
+    "toleranciaDeEscapes": 1,
+    "depositos": [
+      {
+        "id": "unitarias",
+        "nombre": "Unitarias",
+        "costePorDefecto": 2,
+        "defectosOcultos": 2,
+        "estimadoMin": 2,
+        "estimadoMax": 2,
+        "descripcion": "Prueban la validación de cada dato del formulario.",
+        "pista": "Varias reglas de validación."
+      },
+      {
+        "id": "integracion",
+        "nombre": "Integración",
+        "costePorDefecto": 2,
+        "defectosOcultos": 1,
+        "estimadoMin": 1,
+        "estimadoMax": 2,
+        "descripcion": "Prueban que la visita se guarde entera en la base de datos.",
+        "pista": "Una tabla nueva."
+      },
+      {
+        "id": "seguridad",
+        "nombre": "Seguridad",
+        "costePorDefecto": 3,
+        "defectosOcultos": 1,
+        "estimadoMin": 1,
+        "estimadoMax": 1,
+        "descripcion": "Prueban que nadie pueda ver los documentos de identidad sin permiso.",
+        "pista": "Hay datos personales.",
+        "critico": true,
+        "porQueEsCritico": "los documentos de identidad de las visitas no pueden quedar a la vista de cualquiera: es una falta grave aunque no falle nada más."
+      }
+    ]
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-TEST-01",
+        "razon": "Las horas fueron donde había más errores y más baratos de atrapar, sin dejar sin probar lo imprescindible. Renunciar a algo caro y con pocos errores fue una decisión, no un olvido."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-TEST-01",
+        "razon": "Se escaparon errores de los tipos donde pusiste pocas horas. Primero cubre los tipos baratos con muchos errores; lo caro, al final y solo si sobra, salvo lo marcado en rojo."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "Pusiste más horas de las que servían en un tipo y dejaste otro, con errores, en cero. Esas horas de más no atraparon nada."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-TEST-01",
+        "razon": "No repartiste ninguna hora: todos los errores le llegan al cliente."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Nunca hay horas para probarlo todo. Planificar las pruebas es elegir qué se prueba primero y qué se deja fuera."
+  }
+}

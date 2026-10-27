@@ -104,6 +104,7 @@
   "ceremonias": [
     {
       "id": "kickoff",
+      "solo": {"nombre": "Arranque del proyecto", "texto": "Una sola vez, con el cliente: el plan del proyecto (PMP) encima de la mesa.", "opciones": {"plan": {"texto": "Repasar el plan con el cliente y dejar por escrito quién decide qué", "acta": "Salieron dos dudas sobre quién aprueba los cambios, y quedaron escritas en el plan. En Cascada el plan es el contrato: lo que no está escrito, se discutirá después y más caro."}, "leido": {"texto": "Dar el plan por leído: ya lo mandaste por correo", "acta": "El cliente no lo había leído. Cada uno se quedó con su propia idea de las fechas."}, "fecha": {"texto": "Prometerle al cliente la fecha que quiere oír, antes de planificar", "acta": "El cliente salió encantado. Tú, con una fecha que no ha calculado nadie."}}},
       "nombre": "Reunión de arranque (kickoff)",
       "cuando": "inicioNivel",
       "costeDias": 0,
@@ -235,6 +236,7 @@
     },
     {
       "id": "lecciones-aprendidas",
+      "solo": {"opciones": {"culpables": {"texto": "Buscar qué tuvo la culpa de cada retraso", "acta": "Quedó una lista de culpables: el cliente, el servidor, la mala suerte. Ninguna cosa que hacer distinto."}}},
       "nombre": "Lecciones aprendidas",
       "cuando": "finNivel",
       "costeDias": 0,

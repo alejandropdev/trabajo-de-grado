@@ -27,7 +27,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "Si la hora no es válida, la visita se guarda igualmente SIN salida y sin avisar a nadie: el error se traga en silencio. Faltaba un else que lo rechace."
+      "explicacion": "Si la hora no es válida, la visita se guarda igualmente SIN salida y sin avisar a nadie: el error se traga en silencio. Faltaba un else que lo rechace.",
+      "niveles": [
+        "nivel-00"
+      ]
     },
     {
       "id": "PR-02",
@@ -60,7 +63,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "El bucle usa <= en vez de <: lee una posición de más, que no existe. El clásico error por uno."
+      "explicacion": "El bucle usa <= en vez de <: lee una posición de más, que no existe. El clásico error por uno.",
+      "niveles": [
+        "nivel-00"
+      ]
     },
     {
       "id": "PR-03",
@@ -85,7 +91,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "Está bien: además de pasar a mayúsculas, aguanta un nombre vacío y quita los espacios de los lados. Pedir cambios aquí era pedir por pedir."
+      "explicacion": "Está bien: además de pasar a mayúsculas, aguanta un nombre vacío y quita los espacios de los lados. Pedir cambios aquí era pedir por pedir.",
+      "niveles": [
+        "nivel-00"
+      ]
     },
     {
       "id": "PR-04",
@@ -110,7 +119,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "Hay un = donde iba ===: en vez de comparar el ascensor, lo ASIGNA. La búsqueda devuelve cualquier reserva de esa franja y, de paso, las estropea."
+      "explicacion": "Hay un = donde iba ===: en vez de comparar el ascensor, lo ASIGNA. La búsqueda devuelve cualquier reserva de esa franja y, de paso, las estropea.",
+      "niveles": [
+        "nivel-01"
+      ]
     },
     {
       "id": "PR-05",
@@ -135,7 +147,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "La contraseña está escrita en el código: queda para siempre en el historial y la ve cualquiera que tenga el repositorio. Va en la configuración, fuera del código."
+      "explicacion": "La contraseña está escrita en el código: queda para siempre en el historial y la ve cualquiera que tenga el repositorio. Va en la configuración, fuera del código.",
+      "niveles": [
+        "nivel-01"
+      ]
     },
     {
       "id": "PR-06",
@@ -164,7 +179,10 @@
           "texto": "  const m = minutosEntre(entrada, salida);"
         }
       ],
-      "explicacion": "Está bien: no cambia lo que hace el programa, solo quita una repetición y le pone nombre. Es un refactor pequeño y limpio."
+      "explicacion": "Está bien: no cambia lo que hace el programa, solo quita una repetición y le pone nombre. Es un refactor pequeño y limpio.",
+      "niveles": [
+        "nivel-00"
+      ]
     },
     {
       "id": "PR-07",
@@ -189,7 +207,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "La consulta se arma pegando texto que viene de fuera: quien escriba una comilla en el número de tarjeta puede leer o borrar la tabla (inyección SQL). Se usan parámetros."
+      "explicacion": "La consulta se arma pegando texto que viene de fuera: quien escriba una comilla en el número de tarjeta puede leer o borrar la tabla (inyección SQL). Se usan parámetros.",
+      "niveles": [
+        "nivel-01"
+      ]
     },
     {
       "id": "PR-08",
@@ -214,7 +235,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "El catch está vacío: si el correo falla, nadie se entera y el anfitrión no baja. Un error que se captura hay que registrarlo o reintentarlo, nunca tragárselo."
+      "explicacion": "El catch está vacío: si el correo falla, nadie se entera y el anfitrión no baja. Un error que se captura hay que registrarlo o reintentarlo, nunca tragárselo.",
+      "niveles": [
+        "nivel-00"
+      ]
     },
     {
       "id": "PR-09",
@@ -239,7 +263,10 @@
           "texto": "});"
         }
       ],
-      "explicacion": "Está bien: es una prueba corta, con un nombre que dice lo que comprueba, y cubre justo el caso que más falla."
+      "explicacion": "Está bien: es una prueba corta, con un nombre que dice lo que comprueba, y cubre justo el caso que más falla.",
+      "niveles": [
+        "nivel-01"
+      ]
     },
     {
       "id": "PR-10",
@@ -264,7 +291,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "Para que entre el turno de noche se ha quitado la comprobación entera: ahora entra cualquiera a cualquier hora. Un «TODO» en un control de acceso es una puerta abierta."
+      "explicacion": "Para que entre el turno de noche se ha quitado la comprobación entera: ahora entra cualquiera a cualquier hora. Un «TODO» en un control de acceso es una puerta abierta.",
+      "niveles": [
+        "nivel-01"
+      ]
     },
     {
       "id": "PR-11",
@@ -297,7 +327,10 @@
           "texto": "}"
         }
       ],
-      "explicacion": "Está bien: se acordó de que los meses empiezan en 0 (por eso el +1) y de rellenar con cero los días de una cifra."
+      "explicacion": "Está bien: se acordó de que los meses empiezan en 0 (por eso el +1) y de rellenar con cero los días de una cifra.",
+      "niveles": [
+        "nivel-01"
+      ]
     },
     {
       "id": "PR-12",
@@ -326,7 +359,582 @@
           "texto": "}"
         }
       ],
-      "explicacion": "Cambia el estado en memoria y en el panel, pero no lo guarda: al reiniciar, la reserva vuelve a estar ocupada. El propio comentario lo dice, y aun así se pidió revisión."
+      "explicacion": "Cambia el estado en memoria y en el panel, pero no lo guarda: al reiniciar, la reserva vuelve a estar ocupada. El propio comentario lo dice, y aun así se pidió revisión.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-13",
+      "titulo": "Buscar una visita por documento",
+      "descripcion": "Permite encontrar la visita aunque se escriba solo una parte del documento.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function buscarPorDocumento(doc) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return visitas.find(v => v.documento === doc);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return visitas.find(v => v.documento.includes(doc));"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Con «includes», el documento 123 encuentra también al visitante con el 51234: puede salir la visita de otra persona. Para identificar a alguien la comparación tiene que ser exacta.",
+      "niveles": [
+        "nivel-00"
+      ]
+    },
+    {
+      "id": "PR-14",
+      "titulo": "Avisar al anfitrión una sola vez",
+      "descripcion": "Evita que el anfitrión reciba el mismo aviso varias veces.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function avisar(visita) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  if (visita.avisado) return;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  enviarCorreo(visita.anfitrion, visita.nombre);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  visita.avisado = true;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: si la recepcionista pulsa dos veces, el anfitrión recibe un solo aviso. Marcar algo como hecho para no repetirlo es una buena práctica.",
+      "niveles": [
+        "nivel-00"
+      ]
+    },
+    {
+      "id": "PR-15",
+      "titulo": "Hora de entrada desde el formulario",
+      "descripcion": "La hora de entrada la escribe la recepcionista.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function registrarEntrada(formulario) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  const entrada = ahora();"
+        },
+        {
+          "tipo": "add",
+          "texto": "  const entrada = formulario.hora;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  guardarVisita(formulario.nombre, entrada);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "La hora de entrada ya no la pone el sistema: la escribe una persona, y puede equivocarse o inventarla. Un dato que el sistema conoce con certeza no se le pide a nadie.",
+      "niveles": [
+        "nivel-00"
+      ]
+    },
+    {
+      "id": "PR-16",
+      "titulo": "Lista de quién sigue dentro",
+      "descripcion": "Simplifica el filtro de la lista del vigilante.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function quienSigueDentro() {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return visitas.filter(v => v.salida == null);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return visitas.filter(v => v.salida);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "El filtro quedó al revés: ahora devuelve a quienes YA salieron. El vigilante cerraría el edificio con gente dentro. «Simplificar» una condición es justo donde se cuelan estos errores.",
+      "niveles": [
+        "nivel-00"
+      ]
+    },
+    {
+      "id": "PR-17",
+      "titulo": "Quitar espacios del nombre",
+      "descripcion": "Limpia los espacios de más al guardar el nombre del visitante.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function guardarVisita(nombre, entrada) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  db.insertar({ nombre, entrada });"
+        },
+        {
+          "tipo": "add",
+          "texto": "  db.insertar({ nombre: nombre.trim(), entrada });"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: « Ana » y «Ana» ya no serán dos personas distintas al buscar. Es un cambio pequeño, claro y que no rompe nada.",
+      "niveles": [
+        "nivel-00"
+      ]
+    },
+    {
+      "id": "PR-18",
+      "titulo": "Borrar las visitas antiguas",
+      "descripcion": "Limpia la base de datos de las visitas de días anteriores.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function limpiar() {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  db.borrar(v => v.entrada < inicioDeHoy());"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Borra también las visitas de ayer que nunca marcaron la salida: alguien que sigue dentro desaparece de la lista. Antes de borrar, hay que pensar en los casos que no acabaron bien.",
+      "niveles": [
+        "nivel-00"
+      ]
+    },
+    {
+      "id": "PR-19",
+      "titulo": "Detectar choques de reservas",
+      "descripcion": "Hace más estricta la comprobación de choques.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function chocan(a, b) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return a.inicio < b.fin && b.inicio < a.fin;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return a.inicio <= b.fin && b.inicio <= a.fin;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Con «<=», una reserva de 10:00 a 11:00 y otra de 11:00 a 12:00 «chocan», aunque una empieza justo cuando acaba la otra. Los bordes de un intervalo son donde más fallan las comparaciones.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-20",
+      "titulo": "Matrículas en mayúsculas",
+      "descripcion": "Compara las matrículas sin distinguir mayúsculas.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function estaAutorizada(matricula) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return autorizadas.includes(matricula);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return autorizadas.includes(matricula.toUpperCase());"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: la lista se guarda en mayúsculas y el lector a veces devuelve minúsculas. Normalizar antes de comparar evita rechazar un vehículo autorizado.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-21",
+      "titulo": "Abrir la barrera",
+      "descripcion": "Añade un registro cuando la matrícula no está autorizada.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function alLlegar(matricula) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  if (!estaAutorizada(matricula)) registrar(\"no autorizada\", matricula);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  barrera.abrir();"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Registra que no está autorizada… y abre la barrera igual. Faltaba un «return» o un «else»: es exactamente el agujero que motivó el encargo.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-22",
+      "titulo": "Tarjetas caducadas",
+      "descripcion": "Deja constancia cuando se usa una tarjeta caducada.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function puedeEntrar(tarjeta, patio) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  if (tarjeta.caduca < hoy()) return false;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  if (tarjeta.caduca < hoy()) console.log(\"tarjeta caducada\");"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  return tarjeta.patios.includes(patio);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Cambió el rechazo por un mensaje en la consola: la tarjeta caducada ahora entra. Avisar no es lo mismo que impedir.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-23",
+      "titulo": "Paginar el informe de accesos",
+      "descripcion": "Divide el informe de accesos en páginas de 50 filas.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function informeDeAccesos(desde, hasta) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return db.accesos(desde, hasta);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return paginar(db.accesos(desde, hasta), 50);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: un mes de accesos son miles de filas; paginarlas no cambia los datos, solo cómo se entregan.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-24",
+      "titulo": "Reintentar si el ascensor no responde",
+      "descripcion": "Vuelve a enviar la orden al ascensor hasta que conteste.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function bloquear(ascensor, franja) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  let respuesta = null;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  while (!respuesta) respuesta = ascensor.enviar(\"bloquear\", franja);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Si el controlador está apagado, el bucle no termina nunca y bloquea todo el sistema. Un reintento necesita un límite y un plan para cuando se agota.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-25",
+      "titulo": "El mantenimiento bloquea las reservas",
+      "descripcion": "No deja reservar un ascensor en su turno de mantenimiento.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function puedeReservar(ascensor, franja) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  if (turnos.enMantenimiento(ascensor, franja)) return false;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  return !reservas.chocan(ascensor, franja);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: pregunta al módulo de turnos por su puerta y evita reservar un ascensor que estará parado. Es la regla que pidió Facilities.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-26",
+      "titulo": "Registro de accesos más completo",
+      "descripcion": "Guarda más datos de cada acceso para poder investigar.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function alPasarTarjeta(tarjeta, patio) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  log(\"acceso\", tarjeta.id, patio);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  log(\"acceso\", tarjeta.numero, tarjeta.pin, patio);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Ahora el registro guarda el número y el PIN de cada tarjeta: quien lea los logs puede copiarlas. Para investigar basta el identificador, nunca la credencial.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-27",
+      "titulo": "Fecha del informe diario",
+      "descripcion": "Usa la fecha estándar para el nombre del informe.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function nombreDelInforme() {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  const hoy = fechaLocal();"
+        },
+        {
+          "tipo": "add",
+          "texto": "  const hoy = new Date().toISOString().slice(0, 10);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  return \"informe-\" + hoy;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "toISOString da la fecha en hora universal: a partir de las 7 de la tarde en Colombia ya es «mañana», y el informe sale con el día equivocado. Las fechas siempre en la zona del usuario.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-28",
+      "titulo": "Constante para los minutos de gracia",
+      "descripcion": "Quita un número mágico repetido.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "add",
+          "texto": "const MINUTOS_DE_GRACIA = 15;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "function llegaTarde(reserva, ahora) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  return ahora > reserva.inicio + 15 * 60000;"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return ahora > reserva.inicio + MINUTOS_DE_GRACIA * 60000;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: el 15 ya tiene nombre y se cambia en un solo sitio. No altera lo que hace el programa.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-29",
+      "titulo": "Cancelar libera el ascensor",
+      "descripcion": "Al cancelar una reserva, avisa al ascensor.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function cancelar(reserva) {"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  reservas.borrar(reserva.id);"
+        },
+        {
+          "tipo": "add",
+          "texto": "  ascensor.liberar(reserva.franja);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: antes, cancelar dejaba el ascensor bloqueado a esa hora. Lo que una operación hace, su contraria lo deshace.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-30",
+      "titulo": "Ordenar las reservas por hora",
+      "descripcion": "Muestra las reservas del día en orden.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function reservasDeHoy() {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return reservas.hoy().sort((a, b) => a.hora > b.hora ? 1 : -1);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Las horas son texto («9:30», «10:00»): ordenadas como palabras, «10:00» va antes que «9:30». Para ordenar horas hay que compararlas como horas.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-31",
+      "titulo": "Quitar código comentado",
+      "descripcion": "Borra un bloque viejo que estaba comentado.",
+      "tieneDefecto": false,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function abrirPatio(patio) {"
+        },
+        {
+          "tipo": "del",
+          "texto": "  // const viejo = barreraVieja.abrir(patio);"
+        },
+        {
+          "tipo": "del",
+          "texto": "  // if (!viejo) reintentar();"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "  return barrera.abrir(patio);"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Está bien: el código comentado no se ejecuta y solo confunde. Si alguien lo necesita, está en el historial del repositorio.",
+      "niveles": [
+        "nivel-01"
+      ]
+    },
+    {
+      "id": "PR-32",
+      "titulo": "Plazas libres del patio",
+      "descripcion": "Muestra cuántas plazas quedan en el patio.",
+      "tieneDefecto": true,
+      "lineas": [
+        {
+          "tipo": "ctx",
+          "texto": "function plazasLibres(patio) {"
+        },
+        {
+          "tipo": "add",
+          "texto": "  return patio.capacidad - patio.dentro.length + 1;"
+        },
+        {
+          "tipo": "ctx",
+          "texto": "}"
+        }
+      ],
+      "explicacion": "Ese «+ 1» dice que queda una plaza cuando el patio está lleno: el panel deja entrar a un vehículo que no cabe. Los errores de uno de más son de los más comunes.",
+      "niveles": [
+        "nivel-01"
+      ]
     }
   ]
 }

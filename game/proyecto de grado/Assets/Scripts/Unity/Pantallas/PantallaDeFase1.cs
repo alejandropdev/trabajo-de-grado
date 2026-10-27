@@ -270,7 +270,7 @@ namespace Nexus.Unity.Pantallas {
                 if (Perfil.Briefing != null) foreach (var linea in Perfil.Briefing) _hoja.Parrafo(linea);
                 PintarPistas(_hoja.Raiz);
                 _hoja.Espacio();
-                _hoja.Nota($"{Perfil.DiasTotales} días · equipo de {Perfil.EquipoInicial} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
+                _hoja.Nota($"{Perfil.DiasTotales} días · {TextoDelEquipo()} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
                 _hoja.Nota("Léelo con calma: las tres decisiones que vienen se juzgan contra lo que dice aquí.");
                 PintarMetricas();
                 return;
@@ -316,8 +316,14 @@ namespace Nexus.Unity.Pantallas {
             }
             PantallaDeGlosario.Palabras(App, cliente, "Si alguna palabra no te suena:", "cliente", "interesados", "alcance");
 
-            // Con quien se va a trabajar: se presenta desde el principio, no cuando ya hay confianza.
-            if (Perfil.Equipo != null && Perfil.Equipo.Count > 0) {
+            // Con quien se va a trabajar: se presenta desde el principio, no cuando ya hay confianza. Si el equipo sale
+            // de las hojas de vida del recorrido y todavia no se ha recorrido, no hay equipo que presentar: se dice.
+            if (S.EquipoDesdeRecoleccion && !S.RecoleccionHecha) {
+                var porFormar = _hoja.Tarjeta("Tu equipo en este proyecto", Tono.Aviso);
+                Ui.Texto(porFormar, "Todavía no tienes equipo. Lo formas tú en el recorrido por el edificio: cada hoja de vida que " +
+                                    "encuentres es una persona que se une al proyecto. Si no encuentras ninguna, lo sacarás tú solo.",
+                         EstiloTexto.Pequeno, Tema.ink);
+            } else if (Perfil.Equipo != null && Perfil.Equipo.Count > 0) {
                 var equipo = _hoja.Tarjeta("Tu equipo en este proyecto");
                 foreach (var m in Perfil.Equipo) {
                     Ui.FilaDeEquipo(equipo, m.Nombre, m.Rol, EstadoDeEquipo.Activo);
@@ -327,7 +333,7 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Texto(equipo, "Durante el desarrollo los tienes en «Equipo»: qué lleva cada uno, qué terminó y cómo va.", EstiloTexto.Pequeno, Tema.cyan);
             }
 
-            _hoja.Nota($"{Perfil.DiasTotales} días · equipo de {Perfil.EquipoInicial} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
+            _hoja.Nota($"{Perfil.DiasTotales} días · {TextoDelEquipo()} · alcance de {Perfil.AlcanceInicial:0} puntos de trabajo");
             _hoja.Nota("Léelo con calma: las tres decisiones que vienen se juzgan contra lo que dice aquí.");
             if (Perfil.Briefing != null && Perfil.Briefing.Length > 0)
             {
@@ -502,6 +508,14 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
+        /// <summary>«equipo de 4», o, si el equipo sale del recorrido y aun no se ha hecho, que todavia esta por formar.</summary>
+        private string TextoDelEquipo() {
+            if (S.EquipoDesdeRecoleccion && !S.RecoleccionHecha) return "equipo por formar en el recorrido";
+            var equipo = S.EquipoDelProyecto();
+            if (S.EquipoDesdeRecoleccion && S.TrabajasSolo) return "sin equipo: trabajas solo";
+            return $"equipo de {Perfil.EquipoInicial}";
+        }
+
         private void PintarPistas(Transform padre) {
             var pistas = S.PistasEncontradas();
             if (pistas.Count == 0) return;
@@ -522,7 +536,8 @@ namespace Nexus.Unity.Pantallas {
                 var aviso = _hoja.Tarjeta("Esta parte es en 3D", Tono.Aviso);
                 Ui.Texto(aviso, modulo != null
                              ? "Vas a salir de estas pantallas y a recorrer el sitio en 3D. Muévete con W A S D, mira con el ratón y salta " +
-                               "con Espacio. Cuando hayas visto lo que querías, pulsa «Dejar de recolectar» para volver aquí."
+                               "con Espacio. Tienes 5 minutos: cuando se acaben, vuelves aquí con lo que lleves. Recoge hojas de vida " +
+                               "(son tu equipo) y suministros (pizza, café, Guepardex) para el desarrollo. Esc pausa el reloj."
                              : "El recorrido en 3D lo está construyendo otro equipo. Mientras tanto, se simula: elige cómo de a fondo " +
                                "quieres recorrerlo. Cuanto más miras, más encuentras… y más tiempo gastas, y más cosas puedes tocar que no debías.",
                          EstiloTexto.Pequeno, Tema.ink);
@@ -553,9 +568,80 @@ namespace Nexus.Unity.Pantallas {
 
             var resultado = _hoja.Tarjeta($"Lo que encontraste · {S.R.MinutosDeRecoleccion} minutos");
             var hallazgos = S.HallazgosRecogidos();
-            if (hallazgos.Count == 0) Ui.Texto(resultado, "Nada. A veces el recorrido no da nada.", EstiloTexto.Cuerpo);
+            var objetos = S.ObjetosRecogidos();
+            if (hallazgos.Count == 0 && objetos.Count == 0) Ui.Texto(resultado, "Nada. A veces el recorrido no da nada.", EstiloTexto.Cuerpo);
             foreach (var h in hallazgos) Ui.Texto(resultado, DescribirHallazgo(h), EstiloTexto.Cuerpo,
                                                    h.Tipo == TiposDeHallazgo.Riesgo ? Tema.warning : Tema.ink);
+            foreach (var kv in objetos)
+                Ui.Texto(resultado, $"<b>{DescribirTipo(kv.Key.Tipo)}:</b> {kv.Key.Nombre}{(kv.Value > 1 ? "  ×" + kv.Value : "")}",
+                         EstiloTexto.Cuerpo, Tema.ink);
+            if (objetos.Count > 0)
+                Ui.Boton(resultado, "Ver el resumen del recorrido", () => App.Router.Apilar<PantallaResumenDeRecoleccion>(), VarianteBoton.Fantasma);
+            PintarEquipoFormado(_hoja.Raiz);
+        }
+
+        /// <summary>
+        /// Quien va a trabajar contigo en el desarrollo, ya decidido: lo que se ve antes de cerrar la planificacion. Si
+        /// salio de las hojas de vida, se dice; si no se encontro ninguna, se dice que vas solo.
+        /// </summary>
+        private string _avisoDeEquipo;
+
+        /// <summary>
+        /// Se recogieron mas hojas de vida de las que caben en el proyecto: el jugador elige quien entra. Cada boton
+        /// mete o saca a esa persona; mientras no elija, entran las primeras.
+        /// </summary>
+        private void PintarEleccionDeEquipo(Transform padre) {
+            var hojas = S.HojasRecogidas();
+            var dentro = new HashSet<string>(S.EquipoDelProyecto().Select(m => m.Id));
+            var max = S.MaxEquipo;
+            var tarjeta = Ui.Tarjeta(padre, $"Elige tu equipo · {dentro.Count} de {max} plazas", Tono.Cyan);
+            Ui.Texto(tarjeta, $"Encontraste {hojas.Count} hojas de vida, pero este proyecto da para {max} personas. Elige quién entra: " +
+                              "lo que se le da bien a cada uno (y lo que trae al llegar) se nota desde el día 1.", EstiloTexto.Pequeno, Tema.ink);
+            if (!string.IsNullOrEmpty(_avisoDeEquipo)) Ui.Texto(tarjeta, _avisoDeEquipo, EstiloTexto.Pequeno, Tema.warning);
+            foreach (var o in hojas) {
+                var id = o.Miembro.Id;
+                var esta = dentro.Contains(id);
+                var boton = Ui.BotonDeOpcion(tarjeta, (esta ? "✓ " : "+ ") + o.Miembro.Nombre + " · " + o.Miembro.Rol, o.Texto ?? o.Miembro.Descripcion, () => {
+                    var nuevo = new HashSet<string>(dentro);
+                    if (esta) nuevo.Remove(id); else nuevo.Add(id);
+                    var motivo = S.PorQueNoSePuedeElegirEquipo(nuevo);
+                    if (motivo == null) { S.ElegirEquipo(nuevo.ToList()); _avisoDeEquipo = null; }
+                    else _avisoDeEquipo = nuevo.Count > max ? $"Ya tienes {max}: quita a alguien antes de añadir a otra persona." : motivo;
+                    Repintar();
+                });
+                Ui.Resaltar(boton, esta);
+            }
+        }
+
+        private void PintarEquipoFormado(Transform padre) {
+            if (S.HayQueElegirEquipo && !S.Fase1Cerrada) { PintarEleccionDeEquipo(padre); return; }
+            var equipo = S.EquipoDelProyecto();
+            var solo = S.EquipoDesdeRecoleccion && S.TrabajasSolo;
+            var tarjeta = Ui.Tarjeta(padre, solo ? "Tu equipo para el desarrollo · nadie" : $"Tu equipo para el desarrollo · {equipo.Count}",
+                                     solo ? Tono.Aviso : Tono.Cyan);
+            if (solo) {
+                Ui.Texto(tarjeta, "No encontraste ninguna hoja de vida en el recorrido: vas a sacar el proyecto tú solo, y más despacio.",
+                         EstiloTexto.Pequeno, Tema.warning);
+                return;
+            }
+            foreach (var m in equipo) {
+                Ui.FilaDeEquipo(tarjeta, m.Nombre, m.Rol, EstadoDeEquipo.Activo);
+                if (!string.IsNullOrEmpty(m.Descripcion)) Ui.Texto(tarjeta, m.Descripcion, EstiloTexto.Pequeno, Tema.inkMuted);
+            }
+            Ui.Texto(tarjeta, S.EquipoDesdeRecoleccion
+                         ? "Son las hojas de vida que encontraste en el recorrido. Durante el desarrollo los tienes en «Equipo»."
+                         : "Es el equipo asignado a este proyecto. Durante el desarrollo los tienes en «Equipo».",
+                     EstiloTexto.Leyenda, Tema.cyan);
+        }
+
+        private static string DescribirTipo(string tipo) {
+            switch (tipo) {
+                case TiposDeObjeto3D.Candidato: return "Se une al equipo";
+                case TiposDeObjeto3D.Suministro: return "Suministro";
+                case TiposDeObjeto3D.Coleccionable: return "Para tu diario";
+                case TiposDeObjeto3D.Efecto: return "Para el proyecto";
+                default: return "Nota";
+            }
         }
 
         private string DescribirHallazgo(Hallazgo h) {
@@ -597,7 +683,12 @@ namespace Nexus.Unity.Pantallas {
             S.AplicarRecoleccion(resultado);
             foreach (var h in S.HallazgosRecogidos())
                 if (h.Tipo == TiposDeHallazgo.Coleccionable) App.AnotarColeccionable(h.Id);
+            // Las piezas del diario que se trajeron del 3D (cartas, el fragmento de USB).
+            foreach (var kv in S.ObjetosRecogidos())
+                if (kv.Key.Tipo == TiposDeObjeto3D.Coleccionable) App.AnotarColeccionable(kv.Key.Coleccionable);
             Repintar();
+            // Lo que se trajo, dicho entero: quien forma el equipo, que suministros hay y que fue al diario.
+            App.Router.Apilar<PantallaResumenDeRecoleccion>(p => p.SeAcaboElTiempo = !resultado.AbandonoAntes);
         }
 
         // ==================================================================== 3 · metodologia
@@ -618,13 +709,15 @@ namespace Nexus.Unity.Pantallas {
 
             // Maestro y detalle: a la izquierda se elige, a la derecha se justifica. Antes las razones caian debajo de las
             // tarjetas y habia que desplazarse para verlas.
+            // Las tres a la vista, una al lado de otra: antes iban en columna y la tercera (Kanban) quedaba por debajo
+            // del borde, y habia que desplazarse para saber que existia. Los motivos y el calendario, debajo.
             var disponibles = S.MetodologiasDisponibles();
-            var escena = Ui.Fila(_hoja.Raiz, "Eleccion", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
-            var opciones = Ui.Columna(escena, "Metodologias", Tema.Espacio(2));
-            UiKit.Tamano(opciones, ancho: 440);
-            GuiaView.Registrar("fase1.metodologias", opciones);
+            var opcionesEnFila = Ui.Fila(_hoja.Raiz, "Metodologias", Tema.Espacio(3), alineacion: TextAnchor.UpperLeft);
+            GuiaView.Registrar("fase1.metodologias", opcionesEnFila);
             foreach (var m in disponibles) {
                 var met = m;
+                var opciones = Ui.Columna(opcionesEnFila, "Metodologia " + met.Id, Tema.Espacio(1));
+                UiKit.Tamano(opciones, ancho: 0, flexAncho: 1);
                 var tarjeta = Ui.BotonDeOpcion(opciones, met.Nombre, met.Resumen, () => {
                     if (_metodologia != met.Id) { _razonMetodologia = null; _duracion = null; }   // otra metodologia, otros motivos y otro calendario
                     _metodologia = met.Id;
@@ -635,11 +728,10 @@ namespace Nexus.Unity.Pantallas {
                 if (e != null) Ui.Boton(opciones, "¿Qué es " + met.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
             }
 
-            var detalle = Ui.Columna(escena, "Motivos", Tema.espacio);
-            UiKit.Tamano(detalle, ancho: 0, flexAncho: 1);
+            var detalle = Ui.Columna(_hoja.Raiz, "Motivos", Tema.espacio);
             var elegida = disponibles.FirstOrDefault(m => m.Id == _metodologia);
             if (elegida == null) {
-                Ui.Texto(detalle, "Elige una, a la izquierda, para ver sus motivos.", EstiloTexto.Pequeno);
+                Ui.Texto(detalle, "Elige una, arriba, para ver sus motivos.", EstiloTexto.Pequeno);
                 return;
             }
             Ui.Texto(detalle, $"¿Por qué {elegida.Nombre}?", EstiloTexto.Subtitulo);
@@ -676,8 +768,9 @@ namespace Nexus.Unity.Pantallas {
                 for (var i = 0; i < o.Unidades.Count; i++) {
                     var caja = Ui.PanelColumna(tira, "Unidad", Tema.Espacio(2), 0, marcada ? Tema.surfaceRaised : Tema.surfaceSunken);
                     UiKit.Tamano(caja, ancho: 0, flexAncho: o.Unidades[i]);
-                    var nombre = o.Unidades.Count > 3 && o.Nombres[i].Length > 9 ? (i + 1).ToString() : o.Nombres[i];
-                    Ui.Texto(caja, $"{nombre} · {o.Unidades[i]} d", EstiloTexto.Leyenda, marcada ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Center);
+                    // El nombre de la etapa siempre (antes, los largos se cambiaban por su numero: «1», «3»), y los dias
+                    // debajo: en dos lineas cabe aunque la etapa sea corta.
+                    Ui.Texto(caja, $"{o.Nombres[i]}\n{o.Unidades[i]} d", EstiloTexto.Leyenda, marcada ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Center);
                 }
                 Ui.Texto(tarjeta, o.Despliegues.Count == 1 ? $"Un solo despliegue, el día {o.Despliegues[0]}."
                                                            : $"{o.Despliegues.Count} despliegues: al cerrar los días {string.Join(", ", o.Despliegues)}.",
@@ -871,8 +964,10 @@ namespace Nexus.Unity.Pantallas {
                 Linea("Product backlog", _backlog.Count == 0 ? null : $"{_backlog.Count} historias; la primera, «{Perfil.Proyecto.Historia(_backlog[0]).Titulo}»",
                       Paso.Backlog, _backlog.Count >= MinimoDeHistorias);
             if (HayRecoleccion)
-                Linea("Recorrido", S.RecoleccionHecha ? $"{S.HallazgosRecogidos().Count} hallazgos en {S.R.MinutosDeRecoleccion} min" : null,
+                Linea("Recorrido", S.RecoleccionHecha ? $"{S.HallazgosRecogidos().Count + S.ObjetosRecogidos().Count} hallazgos en {S.R.MinutosDeRecoleccion} min · {TextoDelEquipo()}" : null,
                       Paso.Recoleccion, S.RecoleccionHecha);
+            // Antes de confirmar se ve con quien se va a trabajar (si el equipo sale del recorrido, solo cuando ya se hizo).
+            if (!S.EquipoDesdeRecoleccion || S.RecoleccionHecha) PintarEquipoFormado(_hoja.Raiz);
 
             var listo = Pasos().Where(p => p != Paso.Resumen).All(Completo);
             var confirmar = _hoja.Accion("Confirmar y empezar el nivel", Confirmar);

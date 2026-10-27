@@ -1,0 +1,219 @@
+{
+  "id": "MJ-OF-N1-DIAGRAMA-5",
+  "verbo": "V1_DETECTAR",
+  "lienzo": "diagrama",
+  "temaPrincipal": "SAD",
+  "objetivoAprendizaje": "OA-DIS-01",
+  "modulo": "panel",
+  "enElProyecto": "Es el diagrama del panel desde el que Facilities ve los ascensores y las reservas del día.",
+  "presentacion": {
+    "titulo": "Práctica: el diagrama del panel de Facilities",
+    "comoSeJuega": "El diagrama de el panel de Facilities. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "quienEspera": "Tú mismo",
+    "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
+    "segundosReloj": 100
+  },
+  "artefacto": {
+    "elementos": [
+      {
+        "id": "panel",
+        "capa": "interfaz",
+        "texto": "Panel de Facilities",
+        "tipo": "componente",
+        "fila": 0,
+        "columna": 1,
+        "detalle": "Lo que mira Facilities durante el día."
+      },
+      {
+        "id": "estado",
+        "capa": "logica",
+        "texto": "Estado de los ascensores",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 0,
+        "detalle": ""
+      },
+      {
+        "id": "reservas",
+        "capa": "logica",
+        "texto": "Reservas",
+        "tipo": "componente",
+        "fila": 1,
+        "columna": 2,
+        "detalle": "Las reservas de hoy."
+      },
+      {
+        "id": "ascensor",
+        "capa": "externo",
+        "texto": "Controlador del ascensor",
+        "tipo": "externo",
+        "fila": 2,
+        "columna": 0,
+        "detalle": "El aparato del fabricante."
+      },
+      {
+        "id": "bd",
+        "capa": "datos",
+        "texto": "Base de datos",
+        "tipo": "baseDeDatos",
+        "fila": 2,
+        "columna": 2,
+        "detalle": "Las reservas."
+      }
+    ],
+    "conexiones": [
+      {
+        "id": "p1",
+        "tipo": "pide",
+        "desde": "panel",
+        "hasta": "estado",
+        "texto": "pide el estado"
+      },
+      {
+        "id": "p2",
+        "tipo": "lee",
+        "desde": "estado",
+        "hasta": "ascensor",
+        "texto": "consulta en qué piso está"
+      },
+      {
+        "id": "p3",
+        "tipo": "pide",
+        "desde": "panel",
+        "hasta": "reservas",
+        "texto": "pide las reservas de hoy"
+      },
+      {
+        "id": "p4",
+        "tipo": "lee",
+        "desde": "reservas",
+        "hasta": "bd",
+        "texto": "lee las reservas"
+      },
+      {
+        "id": "p5",
+        "tipo": "escribe",
+        "desde": "panel",
+        "hasta": "bd",
+        "texto": "edita reservas directo en la tabla"
+      }
+    ]
+  },
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "p5"
+      ],
+      "defecto": "acoplamiento_indebido",
+      "explicacion": "El panel escribe directo en las tablas de reservas, saltándose el módulo que comprueba los choques de horario. Cualquier cambio de la tabla rompe el panel.",
+      "pista": "Mira por dónde cambia el panel una reserva. ¿Pasa por la puerta del módulo de reservas?"
+    },
+    {
+      "id": "Z2",
+      "tipo": "commit",
+      "commits": [
+        "estado"
+      ],
+      "defecto": "elemento_sin_especificar",
+      "explicacion": "No dice cada cuánto se actualiza el estado ni qué se muestra si el ascensor no contesta. Sin eso, el panel puede enseñar un estado viejo como si fuera de ahora.",
+      "pista": "¿Qué pieza no explica qué hace cuando el aparato del fabricante no responde?"
+    }
+  ],
+  "toleranciaDeSenuelos": 1,
+  "senuelos": [
+    {
+      "id": "S1",
+      "commits": [
+        "p2"
+      ],
+      "razonNoEsDefecto": "Consultar al controlador en qué piso está el ascensor es lo esperado: es la única forma de saberlo."
+    }
+  ],
+  "paletaEtiquetas": [
+    "acoplamiento_indebido",
+    "elemento_sin_especificar",
+    "falla_de_seguridad",
+    "requisito_incompleto"
+  ],
+  "andamiaje": {
+    "3": {
+      "resaltarZonasCandidatas": true,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "elemento_sin_especificar",
+        "requisito_incompleto"
+      ],
+      "contadorRestantes": true
+    },
+    "2": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [
+        "acoplamiento_indebido",
+        "elemento_sin_especificar",
+        "falla_de_seguridad",
+        "requisito_incompleto"
+      ],
+      "contadorRestantes": true
+    },
+    "1": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false
+    },
+    "0": {
+      "resaltarZonasCandidatas": false,
+      "etiquetas": [],
+      "contadorRestantes": false,
+      "etiquetasTrampa": [
+        "falla_de_seguridad"
+      ]
+    }
+  },
+  "consecuencias": {
+    "todos": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-DIS-01",
+        "razon": "Una pantalla que escribe en las tablas de otro módulo se salta sus reglas."
+      }
+    },
+    "parcial": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-DIS-01",
+        "razon": "Algo viste, pero no todo: mira otra vez cada flecha que entra y sale de las piezas sospechosas."
+      }
+    },
+    "falsoPositivo": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "Marcaste algo que estaba bien. Revisar es distinguir, no sospechar de todo."
+      }
+    },
+    "omitido": {
+      "efectosInmediatos": {},
+      "efectosDiferidos": [],
+      "hallazgos": [],
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-DIS-01",
+        "razon": "No se revisó."
+      }
+    }
+  },
+  "cierre": {
+    "texto": "Una pantalla pide las cosas al módulo que sabe hacerlas; no las hace ella por su cuenta en la base de datos."
+  }
+}

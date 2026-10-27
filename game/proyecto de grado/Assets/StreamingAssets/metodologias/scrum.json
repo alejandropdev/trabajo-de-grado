@@ -34,6 +34,7 @@
   "ceremonias": [
     {
       "id": "planning",
+      "solo": {"nombre": "Planificación personal del sprint", "texto": "Decides tú solo lo que crees que cabe. Nadie te va a corregir el optimismo.", "paraQueSirve": "Eliges, del product backlog, lo que crees que puedes terminar tú en el sprint. Lo que está más arriba entra primero."},
       "nombre": "Planificación de sprint",
       "cuando": "inicioIteracion",
       "costeDias": 0.5,
@@ -44,6 +45,7 @@
     },
     {
       "id": "daily",
+      "solo": {"nombre": "Repaso diario del plan", "texto": "Cinco minutos contigo mismo antes de empezar: qué te bloquea hoy y cómo lo quitas.", "paraQueSirve": "Cada mañana: qué te frena y qué vas a terminar hoy. No es una lista de lo que hiciste ayer.", "opciones": {"bloqueos": {"texto": "Apuntar qué te bloquea y quitarlo hoy", "acta": "Escribiste el bloqueo que llevabas dos días esquivando y lo resolviste antes de comer. Decirlo en voz alta, aunque sea a ti mismo, ya es empezar a quitarlo."}, "parte": {"texto": "Hacer la lista de todo lo que hiciste ayer", "acta": "La lista quedó larga y ordenada. Lo que te tiene parado no salía en ella: repasar lo hecho no es mirar lo que falta."}, "diseno": {"texto": "Repensar otra vez el diseño entero", "acta": "Los cinco minutos fueron una hora. El diseño sigue igual y el día empezó tarde: lo grande se piensa aparte, con tiempo."}}},
       "nombre": "Reunión diaria",
       "cuando": "diario",
       "costeDias": 0.05,
@@ -82,6 +84,7 @@
     },
     {
       "id": "review",
+      "solo": {"opciones": {"a-medias": {"texto": "Enseñar también lo que está a medias, como si estuviera", "acta": "Quedó muy bien en la sala. Ahora el cliente cuenta con cosas que no están, y tú tienes que cerrarlas deprisa para que no se note. Lo que no está terminado, no se enseña."}}},
       "nombre": "Revisión de sprint",
       "cuando": "finIteracion",
       "costeDias": 0.5,
@@ -121,6 +124,7 @@
     },
     {
       "id": "retro",
+      "solo": {"nombre": "Retro personal", "texto": "Qué te salió bien, qué no y qué vas a cambiar. Solo una cosa: las listas de diez propósitos no cambian nada.", "paraQueSirve": "Miras cómo trabajaste (no qué construiste) y eliges UNA cosa que cambiar en el siguiente sprint."},
       "nombre": "Retrospectiva",
       "cuando": "finIteracion",
       "costeDias": 0.5,
@@ -144,6 +148,7 @@
         },
         {
           "id": "pareja",
+          "soloEnEquipo": true,
           "texto": "Programación en pareja obligatoria en los módulos críticos",
           "coeficiente": "alpha",
           "multiplicador": 0.8,

@@ -33,6 +33,7 @@
   "ceremonias": [
     {
       "id": "reposicion",
+      "solo": {"opciones": {"apetece": {"texto": "Coger lo que más te apetezca", "acta": "Entraron las tarjetas más entretenidas. La que esperaba el cliente sigue esperando."}}},
       "nombre": "Reposición del tablero",
       "cuando": "cada",
       "costeDias": 0,
@@ -74,6 +75,7 @@
     },
     {
       "id": "daily-de-tablero",
+      "solo": {"nombre": "Repaso ante el tablero", "texto": "De pie, delante del tablero, tú solo. Se habla de las tarjetas, no de lo ocupado que estás.", "opciones": {"por-persona": {"texto": "Repasar todo lo que llevas entre manos", "acta": "Estabas ocupado con todo. Las tarjetas atascadas siguieron atascadas: mirarte a ti no es mirar el flujo."}, "empezar-mas": {"texto": "Empezar tarjetas nuevas para no estar parado", "acta": "No estuviste parado. El trabajo sí: saltaste entre tres cosas y ninguna se terminó."}}},
       "nombre": "Reunión diaria ante el tablero",
       "cuando": "diario",
       "costeDias": 0,

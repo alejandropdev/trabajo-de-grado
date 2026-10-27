@@ -9,8 +9,10 @@ namespace Nexus.Core.Coleccion {
         public const string Codigo = "codigo";
         public const string Startup = "startup";
         public const string Advertencia = "advertencia";
+        /// <summary>Notas adhesivas del edificio (los post-its del recorrido 3D): rumores y pistas, no lecciones.</summary>
+        public const string Nota = "nota";
 
-        private static readonly string[] _todas = { Carta, Usb, Codigo, Startup, Advertencia };
+        private static readonly string[] _todas = { Carta, Usb, Codigo, Startup, Advertencia, Nota };
         public static IReadOnlyList<string> Todas { get { return _todas; } }
 
         public static bool EsValida(string serie) {
@@ -35,6 +37,37 @@ namespace Nexus.Core.Coleccion {
                 if (string.Equals(p, palo, StringComparison.Ordinal)) return true;
             return false;
         }
+    }
+
+    /// <summary>Lo dificil que es hacer aparecer un coleccionable del mapa.</summary>
+    public static class DificultadesDeColeccionable {
+        /// <summary>Una condicion de hora o de dia: basta con volver mas tarde.</summary>
+        public const string Facil = "facil";
+        /// <summary>Dia y franja, o una accion sencilla (una ceremonia, una conversacion, una tarea).</summary>
+        public const string Media = "media";
+        /// <summary>Una combinacion, o algo que hay que sostener (quedarse de noche, revisar bien varios cambios).</summary>
+        public const string Dificil = "dificil";
+
+        private static readonly string[] _todas = { Facil, Media, Dificil };
+        public static IReadOnlyList<string> Todas { get { return _todas; } }
+
+        public static bool EsValida(string d) {
+            foreach (var x in _todas)
+                if (string.Equals(x, d, StringComparison.Ordinal)) return true;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Cuando aparece un coleccionable del mapa. Sin esto, esta ahi desde que se entra en la zona. Con esto, solo
+    /// cuando se cumplen TODAS sus precondiciones (la misma sintaxis que las de los eventos); mientras tanto, la zona
+    /// enseña la pista.
+    /// </summary>
+    public sealed class AparicionDeColeccionable {
+        public string Dificultad = DificultadesDeColeccionable.Facil;
+        public List<string> Precondiciones = new List<string>();
+        /// <summary>Lo que se ve en la zona mientras no aparece: mas clara cuanto mas facil.</summary>
+        public string Pista;
     }
 
     /// <summary>
@@ -74,5 +107,10 @@ namespace Nexus.Core.Coleccion {
 
         // --- fragmentos del USB ---
         public int Fragmento;
+
+        /// <summary>Cuando aparece en su zona. null = desde que se entra.</summary>
+        public AparicionDeColeccionable Aparicion;
+
+        public bool TieneCondicion { get { return Aparicion != null && Aparicion.Precondiciones != null && Aparicion.Precondiciones.Count > 0; } }
     }
 }

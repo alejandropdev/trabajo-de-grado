@@ -206,14 +206,48 @@ namespace Nexus.Core.Sesion {
 
         // ==================================================================== coleccionables
 
-        /// <summary>Los coleccionables de la zona donde esta el jugador que todavia no ha recogido.</summary>
+        /// <summary>
+        /// Los coleccionables de la zona donde esta el jugador que todavia no ha recogido y que ya han aparecido: los
+        /// que tienen condicion (Aparicion) solo cuando se cumple.
+        /// </summary>
         public List<string> ColeccionablesAqui() {
+            var lista = new List<string>();
+            foreach (var id in PendientesAqui())
+                if (HaAparecido(id)) lista.Add(id);
+            return lista;
+        }
+
+        /// <summary>Los de la zona que aun no han aparecido: la UI enseña su pista.</summary>
+        public List<Nexus.Core.Coleccion.Coleccionable> ColeccionablesPorAparecerAqui() {
+            var lista = new List<Nexus.Core.Coleccion.Coleccionable>();
+            foreach (var id in PendientesAqui()) {
+                if (HaAparecido(id)) continue;
+                var col = Coleccionable(id);
+                if (col != null) lista.Add(col);
+            }
+            return lista;
+        }
+
+        private List<string> PendientesAqui() {
             var lista = new List<string>();
             var zona = Perfil.Mapa == null ? null : Perfil.Mapa.PorId(R.ZonaActual);
             if (zona == null || zona.Coleccionables == null) return lista;
             foreach (var id in zona.Coleccionables)
                 if (!R.ColeccionablesRecogidos.Contains(id)) lista.Add(id);
             return lista;
+        }
+
+        private Nexus.Core.Coleccion.Coleccionable Coleccionable(string id) {
+            if (_catalogo.Coleccionables == null) return null;
+            foreach (var c in _catalogo.Coleccionables) if (c != null && c.Id == id) return c;
+            return null;
+        }
+
+        /// <summary>Si ya esta a la vista: sin condicion, siempre; con condicion, cuando se cumplen todas.</summary>
+        public bool HaAparecido(string id) {
+            var col = Coleccionable(id);
+            if (col == null || !col.TieneCondicion) return true;
+            return ConditionEvaluator.EvaluarTodas(col.Aparicion.Precondiciones, this);
         }
 
         /// <summary>
@@ -373,6 +407,8 @@ namespace Nexus.Core.Sesion {
                 double v;
                 if (W.TryGet(nombre, out v)) e.EstadoInicial[nombre] = v;
             }
+            foreach (var o in _catalogo.Objetos3D.Objetos) if (o != null) e.Objetos.Add(o.Clone());
+            e.EquipoDesdeRecoleccion = cfg.EquipoDesdeRecoleccion;
             return e;
         }
 
@@ -407,6 +443,15 @@ namespace Nexus.Core.Sesion {
                 recogidos.Add(h);
             }
 
+            // Lo que se trajo del mundo 3D: tambien se valida entero ANTES de tocar nada.
+            var objetos = new List<KeyValuePair<Nexus.Core.Fase1.Objeto3D, int>>();
+            foreach (var kv in resultado.Objetos ?? new Dictionary<string, int>()) {
+                var o = _catalogo.Objetos3D.Buscar(kv.Key);
+                if (o == null) throw new InvalidOperationException($"'{kv.Key}' no es un objeto del recorrido 3D (objetos-3d.json).");
+                if (kv.Value <= 0) throw new InvalidOperationException($"'{kv.Key}' llega con {kv.Value} unidades.");
+                objetos.Add(new KeyValuePair<Nexus.Core.Fase1.Objeto3D, int>(o, kv.Value));
+            }
+
             foreach (var h in recogidos) {
                 if (h.Tipo == Nexus.Core.Fase1.TiposDeHallazgo.Coleccionable) {
                     if (!R.ColeccionablesRecogidos.Contains(h.Id)) R.ColeccionablesRecogidos.Add(h.Id);
@@ -420,7 +465,133 @@ namespace Nexus.Core.Sesion {
             }
             R.HallazgosDeRecoleccion = new List<string>(vistos);
             R.MinutosDeRecoleccion = resultado.MinutosUsados;
+            AplicarObjetos(objetos);
             R.RecoleccionHecha = true;
+            AplicarEquipoRecogido();
+        }
+
+        /// <summary>
+        /// Cada objeto del 3D hace lo suyo: las hojas de vida se apuntan como equipo (y lo que esa persona cambia al
+        /// llegar, una vez), los suministros se guardan para la Fase 2, las piezas del diario van al diario y los
+        /// objetos de efecto cambian el proyecto. Las notas solo se cuentan.
+        /// </summary>
+        private void AplicarObjetos(List<KeyValuePair<Nexus.Core.Fase1.Objeto3D, int>> objetos) {
+            R.ObjetosDeRecoleccion = new Dictionary<string, int>(StringComparer.Ordinal);
+            // En el orden del catalogo: el equipo sale siempre igual, se recogiera en el orden que se recogiera.
+            objetos.Sort((a, b) => _catalogo.Objetos3D.Objetos.IndexOf(a.Key).CompareTo(_catalogo.Objetos3D.Objetos.IndexOf(b.Key)));
+            foreach (var kv in objetos) {
+                var o = kv.Key;
+                R.ObjetosDeRecoleccion[o.Id] = kv.Value;
+                switch (o.Tipo) {
+                    case Nexus.Core.Fase1.TiposDeObjeto3D.Candidato:
+                        if (R.EquipoRecogido.Contains(o.Id)) continue;
+                        R.EquipoRecogido.Add(o.Id);   // lo que trae al llegar se cobra al cerrar la Fase 1, si entra
+                        break;
+                    case Nexus.Core.Fase1.TiposDeObjeto3D.Suministro:
+                        int ya;
+                        R.Suministros.TryGetValue(o.Id, out ya);
+                        R.Suministros[o.Id] = ya + kv.Value;
+                        break;
+                    case Nexus.Core.Fase1.TiposDeObjeto3D.Coleccionable:
+                        if (!string.IsNullOrEmpty(o.Coleccionable) && !R.ColeccionablesRecogidos.Contains(o.Coleccionable))
+                            R.ColeccionablesRecogidos.Add(o.Coleccionable);
+                        break;
+                    case Nexus.Core.Fase1.TiposDeObjeto3D.Efecto:
+                        AplicarEfectosDeObjeto(o.Efectos);
+                        break;
+                }
+            }
+        }
+
+        private void AplicarEfectosDeObjeto(Dictionary<string, double> efectos) {
+            if (efectos == null || efectos.Count == 0) return;
+            var d = new Dictionary<string, object>(StringComparer.Ordinal);
+            foreach (var kv in efectos) d[kv.Key] = kv.Value;
+            EffectApplier.Aplicar(W, d);
+        }
+
+        /// <summary>
+        /// Si el nivel lo pide, el equipo del proyecto son las hojas de vida recogidas: se cambia el del perfil (una
+        /// copia: el catalogo no se toca), y con el todo lo que lo lee (la Fase 1, el tablero, el panel «Equipo»). Sin
+        /// ninguna, trabajas tu solo. Se llama al aplicar la recoleccion y al restaurar un guardado posterior.
+        /// </summary>
+        private void AplicarEquipoRecogido() {
+            var cfg = Recoleccion;
+            if (cfg == null || !cfg.EquipoDesdeRecoleccion || !R.RecoleccionHecha) return;
+            var equipo = new List<Nexus.Core.Tablero.MiembroDelEquipo>();
+            foreach (var o in HojasDelEquipo()) equipo.Add(Nexus.Core.Fase1.Objeto3D.CopiarMiembro(o.Miembro));
+            if (equipo.Count == 0) equipo.Add(Nexus.Core.Fase1.CatalogoDeObjetos3D.TuSolo());
+            Perfil.Equipo = equipo;
+            Perfil.EquipoInicial = equipo.Count;
+        }
+
+        /// <summary>Cuantas personas caben en el equipo de este proyecto. 0 = sin limite.</summary>
+        public int MaxEquipo { get { return Recoleccion == null ? 0 : Math.Max(0, Recoleccion.MaxEquipo); } }
+
+        /// <summary>Todas las hojas de vida recogidas, entren o no, en el orden del catalogo.</summary>
+        public List<Nexus.Core.Fase1.Objeto3D> HojasRecogidas() {
+            var lista = new List<Nexus.Core.Fase1.Objeto3D>();
+            foreach (var id in R.EquipoRecogido) {
+                var o = _catalogo.Objetos3D.Buscar(id);
+                if (o != null && o.Miembro != null) lista.Add(o);
+            }
+            return lista;
+        }
+
+        /// <summary>
+        /// Las que forman el equipo: las elegidas por el jugador o, si no eligio (o caben todas), las primeras hasta el
+        /// limite del proyecto.
+        /// </summary>
+        public List<Nexus.Core.Fase1.Objeto3D> HojasDelEquipo() {
+            var todas = HojasRecogidas();
+            var max = MaxEquipo;
+            if (R.EquipoElegido.Count > 0) {
+                var elegidas = todas.FindAll(o => R.EquipoElegido.Contains(o.Miembro.Id));
+                if (elegidas.Count > 0) todas = elegidas;
+            }
+            return max > 0 && todas.Count > max ? todas.GetRange(0, max) : todas;
+        }
+
+        /// <summary>Hay mas hojas de vida que plazas: el jugador tiene que (o puede) elegir quien entra.</summary>
+        public bool HayQueElegirEquipo { get { return EquipoDesdeRecoleccion && MaxEquipo > 0 && HojasRecogidas().Count > MaxEquipo; } }
+
+        public string PorQueNoSePuedeElegirEquipo(ICollection<string> miembros) {
+            if (Fase1Cerrada) return "El equipo ya está formado: la planificación está cerrada.";
+            if (!HayQueElegirEquipo) return "Caben todas las hojas de vida que recogiste: no hay que elegir.";
+            if (miembros == null || miembros.Count == 0) return "Elige al menos a una persona.";
+            if (miembros.Count > MaxEquipo) return $"En este proyecto caben {MaxEquipo} personas.";
+            var recogidas = HojasRecogidas();
+            foreach (var id in miembros)
+                if (!recogidas.Exists(o => o.Miembro.Id == id)) return "Solo puedes elegir entre las hojas de vida que recogiste.";
+            return null;
+        }
+
+        /// <summary>Quien entra en el equipo cuando se recogieron mas hojas de vida de las que caben. Hasta cerrar la Fase 1.</summary>
+        public void ElegirEquipo(ICollection<string> miembros) {
+            var motivo = PorQueNoSePuedeElegirEquipo(miembros);
+            if (motivo != null) throw new InvalidOperationException(motivo);
+            R.EquipoElegido = new List<string>(miembros);
+            AplicarEquipoRecogido();
+        }
+
+        /// <summary>Al cerrar la Fase 1: lo que cada persona que SI entro trae al llegar (una vez).</summary>
+        private void AplicarLlegadaDelEquipo() {
+            if (!EquipoDesdeRecoleccion || !R.RecoleccionHecha) return;
+            foreach (var o in HojasDelEquipo()) AplicarEfectosDeObjeto(o.Efectos);
+        }
+
+        /// <summary>El equipo sale de lo que se recoja en el recorrido (y todavia no se ha recorrido, o ya si).</summary>
+        public bool EquipoDesdeRecoleccion { get { return Recoleccion != null && Recoleccion.EquipoDesdeRecoleccion; } }
+
+        /// <summary>Lo que se trajo del 3D, en el orden del catalogo, con cuantos de cada uno. Sin los ocultos.</summary>
+        public List<KeyValuePair<Nexus.Core.Fase1.Objeto3D, int>> ObjetosRecogidos() {
+            var lista = new List<KeyValuePair<Nexus.Core.Fase1.Objeto3D, int>>();
+            foreach (var o in _catalogo.Objetos3D.Objetos) {
+                int n;
+                if (o != null && !o.Oculto && R.ObjetosDeRecoleccion.TryGetValue(o.Id, out n) && n > 0)
+                    lista.Add(new KeyValuePair<Nexus.Core.Fase1.Objeto3D, int>(o, n));
+            }
+            return lista;
         }
 
         /// <summary>Los hallazgos recogidos, en el orden del catalogo.</summary>
@@ -467,6 +638,23 @@ namespace Nexus.Core.Sesion {
         public int VecesHoy(string tareaId) {
             int n;
             return R.TareasDeOficinaHoy.TryGetValue(tareaId ?? "", out n) ? n : 0;
+        }
+
+        /// <summary>
+        /// El caso que toca hoy de esa tarea (o el que esta abierto). Los casos se barajan con la semilla de la partida
+        /// (cada partida, otro orden) y se recorren en orden: no se repite ninguno hasta que han salido todos. No gasta
+        /// el azar de la sesion, como el cambio a revisar del tablero (ElegirPrDeHoy).
+        /// </summary>
+        public Nexus.Core.Oficina.VarianteDeTarea CasoDeHoy(string tareaId) {
+            var t = Perfil.Oficina == null ? null : Perfil.Oficina.PorId(tareaId);
+            if (t == null) return null;
+            var casos = t.Casos();
+            casos.Sort((a, b) => GeneradorDeTarjetas.Hash(Semilla, "of:" + t.Id + ":" + a.Minijuego)
+                                     .CompareTo(GeneradorDeTarjetas.Hash(Semilla, "of:" + t.Id + ":" + b.Minijuego)));
+            var hechasHoy = VecesHoy(t.Id);
+            if (R.TareaDeOficinaAbierta == t.Id && hechasHoy > 0) hechasHoy--;   // la abierta ya se conto al empezarla
+            var k = Math.Max(0, R.DiaActual - 1) * Math.Max(1, t.VecesPorDia) + hechasHoy;
+            return casos[k % casos.Count];
         }
 
         /// <summary>null si la tarea se puede empezar ahora; si no, el porque, en palabras para el jugador.</summary>
@@ -729,6 +917,7 @@ namespace Nexus.Core.Sesion {
 
             _eventos = new EventDirector(EventosDelNivel(_catalogo, Perfil.Id), Perfil, Reglas, _rng, _scheduler);
             _minijuegos = new MinigameDirector(MinijuegosDelNivel(_catalogo, Perfil.Id), Perfil, _rng);
+            AplicarLlegadaDelEquipo();
             AplicarElBacklogCreado();   // antes del tablero: lo que nadie pidio hace crecer el alcance
             AsegurarTablero();
         }
@@ -746,6 +935,8 @@ namespace Nexus.Core.Sesion {
             // Si el jugador armo el product backlog, las tarjetas son sus historias, en su orden.
             GeneradorDeTarjetas.AplicarHistorias(R.Tablero, Perfil.Proyecto, R.BacklogElegido);
             // Kanban: el limite de trabajo en curso es el del tablero, y con el que se empieza es el neutro.
+            // Solo, con 3 tarjetas a la vez el cansancio por llevar dos o mas te quemaria todos los dias: el neutro es 2.
+            if (TrabajasSolo && R.LimiteWip > 2) R.LimiteWip = 2;
             if (Politica != null && Politica.LimiteDeWip && R.LimiteWip > 0)
                 R.Tablero.LimiteEnCurso = R.Tablero.LimiteNeutro = R.LimiteWip;
             SincronizarTablero();
@@ -782,6 +973,7 @@ namespace Nexus.Core.Sesion {
             R.JornadaProrrogada = false;
             R.JornadaSimulada = false;
             R.TareasDeOficinaHoy.Clear();
+            R.AccionesSoloHoy.Clear();
             R.TareaDeOficinaAbierta = null;
             R.ZonaActual = Perfil.Mapa != null && !Perfil.Mapa.Vacio ? Perfil.Mapa.Ancla?.Id : null;
 
@@ -821,8 +1013,9 @@ namespace Nexus.Core.Sesion {
 
                 if (ceremonia.AjustaCoeficiente)
                     PendingRetro = new RetroRequest {
-                        CeremoniaId = ceremonia.Id, Texto = ceremonia.Texto,
-                        Acciones = ceremonia.Acciones ?? new List<AccionRetro>()
+                        CeremoniaId = ceremonia.Id, Texto = TextoDe(ceremonia),
+                        // Solo no hay con quien programar en pareja: esas acciones no se ofrecen.
+                        Acciones = (ceremonia.Acciones ?? new List<AccionRetro>()).FindAll(a => a != null && !(TrabajasSolo && a.SoloEnEquipo))
                     };
 
                 if (_planDeHoy.EsPrimerDiaDeUnidad && string.Equals(ceremonia.Verbo, "V5", StringComparison.OrdinalIgnoreCase))
@@ -1477,6 +1670,7 @@ namespace Nexus.Core.Sesion {
                 case "volatilidadreal": valor = Perfil.VolatilidadReal; return true;
                 case "riesgolatente": valor = Derivadas().RiesgoLatente; return true;
                 case "retrasorelativo": valor = RetrasoRelativo(); return true;
+                case "tamanoequipo": valor = EquipoDelProyecto().Count; return true;
                 default: valor = 0; return false;
             }
         }
@@ -1579,6 +1773,7 @@ namespace Nexus.Core.Sesion {
             s.Lanzamiento = nivel.Lanzamiento;
             s._fichasDeCalidad = nivel.FichasDeCalidad ?? new Dictionary<string, int>(StringComparer.Ordinal);
             s.ReaplicarPesosDeCalidad();   // ← lo unico de la Fase 1 que SI hay que reaplicar
+            s.AplicarEquipoRecogido();     // y el equipo, si salio de las hojas de vida del recorrido
 
             // el reloj y las alertas del dia a medias. Guardar a las 14:00 con una alerta viva hasta
             // las 16:00 y recargar tiene que devolver EXACTAMENTE esa situacion (INV-7).

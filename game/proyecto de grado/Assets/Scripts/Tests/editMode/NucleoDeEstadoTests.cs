@@ -250,7 +250,10 @@ namespace Nexus.Tests {
             CollectionAssert.AreEquivalent(
                 new[] { "diaActual", "fase", "wipActual", "limiteWip", "sobreCompromiso",
                         "diasConHorasExtra", "diasSeguidosTrabajando", "cambiosAceptados",
-                        "vecesQueSeFueACasa", "accionesRetroElegidas", "minutoDelDia" },
+                        "vecesQueSeFueACasa", "accionesRetroElegidas", "minutoDelDia",
+                        // lo que hizo el jugador: lo leen las condiciones de aparicion de los coleccionables
+                        "jornadaProrrogada", "prsBienRevisados", "tareasDeOficinaHechas", "minijuegosJugados",
+                        "conversacionesHechas", "ceremoniasAsistidas", "coleccionablesRecogidos" },
                 RuntimeState.Consultables);
 
             foreach (var nombre in RuntimeState.Consultables)
@@ -261,7 +264,7 @@ namespace Nexus.Tests {
             Assert.IsTrue(r.TryGet("sobreCompromiso", out v));
             Assert.AreEqual(1.5, v, Tol);
 
-            foreach (var interno in new[] { "sprintActual", "visitasZonaC", "minijuegosJugados", "ventana", "cambiosRechazados" })
+            foreach (var interno in new[] { "sprintActual", "visitasZonaC", "ventana", "cambiosRechazados" })
                 Assert.IsFalse(r.TryGet(interno, out v), interno + " es interno a proposito");
         }
 
