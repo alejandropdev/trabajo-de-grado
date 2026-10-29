@@ -8,6 +8,7 @@ using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>
@@ -27,6 +28,12 @@ namespace Nexus.Unity.Pantallas {
 
         public override bool PuedeVolver { get { return false; } }
 
+        // El reporte PDF: generado, o descartado a sabiendas. Mientras no pase una de las dos, no se continua.
+        private Button _seguir;
+        private RectTransform _estadoDelReporte;
+        private string _rutaDelReporte, _errorDelReporte;
+        private bool _reporteGenerado, _reporteOmitido;
+
         protected override void Construir() {
             var r = Reporte;
             var superado = r.CumpleUmbralesDeExito;
@@ -42,10 +49,16 @@ namespace Nexus.Unity.Pantallas {
             GuiaView.BotonDeAyuda(App, cabecera);
             if (!superado && AlRepetir != null) {
                 Ui.Boton(cabecera, "Repetir el nivel", () => AlRepetir(), VarianteBoton.Primario);
-                Ui.Boton(cabecera, "Seguir de todos modos", () => AlSeguir?.Invoke());
+                _seguir = Ui.Boton(cabecera, "Seguir de todos modos", () => AlSeguir?.Invoke());
             } else {
-                Ui.Boton(cabecera, "Continuar", () => AlSeguir?.Invoke(), VarianteBoton.Primario);
+                _seguir = Ui.Boton(cabecera, "Continuar", () => AlSeguir?.Invoke(), VarianteBoton.Primario);
             }
+
+            // El reporte para los profesores: casi obligatorio. «Continuar» no se abre hasta generarlo o decir, a
+            // sabiendas, que se sigue sin él.
+            var tarjetaDelReporte = Ui.Tarjeta(marco, "Reporte para tus profesores");
+            _estadoDelReporte = Ui.Columna(tarjetaDelReporte, "Estado del reporte", Tema.espacio);
+            PintarReporte();
 
             RectTransform contenido;
             var scroll = Ui.Desplazable(marco, out contenido);
@@ -80,6 +93,61 @@ namespace Nexus.Unity.Pantallas {
             GuiaView.RegistrarRespaldo("lecciones.decisiones", pestanas.Boton(1));
             GuiaView.RegistrarRespaldo("lecciones.radar", pestanas.Boton(3));
             GuiaView.Avisar(App, "lecciones");
+        }
+
+        // ================================================================== el reporte PDF
+
+        /// <summary>Rehace el cuerpo de la tarjeta segun en que punto va el reporte, y abre o cierra «Continuar».</summary>
+        private void PintarReporte() {
+            foreach (Transform hijo in _estadoDelReporte) {
+                hijo.gameObject.SetActive(false);
+                Destroy(hijo.gameObject);
+            }
+
+            if (_reporteGenerado) {
+                Ui.Notificacion(_estadoDelReporte, "Reporte guardado: " + _rutaDelReporte, Tono.Exito);
+                Ui.Texto(_estadoDelReporte, "Es un PDF con formato APA 7. Adjúntalo a tu correo para tus profesores.", EstiloTexto.Pequeno);
+                var fila = Ui.Fila(_estadoDelReporte);
+                Ui.Boton(fila, "Abrir la carpeta", () => ExportadorDeReportes.MostrarEnCarpeta(_rutaDelReporte), VarianteBoton.Primario);
+                Ui.Boton(fila, "Generarlo de nuevo", GenerarReporte, VarianteBoton.Fantasma);
+            } else {
+                if (_errorDelReporte != null)
+                    Ui.Notificacion(_estadoDelReporte, "No se pudo guardar el reporte: " + _errorDelReporte, Tono.Peligro);
+                else if (_reporteOmitido)
+                    Ui.Notificacion(_estadoDelReporte, "Vas a seguir sin el reporte de este nivel. Aún puedes generarlo.", Tono.Aviso);
+                else
+                    Ui.Texto(_estadoDelReporte, "Genera el informe de lo que enseñó este nivel, en PDF, para mandárselo a tus profesores. " +
+                             "Se guarda en Documentos\\" + ExportadorDeReportes.NombreDeCarpeta + "\\" + ExportadorDeReportes.SubcarpetaDeReportes + ".", EstiloTexto.Cuerpo);
+                var fila = Ui.Fila(_estadoDelReporte);
+                Ui.Boton(fila, _errorDelReporte != null ? "Reintentar" : "Generar reporte PDF", GenerarReporte, VarianteBoton.Primario);
+                if (!_reporteOmitido)
+                    Ui.Boton(fila, "Omitir", PedirOmitirReporte, VarianteBoton.Fantasma);
+                if (!_reporteOmitido)
+                    Ui.Texto(_estadoDelReporte, "Para continuar, genera el reporte o pulsa «Omitir».", EstiloTexto.Pequeno, Tema.warning);
+            }
+
+            if (_seguir != null) _seguir.interactable = _reporteGenerado || _reporteOmitido;
+        }
+
+        private void GenerarReporte() {
+            try {
+                _rutaDelReporte = ExportadorDeReportes.Exportar(App, Reporte);
+                _errorDelReporte = null;
+                _reporteGenerado = true;
+            } catch (Exception e) {
+                _errorDelReporte = e.Message;
+                UnityEngine.Debug.LogWarning("No se pudo generar el reporte de lecciones: " + e);
+            }
+            PintarReporte();
+        }
+
+        private void PedirOmitirReporte() {
+            App.Router.Apilar<PantallaDeConfirmacion>(c => {
+                c.Titulo = "¿Seguir sin el reporte?";
+                c.Texto = "Tus profesores no recibirán el informe de lo que enseñó este nivel, y una vez que sigas no podrás generarlo desde el juego.";
+                c.TextoSi = "Omitir";
+                c.AlConfirmar = () => { _reporteOmitido = true; _errorDelReporte = null; PintarReporte(); };
+            });
         }
 
         // 1
