@@ -40,6 +40,12 @@ namespace Nexus.Core.Evaluacion {
         public string Oa;
 
         public string Enunciado;
+
+        /// <summary>
+        /// La pregunta en una linea, para verla de un vistazo. El Enunciado y las opciones completas son el instrumento del
+        /// pre-test y no cambian: siguen disponibles en pantalla («Ver pregunta completa»).
+        /// </summary>
+        public string Frase;
         public List<OpcionDePregunta> Opciones = new List<OpcionDePregunta>();
 
         /// <summary>El id de la opcion correcta.</summary>
@@ -52,6 +58,9 @@ namespace Nexus.Core.Evaluacion {
     public sealed class OpcionDePregunta {
         public string Id;
         public string Texto;
+
+        /// <summary>Lo que dice el boton en la vista corta (tres palabras como mucho).</summary>
+        public string Etiqueta;
     }
 
     /// <summary>

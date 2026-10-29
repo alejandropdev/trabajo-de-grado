@@ -237,9 +237,24 @@ namespace Nexus.Unity.Pantallas {
                      m.RazonValida ? Tema.success : m.RazonTrampa ? Tema.danger : Tema.warning);
             if (m.Practicas.Count > 0) {
                 Ui.Texto(t, "Sus prácticas, contra lo que pasó:", EstiloTexto.Pequeno);
-                foreach (var p in m.Practicas.Where(x => x.Evaluable))
-                    Ui.Texto(t, (p.Cumple ? "√ " : "× ") + p.Descripcion + (string.IsNullOrEmpty(p.Razon) ? "" : " — " + p.Razon),
-                             EstiloTexto.Pequeno, p.Cumple ? Tema.ink : Tema.warning);
+                var evaluables = m.Practicas.Where(x => x.Evaluable).ToList();
+                // Una linea por practica; el porque de cada una queda plegado (el PDF lo conserva completo).
+                foreach (var p in evaluables)
+                    Ui.Texto(t, (p.Cumple ? "√ " : "× ") + p.Descripcion, EstiloTexto.Pequeno, p.Cumple ? Tema.ink : Tema.warning);
+                if (evaluables.Any(p => !string.IsNullOrEmpty(p.Razon))) {
+                    var razones = Ui.Columna(t, "Razones", Tema.Espacio(1));
+                    foreach (var p in evaluables.Where(x => !string.IsNullOrEmpty(x.Razon)))
+                        Ui.Texto(razones, (p.Cumple ? "√ " : "× ") + p.Razon, EstiloTexto.Pequeno, p.Cumple ? Tema.ink : Tema.warning);
+                    razones.gameObject.SetActive(false);
+                    var abierto = false;
+                    Button ver = null;
+                    ver = Ui.Boton(t, "Ver por qué", () => {
+                        abierto = !abierto;
+                        razones.gameObject.SetActive(abierto);
+                        var texto = ver.GetComponentInChildren<TMP_Text>();
+                        if (texto != null) texto.text = abierto ? "Ocultar por qué" : "Ver por qué";
+                    }, VarianteBoton.Fantasma);
+                }
             }
             return t;
         }

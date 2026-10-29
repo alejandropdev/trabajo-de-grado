@@ -34,10 +34,10 @@ namespace Nexus.Unity.Pantallas {
             var tono = nivel == NivelesDeLanzamiento.Bien ? Tono.Exito : nivel == NivelesDeLanzamiento.Mal ? Tono.Peligro : Tono.Aviso;
             UiKit.Tamano(Ui.Cifra(hoja.Fila(), $"{l.Puntaje:0} / 100", "Puntaje del lanzamiento", null, tono).transform.parent, ancho: 320);
             hoja.Parrafo(nivel == NivelesDeLanzamiento.Bien
-                ? "El cliente recibió lo que esperaba y casi sin sorpresas. Así se ve un proyecto bien llevado."
+                ? "El cliente recibió lo que esperaba, casi sin sorpresas."
                 : nivel == NivelesDeLanzamiento.ConProblemas
-                    ? "Se entregó, pero el cliente notó cosas. No es un desastre, pero tampoco es lo que se buscaba: mira abajo qué falló."
-                    : "El cliente no quedó contento. Abajo está qué falló y qué decisiones lo provocaron: es justo lo que hay que aprender.");
+                    ? "Se entregó, pero el cliente notó cosas. Mira abajo qué falló."
+                    : "El cliente no quedó contento. Abajo, qué falló y qué lo provocó.");
             if (!string.IsNullOrEmpty(l.Texto)) hoja.Parrafo(l.Texto);
             if (!string.IsNullOrEmpty(l.TextoMetodologia)) hoja.Parrafo(l.TextoMetodologia, Tema.inkMuted);
 
@@ -68,8 +68,8 @@ namespace Nexus.Unity.Pantallas {
             }
 
             hoja.Nota(nivel == NivelesDeLanzamiento.Bien
-                ? "Al cerrar el nivel verás cada decisión con su explicación."
-                : "Al cerrar el nivel podrás repetirlo para intentar que salga bien, o seguir adelante con estas consecuencias.");
+                ? "Al cerrar verás cada decisión con su porqué."
+                : "Al cerrar podrás repetir el nivel o seguir adelante.");
             hoja.Accion("Cerrar el nivel", () => AlSeguir?.Invoke());
             GuiaView.Avisar(App, "lanzamiento");
         }

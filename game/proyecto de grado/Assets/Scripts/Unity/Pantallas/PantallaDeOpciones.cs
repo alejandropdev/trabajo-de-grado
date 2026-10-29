@@ -46,6 +46,13 @@ namespace Nexus.Unity.Pantallas {
             Opcion(fila, "Ventana", p => p.pantallaCompleta = false, p => !p.pantallaCompleta);
 
             Hoja.Espacio();
+            Hoja.Subtitulo("Textos", Tema.ink);
+            Hoja.Nota("Frases cortas y tarjetas, o los textos completos de siempre.");
+            fila = Hoja.Fila();
+            Opcion(fila, "Tarjetas y frases cortas", p => p.modoTarjetas = true, p => p.modoTarjetas);
+            Opcion(fila, "Textos completos", p => p.modoTarjetas = false, p => !p.modoTarjetas);
+
+            Hoja.Espacio();
             Ui.Boton(Hoja.Fila(), "Cerrar", () => App.Router.Volver(), VarianteBoton.Primario);
             Refrescar();
         }

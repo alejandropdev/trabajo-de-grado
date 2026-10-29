@@ -13,6 +13,9 @@ namespace Nexus.Core.Sesion {
         public string Nombre;
         public string Texto;
         public string ParaQueSirve;
+        /// <summary>Lo que dice la tarjeta (ver Ceremonia.Frase). Vacio = no hay tarjeta para esta ceremonia.</summary>
+        public string Frase;
+        public string Ayuda;
         public int DuracionMinutos;
         /// <summary>La vista de monitoreo que se pone delante en la reunion (o null).</summary>
         public string Muestra;
@@ -452,6 +455,7 @@ namespace Nexus.Core.Sesion {
                 if (c.Opciones == null || c.Opciones.Count == 0) continue;
                 lista.Add(new CeremoniaDeHoy {
                     Id = c.Id, Nombre = NombreDe(c), Texto = TextoDe(c), ParaQueSirve = ParaQueSirveDe(c),
+                    Frase = c.Frase, Ayuda = c.Ayuda,
                     DuracionMinutos = c.DuracionMinutos, Muestra = c.Muestra, Opciones = OpcionesDe(c),
                     Hecha = R.CeremoniasHechasHoy.Contains(c.Id)
                 });

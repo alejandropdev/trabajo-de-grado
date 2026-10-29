@@ -14,13 +14,19 @@ namespace Nexus.Core {
         /// <summary>0 = silencio, 1 = volumen completo.</summary>
         public double volumenGeneral = 1.0;
         public bool pantallaCompleta = true;
+        /// <summary>
+        /// Tarjetas y frases cortas (true) o los textos completos de siempre (false). Existe para poder comparar las dos
+        /// versiones con usuarios y para volver atras si algo falla.
+        /// </summary>
+        public bool modoTarjetas = true;
 
         /// <summary>Devuelve los valores dentro de su rango: un JSON editado a mano no puede romper el juego.</summary>
         public Preferencias Acotadas() {
             return new Preferencias {
                 velocidadDeSimulacion = Acotar(velocidadDeSimulacion, VelocidadMinima, VelocidadMaxima, 1.0),
                 volumenGeneral = Acotar(volumenGeneral, 0, 1, 1.0),
-                pantallaCompleta = pantallaCompleta
+                pantallaCompleta = pantallaCompleta,
+                modoTarjetas = modoTarjetas
             };
         }
 

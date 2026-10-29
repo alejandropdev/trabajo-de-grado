@@ -237,6 +237,12 @@ namespace Nexus.Core.Metodologia {
 
         public string Texto;
 
+        /// <summary>La frase de la tarjeta de esta ceremonia (una linea, doce palabras como mucho). Sin ella no sale como tarjeta.</summary>
+        public string Frase;
+
+        /// <summary>La linea del «?» de la tarjeta (dieciocho palabras como mucho).</summary>
+        public string Ayuda;
+
         public Dictionary<string, object> Efectos = new Dictionary<string, object>(StringComparer.Ordinal);
 
         /// <summary>Si es true, Acciones no puede estar vacia: es la retrospectiva.</summary>
@@ -307,6 +313,9 @@ namespace Nexus.Core.Metodologia {
     public sealed class AccionRetro {
         public string Id;
         public string Texto;
+
+        /// <summary>Lo que dice el boton de la tarjeta de la retrospectiva (hasta 3 palabras). null = se sigue mostrando Texto.</summary>
+        public string Etiqueta;
 
         /// <summary>alpha | beta | gamma | delta | sensibilidadMoral | theta | iota | kappa | lambda.</summary>
         public string Coeficiente;

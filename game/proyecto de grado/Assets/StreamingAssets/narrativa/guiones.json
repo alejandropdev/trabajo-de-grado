@@ -6,11 +6,8 @@
       "id": "CIN-0.0", "titulo": "El Ascensor", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 1,
       "variantes": {
         "default": [
-          { "quien": "narrador", "texto": "Un ascensor de vidrio sube por la fachada del edificio N1. Dentro, una sola persona. No dice nada." },
-          { "quien": "narrador", "texto": "Por el cristal se ve el campus por niveles: gris al norte, azul al este, blanco al sur. Al fondo, un cubo de titanio sin ventanas." },
-          { "quien": "Megafonía", "texto": "Bienvenidos al Concurso de Admisión de Nexus. Les rogamos mantengan sus credenciales visibles durante toda la estancia." },
-          { "quien": "Megafonía", "texto": "Los concursantes dispondrán de un puesto, un equipo y acceso a las zonas comunes de N1. El uso de recursos externos queda registrado." },
-          { "quien": "Megafonía", "texto": "Antes de comenzar, cada concursante será entrevistado. La entrevista no puntúa. Se ruega responder con sinceridad." },
+          { "quien": "narrador", "texto": "Un ascensor de vidrio sube por el edificio N1. Dentro, una sola persona. No dice nada." },
+          { "quien": "Megafonía", "texto": "Bienvenidos al Concurso de Admisión de Nexus. Antes de empezar, cada concursante será entrevistado. La entrevista no puntúa." },
           { "quien": "Megafonía", "texto": "Cinco días. Un problema real. Un ganador." }
         ]
       }
@@ -20,11 +17,10 @@
       "id": "ENT-0", "titulo": "La entrevista de admisión", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 2,
       "variantes": {
         "default": [
-          { "quien": "narrador", "texto": "Una sala pequeña, una mesa, dos sillas al otro lado. En una, una mujer con una planilla. En la otra, un hombre canoso de traje verde que no se presenta." },
-          { "quien": "Marisol Andrade", "texto": "Buenos días. Soy Marisol Andrade. Le haré quince preguntas; conteste la que le parezca correcta. Si no sabe una, dígalo: no se descuenta nada." },
-          { "quien": "Marisol Andrade", "texto": "El señor que me acompaña solo va a escuchar." },
-          { "quien": "narrador", "texto": "El hombre no levanta la vista. Cada vez que respondas, se inclinará hacia ella y le dirá algo en voz baja. Ella no lo repetirá. Tú sí lo oirás." },
-          { "quien": "Marisol Andrade", "texto": "Antes de empezar, para la ficha: ¿de dónde viene usted?" }
+          { "quien": "narrador", "texto": "Una sala pequeña. Una mujer con una planilla; a su lado, un hombre de traje verde que no se presenta." },
+          { "quien": "Marisol Andrade", "texto": "Soy Marisol Andrade. Quince preguntas; si no sabe una, dígalo: no se descuenta nada. El señor solo escucha." },
+          { "quien": "narrador", "texto": "Cada vez que respondas, el hombre le susurrará algo a ella. Ella no lo repetirá. Tú sí lo oirás." },
+          { "quien": "Marisol Andrade", "texto": "Para la ficha: ¿de dónde viene usted?" }
         ]
       },
       "opciones": [
@@ -37,9 +33,8 @@
       "id": "ENT-0.FIN", "titulo": "Fin de la entrevista", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 3,
       "variantes": {
         "default": [
-          { "quien": "Marisol Andrade", "texto": "Eso es todo. Gracias." },
-          { "quien": "narrador", "texto": "El hombre se levanta primero y sale sin despedirse. Marisol termina de escribir, cierra la planilla y te acompaña a la puerta." },
-          { "quien": "Marisol Andrade", "texto": "Su puesto es el siete. El problema del concurso le estará esperando en la pantalla." }
+          { "quien": "Marisol Andrade", "texto": "Eso es todo. Su puesto es el siete: el problema del concurso le espera en la pantalla." },
+          { "quien": "narrador", "texto": "El hombre sale sin despedirse." }
         ]
       }
     },
@@ -48,10 +43,9 @@
       "id": "CIN-0.1", "titulo": "El Problema", "nivel": "nivel-00", "momento": "antesDelNivel", "orden": 4,
       "variantes": {
         "default": [
-          { "quien": "narrador", "texto": "En la pantalla del puesto siete se abre un ticket: NEX-4417. Prioridad: P1." },
-          { "quien": "narrador", "texto": "Un ticket no es un encargo: es una conversación. Arriba, el resumen. Debajo, la descripción. Y abajo del todo, lo que casi nadie lee: las restricciones y los comentarios." },
-          { "quien": "narrador", "texto": "La restricción dice que la recepción tiene un solo equipo y que ningún visitante va a instalar nada. Un comentario pregunta algo que nadie ha contestado." },
-          { "quien": "narrador", "texto": "Todo lo que necesitas para decidir está en este ticket. No todo está en la primera línea." }
+          { "quien": "narrador", "texto": "En el puesto siete se abre el ticket NEX-4417. Prioridad: P1." },
+          { "quien": "narrador", "texto": "Un ticket es una conversación. Abajo del todo está lo que casi nadie lee: las restricciones y los comentarios." },
+          { "quien": "narrador", "texto": "Todo lo que necesitas para decidir está aquí. No todo está en la primera línea." }
         ]
       }
     },
@@ -60,11 +54,9 @@
       "id": "GUIA-0.F1", "titulo": "Antes de empezar", "nivel": "nivel-00", "momento": "fase1", "orden": 1,
       "variantes": {
         "default": [
-          { "quien": "Marisol Andrade", "texto": "Antes de escribir una sola línea de código, todo proyecto toma tres decisiones. Las tres quedan registradas, y de ellas depende cómo te va a ir los cinco días." },
-          { "quien": "Marisol Andrade", "texto": "Una: CÓMO va a trabajar tu equipo. Eso se llama metodología. Puede ser por etapas, una detrás de otra (cascada); por vueltas cortas de una semana que se revisan al final (Scrum); o como un tablero por el que el trabajo va pasando (Kanban)." },
-          { "quien": "Marisol Andrade", "texto": "Dos: QUÉ vas a cuidar más. Es la calidad. Tienes cuatro fichas para repartir entre tres cosas: que haga lo que se pidió, que sea fácil de usar y que no se caiga. Lo que dejes sin fichas es justo lo que el jurado va a probar." },
-          { "quien": "Marisol Andrade", "texto": "Tres: QUÉ FORMA tiene lo que construyes. Es la arquitectura, como el plano de una casa: una web sencilla, una app para el móvil… La pista está en las restricciones del encargo." },
-          { "quien": "Marisol Andrade", "texto": "En las tres te pediré POR QUÉ. Elegir bien por un mal motivo también cuenta en contra: la suerte no se repite. Si te pierdes, pulsa «¿Qué hago ahora?»." }
+          { "quien": "Marisol Andrade", "texto": "Antes de programar, todo proyecto toma tres decisiones: cómo trabajar (metodología), qué cuidar (calidad) y qué forma tiene (arquitectura)." },
+          { "quien": "Marisol Andrade", "texto": "En las tres te pediré POR QUÉ. Acertar por un mal motivo también cuenta en contra." },
+          { "quien": "Marisol Andrade", "texto": "Si te pierdes, pulsa «¿Qué hago ahora?»." }
         ]
       }
     },
@@ -73,10 +65,8 @@
       "id": "TUT-0.1", "titulo": "Aquí el día corre", "nivel": "nivel-00", "momento": "dia",
       "variantes": {
         "default": [
-          { "quien": "Marisol Andrade", "texto": "Una cosa antes de que empieces. Aquí el día no salta de hora en hora: corre. Mira el reloj de la pared." },
-          { "quien": "Marisol Andrade", "texto": "Cuando algo te necesite, te llegará un aviso a tu puesto. Tendrás unas horas para atenderlo, y solo puedes hacerlo desde aquí, desde tu puesto." },
-          { "quien": "Marisol Andrade", "texto": "Si no llegas a tiempo, alguien decidirá por ti. Y casi nunca decide bien." },
-          { "quien": "Marisol Andrade", "texto": "A las cinco se cierra la sala. Puedes irte, o quedarte hasta las siete. Las dos cosas tienen un precio." }
+          { "quien": "Marisol Andrade", "texto": "Aquí el día no salta de hora en hora: corre. Mira el reloj de la pared." },
+          { "quien": "Marisol Andrade", "texto": "Los avisos solo se atienden desde tu puesto. A las cinco puedes irte o quedarte: las dos cosas tienen precio." }
         ]
       }
     },
@@ -85,10 +75,9 @@
       "id": "TUT-0.2", "titulo": "Marta", "nivel": "nivel-00", "momento": "dia",
       "variantes": {
         "default": [
-          { "quien": "narrador", "texto": "La concursante del puesto de al lado se acerca con dos cafés. Uno es para ti." },
-          { "quien": "Marta Oyola", "texto": "Marta. Puesto ocho. Te he visto leer los comentarios del ticket; casi nadie lo hace." },
-          { "quien": "Marta Oyola", "texto": "Los avisos llegan antes que los problemas, ¿te has dado cuenta? Lo que ayer era un comentario suelto, hoy es una alerta. Hay que leerlos." },
-          { "quien": "Marta Oyola", "texto": "Te propongo algo: compartimos lo que vayamos encontrando. Solo gana uno, lo sé. Pero cinco días es poco para hacerlo todo solo." }
+          { "quien": "narrador", "texto": "Tu vecina de puesto se acerca con dos cafés. Uno es para ti." },
+          { "quien": "Marta Oyola", "texto": "Marta, puesto ocho. Te vi leer los comentarios del ticket: casi nadie lo hace." },
+          { "quien": "Marta Oyola", "texto": "Los avisos llegan antes que los problemas. ¿Compartimos lo que vayamos encontrando?" }
         ]
       },
       "opciones": [
@@ -101,9 +90,8 @@
       "id": "TUT-0.3", "titulo": "Más allá de tu puesto", "nivel": "nivel-00", "momento": "dia",
       "variantes": {
         "default": [
-          { "quien": "Marisol Andrade", "texto": "Desde hoy el auditorio está abierto: allí está la clasificación provisional." },
-          { "quien": "Marisol Andrade", "texto": "Puedes moverte por la planta cuando quieras. Ten en cuenta que ir y volver cuesta tiempo, y que los avisos solo se atienden desde tu puesto. Y habla con la gente: quien confía en ti, te echa una mano." },
-          { "quien": "Marisol Andrade", "texto": "Y fíjate en las paredes. En este edificio la gente deja cosas pegadas. Algunas valen la pena." }
+          { "quien": "Marisol Andrade", "texto": "Desde hoy el auditorio está abierto. Moverte cuesta tiempo, y los avisos solo se atienden desde tu puesto." },
+          { "quien": "Marisol Andrade", "texto": "Habla con la gente: quien confía en ti, te echa una mano. Y mira las paredes: algunas cosas valen la pena." }
         ]
       }
     },
@@ -112,8 +100,7 @@
       "id": "TUT-0.4", "titulo": "Irse o quedarse", "nivel": "nivel-00", "momento": "dia",
       "variantes": {
         "default": [
-          { "quien": "Marta Oyola", "texto": "¿Te quedas esta noche? Yo ayer me quedé hasta las siete." },
-          { "quien": "Marta Oyola", "texto": "Avancé más, eso sí. Pero hoy me cuesta el doble concentrarme, y lo que escribí anoche lo he tenido que rehacer." },
+          { "quien": "Marta Oyola", "texto": "¿Te quedas esta noche? Yo ayer sí: avancé más, pero hoy me cuesta el doble concentrarme." },
           { "quien": "Marta Oyola", "texto": "Quedarse es un préstamo. Te lo cobran mañana, con intereses." }
         ]
       }
@@ -123,7 +110,7 @@
       "id": "TUT-0.5", "titulo": "La entrega", "nivel": "nivel-00", "momento": "dia",
       "variantes": {
         "default": [
-          { "quien": "Megafonía", "texto": "Último día del concurso. Las entregas se cierran a las cinco en punto. No se admitirán prórrogas." },
+          { "quien": "Megafonía", "texto": "Último día. Las entregas se cierran a las cinco en punto." },
           { "quien": "Marisol Andrade", "texto": "Lo que tengas a las cinco es lo que llega al jurado. No lo que ibas a tener." },
           { "quien": "narrador", "texto": "A las cinco menos cuarto, la barra de subida de tu entrega se detiene seis segundos. Después sigue." }
         ]
@@ -135,34 +122,29 @@
       "variantes": {
         "default": [
           { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
-          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es el concursante del puesto siete." },
-          { "quien": "narrador", "texto": "Alguien te pone un badge gris en la mano. En el escenario, un holograma: el hombre del traje verde de la entrevista. Aplaude." },
-          { "quien": "narrador", "texto": "Aplaude con la muñeca, porque en los dedos está girando algo pequeño y antiguo. Dos segundos. Nadie lo señala." },
-          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+          { "quien": "Megafonía", "texto": "El ganador es el concursante del puesto siete." },
+          { "quien": "narrador", "texto": "En el escenario, el holograma del hombre del traje verde aplaude con la muñeca; en los dedos gira algo pequeño y antiguo." },
+          { "quien": "narrador", "texto": "Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
         ],
         "lanzamiento-bien": [
           { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
-          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es el concursante del puesto siete." },
-          { "quien": "narrador", "texto": "Tu puesto. Marisol te mira desde un lateral y asiente una sola vez: el sistema funcionó el viernes, y el jurado lo probó sin encontrar casi nada." },
-          { "quien": "narrador", "texto": "Alguien te pone un badge gris en la mano. En el escenario, un holograma: el hombre del traje verde de la entrevista. Aplaude." },
-          { "quien": "narrador", "texto": "Aplaude con la muñeca, porque en los dedos está girando algo pequeño y antiguo. Dos segundos. Nadie lo señala." },
-          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+          { "quien": "narrador", "texto": "Ganas tú. Marisol asiente una sola vez: el sistema funcionó y el jurado casi no encontró fallos." },
+          { "quien": "narrador", "texto": "En el escenario, el holograma del hombre del traje verde aplaude con la muñeca; en los dedos gira algo pequeño y antiguo." },
+          { "quien": "narrador", "texto": "Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
         ],
         "lanzamiento-con-problemas": [
           { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
-          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es… el concursante del puesto tres." },
-          { "quien": "narrador", "texto": "No eres tú. El jurado encontró errores en tu entrega, y tu cliente no quedó del todo contento. Marisol se acerca al terminar." },
-          { "quien": "Marisol Andrade", "texto": "No ganaste, pero entraste: Nexus admite a los tres primeros. Lo que funcionó, funcionó. Lo que no, léelo en tus lecciones antes del lunes." },
-          { "quien": "narrador", "texto": "Alguien te pone un badge gris en la mano. En el escenario, un holograma: el hombre del traje verde de la entrevista. Mira hacia tu fila un segundo de más." },
-          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+          { "quien": "narrador", "texto": "Gana el puesto tres. El jurado encontró errores en tu entrega, y tu cliente no quedó contento." },
+          { "quien": "Marisol Andrade", "texto": "No ganaste, pero entraste: Nexus admite a los tres primeros. Lo que no funcionó, léelo en tus lecciones." },
+          { "quien": "narrador", "texto": "En el escenario, el holograma del traje verde mira hacia tu fila un segundo de más." },
+          { "quien": "narrador", "texto": "Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
         ],
         "lanzamiento-mal": [
           { "quien": "narrador", "texto": "El auditorio de N1, lleno. Los doce concursantes en primera fila." },
-          { "quien": "Megafonía", "texto": "El ganador del Concurso de Admisión de este año es el concursante del puesto tres." },
-          { "quien": "narrador", "texto": "Tu entrega se cayó dos veces durante la prueba del jurado. La recepcionista volvió al cuaderno a las nueve y cuarto." },
-          { "quien": "Marisol Andrade", "texto": "Entras a prueba. No porque lo hicieras bien, sino porque alguien arriba quiere verte de cerca. No desperdicies la segunda oportunidad: mira qué decisiones te trajeron aquí." },
-          { "quien": "narrador", "texto": "En el escenario, un holograma: el hombre del traje verde de la entrevista. No aplaude. Toma una nota." },
-          { "quien": "narrador", "texto": "El holograma se apaga. La gente se levanta. Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
+          { "quien": "narrador", "texto": "Gana el puesto tres. Tu entrega se cayó dos veces durante la prueba del jurado." },
+          { "quien": "Marisol Andrade", "texto": "Entras a prueba: alguien arriba quiere verte de cerca. No desperdicies la segunda oportunidad." },
+          { "quien": "narrador", "texto": "El holograma del traje verde no aplaude. Toma una nota." },
+          { "quien": "narrador", "texto": "Nadie se acuerda de tu nombre, pero ya lo tienen escrito." }
         ]
       }
     },

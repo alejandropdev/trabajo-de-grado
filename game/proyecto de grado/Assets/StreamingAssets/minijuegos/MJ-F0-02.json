@@ -5,10 +5,10 @@
   "temaPrincipal": "SRS",
   "objetivoAprendizaje": "OA-DOC-01",
   "modulo": "dentro",
-  "enElProyecto": "Es el diagrama de «Quién sigue dentro»: la lista que mira el vigilante al cerrar. Lo dibujó Mateo y te pide que lo revises antes de programarlo.",
+  "enElProyecto": "El diagrama de «Quién sigue dentro», que Mateo dibujó y quiere revisado.",
   "presentacion": {
     "titulo": "El diagrama de Mateo",
-    "comoSeJuega": "Mateo dibujó cómo va a funcionar «Quién sigue dentro» y te pide una revisión antes de programarlo. Mira cada caja y cada flecha, y compáralas con lo que pidió el vigilante. Si encuentras un problema, pínchalo y di cuál es. Si después de mirarlo todo no falla nada, pulsa «Está bien: lo apruebo». No todo lo que llega a revisión está mal: marcar algo que funciona hace perder el tiempo a quien lo hizo.",
+    "comoSeJuega": "Mateo te pide revisar su diagrama antes de programarlo. Pincha lo que falle; si todo está bien, apruébalo.",
     "quienEspera": "Mateo",
     "textoPresion": "Mateo empieza a programarlo a las 11:00",
     "segundosReloj": 90

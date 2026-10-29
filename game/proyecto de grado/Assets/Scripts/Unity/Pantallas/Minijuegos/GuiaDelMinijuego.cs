@@ -28,6 +28,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private readonly RectTransform _panel;
         private readonly TMP_Text _progreso, _texto, _porque, _aviso;
         private readonly Button _entendido;
+        // El porque es lo largo: queda plegado tras «¿Por qué?» salvo en los pasos que SON la leccion.
+        private readonly Button _verPorque;
+        private bool _porqueAbierto;
         private readonly ScrollRect _scrollPorque;
         private readonly LayoutElement _altoPorque;
         private const float AltoMaximoDelPorque = 110;
@@ -52,6 +55,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             UiKit.Tamano(_progreso, flexAncho: 1);
             _entendido = ui.Boton(cabecera, "Entendido", Entendido, VarianteBoton.Primario);
             _texto = ui.Texto(_panel, "", EstiloTexto.Encabezado, tema.ink);
+            _verPorque = ui.Boton(_panel, "¿Por qué?", AlternarPorque, VarianteBoton.Fantasma);
             // El porque puede ser largo: va en su propio scroll de alto acotado, para no aplastar el tablero.
             RectTransform contenido;
             _scrollPorque = ui.Desplazable(_panel, out contenido, "Porque");
@@ -110,17 +114,31 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private void Pintar() {
             _aviso.text = "";
             var p = Actual;
+            _porqueAbierto = false;
             if (p == null) {
                 _progreso.text = "MARISOL TE GUÍA · LISTO";
                 _texto.text = "¡Hecho!";
                 PonerPorque("");
+                _verPorque.gameObject.SetActive(false);
                 _entendido.gameObject.SetActive(false);
                 return;
             }
             _progreso.text = $"MARISOL TE GUÍA · PASO {_indice + 1} DE {_pasos.Count}";
             _texto.text = p.Texto;
-            PonerPorque(p.Porque ?? "");
+            // La leccion se ve siempre (es lo que se aprende); el resto del porque, a peticion.
+            // Con los textos completos pedidos en Opciones, el porque se ve siempre, como antes.
+            var hayPorque = !string.IsNullOrEmpty(p.Porque);
+            var plegado = _app.Preferencias.modoTarjetas && !p.EsLeccion;
+            _verPorque.gameObject.SetActive(hayPorque && plegado);
+            PonerPorque(hayPorque && !plegado ? p.Porque : "");
             _entendido.gameObject.SetActive(p.Accion == AccionGuiada.Leer);
+        }
+
+        private void AlternarPorque() {
+            var p = Actual;
+            if (p == null || string.IsNullOrEmpty(p.Porque)) return;
+            _porqueAbierto = !_porqueAbierto;
+            PonerPorque(_porqueAbierto ? p.Porque : "");
         }
 
         /// <summary>El alto del porque se ajusta a su texto, hasta un maximo; lo que sobre, con scroll.</summary>

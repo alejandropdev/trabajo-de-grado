@@ -6,6 +6,7 @@ using Nexus.Core.Guardado;
 using Nexus.Core.Jornada;
 using Nexus.Core.Minijuegos;
 using Nexus.Core.Sesion;
+using Nexus.Core.Tarjetas;
 using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Guia;
 using Nexus.Unity.Juego;
@@ -511,6 +512,19 @@ namespace Nexus.Unity.Pantallas {
             var ceremonia = S.Reglas == null ? null : S.Reglas.CeremoniaPorId(retro.CeremoniaId);
             _ahora.Etiqueta("Ceremonia · " + (ceremonia != null && !string.IsNullOrEmpty(ceremonia.Nombre) ? ceremonia.Nombre : "retrospectiva"));
             _ahora.Titulo("¿Qué cambiamos del proceso?");
+            // Con tarjeta, la retro es una pregunta y una mejora; el texto largo se queda fuera de la vista.
+            var tarjeta = App.Preferencias.modoTarjetas ? TarjetaDeProceso.DeRetro(retro, ceremonia == null ? null : ceremonia.Nombre) : null;
+            if (tarjeta != null) {
+                _ahora.Nota("El reloj espera. Lo que elijas cambia cómo trabajas desde hoy.");
+                Action abrirRetro = () => ProcesoConTarjeta(tarjeta, "Retrospectiva", opcion => {
+                    var accion = retro.Acciones.FirstOrDefault(x => x.Id == opcion.Id);
+                    S.ElegirAccionRetro(opcion.Id);
+                    Anotar($"Retrospectiva: «{(accion != null ? accion.Texto : opcion.Etiqueta)}»");
+                });
+                _ahora.Accion("Elegir una mejora  ►", abrirRetro);
+                AbrirSola(() => S.PendingRetro != null, abrirRetro);
+                return;
+            }
             if (!string.IsNullOrEmpty(retro.Texto)) _ahora.Parrafo(retro.Texto);
             _ahora.Nota(Solo("Lo que elijas cambia cómo trabaja el equipo desde hoy. El reloj espera.", "Lo que elijas cambia cómo trabajas desde hoy. El reloj espera."));
             foreach (var accion in retro.Acciones) {
@@ -586,6 +600,18 @@ namespace Nexus.Unity.Pantallas {
             }
             _ahora.Etiqueta("Ceremonia · planificación de " + plan.Unidad);
             _ahora.Titulo("¿Con cuánto te comprometes?");
+            var tarjeta = App.Preferencias.modoTarjetas ? TarjetaDeProceso.DePlanificacion(plan, S.TrabajasSolo) : null;
+            if (tarjeta != null) {
+                _ahora.Nota("El reloj espera. Prometer de más no da error, pero se paga después.");
+                Action abrirPlan = () => ProcesoConTarjeta(tarjeta, "Planificación", opcion => {
+                    var puntos = TarjetaDeProceso.PuntosDe(opcion);
+                    S.Comprometer(puntos);
+                    Anotar($"Planificación: {Solo("el equipo se compromete", "te comprometes")} a {puntos:0} puntos.");
+                });
+                _ahora.Accion("Comprometerse  ►", abrirPlan);
+                AbrirSola(() => S.PendingPlanning != null, abrirPlan);
+                return;
+            }
             _ahora.Parrafo($"{Solo("El equipo calcula que puede", "Calculas que puedes")} con unos {plan.CapacidadSugerida:0.#} puntos. Quedan {plan.PuntosPendientes:0} puntos por hacer.");
             // Lo que se promete son tarjetas de verdad: las primeras del backlog, hasta llenar los puntos.
             if (S.Tablero != null) {
@@ -693,6 +719,15 @@ namespace Nexus.Unity.Pantallas {
             var d = S.Decision;
             _ahora.Etiqueta("Decisión");
             _ahora.Titulo(d.Titulo);
+            // Con tarjeta, la decision es una frase y un gesto; el resto (aviso largo, notas) se queda fuera de la vista.
+            var tarjeta = App.Preferencias.modoTarjetas ? TarjetaDeDecision.De(d) : null;
+            if (tarjeta != null) {
+                _ahora.Parrafo(tarjeta.Frase);
+                _ahora.Nota("El reloj está parado mientras decides.");
+                _ahora.Accion("Decidir  ►", () => DecidirConTarjeta(tarjeta));
+                AbrirSola(() => S.Decision != null, () => DecidirConTarjeta(tarjeta));
+                return;
+            }
             if (!string.IsNullOrEmpty(d.TextoAviso)) _ahora.Parrafo(d.TextoAviso);
             _ahora.Nota("El reloj está parado mientras decides. Debajo de cada opción, lo que cambia en el momento; lo que llega días después no se ve.");
             foreach (var opcion in d.Opciones) {
@@ -944,6 +979,65 @@ namespace Nexus.Unity.Pantallas {
                     App.Router.Apilar<PantallaDetectar>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
             }
+        }
+
+        /// <summary>
+        /// La decision como tarjeta: se elige deslizando o con un boton, y al cerrar se resuelve con ResolverDecision, el
+        /// mismo camino de siempre (multiplicador de la metodologia, diferidos, traza con la rubrica del evento).
+        /// </summary>
+        private void DecidirConTarjeta(TarjetaDef tarjeta) {
+            OpcionTarjeta elegida = null;
+            _escenaApilada = true;
+            Runner.EnEscena = true;
+            App.Router.Apilar<PantallaDeTarjetas>(p => {
+                p.Sesion = S;
+                p.Etiqueta = "Decisión";
+                p.Tarjetas = new List<TarjetaDef> { tarjeta };
+                p.ResuelveOtro = true;
+                p.AlElegir = (_, opcion) => elegida = opcion;
+                p.AlTerminar = () => {
+                    App.Router.Volver();
+                    _escenaApilada = false;
+                    if (elegida != null) Resolver(elegida.Id);
+                };
+            });
+        }
+
+        /// <summary>
+        /// La retrospectiva y la planificacion como tarjeta: se elige deslizando o con un boton, y al cerrar se llama al
+        /// mismo camino de siempre (ElegirAccionRetro, Comprometer) con lo elegido.
+        /// </summary>
+        /// <summary>
+        /// Abre la tarjeta sin esperar a que se pulse el boton: la decision, la retro y la planificacion salen sobre el
+        /// fondo del juego, como las ceremonias, y no sobre el panel del dia. Se difiere un fotograma para no apilar una
+        /// pantalla en mitad de pintar esta; si para entonces el paso ya paso, no se abre.
+        /// </summary>
+        private void AbrirSola(Func<bool> sigueEnPie, Action abrir) {
+            if (_escenaApilada || !isActiveAndEnabled) return;
+            StartCoroutine(AbrirEnElSiguienteFotograma(sigueEnPie, abrir));
+        }
+
+        private System.Collections.IEnumerator AbrirEnElSiguienteFotograma(Func<bool> sigueEnPie, Action abrir) {
+            yield return null;
+            if (this != null && isActiveAndEnabled && !_escenaApilada && sigueEnPie()) abrir();
+        }
+
+        private void ProcesoConTarjeta(TarjetaDef tarjeta, string etiqueta, Action<OpcionTarjeta> alCerrar) {
+            OpcionTarjeta elegida = null;
+            _escenaApilada = true;
+            Runner.EnEscena = true;
+            App.Router.Apilar<PantallaDeTarjetas>(p => {
+                p.Sesion = S;
+                p.Etiqueta = etiqueta;
+                p.Tarjetas = new List<TarjetaDef> { tarjeta };
+                p.ResuelveOtro = true;
+                p.AlElegir = (_, opcion) => elegida = opcion;
+                p.AlTerminar = () => {
+                    App.Router.Volver();
+                    _escenaApilada = false;
+                    if (elegida != null) alCerrar(elegida);
+                };
+            });
         }
 
         private void Resolver(string opcionId) {

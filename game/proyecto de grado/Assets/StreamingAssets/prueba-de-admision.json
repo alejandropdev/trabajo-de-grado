@@ -12,17 +12,21 @@
       "numero": 1,
       "oa": "OA-INTRO-01",
       "enunciado": "¿Qué distingue a la ingeniería de software de simplemente escribir código?",
+      "frase": "¿Qué distingue a la ingeniería de software?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Mejores herramientas",
           "texto": "Usar lenguajes y herramientas más avanzados que los de un programador aficionado."
         },
         {
           "id": "B",
+          "etiqueta": "Equipos grandes",
           "texto": "Trabajar en un equipo grande, porque un proyecto de una sola persona no es ingeniería."
         },
         {
           "id": "C",
+          "etiqueta": "Proceso disciplinado",
           "texto": "Aplicar un proceso disciplinado, con calidad y mantenibilidad que se puedan medir."
         }
       ],
@@ -34,17 +38,21 @@
       "numero": 2,
       "oa": "OA-CICLO-01",
       "enunciado": "En el modelo en cascada, ¿qué pasa si un error de requisitos se descubre en la fase de pruebas?",
+      "frase": "Error de requisitos hallado en pruebas, en cascada: ¿qué pasa?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Cuesta mucho más",
           "texto": "Corregirlo cuesta mucho más, porque obliga a rehacer diseño y código ya cerrados."
         },
         {
           "id": "B",
+          "etiqueta": "Sin coste extra",
           "texto": "Se corrige en la misma fase de pruebas, que existe para eso, sin ningún coste extra."
         },
         {
           "id": "C",
+          "etiqueta": "Casi no afecta",
           "texto": "Casi no afecta, porque cada fase de la cascada está aislada de las anteriores."
         }
       ],
@@ -56,17 +64,21 @@
       "numero": 3,
       "oa": "OA-SCRUM-01",
       "enunciado": "¿Quién es responsable de maximizar el valor del producto en Scrum?",
+      "frase": "¿Quién maximiza el valor del producto en Scrum?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Scrum Master",
           "texto": "El Scrum Master, porque es quien dirige el proceso y organiza el trabajo."
         },
         {
           "id": "B",
+          "etiqueta": "Product Owner",
           "texto": "El Product Owner, porque decide el orden del backlog según lo que aporta."
         },
         {
           "id": "C",
+          "etiqueta": "Todo el equipo",
           "texto": "Todo el equipo por igual, porque en Scrum no hay roles con más peso."
         }
       ],
@@ -78,17 +90,21 @@
       "numero": 4,
       "oa": "OA-KANBAN-01",
       "enunciado": "¿Para qué sirve un límite de trabajo en curso (WIP) en un tablero Kanban?",
+      "frase": "¿Para qué sirve el límite WIP en Kanban?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Tablero visible",
           "texto": "Para que el tablero no se llene y el equipo pueda ver todas las tareas de un vistazo."
         },
         {
           "id": "B",
+          "etiqueta": "Limitar personas",
           "texto": "Para limitar cuántas personas trabajan a la vez y así no se estorben entre sí."
         },
         {
           "id": "C",
+          "etiqueta": "Terminar primero",
           "texto": "Para obligar a terminar antes de empezar algo nuevo y hacer visibles los atascos."
         }
       ],
@@ -100,17 +116,21 @@
       "numero": 5,
       "oa": "OA-DEVOPS-01",
       "enunciado": "¿Qué resuelve principalmente la integración continua (CI)?",
+      "frase": "¿Qué resuelve la integración continua?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Conflictos pronto",
           "texto": "Detectar conflictos pronto, integrando cambios pequeños y frecuentes."
         },
         {
           "id": "B",
+          "etiqueta": "Código con estilo",
           "texto": "Mantener el código limpio y con un mismo estilo, formateándolo en cada commit."
         },
         {
           "id": "C",
+          "etiqueta": "Menos programadores",
           "texto": "Automatizar parte de la programación para que hagan falta menos desarrolladores."
         }
       ],
@@ -122,17 +142,21 @@
       "numero": 6,
       "oa": "OA-DEVOPS-02",
       "enunciado": "¿Cuál es la diferencia entre entrega continua y despliegue continuo?",
+      "frase": "Entrega continua frente a despliegue continuo: ¿en qué se diferencian?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Son lo mismo",
           "texto": "Son dos nombres para lo mismo: en ambos, cada cambio llega solo a producción."
         },
         {
           "id": "B",
+          "etiqueta": "Despliegue: sale solo",
           "texto": "En la entrega, el software queda listo para salir; en el despliegue, sale solo."
         },
         {
           "id": "C",
+          "etiqueta": "Una sin pruebas",
           "texto": "En la entrega se despliega sin pruebas; en el despliegue se prueba todo a mano."
         }
       ],
@@ -144,17 +168,21 @@
       "numero": 7,
       "oa": "OA-DIS-01",
       "enunciado": "¿Qué significa que dos módulos tengan «bajo acoplamiento»?",
+      "frase": "¿Qué es «bajo acoplamiento»?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Mismo archivo",
           "texto": "Que están en el mismo archivo, así que se pueden modificar juntos sin problema."
         },
         {
           "id": "B",
+          "etiqueta": "Datos compartidos",
           "texto": "Que comparten sus datos internos, así que se comunican sin necesitar una interfaz."
         },
         {
           "id": "C",
+          "etiqueta": "Dependen poco",
           "texto": "Que dependen poco el uno del otro, así que se pueden cambiar por separado."
         }
       ],
@@ -166,17 +194,21 @@
       "numero": 8,
       "oa": "OA-DOC-01",
       "enunciado": "¿Para qué sirve un SRS (documento de especificación de requisitos)?",
+      "frase": "¿Para qué sirve un SRS?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Fijar qué hacer",
           "texto": "Para fijar de forma verificable qué debe hacer el sistema, antes de construirlo."
         },
         {
           "id": "B",
+          "etiqueta": "Contrato sin cambios",
           "texto": "Para que el cliente firme un contrato y ya no pueda pedir ningún cambio después."
         },
         {
           "id": "C",
+          "etiqueta": "Describir lo programado",
           "texto": "Para describir cómo quedó programado el sistema, una vez que está terminado."
         }
       ],
@@ -188,17 +220,21 @@
       "numero": 9,
       "oa": "OA-EST-01",
       "enunciado": "¿Por qué las estimaciones de un equipo tienden a ser optimistas, incluso con experiencia?",
+      "frase": "¿Por qué las estimaciones salen optimistas?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Falta de esfuerzo",
           "texto": "Porque el equipo no se esfuerza lo suficiente para cumplir lo que promete."
         },
         {
           "id": "B",
+          "etiqueta": "Exceso de confianza",
           "texto": "Porque con la experiencia se confía y deja de revisar lo que estima."
         },
         {
           "id": "C",
+          "etiqueta": "Se ignoran imprevistos",
           "texto": "Porque se estima el caso ideal, sin contar interrupciones ni imprevistos."
         }
       ],
@@ -210,17 +246,21 @@
       "numero": 10,
       "oa": "OA-GIT-01",
       "enunciado": "¿Qué hace un merge en control de versiones?",
+      "frase": "¿Qué hace un merge?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Reemplaza una rama",
           "texto": "Reemplaza una rama por otra y descarta el historial de la que se sustituye."
         },
         {
           "id": "B",
+          "etiqueta": "Combina dos ramas",
           "texto": "Combina los cambios de dos ramas en una sola línea de desarrollo."
         },
         {
           "id": "C",
+          "etiqueta": "Copia de seguridad",
           "texto": "Guarda una copia de seguridad del repositorio antes de un cambio grande."
         }
       ],
@@ -232,17 +272,21 @@
       "numero": 11,
       "oa": "OA-MLOPS-01",
       "enunciado": "Un modelo de aprendizaje automático en producción falla cada vez más, sin que nadie haya cambiado el código. ¿A qué se debe probablemente?",
+      "frase": "Modelo en producción falla más, sin tocar el código. ¿Por qué?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Los datos cambiaron",
           "texto": "A que los datos de entrada ya no se parecen a los del entrenamiento."
         },
         {
           "id": "B",
+          "etiqueta": "Error oculto",
           "texto": "A un error de programación oculto, que se manifiesta con el paso del tiempo."
         },
         {
           "id": "C",
+          "etiqueta": "Se desgasta",
           "texto": "A que el modelo se desgasta con el uso y va perdiendo lo que aprendió."
         }
       ],
@@ -254,17 +298,21 @@
       "numero": 12,
       "oa": "OA-PAT-01",
       "enunciado": "¿Qué es un patrón de diseño?",
+      "frase": "¿Qué es un patrón de diseño?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Una librería",
           "texto": "Una librería ya probada que se instala para no escribir lo mismo desde cero."
         },
         {
           "id": "B",
+          "etiqueta": "Norma de estilo",
           "texto": "Una norma de estilo que dice cómo nombrar e indentar el código del equipo."
         },
         {
           "id": "C",
+          "etiqueta": "Solución probada",
           "texto": "Una solución probada a un problema de diseño que se repite; no es código hecho."
         }
       ],
@@ -276,17 +324,21 @@
       "numero": 13,
       "oa": "OA-CAL-01",
       "enunciado": "Según ISO 25010, ¿cuál de estos NO es un atributo de calidad del software?",
+      "frase": "Según ISO 25010, ¿cuál NO es atributo de calidad?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Portabilidad",
           "texto": "Portabilidad."
         },
         {
           "id": "B",
+          "etiqueta": "Rentabilidad",
           "texto": "Rentabilidad."
         },
         {
           "id": "C",
+          "etiqueta": "Compatibilidad",
           "texto": "Compatibilidad."
         }
       ],
@@ -298,17 +350,21 @@
       "numero": 14,
       "oa": "OA-TEST-01",
       "enunciado": "¿Qué diferencia a una prueba unitaria de una prueba de integración?",
+      "frase": "¿Prueba unitaria frente a prueba de integración?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Aislada o conjunta",
           "texto": "La unitaria prueba una pieza aislada; la de integración, varias piezas juntas."
         },
         {
           "id": "B",
+          "etiqueta": "Programador o cliente",
           "texto": "La unitaria la escribe el programador; la de integración, el cliente al final."
         },
         {
           "id": "C",
+          "etiqueta": "Función o rendimiento",
           "texto": "La unitaria prueba una función; la de integración, el rendimiento del sistema."
         }
       ],
@@ -320,17 +376,21 @@
       "numero": 15,
       "oa": "OA-TEST-02",
       "enunciado": "Un módulo tiene un 100 % de cobertura de pruebas. ¿Garantiza eso que no tiene errores?",
+      "frase": "Cobertura del 100 %: ¿garantiza que no hay errores?",
       "opciones": [
         {
           "id": "A",
+          "etiqueta": "Sí, garantiza",
           "texto": "Sí: si cada línea se ejecutó en alguna prueba, no queda nada sin comprobar."
         },
         {
           "id": "B",
+          "etiqueta": "No, no basta",
           "texto": "No: dice qué líneas se ejecutaron, no si el resultado obtenido era el correcto."
         },
         {
           "id": "C",
+          "etiqueta": "Solo si pasan",
           "texto": "Solo si además todas las pruebas pasan en verde en el servidor de integración."
         }
       ],

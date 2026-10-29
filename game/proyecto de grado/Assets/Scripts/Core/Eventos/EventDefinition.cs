@@ -56,6 +56,9 @@ namespace Nexus.Core.Eventos {
 
         public string ObjetivoAprendizaje;
 
+        /// <summary>La frase de la tarjeta de la decision (doce palabras como mucho). Vacia = la decision sale con su texto largo.</summary>
+        public string Frase;
+
         /// <summary>Vacia = vale para todas las metodologias.</summary>
         public List<string> SoloMetodologias = new List<string>();
 
@@ -144,6 +147,9 @@ namespace Nexus.Core.Eventos {
     public sealed class OpcionEvento {
         public string Id;
         public string Texto;
+
+        /// <summary>Lo que dice el boton de la tarjeta (tres palabras como mucho).</summary>
+        public string Etiqueta;
 
         /// <summary>Si amplia el alcance, el veredicto de la metodologia decide cuanto cuesta.</summary>
         public bool AmpliaAlcance;

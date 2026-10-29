@@ -5,10 +5,10 @@
   "temaPrincipal": "SRS",
   "objetivoAprendizaje": "OA-DOC-01",
   "modulo": "registro",
-  "enElProyecto": "Es el diagrama de tu propuesta para la recepción: cómo pasa un visitante del formulario al registro y cómo se avisa a su anfitrión.",
+  "enElProyecto": "El diagrama de tu propuesta: del formulario al registro, y se avisa al anfitrión.",
   "presentacion": {
     "titulo": "La revisión de tu propuesta",
-    "comoSeJuega": "Esto es una revisión: buscar errores en un diseño ANTES de construirlo, cuando arreglarlos es barato. Es el diagrama de tu propuesta. Paso 1: pincha la caja o la flecha que tenga un problema. Paso 2: elige a la derecha qué problema es. Ganas si encuentras el problema real sin marcar nada que esté bien.",
+    "comoSeJuega": "Revisa el diagrama antes de construirlo. Pincha lo que falle y di qué problema es. No marques lo que está bien.",
     "quienEspera": "Marisol Andrade",
     "textoPresion": "Marisol recoge las propuestas revisadas a las 12:00",
     "segundosReloj": 90

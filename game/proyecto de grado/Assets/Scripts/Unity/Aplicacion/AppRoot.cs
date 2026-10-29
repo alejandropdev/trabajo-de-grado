@@ -55,6 +55,9 @@ namespace Nexus.Unity.Aplicacion {
         public PreferenciasStore AlmacenDePreferencias { get; private set; }
         public Preferencias Preferencias { get; private set; } = new Preferencias();
 
+        /// <summary>Tiempo por pantalla y dia de abandono, solo en esta maquina (pruebas con usuarios).</summary>
+        public TelemetriaDePantallas Telemetria { get; private set; }
+
         private AutoGuardado _autoGuardado;
 
         // --- modulos que se enchufan desde otro ensamblado ---
@@ -87,6 +90,12 @@ namespace Nexus.Unity.Aplicacion {
 
             CargarCatalogo();
             Router = new ScreenRouter(this, CrearLienzo());
+            Telemetria = new TelemetriaDePantallas(almacen);
+            Router.AlCambiar += pantalla => {
+                Telemetria.EntrarA(pantalla == null ? null : pantalla.GetType().Name, Time.realtimeSinceStartupAsDouble,
+                                   Sesion != null && Sesion.R != null ? Sesion.R.DiaActual : 0);
+                Telemetria.Guardar();
+            };
             CrearEventSystem();
             Runner = gameObject.AddComponent<LevelRunner>();
             Preferencias = AlmacenDePreferencias.Cargar();
@@ -436,6 +445,7 @@ namespace Nexus.Unity.Aplicacion {
         }
 
         private void OnApplicationQuit() {
+            if (Telemetria != null) Telemetria.Terminar(Time.realtimeSinceStartupAsDouble);
             // Cerrar la ventana a mitad de dia no puede perder el dia: INV-7 dice que recargar da lo mismo.
             if (Sesion != null && !Sesion.NivelTerminado) Guardar("cerrar la aplicacion");
         }

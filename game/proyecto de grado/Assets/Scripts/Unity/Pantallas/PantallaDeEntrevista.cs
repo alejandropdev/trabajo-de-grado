@@ -24,6 +24,8 @@ namespace Nexus.Unity.Pantallas {
         private int _indice;
         private string _susurro;
         private Hoja _hoja;
+        // La vista corta (frase + etiquetas) es la de siempre; la completa es el instrumento original, a peticion.
+        private bool _completa;
 
         public override bool PuedeVolver { get { return false; } }
 
@@ -41,11 +43,13 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Ilustracion(ficha, MaterialesNexus.IdDePersonaje(e.Nombre), null, alto: 300);
                 Ui.Texto(ficha, e.Nombre, EstiloTexto.Encabezado);
                 if (!string.IsNullOrEmpty(e.Rol)) Ui.Texto(ficha, e.Rol, EstiloTexto.Pequeno, Tema.cyan);
-                if (!string.IsNullOrEmpty(e.Descripcion)) Ui.Texto(ficha, e.Descripcion, EstiloTexto.Pequeno);
+                if (!string.IsNullOrEmpty(e.Descripcion) && !_preguntas.Any(TieneVistaCorta)) Ui.Texto(ficha, e.Descripcion, EstiloTexto.Pequeno);
             }
             Ui.Separador(ficha);
-            Ui.Texto(ficha, "Quince preguntas. Si no sabes una, dilo: no se descuenta nada. La entrevista no cambia nada de la partida; " +
-                            "sirve para saber de dónde partes.", EstiloTexto.Pequeno);
+            Ui.Texto(ficha, _preguntas.Any(TieneVistaCorta)
+                ? "Quince preguntas. Si no sabes una, dilo: no se descuenta nada."
+                : "Quince preguntas. Si no sabes una, dilo: no se descuenta nada. La entrevista no cambia nada de la partida; " +
+                  "sirve para saber de dónde partes.", EstiloTexto.Pequeno);
 
             var centro = Ui.Ventana(marco, "Pregunta");
             UiKit.Tamano(centro, flexAncho: 1, flexAlto: 1);
@@ -60,14 +64,15 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Vaciar();
             var p = _preguntas[_indice];
             _hoja.Etiqueta($"Pregunta {_indice + 1} de {_preguntas.Count}");
-            Ui.Texto(_hoja.Raiz, p.Enunciado, EstiloTexto.Encabezado);
+            var corta = TieneVistaCorta(p) && !_completa;
+            Ui.Texto(_hoja.Raiz, corta ? p.Frase : p.Enunciado, EstiloTexto.Encabezado);
             _hoja.Espacio();
 
             string elegida;
             var respondida = _respuestas.TryGetValue(p.Numero, out elegida);
             foreach (var opcion in p.Opciones) {
                 var o = opcion;
-                var boton = _hoja.Opcion($"{o.Id.ToUpperInvariant()}.  {o.Texto}", null, () => Responder(p, o.Id));
+                var boton = _hoja.Opcion($"{o.Id.ToUpperInvariant()}.  {(corta ? o.Etiqueta : o.Texto)}", null, () => Responder(p, o.Id));
                 if (respondida) {
                     boton.interactable = false;
                     if (o.Id == elegida) Ui.Resaltar(boton, true);
@@ -75,7 +80,10 @@ namespace Nexus.Unity.Pantallas {
             }
             if (!respondida) {
                 _hoja.Espacio(4);
-                Ui.Boton(_hoja.Fila(), "No lo sé", () => Responder(p, null), VarianteBoton.Fantasma);
+                var acciones = _hoja.Fila();
+                Ui.Boton(acciones, "No lo sé", () => Responder(p, null), VarianteBoton.Fantasma);
+                if (TieneVistaCorta(p))
+                    Ui.Boton(acciones, corta ? "Ver pregunta completa" : "Ver versión corta", () => { _completa = !_completa; Repintar(); }, VarianteBoton.Fantasma);
                 return;
             }
 
@@ -93,8 +101,13 @@ namespace Nexus.Unity.Pantallas {
             Repintar();
         }
 
+        private bool TieneVistaCorta(PreguntaDeAdmision p) {
+            return App.Preferencias.modoTarjetas && !string.IsNullOrEmpty(p.Frase) && p.Opciones.All(o => !string.IsNullOrEmpty(o.Etiqueta));
+        }
+
         private void Siguiente() {
             if (_indice < _preguntas.Count - 1) {
+                _completa = false;
                 _indice++;
                 Repintar();
                 return;

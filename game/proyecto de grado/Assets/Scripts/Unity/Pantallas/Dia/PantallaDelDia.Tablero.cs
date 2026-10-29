@@ -4,6 +4,7 @@ using System.Linq;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Sesion;
 using Nexus.Core.Tablero;
+using Nexus.Core.Tarjetas;
 using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
@@ -619,13 +620,23 @@ namespace Nexus.Unity.Pantallas {
             foreach (var ceremonia in hoy) {
                 var c = ceremonia;
                 var t = Ui.Tarjeta(hoja, c.Nombre + (c.Hecha ? " · hecha" : $" · {c.DuracionMinutos} min"), c.Hecha ? Tono.Exito : Tono.Cyan);
-                if (!string.IsNullOrEmpty(c.ParaQueSirve)) Ui.Texto(t, c.ParaQueSirve, EstiloTexto.Cuerpo, Tema.ink);
+                if (!string.IsNullOrEmpty(c.ParaQueSirve) && (c.Hecha || TarjetaDeCeremoniaSiHay(c) == null))
+                    Ui.Texto(t, c.ParaQueSirve, EstiloTexto.Cuerpo, Tema.ink);
                 if (c.Hecha) {
                     var acta = S.R.ActasDeCeremonias.LastOrDefault(a => a.Dia == S.R.DiaActual && a.CeremoniaId == c.Id);
                     if (acta != null) {
                         Ui.Texto(t, "La llevaste así: " + acta.Opcion, EstiloTexto.Pequeno, Tema.cyan);
                         Ui.Texto(t, acta.Texto, EstiloTexto.Cuerpo, Tema.ink);
                     }
+                    continue;
+                }
+                // La tarjeta: una frase y un boton, en vez del parrafo. Las formas de llevarla se eligen en la tarjeta.
+                var tarjeta = TarjetaDeCeremoniaSiHay(c);
+                var porQueNo = S.PorQueNoSePuedeAsistir(c.Id);
+                if (tarjeta != null) {
+                    Ui.Texto(t, tarjeta.Frase, EstiloTexto.Cuerpo, Tema.ink);
+                    if (porQueNo != null) Ui.Texto(t, porQueNo, EstiloTexto.Pequeno, Tema.warning);
+                    else Ui.Boton(t, "Asistir  ►", () => AsistirConTarjeta(c, tarjeta), VarianteBoton.Primario);
                     continue;
                 }
                 if (!string.IsNullOrEmpty(c.Texto)) Ui.Texto(t, c.Texto, EstiloTexto.Pequeno).fontStyle = FontStyles.Italic;
@@ -643,6 +654,35 @@ namespace Nexus.Unity.Pantallas {
                     boton.interactable = motivo == null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Asistir a una ceremonia como tarjeta: la escena para el reloj, se elige deslizando o con un boton y, al cerrar,
+        /// el reloj cobra los minutos y aplica lo que esa forma de llevarla provoca (AsistirACeremonia), igual que antes.
+        /// </summary>
+        private void AsistirConTarjeta(CeremoniaDeHoy ceremonia, TarjetaDef tarjeta) {
+            OpcionTarjeta elegida = null;
+            _escenaApilada = true;
+            Runner.EnEscena = true;
+            App.Router.Apilar<PantallaDeTarjetas>(p => {
+                p.Sesion = S;
+                p.Etiqueta = "Ceremonia";
+                p.Tarjetas = new List<TarjetaDef> { tarjeta };
+                p.ResuelveOtro = true;
+                p.AlElegir = (_, opcion) => elegida = opcion;
+                p.AlTerminar = () => {
+                    App.Router.Volver();
+                    _escenaApilada = false;
+                    Runner.EnEscena = false;
+                    if (elegida != null)
+                        Actuar(() => S.AsistirACeremonia(ceremonia.Id, elegida.Id), $"Asististe a «{ceremonia.Nombre}».");
+                };
+            });
+        }
+
+        /// <summary>La tarjeta de la ceremonia, salvo que el jugador haya pedido los textos completos (Opciones).</summary>
+        private TarjetaDef TarjetaDeCeremoniaSiHay(CeremoniaDeHoy c) {
+            return App.Preferencias.modoTarjetas ? TarjetaDeCeremonia.De(c) : null;
         }
 
         private void PintarAgenda(RectTransform hoja) {

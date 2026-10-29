@@ -32,6 +32,9 @@ namespace Nexus.Core.Datos {
         /// <summary>La entrevista del N0. Null si el catalogo no la trae (un prototipo puede no tenerla).</summary>
         public PruebaDeAdmision Admision;
 
+        /// <summary>Las decisiones rapidas que sustituyen a las pantallas de lectura. Vacio = no hay tarjetas.</summary>
+        public Nexus.Core.Tarjetas.CatalogoDeTarjetas Tarjetas = new Nexus.Core.Tarjetas.CatalogoDeTarjetas();
+
         public List<Coleccionable> Coleccionables = new List<Coleccionable>();
 
         /// <summary>Los cambios de codigo que salen a revision en el tablero. Vacio = no hay revisiones.</summary>
@@ -334,6 +337,12 @@ namespace Nexus.Core.Datos {
                 } catch (SchemaException ex) {
                     errores.Add(ex.Message);
                 }
+            }
+
+            try {
+                catalogo.Tarjetas = Nexus.Core.Tarjetas.CatalogoDeTarjetas.Cargar(fuente);
+            } catch (SchemaException ex) {
+                errores.Add(ex.Message);
             }
 
             if (fuente.Existe(ArchivoMicroPrs)) {

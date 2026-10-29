@@ -141,8 +141,8 @@ namespace Nexus.Unity.Pantallas {
             var hoja = new Hoja(Ui, contenido);
 
             hoja.Parrafo(_plan.EsFinal
-                ? "Se acabaron los días de desarrollo. Antes de la evaluación, lo construido tiene que llegar al cliente: eso es desplegar."
-                : "Cerraste una etapa de trabajo. Lo que ya está listo puede llegar hoy al cliente: eso es desplegar. Mañana se sigue construyendo.");
+                ? "Se acabó el desarrollo. Lo construido tiene que llegar al cliente: eso es desplegar."
+                : "Cerraste una etapa. Lo que está listo llega hoy al cliente: eso es desplegar.");
 
             var salen = hoja.Tarjeta(_plan.Modulos.Count == 0 ? "Hoy no sale ningún módulo" : "Lo que sale hoy", Tono.Cyan);
             if (_plan.Modulos.Count == 0) Ui.Texto(salen, "Ninguno llega todavía al mínimo para entregarse. Aun así hay que dejar armado el camino a producción.", EstiloTexto.Cuerpo, Tema.ink);
@@ -162,9 +162,9 @@ namespace Nexus.Unity.Pantallas {
                 hoja.Nota("Todavía no salen (les falta trabajo): " + string.Join(", ", _plan.NoListos.Select(NombreDe)) + ".", Tema.inkMuted);
 
             var como = hoja.Tarjeta("Cómo se juega");
-            Ui.Texto(como, "1 · <b>La tubería.</b> Arrastra a cada hueco un tramo del camino entre el código y el cliente. Hay más tramos que huecos, y alguno es un atajo que sale caro. Un hueco vacío no da error: esa etapa, simplemente, no ocurre.", EstiloTexto.Cuerpo, Tema.ink);
-            Ui.Texto(como, "2 · <b>Los módulos.</b> Uno por uno: arrastra cada cable a la toma que le corresponde. Fíjate en cuáles son de producción y cuáles de pruebas. Después, enciéndelo.", EstiloTexto.Cuerpo, Tema.ink);
-            Ui.Texto(como, $"Tienes <b>{Reloj(_total)}</b> para todo. Cuando el reloj llega a cero se entrega lo que haya. Lo que salga de aquí cambia las barras del proyecto y pesa en la evaluación final.", EstiloTexto.Cuerpo, Tema.warning);
+            Ui.Texto(como, "1 · <b>La tubería.</b> Arrastra un tramo a cada hueco. Hay más tramos que huecos, y alguno es un atajo.", EstiloTexto.Cuerpo, Tema.ink);
+            Ui.Texto(como, "2 · <b>Los módulos.</b> Arrastra cada cable a su toma (producción, no pruebas) y enciéndelo.", EstiloTexto.Cuerpo, Tema.ink);
+            Ui.Texto(como, $"Tienes <b>{Reloj(_total)}</b>. Al llegar a cero se entrega lo que haya.", EstiloTexto.Cuerpo, Tema.warning);
             PantallaDeGlosario.Palabras(App, hoja.Raiz, "Si alguna palabra no te suena:", "despliegue", "pipeline", "entorno", "secretos");
 
             hoja.Accion("Empezar: armar la tubería  ►", () => { _paso = Paso.Tuberia; PintarJuego(); });
