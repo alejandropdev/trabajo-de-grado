@@ -148,6 +148,11 @@ namespace Nexus.Core.Minijuegos {
         /// </summary>
         public bool Guiado;
 
+        /// <summary>Quien subio el andamiaje de este reto (AndamiajeDelReto), para decirselo al jugador. null = nadie.</summary>
+        public string AyudaDe;
+        /// <summary>«equipo» o «confianza»: por donde llego esa ayuda.</summary>
+        public string AyudaPor;
+
         /// <summary>Ayudas de compañeros que el jugador decidio gastar en este minijuego (TiposDeAyuda).</summary>
         public List<string> Ayudas = new List<string>();
 

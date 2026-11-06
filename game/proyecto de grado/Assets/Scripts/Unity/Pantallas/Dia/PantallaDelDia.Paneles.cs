@@ -89,7 +89,7 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
             AvisoDeAlertaEnPanel(h);
-            h.Nota("Mientras miras el mapa, el reloj espera. Ir a otro lugar sí cuesta: los minutos que dice cada uno.");
+            h.Nota("Mirar es gratis; ir cuesta los minutos que marca cada sitio.");
             var puedeMoverse = Runner.PuedeMoverse;
 
             var columnas = Ui.Fila(h.Raiz, "Mapa", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
@@ -178,7 +178,7 @@ namespace Nexus.Unity.Pantallas {
             if (fichas.Count == 0) return;
             if (S.TrabajasSolo) { PintarTrabajasSolo(h, fichas[0]); return; }
             h.Subtitulo("Tu equipo de proyecto", Tema.cyan);
-            h.Nota("Son quienes construyen el sistema contigo. Lo que hagas con cada uno cuesta minutos de la jornada.", Tema.inkMuted);
+            h.Nota("Cada cosa que hagas con alguien cuesta minutos.", Tema.inkMuted);
             DecirLoUltimo(h);
             var enDesarrollo = S.Tablero != null && S.R.Fase == 2 && S.R.DiaActual > 0;
             foreach (var f in fichas) {
@@ -191,6 +191,9 @@ namespace Nexus.Unity.Pantallas {
                 var sabe = (f.Fuerte != null ? "Se le da mejor: " + NombreDeTipo(f.Fuerte) : "") +
                            (f.Fuerte != null && f.Flojo != null ? "  ·  " : "") + (f.Flojo != null ? "le cuesta: " + NombreDeTipo(f.Flojo) : "");
                 if (sabe.Length > 0) Ui.Texto(ficha, sabe, EstiloTexto.Leyenda, Tema.cyan);
+                var ayudaEn = Nexus.Core.Minijuegos.AndamiajeDelReto.EnQueAyuda(datos);
+                if (ayudaEn.Count > 0)
+                    Ui.Texto(ficha, "En los retos te echa una mano al " + string.Join(" y al ", ayudaEn) + ".", EstiloTexto.Pequeno, Tema.success);
                 if (!enDesarrollo) continue;
 
                 Ui.Texto(ficha, f.Ahora.Count == 0 ? "Ahora: sin tarjeta."
@@ -300,7 +303,7 @@ namespace Nexus.Unity.Pantallas {
             var rel = App.Catalogo.Relaciones;
             var conocidos = S.R.Confianza.Keys.ToList();
             if (conocidos.Count == 0)
-                Ui.Texto(lista, "Todavía no has hablado con nadie de fuera del equipo. Cuando haya alguien en una sala, aparecerá «Hablar con…» en el mapa, en «Aquí».",
+                Ui.Texto(lista, "Aún no has hablado con nadie. Cuando haya alguien en una sala, verás «Hablar con…».",
                          EstiloTexto.Pequeno, Tema.inkMuted);
             var enEsteNivel = new HashSet<string>(rel.Conversaciones.Where(c => c.Nivel == S.NivelId).Select(c => c.Personaje));
             foreach (var id in conocidos.OrderByDescending(x => enEsteNivel.Contains(x))) {
@@ -427,8 +430,7 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
             AvisoDeAlertaEnPanel(h);
-            h.Parrafo("Mientras no suena nada, puedes adelantar trabajo. Cada tarea cuesta tiempo del día y mejora el proyecto. " +
-                      "Es práctica: no cuenta para tu evaluación, y si no te sale puedes intentarla otra vez.");
+            h.Parrafo("Práctica: cuesta tiempo, mejora el proyecto y no cuenta para tu nota.");
             var lista = Ui.Columna(h.Raiz, "Tareas", Tema.Espacio(2));
             GuiaView.Registrar("dia.oficina", lista);
             foreach (var t in S.TareasDeOficina) {
@@ -488,11 +490,11 @@ namespace Nexus.Unity.Pantallas {
             if (brief != null && brief.Avisos.Count > 0) {
                 nada = false;
                 var anuncios = h.Tarjeta("Anuncios de hoy");
-                Ui.Texto(anuncios, "Avisan de lo que llegará en los próximos días. Léelos: lo que hoy es un comentario suelto, mañana es un problema.",
+                Ui.Texto(anuncios, "Lo que hoy es un comentario suelto, mañana es un problema.",
                          EstiloTexto.Pequeno);
                 foreach (var aviso in brief.Avisos) Ui.Notificacion(anuncios, aviso, Tono.Cyan);
             }
-            if (nada) h.Nota(S.R.DiaActual == 0 ? "Aún no ha empezado el primer día." : "Hoy no hay nada que leer todavía. Cuando suene un aviso, aparecerá aquí y en «La jornada».");
+            if (nada) h.Nota(S.R.DiaActual == 0 ? "Aún no ha empezado el primer día." : "Nada que leer todavía.");
         }
 
         private void PintarBitacora(RectTransform hoja) {
@@ -515,7 +517,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void PintarPanelDeMonitoreo(Hoja h) {
-            h.Nota("Mirar es gratis: el reloj espera mientras este panel está abierto. Las acciones (probar, inspeccionar) cuestan minutos de la jornada.");
+            h.Nota("Mirar es gratis; probar o inspeccionar cuesta minutos.");
             DecirLoUltimo(h);
             // Lo comun a todo proyecto, y despues lo que es de ESTA metodologia: su diagrama, sus documentos, sus pruebas.
             var vistas = new List<KeyValuePair<string, Action<RectTransform>>> {

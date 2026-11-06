@@ -32,6 +32,15 @@ namespace Nexus.Unity.Pantallas {
         protected override void Construir() {
             _prueba = App.Catalogo.Admision;
             _preguntas = _prueba.Preguntas.OrderBy(p => p.Numero).ToList();
+            // Quien cerro el juego a mitad vuelve a la pregunta donde iba, con sus respuestas.
+            var guardada = App.PerfilActivo != null ? App.PerfilActivo.entrevistaEnCurso : null;
+            if (EntrevistaEnCurso.HayUnaAMedias(guardada)) {
+                foreach (var r in guardada.respuestas) _respuestas[r.Key] = r.Value;
+                _indice = EntrevistaEnCurso.IndiceDeInicio(guardada, _preguntas.Count);
+                string elegida;
+                if (_respuestas.TryGetValue(_preguntas[_indice].Numero, out elegida))
+                    _susurro = CorrectorDeAdmision.Susurro(_preguntas[_indice], elegida);
+            }
 
             var marco = UiKit.Rellenar(Ui.Fila(Raiz, "Marco", Tema.margen * 1.5f, Tema.margen * 1.5f, TextAnchor.UpperLeft));
 
@@ -98,6 +107,12 @@ namespace Nexus.Unity.Pantallas {
         private void Responder(PreguntaDeAdmision pregunta, string opcionId) {
             _respuestas[pregunta.Numero] = opcionId;   // null = «no lo sé», que cuenta como fallo
             _susurro = CorrectorDeAdmision.Susurro(pregunta, opcionId);
+            var perfil = App.PerfilActivo;
+            if (perfil != null && !perfil.preTestHecho) {
+                perfil.entrevistaEnCurso = EntrevistaEnCurso.Anotar(perfil.entrevistaEnCurso, pregunta.Numero, opcionId,
+                                                                    Math.Min(_indice + 1, _preguntas.Count - 1));
+                App.GuardarPerfil();
+            }
             Repintar();
         }
 
@@ -117,6 +132,7 @@ namespace Nexus.Unity.Pantallas {
             if (perfil != null && !perfil.preTestHecho) {
                 CorrectorDeAdmision.GuardarPreTest(perfil, CorrectorDeAdmision.Corregir(_prueba, _respuestas));
                 perfil.preTestHecho = true;
+                perfil.entrevistaEnCurso = null;
                 App.GuardarPerfil();
             }
             AlTerminar?.Invoke();

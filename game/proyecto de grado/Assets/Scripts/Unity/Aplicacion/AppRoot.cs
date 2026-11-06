@@ -99,20 +99,43 @@ namespace Nexus.Unity.Aplicacion {
             CrearEventSystem();
             Runner = gameObject.AddComponent<LevelRunner>();
             Preferencias = AlmacenDePreferencias.Cargar();
+            // La musica: entera en los menus, de fondo en la partida, callada en los retos (MusicaDeFondo).
+            Musica = MusicaDeFondo.Crear(gameObject, (float)Preferencias.volumenMusica);
+            Router.AlCambiar += Musica.AlCambiarDePantalla;
+            AuditorDeBotones.Vigilar(this);   // solo en desarrollo: avisa si una pantalla pasa de siete botones
+            AlCambiarPreferencias += p => Musica.CambiarVolumen((float)p.volumenMusica);
             AplicarPreferencias();
         }
 
-        /// <summary>Guarda las opciones y las aplica ya: volumen, modo de ventana y velocidad de la simulacion.</summary>
+        public MusicaDeFondo Musica { get; private set; }
+        private double _velocidadAplicada = double.NaN;
+
+        /// <summary>Lo avisa cada cambio de opciones (la musica, el recorrido 3D): se aplican sin reiniciar nada.</summary>
+        public event Action<Preferencias> AlCambiarPreferencias;
+
+        /// <summary>Guarda las opciones y las aplica ya: volumen, musica, modo de ventana y velocidad de la simulacion.</summary>
         public void CambiarPreferencias(Preferencias nuevas) {
             Preferencias = (nuevas ?? new Preferencias()).Acotadas();
             AlmacenDePreferencias.Guardar(Preferencias);
             AplicarPreferencias();
         }
 
+        /// <summary>Las aplica sin guardarlas: lo que pasa mientras se arrastra un deslizador. Se guardan al soltarlo/cerrar.</summary>
+        public void PrevisualizarPreferencias(Preferencias nuevas) {
+            Preferencias = (nuevas ?? new Preferencias()).Acotadas();
+            AplicarPreferencias();
+        }
+
         private void AplicarPreferencias() {
             AudioListener.volume = (float)Preferencias.volumenGeneral;
-            Screen.fullScreenMode = Preferencias.pantallaCompleta ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
-            if (Runner != null) Runner.Velocidad = Preferencias.velocidadDeSimulacion;
+            if (Screen.fullScreenMode != (Preferencias.pantallaCompleta ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed))
+                Screen.fullScreenMode = Preferencias.pantallaCompleta ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
+            // La velocidad solo se toca si la de Opciones cambio: mover la musica no puede deshacer el ×4 del dia.
+            if (Runner != null && System.Math.Abs(Preferencias.velocidadDeSimulacion - _velocidadAplicada) > 0.001) {
+                Runner.Velocidad = Preferencias.velocidadDeSimulacion;
+                _velocidadAplicada = Preferencias.velocidadDeSimulacion;
+            }
+            AlCambiarPreferencias?.Invoke(Preferencias);
         }
 
         private void Start() {
@@ -358,6 +381,22 @@ namespace Nexus.Unity.Aplicacion {
             var canonico = Nexus.Core.Minijuegos.Verbos.Normalizar(verbo);
             if (guiadas == null || canonico == null || guiadas.Contains(canonico)) return;
             guiadas.Add(canonico);
+            GuardarPerfil();
+        }
+
+        /// <summary>Si la receta de esta mecanica ya se le abrio sola a este perfil (despues va tras el «?»).</summary>
+        public bool YaVioLaReceta(string verbo) {
+            var canonico = Nexus.Core.Minijuegos.Verbos.Normalizar(verbo);
+            return PerfilActivo != null && canonico != null && PerfilActivo.recetasVistas != null &&
+                   PerfilActivo.recetasVistas.Contains(canonico);
+        }
+
+        public void AnotarRecetaVista(string verbo) {
+            var canonico = Nexus.Core.Minijuegos.Verbos.Normalizar(verbo);
+            if (PerfilActivo == null || canonico == null) return;
+            if (PerfilActivo.recetasVistas == null) PerfilActivo.recetasVistas = new List<string>();
+            if (PerfilActivo.recetasVistas.Contains(canonico)) return;
+            PerfilActivo.recetasVistas.Add(canonico);
             GuardarPerfil();
         }
 

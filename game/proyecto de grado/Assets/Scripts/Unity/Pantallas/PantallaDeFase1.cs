@@ -532,9 +532,8 @@ namespace Nexus.Unity.Pantallas {
             if (!S.RecoleccionHecha) {
                 var aviso = _hoja.Tarjeta("Esta parte es en 3D", Tono.Aviso);
                 Ui.Texto(aviso, modulo != null
-                             ? "Vas a salir de estas pantallas y a recorrer el sitio en 3D. Muévete con W A S D, mira con el ratón y salta " +
-                               "con Espacio. Tienes 5 minutos: cuando se acaben, vuelves aquí con lo que lleves. Recoge hojas de vida " +
-                               "(son tu equipo) y suministros (pizza, café, Guepardex) para el desarrollo. Esc pausa el reloj."
+                             ? "Recorre el edificio en 3D durante 5 minutos: W A S D para moverte, el ratón para mirar, Esc para pausar. " +
+                               "Las hojas de vida forman tu equipo; la pizza, el café y la Guepardex te ayudan después."
                              : "El recorrido en 3D lo está construyendo otro equipo. Mientras tanto, se simula: elige cómo de a fondo " +
                                "quieres recorrerlo. Cuanto más miras, más encuentras… y más tiempo gastas, y más cosas puedes tocar que no debías.",
                          EstiloTexto.Pequeno, Tema.ink);
@@ -622,7 +621,11 @@ namespace Nexus.Unity.Pantallas {
             }
             foreach (var m in equipo) {
                 Ui.FilaDeEquipo(tarjeta, m.Nombre, m.Rol, EstadoDeEquipo.Activo);
-                if (!string.IsNullOrEmpty(m.Descripcion)) Ui.Texto(tarjeta, m.Descripcion, EstiloTexto.Pequeno, Tema.inkMuted);
+                // Lo que aporta, dicho en corto: asi se entiende por que importa a quien traes.
+                var ayudaEn = Nexus.Core.Minijuegos.AndamiajeDelReto.EnQueAyuda(m);
+                Ui.Texto(tarjeta, ayudaEn.Count > 0 ? "Te echa una mano al " + string.Join(" y al ", ayudaEn) + "."
+                                                    : "Suma manos al tablero: con más gente, sale más trabajo al día.",
+                         EstiloTexto.Pequeno, ayudaEn.Count > 0 ? Tema.success : Tema.inkMuted);
             }
             Ui.Texto(tarjeta, S.EquipoDesdeRecoleccion
                          ? "Las hojas de vida que encontraste. Las tendrás en «Equipo»."
@@ -694,13 +697,15 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Titulo("¿Cómo va a trabajar el equipo?");
             _hoja.Parrafo("Elige una metodología y el motivo. El motivo cuenta tanto como la elección.");
 
-            var palabras = _hoja.Fila();
-            Ui.Texto(palabras, "Palabras que vas a ver:", EstiloTexto.Pequeno, Tema.inkMuted);
-            foreach (var termino in new[] { "ciclo-de-vida", "sprint", "backlog", "ceremonia", "retrospectiva", "wip" }) {
-                var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, termino);
-                if (e == null) continue;
-                Ui.Boton(palabras, e.Termino + " ?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
-            }
+            // Las palabras del oficio, en un solo boton (antes, seis): quien ya las sabe no tiene que saltarlas.
+            PantallaDeMenu.Boton(App, _hoja.Fila(), "Palabras que vas a ver ?", "Palabras del oficio", () => {
+                var lista = new List<OpcionDeMenu>();
+                foreach (var termino in new[] { "ciclo-de-vida", "sprint", "backlog", "ceremonia", "retrospectiva", "wip" }) {
+                    var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, termino);
+                    if (e != null) lista.Add(new OpcionDeMenu(e.Termino, () => PantallaDePizarra.AbrirConcepto(App, e)));
+                }
+                return lista;
+            });
 
             // Maestro y detalle: a la izquierda se elige, a la derecha se justifica. Antes las razones caian debajo de las
             // tarjetas y habia que desplazarse para verlas.
@@ -720,7 +725,8 @@ namespace Nexus.Unity.Pantallas {
                     Repintar();
                 });
                 Ui.Resaltar(tarjeta, _metodologia == met.Id);
-                var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, met.Id);
+                // «¿Qué es …?» solo bajo la elegida: tres botones iguales, uno por columna, eran ruido.
+                var e = _metodologia == met.Id ? Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, met.Id) : null;
                 if (e != null) Ui.Boton(opciones, "¿Qué es " + met.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
             }
 
@@ -829,6 +835,8 @@ namespace Nexus.Unity.Pantallas {
                     Repintar();
                 });
                 Ui.Resaltar(boton, _arquitectura == arq.Id);
+                // Las ayudas, solo bajo la elegida (antes, dos botones por cada forma).
+                if (_arquitectura != arq.Id) continue;
                 var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, arq.Id);
                 var ayudas = Ui.Fila(opciones, "Ayudas", Tema.Espacio(2));
                 if (e != null) Ui.Boton(ayudas, "¿Qué es?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
@@ -904,17 +912,19 @@ namespace Nexus.Unity.Pantallas {
             var mio = Ui.Tarjeta(lado, $"Tu product backlog · {_backlog.Count} historia{(_backlog.Count == 1 ? "" : "s")}");
             GuiaView.Registrar("fase1.mibacklog", mio);
             if (_backlog.Count == 0) Ui.Texto(mio, "Vacío. Pulsa una historia, a la izquierda, para meterla.", EstiloTexto.Pequeno, Tema.inkMuted);
-            else Ui.Texto(mio, "Arriba, lo que se hace primero: lo que más le vale al cliente. Súbelas y bájalas con ▲▼.", EstiloTexto.Pequeno, Tema.inkMuted);
+            else Ui.Texto(mio, "Arriba, lo que más le vale al cliente. Con «⋯» la subes, la bajas o la quitas.", EstiloTexto.Pequeno, Tema.inkMuted);
             for (var i = 0; i < _backlog.Count; i++) {
                 var indice = i;
                 var h = f.Historia(_backlog[i]);
                 var fila = Ui.Fila(mio, "Historia", Tema.Espacio(2));
                 UiKit.Tamano(Ui.Texto(fila, $"{i + 1}. {h.Titulo}", EstiloTexto.Cuerpo, Tema.ink), flexAncho: 1);
-                var sube = Ui.Boton(fila, "▲", () => MoverHistoria(indice, -1), VarianteBoton.Fantasma);
-                sube.interactable = i > 0;
-                var baja = Ui.Boton(fila, "▼", () => MoverHistoria(indice, 1), VarianteBoton.Fantasma);
-                baja.interactable = i < _backlog.Count - 1;
-                Ui.Boton(fila, "×", () => { _backlog.RemoveAt(indice); _mantenerScroll = true; Repintar(); }, VarianteBoton.Fantasma);
+                // Un «⋯» por historia en vez de tres botones (▲ ▼ ×): la lista se lee, no se esquiva.
+                var total = _backlog.Count;
+                PantallaDeMenu.Boton(App, fila, "⋯", h.Titulo, () => new List<OpcionDeMenu> {
+                    new OpcionDeMenu("Subir", () => MoverHistoria(indice, -1)) { Activa = indice > 0 },
+                    new OpcionDeMenu("Bajar", () => MoverHistoria(indice, 1)) { Activa = indice < total - 1 },
+                    new OpcionDeMenu("Quitar del backlog", () => { _backlog.RemoveAt(indice); _mantenerScroll = true; Repintar(); }, VarianteBoton.Peligro),
+                });
             }
             if (_backlog.Count < MinimoDeHistorias)
                 Ui.Texto(mio, $"Hacen falta al menos {MinimoDeHistorias}: una por cada parte del sistema.", EstiloTexto.Pequeno, Tema.warning);

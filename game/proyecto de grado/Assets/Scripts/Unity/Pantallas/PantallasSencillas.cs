@@ -52,6 +52,56 @@ namespace Nexus.Unity.Pantallas {
         protected abstract void Rellenar();
     }
 
+    /// <summary>Una entrada de un menu corto: el rotulo y lo que hace. 'Activa' = false la deja gris.</summary>
+    public sealed class OpcionDeMenu {
+        public readonly string Texto;
+        public readonly Action AlPulsar;
+        public bool Activa = true;
+        public VarianteBoton Variante = VarianteBoton.Secundario;
+
+        public OpcionDeMenu(string texto, Action alPulsar, VarianteBoton variante = VarianteBoton.Secundario) {
+            Texto = texto;
+            AlPulsar = alPulsar;
+            Variante = variante;
+        }
+    }
+
+    /// <summary>
+    /// El menu de «Más» y de «?»: lo que no hace falta a cada momento sale de la cabecera y espera aqui. Asi ninguna
+    /// pantalla pasa de siete botones a la vista. Al elegir, el menu se cierra antes de hacer nada.
+    /// </summary>
+    public sealed class PantallaDeMenu : PantallaModal {
+        public string Titulo;
+        public List<OpcionDeMenu> Opciones = new List<OpcionDeMenu>();
+
+        protected override float Ancho { get { return 420; } }
+
+        /// <summary>Un boton que abre el menu. Las opciones se piden al pulsar: asi reflejan el estado de ese momento.</summary>
+        public static Button Boton(AppRoot app, Transform padre, string rotulo, string titulo, Func<List<OpcionDeMenu>> opciones,
+                                   VarianteBoton variante = VarianteBoton.Fantasma) {
+            return app.Ui.Boton(padre, rotulo, () => app.Router.Apilar<PantallaDeMenu>(m => {
+                m.Titulo = titulo;
+                m.Opciones = opciones() ?? new List<OpcionDeMenu>();
+            }), variante);
+        }
+
+        protected override void Rellenar() {
+            if (!string.IsNullOrEmpty(Titulo)) Hoja.Subtitulo(Titulo, Tema.ink);
+            var col = Ui.Columna(Hoja.Raiz, espacio: Tema.espacio);
+            foreach (var o in Opciones) {
+                if (o == null) continue;
+                var opcion = o;
+                var boton = Ui.Boton(col, opcion.Texto, () => {
+                    App.Router.Volver();
+                    opcion.AlPulsar?.Invoke();
+                }, opcion.Variante);
+                boton.interactable = opcion.Activa;
+            }
+            Hoja.Espacio();
+            Ui.Boton(Hoja.Fila(), "Cerrar", () => App.Router.Volver(), VarianteBoton.Fantasma);
+        }
+    }
+
     /// <summary>«¿Seguro?» antes de lo que no se deshace: borrar un perfil o una partida.</summary>
     public sealed class PantallaDeConfirmacion : PantallaModal {
         public string Titulo = "¿Seguro?";
@@ -126,6 +176,11 @@ namespace Nexus.Unity.Pantallas {
             Hoja.Espacio();
             var col = Ui.Columna(Hoja.Raiz, espacio: Tema.espacio);
             Ui.Boton(col, "Seguir jugando", Seguir, VarianteBoton.Primario);
+            // La ayuda de la guia (si esta activa): «¿Qué hago ahora?» y los apuntes, siempre a mano desde la pausa.
+            foreach (var o in Nexus.Unity.Guia.GuiaView.OpcionesDeAyuda(App)) {
+                var opcion = o;
+                Ui.Boton(col, opcion.Texto, () => { Seguir(); opcion.AlPulsar?.Invoke(); });
+            }
             Ui.Boton(col, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
             Ui.Boton(col, "Opciones", () => App.Router.Apilar<PantallaDeOpciones>());
             Ui.Boton(col, "Guardar y volver al menú", Salir);

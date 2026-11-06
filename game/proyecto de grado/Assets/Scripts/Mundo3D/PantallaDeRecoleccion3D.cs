@@ -55,12 +55,17 @@ namespace Nexus.Mundo3D {
         private TMP_Text _estado, _fps;
         private MenuDePausa3D _menu;
         private GameTimerUI _reloj;
+        /// <summary>Con este tiempo o menos en el reloj, la musica del recorrido sube (MusicaDeFondo.Apremio).</summary>
+        private const float SegundosDeApremio = 60f;
         private InventoryController _inventario;
         // La escena trae MAS de un InventoryPanelUI (uno en el boton que abre, otro en el que cierra): se escuchan todos.
         private readonly List<InventoryPanelUI> _panelesDeInventario = new List<InventoryPanelUI>();
         private GameObject _jugador;
         private bool _escenaCargada, _fondoQuitado, _terminando, _menuTrasInventario;
         private bool _cursorCapturadoAntes;
+        /// <summary>Como venia el eje vertical de cada camara: «invertir» en Opciones es respecto de eso.</summary>
+        private readonly Dictionary<CinemachineFreeLook, bool> _ejeYDeFabrica = new Dictionary<CinemachineFreeLook, bool>();
+        private bool _escuchandoOpciones;
         private float _escalaDeTiempoAntes = 1f;
         private float _volumenDelJuego = -1;   // el volumen general al entrar; -1 = no se ha tocado
         private int _calidadAnterior = -1;
@@ -88,7 +93,6 @@ namespace Nexus.Mundo3D {
             _estado = Ui.Texto(_cartel, "Cargando el recorrido…", EstiloTexto.Pequeno, Tema.ink);
             var teclas = Ui.Columna(_cartel, "Teclas", Tema.Espacio(1));
             Tecla(teclas, "W A S D", "Moverte");
-            Tecla(teclas, "Espacio", "Saltar");
             Tecla(teclas, "E", "Abrir puertas");
             Tecla(teclas, "I", "Inventario");
             Tecla(teclas, "Esc", "Pausa y controles");
@@ -107,7 +111,13 @@ namespace Nexus.Mundo3D {
             _menu.AlContinuar = CerrarPausa;
             _menu.AlInventario = InventarioDesdeLaPausa;
             _menu.AlTerminar = () => Terminar(terminoAntes: true);
-            _menu.AlCambiarSensibilidad = AplicarSensibilidad;
+            _menu.SensibilidadActual = () => (float)App.Preferencias.sensibilidadRaton;
+            _menu.AlCambiarSensibilidad = v => {
+                var p = App.Preferencias.Acotadas();
+                p.sensibilidadRaton = v;
+                App.PrevisualizarPreferencias(p);   // aplica (AplicarOpciones); se guarda al volver
+            };
+            _menu.AlGuardarOpciones = () => App.CambiarPreferencias(App.Preferencias);
             _menu.AlCambiarVolumen = AplicarVolumen;
             _menu.Estado = EstadoDelRecorrido;
         }
@@ -159,9 +169,18 @@ namespace Nexus.Mundo3D {
             _fondoQuitado = true;
 
             ConectarConLaEscena(escena);
+            // El nivel del equipo 3D, ajustado sin tocar la escena: salto, limites, camara y luz (AjustesDelRecorrido).
+            foreach (var raiz in escena.GetRootGameObjects()) AjustesDelRecorrido.AjustarSalto(raiz);
+            AjustesDelRecorrido.PonerRedDeSeguridad(escena);
+            AjustesDelRecorrido.Ambientar(escena);
             _volumenDelJuego = AudioListener.volume;
             AplicarVolumen(MenuDePausa3D.Volumen);
-            AplicarSensibilidad(MenuDePausa3D.Sensibilidad);
+            MigrarSensibilidadVieja();
+            AplicarOpciones(App.Preferencias);
+            App.AlCambiarPreferencias += AplicarOpciones;
+            _escuchandoOpciones = true;
+            // Se entra mirando: el raton mueve la camara y no se ve la flecha. Tab la suelta; la pausa tambien.
+            CapturarCursor();
 
             var minutos = _reloj != null ? Mathf.RoundToInt(_reloj.TotalTime / 60f) : 0;
             _estado.text = "Recoge <b>hojas de vida</b> (tu equipo) y <b>suministros</b>" +
@@ -174,8 +193,11 @@ namespace Nexus.Mundo3D {
                 if (_reloj == null) _reloj = raiz.GetComponentInChildren<GameTimerUI>(true);
                 if (_inventario == null) _inventario = raiz.GetComponentInChildren<InventoryController>(true);
                 _panelesDeInventario.AddRange(raiz.GetComponentsInChildren<InventoryPanelUI>(true));
-                foreach (var camara in raiz.GetComponentsInChildren<CinemachineFreeLook>(true))
+                foreach (var camara in raiz.GetComponentsInChildren<CinemachineFreeLook>(true)) {
                     _camaras.Add(new KeyValuePair<CinemachineFreeLook, Vector2>(camara, new Vector2(camara.m_XAxis.m_MaxSpeed, camara.m_YAxis.m_MaxSpeed)));
+                    _ejeYDeFabrica[camara] = camara.m_YAxis.m_InvertInput;
+                    AjustesDelRecorrido.AjustarCamara(camara, EtiquetaDelJugador(escena));
+                }
             }
             if (_inventario != null) _jugador = _inventario.gameObject;
 
@@ -226,6 +248,9 @@ namespace Nexus.Mundo3D {
             if (_fps.gameObject.activeSelf) _fps.text = $"{_medidor.FpsAhora:0} FPS · {_medidor.MsAhora:0.0} ms";
             AnimarLaGuia();
             if (!_escenaCargada) return;
+            // El ultimo minuto del recorrido, la musica sube; con el reloj parado (pausa, inventario), no.
+            if (App.Musica != null)
+                App.Musica.Apremio(_reloj != null && _reloj.IsRunning && !_reloj.IsPaused && _reloj.RemainingTime <= SegundosDeApremio);
 
             VigilarElInventario();
 
@@ -246,6 +271,7 @@ namespace Nexus.Mundo3D {
             var capturado = Cursor.lockState == CursorLockMode.Locked;
             Cursor.lockState = capturado ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = capturado;
+            _soltadoConTab = capturado;
         }
 
         // ==================================================================== la guia de teclas
@@ -282,6 +308,7 @@ namespace Nexus.Mundo3D {
 
         private void CerrarPausa() {
             _menu.Cerrar();
+            App.CambiarPreferencias(App.Preferencias);   // lo que se movio en la pausa (sensibilidad) queda guardado
             Descongelar(MotivoPausa);
         }
 
@@ -362,6 +389,50 @@ namespace Nexus.Mundo3D {
         private void AplicarVolumen(float factor) {
             if (_volumenDelJuego >= 0) AudioListener.volume = _volumenDelJuego * Mathf.Clamp01(factor);
         }
+
+        /// <summary>La etiqueta del objeto que lleva el controlador del jugador (la camara no debe chocar con el).</summary>
+        private static string EtiquetaDelJugador(Scene escena) {
+            foreach (var raiz in escena.GetRootGameObjects())
+                foreach (var c in raiz.GetComponentsInChildren<MonoBehaviour>(true))
+                    if (c != null && c.GetType().Name == "NThirdPersonPlayer") return c.gameObject.tag;
+            return "Player";
+        }
+
+        /// <summary>Sensibilidad y eje vertical, de Opciones: al entrar y cada vez que cambian (tambien desde la pausa).</summary>
+        private void AplicarOpciones(Nexus.Core.Preferencias p) {
+            if (p == null) return;
+            // AppRoot acaba de poner el volumen general: el del recorrido es una parte de ese, se vuelve a aplicar.
+            if (_volumenDelJuego >= 0) {
+                _volumenDelJuego = (float)p.volumenGeneral;
+                AplicarVolumen(MenuDePausa3D.Volumen);
+            }
+            AplicarSensibilidad((float)p.sensibilidadRaton);
+            foreach (var kv in _ejeYDeFabrica) AjustesDelRecorrido.InvertirEjeY(kv.Key, kv.Value, p.invertirY);
+        }
+
+        /// <summary>La sensibilidad vivia en PlayerPrefs (solo del 3D); ahora es una opcion del juego. Se trae una vez.</summary>
+        private void MigrarSensibilidadVieja() {
+            if (!PlayerPrefs.HasKey(MenuDePausa3D.ClaveSensibilidad)) return;
+            var vieja = PlayerPrefs.GetFloat(MenuDePausa3D.ClaveSensibilidad, 1f);
+            PlayerPrefs.DeleteKey(MenuDePausa3D.ClaveSensibilidad);
+            if (Mathf.Abs((float)App.Preferencias.sensibilidadRaton - 1f) > 0.001f || Mathf.Abs(vieja - 1f) < 0.001f) return;
+            var nuevas = App.Preferencias.Acotadas();
+            nuevas.sensibilidadRaton = vieja;
+            App.CambiarPreferencias(nuevas);
+        }
+
+        private void CapturarCursor() {
+            if (_congelado.Count > 0 || _terminando) return;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        /// <summary>Al volver a la ventana (alt-tab, un clic fuera), el raton vuelve a mirar si se estaba jugando.</summary>
+        private void OnApplicationFocus(bool foco) {
+            if (foco && _escenaCargada && !_soltadoConTab) CapturarCursor();
+        }
+
+        private bool _soltadoConTab;
 
         private void AplicarSensibilidad(float factor) {
             foreach (var kv in _camaras) {
@@ -469,6 +540,9 @@ namespace Nexus.Mundo3D {
             _inventario = null;
             _jugador = null;
             _camaras.Clear();
+            _ejeYDeFabrica.Clear();
+            if (_escuchandoOpciones && App != null) App.AlCambiarPreferencias -= AplicarOpciones;
+            _escuchandoOpciones = false;
         }
 
         /// <summary>Deja el juego como estaba antes de entrar. Se puede llamar mas de una vez.</summary>

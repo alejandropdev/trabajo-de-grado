@@ -135,10 +135,10 @@ namespace Nexus.Tests {
         //   H0 (antes de reducir): guiones 959 · guia 2199 · admision 750 · EV-TUT 244 · MJ-F0 791
         //   H3: guia 2199 → 612 (lo anterior pasa a «Quiero saber mas»); ceremonias → tarjetas (127 palabras visibles)
         private const int TechoGuiones = 474;   // H3/H4: 959 → 474 (cinematicas, entrevista y escenas del tutorial)
-        private const int TechoGuia = 612;
+        private const int TechoGuia = 611;   // 2026-11-03: botones movidos a «Más» y «?» (la guia los nombra donde estan ahora)
         private const int TechoAdmision = 220;   // H4: 750 → 220 (frase + etiquetas; el instrumento original queda a un boton)
         private const int TechoEventosTutorial = 71;   // H3: 244 → 71 (aviso + frase + etiquetas)
-        private const int TechoRetosF0 = 676;   // H3: 791 → 676 (comoSeJuega y enElProyecto); el resto se ve al jugar o en el «¿Por qué?»
+        private const int TechoRetosF0 = 651;   // H3: 791 → 676; 2026-11-03: 676 → 651 (comoSeJuega y enElProyecto, más cortos)
         private const int TechoCeremonias = 127;
 
         [Test]
@@ -153,7 +153,7 @@ namespace Nexus.Tests {
 
         // La meta del plan era 1.500-2.000 palabras obligatorias en todo el N0. Lo medido aqui no incluye el expediente de
         // la Fase 1 ni el Dashboard, asi que el techo del total es lo conseguido hoy; ver C4-reduccion-de-texto.md.
-        private const int TechoDelTotalMedido = 2200;
+        private const int TechoDelTotalMedido = 2160;   // 2026-11-03: 2180 → 2154 medido
 
         [Test]
         public void El_total_medido_del_nivel_0_no_supera_su_techo() {

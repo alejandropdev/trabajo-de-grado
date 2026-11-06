@@ -163,6 +163,12 @@ namespace Nexus.Unity.Pantallas {
                 foreach (var f in l.Factores.Where(x => x.Estado != "bien"))
                     Ui.Notificacion(t, $"{f.Nombre}: {f.Valor} — {f.Explicacion}", f.Estado == "mal" ? Tono.Peligro : Tono.Aviso);
             }
+            // Lo que aporto la gente: los retos que llegaron con ayuda de alguien del equipo o de la oficina.
+            var ayudas = App.Sesion != null ? App.Sesion.R.RetosConAyuda : null;
+            if (ayudas != null && ayudas.Count > 0)
+                Ui.Texto(t, "Te echaron una mano en " + ayudas.Values.Sum() + " reto(s): " +
+                            string.Join(", ", ayudas.OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key} ({kv.Value})")) + ".",
+                         EstiloTexto.Pequeno, Tema.success);
             if (r.CumpleUmbralesDeExito) Ui.Notificacion(t, "Cumple todos los umbrales de éxito del nivel.", Tono.Exito);
             foreach (var u in r.UmbralesFallados) Ui.Notificacion(t, u, Tono.Aviso);
             return t;

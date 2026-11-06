@@ -1,0 +1,6 @@
+Atascos del recorrido 3D (con el CharacterController) · 2026-11-05 01:41
+56751 sitios probados con el controlador · 0 atascos reales (0 colliders alrededor) · 27 descartados (no se puede entrar andando)
+
+COLLIDERS ALREDEDOR DE LOS ATASCOS (veces · tipo · convexo · ruta)
+
+SITIOS

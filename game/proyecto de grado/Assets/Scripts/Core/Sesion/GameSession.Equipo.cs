@@ -36,6 +36,24 @@ namespace Nexus.Core.Sesion {
     public sealed partial class GameSession {
         public const int MinutosDeUnoAUno = 15, MinutosDeRespiro = 5, MinutosDePareja = 10;
 
+        /// <summary>
+        /// La ayuda con la que llega un reto de esta mecanica: la base del nivel, o un punto mas si alguien del equipo
+        /// es fuerte en eso o alguien de la oficina confia en ti (AndamiajeDelReto). Con el nombre de quien ayuda.
+        /// </summary>
+        public Nexus.Core.Minijuegos.AndamiajeDelReto.Resultado AndamiajePara(string verbo) {
+            var personajes = _catalogo != null && _catalogo.Relaciones != null ? _catalogo.Relaciones.Personajes : null;
+            return Nexus.Core.Minijuegos.AndamiajeDelReto.Efectivo(Perfil.NivelAndamiaje, verbo, EquipoDelProyecto(),
+                                                                  personajes, Confianza);
+        }
+
+        /// <summary>Un reto llego con la ayuda de alguien: se cuenta para decirlo en las Lecciones. No mueve el motor.</summary>
+        public void AnotarRetoConAyuda(string quien) {
+            if (string.IsNullOrEmpty(quien)) return;
+            int n;
+            R.RetosConAyuda.TryGetValue(quien, out n);
+            R.RetosConAyuda[quien] = n + 1;
+        }
+
         /// <summary>El equipo del proyecto. Antes de empezar el desarrollo, el del perfil del nivel.</summary>
         public List<MiembroDelEquipo> EquipoDelProyecto() {
             if (R.Tablero != null && R.Tablero.Miembros.Count > 0) return R.Tablero.Miembros;

@@ -27,8 +27,12 @@ namespace Nexus.Mundo3D {
         private enum Vista { Principal, Controles, Opciones, Confirmar }
 
         public Action AlContinuar, AlInventario, AlTerminar;
-        /// <summary>La sensibilidad del raton cambio (1 = la de serie).</summary>
+        /// <summary>La sensibilidad del raton cambio (1 = la de serie). Es la misma de Opciones del juego.</summary>
         public Action<float> AlCambiarSensibilidad;
+        /// <summary>La sensibilidad de ahora (de Opciones), para pintar el deslizador.</summary>
+        public Func<float> SensibilidadActual;
+        /// <summary>Al salir de la vista de opciones: guardar lo que se movio.</summary>
+        public Action AlGuardarOpciones;
         /// <summary>El volumen del recorrido cambio: de 0 a 1, sobre el volumen general del juego.</summary>
         public Action<float> AlCambiarVolumen;
         /// <summary>Lo que se enseña bajo el titulo: el tiempo que queda y lo que se lleva.</summary>
@@ -45,7 +49,6 @@ namespace Nexus.Mundo3D {
         private float _alfa;
 
         public static float Volumen { get { return PlayerPrefs.GetFloat(ClaveVolumen, 1f); } }
-        public static float Sensibilidad { get { return PlayerPrefs.GetFloat(ClaveSensibilidad, 1f); } }
 
         /// <summary>Crea el menu, cerrado, encima de todo lo demas (tambien del HUD de la escena 3D).</summary>
         public static MenuDePausa3D Crear(UiKit ui, Transform padre) {
@@ -143,7 +146,6 @@ namespace Nexus.Mundo3D {
             var lista = _ui.Columna(_ventana, "Teclas", _tema.Espacio(2));
             Tecla(lista, "W A S D", "Moverte");
             Tecla(lista, "Ratón", "Mirar alrededor");
-            Tecla(lista, "Espacio", "Saltar");
             Tecla(lista, "Shift", "Caminar despacio");
             Tecla(lista, "E", "Abrir una puerta (con la tarjeta de acceso)");
             Tecla(lista, "I", "Abrir o cerrar el inventario (el reloj se para)");
@@ -167,17 +169,16 @@ namespace Nexus.Mundo3D {
 
         private Button PintarOpciones() {
             _ui.Texto(_ventana, "Opciones", EstiloTexto.Subtitulo, _tema.ink);
-            var primero = Paso(_ventana, "Volumen del recorrido", Volumen, 0f, 1f, 0.1f, v => {
+            // Deslizadores, no pares de «−/+»: se arrastran, y con el teclado se mueven con las flechas.
+            _ui.Deslizador(_ventana, "Volumen del recorrido", Volumen, 0f, 1f, 0.05f, v => {
                 PlayerPrefs.SetFloat(ClaveVolumen, v);
                 AlCambiarVolumen?.Invoke(v);
             }, v => Mathf.RoundToInt(v * 100) + " %");
-            Paso(_ventana, "Sensibilidad del ratón", Sensibilidad, SensibilidadMinima, SensibilidadMaxima, 0.1f, v => {
-                PlayerPrefs.SetFloat(ClaveSensibilidad, v);
-                AlCambiarSensibilidad?.Invoke(v);
-            }, v => "×" + v.ToString("0.0"));
-            _ui.Texto(_ventana, "Se guardan para las próximas partidas.", EstiloTexto.Leyenda, _tema.inkFaint);
-            Boton(_ventana, "Volver", () => { PlayerPrefs.Save(); IrA(Vista.Principal); }, VarianteBoton.Fantasma);
-            return primero;
+            _ui.Deslizador(_ventana, "Sensibilidad del ratón", SensibilidadActual != null ? SensibilidadActual() : 1f,
+                           SensibilidadMinima, SensibilidadMaxima, 0.1f, v => AlCambiarSensibilidad?.Invoke(v),
+                           v => "×" + v.ToString("0.0"));
+            _ui.Texto(_ventana, "La sensibilidad es la misma de Opciones. Se guarda para las próximas partidas.", EstiloTexto.Leyenda, _tema.inkFaint);
+            return Boton(_ventana, "Volver", () => { PlayerPrefs.Save(); AlGuardarOpciones?.Invoke(); IrA(Vista.Principal); }, VarianteBoton.Fantasma);
         }
 
         private Button PintarConfirmar() {
@@ -216,30 +217,6 @@ namespace Nexus.Mundo3D {
             var chip = _ui.Chip(fila, tecla, _tema.surfaceRaised, _tema.cyan);
             UiKit.Tamano(chip, ancho: 150);
             UiKit.Tamano(_ui.Texto(fila, que, EstiloTexto.Pequeno, _tema.ink), flexAncho: 1);
-        }
-
-        /// <summary>Un valor con [−] barra [+]: se maneja igual con raton, teclado o mando. Devuelve el boton «−».</summary>
-        private Button Paso(Transform padre, string titulo, float valor, float min, float max, float paso,
-                            Action<float> alCambiar, Func<float, string> formato) {
-            _ui.Texto(padre, titulo.ToUpperInvariant(), EstiloTexto.Leyenda, _tema.cyan);
-            var fila = _ui.Fila(padre, titulo, _tema.Espacio(3));
-            var actual = Mathf.Clamp(valor, min, max);
-            BarraView barra = null;
-            TMP_Text texto = null;
-            Action<float> poner = v => {
-                actual = Mathf.Clamp(Mathf.Round(v / paso) * paso, min, max);
-                barra.Valor = Mathf.InverseLerp(min, max, actual);
-                texto.text = formato(actual);
-                alCambiar(actual);
-            };
-            var menos = _ui.Boton(fila, "−", () => poner(actual - paso), VarianteBoton.Secundario);
-            UiKit.Tamano(menos, ancho: 56);
-            barra = _ui.Barra(fila, Mathf.InverseLerp(min, max, actual), _tema.cyan);
-            var mas = _ui.Boton(fila, "+", () => poner(actual + paso), VarianteBoton.Secundario);
-            UiKit.Tamano(mas, ancho: 56);
-            texto = _ui.Texto(fila, formato(actual), EstiloTexto.Mono, _tema.ink);
-            UiKit.Tamano(texto, ancho: 90);
-            return menos;
         }
     }
 }

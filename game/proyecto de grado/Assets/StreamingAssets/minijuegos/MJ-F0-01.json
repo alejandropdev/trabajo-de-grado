@@ -5,10 +5,10 @@
   "temaPrincipal": "SRS",
   "objetivoAprendizaje": "OA-DOC-01",
   "modulo": "registro",
-  "enElProyecto": "El diagrama de tu propuesta: del formulario al registro, y se avisa al anfitrión.",
+  "enElProyecto": "Tu propuesta: del formulario al registro, con aviso al anfitrión.",
   "presentacion": {
     "titulo": "La revisión de tu propuesta",
-    "comoSeJuega": "Revisa el diagrama antes de construirlo. Pincha lo que falle y di qué problema es. No marques lo que está bien.",
+    "comoSeJuega": "Pincha lo que falle y di qué problema es. Lo que está bien, déjalo.",
     "quienEspera": "Marisol Andrade",
     "textoPresion": "Marisol recoge las propuestas revisadas a las 12:00",
     "segundosReloj": 90

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Nexus.Core.Guardado;
 using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Tema;
@@ -31,17 +33,8 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Hero);   // el logotipo: una sola vez por pantalla
             Ui.Texto(titulos, "Hola, " + App.PerfilActivo.nombreEstudiante, EstiloTexto.Titulo);
-            Ui.Boton(cabecera, "Opciones", () => App.Router.Apilar<PantallaDeOpciones>());
-            // El diario aparece cuando ya hay algo que leer en el: antes de la primera partida solo confunde.
-            if (App.PerfilActivo.coleccionablesGlobales != null && App.PerfilActivo.coleccionablesGlobales.Count > 0)
-                Ui.Boton(cabecera, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
-            if (App.PerfilActivo.guiaVista != null && App.PerfilActivo.guiaVista.Count > 0)
-                Ui.Boton(cabecera, "Volver a ver la guía", () => {
-                    // La guia sale una vez por perfil; esto la reinicia para la proxima partida del tutorial.
-                    App.PerfilActivo.guiaVista.Clear();
-                    App.GuardarPerfil();
-                    App.Router.IrA<PantallaDePartidas>();
-                }, VarianteBoton.Fantasma);
+            // Lo que no es jugar (opciones, diario, guia, borrar) espera en un solo menu: la pantalla es para elegir partida.
+            PantallaDeMenu.Boton(App, cabecera, "Más ▾", "Más", OpcionesDeLaCabecera, VarianteBoton.Secundario);
 
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);
@@ -49,6 +42,7 @@ namespace Nexus.Unity.Pantallas {
             var guardadas = Ui.Tarjeta(cuerpo, "Tus partidas");
             UiKit.Tamano(guardadas, flexAncho: 1, flexAlto: 1);
             var scroll = Ui.Desplazable(guardadas, out _lista);
+            _lista.gameObject.AddComponent<ListaDeElementos>();   // una fila por partida: contenido, no botones de la pantalla
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
 
             ConstruirNueva(cuerpo);
@@ -56,6 +50,42 @@ namespace Nexus.Unity.Pantallas {
             // Volver atras va abajo a la izquierda, donde se busca en cualquier juego.
             var pie = Ui.Fila(marco, "Pie");
             Ui.Boton(pie, "◄  Cambiar de perfil", () => App.Router.IrA<PantallaDePerfiles>(), VarianteBoton.Fantasma);
+        }
+
+        private List<OpcionDeMenu> OpcionesDeLaCabecera() {
+            var perfil = App.PerfilActivo;
+            var lista = new List<OpcionDeMenu> { new OpcionDeMenu("Opciones", () => App.Router.Apilar<PantallaDeOpciones>()) };
+            // El diario aparece cuando ya hay algo que leer en el: antes de la primera partida solo confunde.
+            if (perfil.coleccionablesGlobales != null && perfil.coleccionablesGlobales.Count > 0)
+                lista.Add(new OpcionDeMenu("Diario de campo", () => App.Router.Apilar<PantallaDelDiario>()));
+            if (perfil.guiaVista != null && perfil.guiaVista.Count > 0)
+                lista.Add(new OpcionDeMenu("Volver a ver la guía", () => {
+                    // La guia sale una vez por perfil; esto la reinicia para la proxima partida del tutorial.
+                    perfil.guiaVista.Clear();
+                    App.GuardarPerfil();
+                    App.Router.IrA<PantallaDePartidas>();
+                }));
+            if (perfil.recetasVistas != null && perfil.recetasVistas.Count > 0)
+                lista.Add(new OpcionDeMenu("Volver a ver las recetas de los retos", () => {
+                    perfil.recetasVistas.Clear();
+                    App.GuardarPerfil();
+                }));
+            var partidas = App.Partidas.Listar(perfil.idPerfil);
+            if (partidas.Count > 0)
+                lista.Add(new OpcionDeMenu("Borrar una partida…", () => App.Router.Apilar<PantallaDeMenu>(m => {
+                    m.Titulo = "¿Cuál borras?";
+                    m.Opciones = partidas.Select(r => new OpcionDeMenu(r.Nombre, () => PedirBorrar(r), VarianteBoton.Peligro)).ToList();
+                })));
+            return lista;
+        }
+
+        private void PedirBorrar(ResumenDePartida borrar) {
+            App.Router.Apilar<PantallaDeConfirmacion>(c => {
+                c.Titulo = $"¿Borrar «{borrar.Nombre}»?";
+                c.Texto = "La partida desaparece. Lo que hayas encontrado para el diario se queda en tu perfil.";
+                c.TextoSi = "Borrar";
+                c.AlConfirmar = () => { App.Partidas.Borrar(App.PerfilActivo.idPerfil, borrar.Id); Repintar(); };
+            });
         }
 
         private void ConstruirNueva(Transform padre) {
@@ -114,13 +144,11 @@ namespace Nexus.Unity.Pantallas {
                 var id = r.Id;
                 Ui.Boton(linea, "Continuar", () => Abrir(id), VarianteBoton.Primario);
             }
-            var borrar = r;
-            Ui.Boton(linea, "Borrar", () => App.Router.Apilar<PantallaDeConfirmacion>(c => {
-                c.Titulo = $"¿Borrar «{borrar.Nombre}»?";
-                c.Texto = "La partida desaparece. Lo que hayas encontrado para el diario se queda en tu perfil.";
-                c.TextoSi = "Borrar";
-                c.AlConfirmar = () => { App.Partidas.Borrar(App.PerfilActivo.idPerfil, borrar.Id); Repintar(); };
-            }), VarianteBoton.Fantasma);
+            // Una partida dañada no se puede continuar: su unico boton es borrarla. Las demas se borran desde «Más».
+            if (r.Danada) {
+                var borrar = r;
+                Ui.Boton(linea, "Borrar", () => PedirBorrar(borrar), VarianteBoton.Fantasma);
+            }
         }
 
         private void Empezar() {

@@ -6,69 +6,99 @@ using UnityEngine.UI;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>
-    /// Las opciones del equipo (SRS CU-05): velocidad de la simulacion, volumen y modo de ventana. Se abre desde el
-    /// menu de partidas y desde la pausa; cada cambio se aplica y se guarda en el momento.
+    /// Las opciones (SRS CU-05). Se abre desde el menu de partidas, la pausa y el recorrido 3D. Lo continuo (volumen,
+    /// musica, sensibilidad, velocidad) va en deslizadores y se aplica mientras se arrastra; se guarda al cerrar. Lo
+    /// que es «una de tres» o «sí/no» va en botones que dicen su estado. En total, siete botones como mucho.
     /// </summary>
     public sealed class PantallaDeOpciones : PantallaModal {
-        private static readonly double[] Velocidades = { 0.5, 1, 2, 4 };
-        private static readonly double[] Volumenes = { 0, 0.25, 0.5, 0.75, 1 };
-
         private readonly List<KeyValuePair<Button, Func<Preferencias, bool>>> _opciones =
             new List<KeyValuePair<Button, Func<Preferencias, bool>>>();
+        private Preferencias _borrador;
+        private bool _cambio;
 
         protected override float Ancho { get { return 680; } }
 
         protected override void Rellenar() {
+            _borrador = App.Preferencias.Acotadas();
             Hoja.Titulo("Opciones");
 
-            Hoja.Subtitulo("Velocidad de la simulación", Tema.ink);
-            Hoja.Nota("Cuánto corre el reloj del día. El docente la usa para que el nivel quepa en la sesión de clase.");
+            Hoja.Subtitulo("Dificultad de los retos", Tema.ink);
+            Hoja.Nota("Cuánto reloj dan los minijuegos. Fácil da la mitad más; difícil, un tercio menos.");
             var fila = Hoja.Fila();
-            foreach (var v in Velocidades) {
-                var valor = v;
-                Opcion(fila, "×" + valor.ToString("0.##"), p => p.velocidadDeSimulacion = valor,
-                       p => Math.Abs(p.velocidadDeSimulacion - valor) < 0.001);
-            }
+            Opcion(fila, "Fácil", p => p.dificultad = Preferencias.Facil, p => p.dificultad == Preferencias.Facil);
+            Opcion(fila, "Normal", p => p.dificultad = Preferencias.Normal, p => p.dificultad == Preferencias.Normal);
+            Opcion(fila, "Difícil", p => p.dificultad = Preferencias.Dificil, p => p.dificultad == Preferencias.Dificil);
 
             Hoja.Espacio();
-            Hoja.Subtitulo("Volumen", Tema.ink);
-            fila = Hoja.Fila();
-            foreach (var v in Volumenes) {
-                var valor = v;
-                Opcion(fila, (valor * 100).ToString("0") + " %", p => p.volumenGeneral = valor,
-                       p => Math.Abs(p.volumenGeneral - valor) < 0.001);
-            }
+            Hoja.Subtitulo("Sonido", Tema.ink);
+            Ui.Deslizador(Hoja.Raiz, "Volumen general", (float)_borrador.volumenGeneral, 0, 1, 0.05f,
+                          v => Ajustar(p => p.volumenGeneral = v), Porcentaje);
+            Ui.Deslizador(Hoja.Raiz, "Música", (float)_borrador.volumenMusica, 0, 1, 0.05f,
+                          v => Ajustar(p => p.volumenMusica = v), Porcentaje);
 
             Hoja.Espacio();
-            Hoja.Subtitulo("Pantalla", Tema.ink);
-            fila = Hoja.Fila();
-            Opcion(fila, "Pantalla completa", p => p.pantallaCompleta = true, p => p.pantallaCompleta);
-            Opcion(fila, "Ventana", p => p.pantallaCompleta = false, p => !p.pantallaCompleta);
+            Hoja.Subtitulo("Recorrido 3D", Tema.ink);
+            Ui.Deslizador(Hoja.Raiz, "Sensibilidad del ratón", (float)_borrador.sensibilidadRaton,
+                          (float)Preferencias.SensibilidadMinima, (float)Preferencias.SensibilidadMaxima, 0.1f,
+                          v => Ajustar(p => p.sensibilidadRaton = v), v => "×" + v.ToString("0.0"));
+            Alternar(Hoja.Fila(), p => p.invertirY ? "Eje vertical invertido: sí" : "Eje vertical invertido: no",
+                     p => p.invertirY = !p.invertirY);
 
             Hoja.Espacio();
-            Hoja.Subtitulo("Textos", Tema.ink);
-            Hoja.Nota("Frases cortas y tarjetas, o los textos completos de siempre.");
+            Hoja.Subtitulo("Partida", Tema.ink);
+            Ui.Deslizador(Hoja.Raiz, "Velocidad del día (el docente la ajusta a la clase)", (float)_borrador.velocidadDeSimulacion,
+                          (float)Preferencias.VelocidadMinima, (float)Preferencias.VelocidadMaxima, 0.5f,
+                          v => Ajustar(p => p.velocidadDeSimulacion = v), v => "×" + v.ToString("0.#"));
             fila = Hoja.Fila();
-            Opcion(fila, "Tarjetas y frases cortas", p => p.modoTarjetas = true, p => p.modoTarjetas);
-            Opcion(fila, "Textos completos", p => p.modoTarjetas = false, p => !p.modoTarjetas);
+            Alternar(fila, p => p.pantallaCompleta ? "Pantalla completa" : "En ventana", p => p.pantallaCompleta = !p.pantallaCompleta);
+            Alternar(fila, p => p.modoTarjetas ? "Textos cortos" : "Textos completos", p => p.modoTarjetas = !p.modoTarjetas);
 
             Hoja.Espacio();
             Ui.Boton(Hoja.Fila(), "Cerrar", () => App.Router.Volver(), VarianteBoton.Primario);
             Refrescar();
         }
 
+        private static string Porcentaje(float v) { return Math.Round(v * 100) + " %"; }
+
+        /// <summary>Un deslizador: se aplica ya (se oye y se nota), y se guarda al cerrar.</summary>
+        private void Ajustar(Action<Preferencias> cambio) {
+            cambio(_borrador);
+            _cambio = true;
+            App.PrevisualizarPreferencias(_borrador);
+        }
+
+        /// <summary>Uno de varios: se guarda en el momento.</summary>
         private void Opcion(UnityEngine.Transform fila, string texto, Action<Preferencias> aplicar, Func<Preferencias, bool> elegida) {
             var boton = Ui.Boton(fila, texto, () => {
-                var nuevas = App.Preferencias.Acotadas();
-                aplicar(nuevas);
-                App.CambiarPreferencias(nuevas);
+                aplicar(_borrador);
+                Guardar();
                 Refrescar();
             }, VarianteBoton.Fantasma);
             _opciones.Add(new KeyValuePair<Button, Func<Preferencias, bool>>(boton, elegida));
         }
 
+        /// <summary>Un sí/no en un solo boton que dice como esta; pulsarlo lo cambia.</summary>
+        private void Alternar(UnityEngine.Transform fila, Func<Preferencias, string> rotulo, Action<Preferencias> cambiar) {
+            Button boton = null;
+            boton = Ui.Boton(fila, rotulo(_borrador), () => {
+                cambiar(_borrador);
+                Guardar();
+                boton.GetComponentInChildren<TMPro.TMP_Text>().text = rotulo(_borrador);
+            }, VarianteBoton.Secundario);
+        }
+
+        private void Guardar() {
+            App.CambiarPreferencias(_borrador);
+            _borrador = App.Preferencias.Acotadas();
+            _cambio = false;
+        }
+
         private void Refrescar() {
-            foreach (var o in _opciones) Ui.Resaltar(o.Key, o.Value(App.Preferencias));
+            foreach (var o in _opciones) Ui.Resaltar(o.Key, o.Value(_borrador));
+        }
+
+        private void OnDestroy() {
+            if (_cambio && App != null) App.CambiarPreferencias(_borrador);
         }
     }
 }

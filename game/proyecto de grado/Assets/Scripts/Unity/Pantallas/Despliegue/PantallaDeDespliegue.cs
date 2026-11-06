@@ -119,8 +119,11 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void Update() {
-            if (_paso != Paso.Tuberia && _paso != Paso.Modulo) return;
-            if (GuiaView.PausaActiva || PantallaDePausa.Abierta) return;
+            var corriendo = (_paso == Paso.Tuberia || _paso == Paso.Modulo) && !GuiaView.PausaActiva && !PantallaDePausa.Abierta;
+            // La musica sube en el ultimo cuarto de la cuenta atras (y baja si el reloj se para).
+            if (App.Musica != null)
+                App.Musica.Apremio(corriendo && _restante / Mathf.Max(10f, _total) <= 0.25f);
+            if (!corriendo) return;
             _restante -= Time.unscaledDeltaTime;
             var f = Mathf.Max(0, _restante) / Mathf.Max(10f, _total);
             _reloj.Mostrar(Reloj(_restante), f < 0.15f ? Tono.Peligro : f < 0.3f ? Tono.Aviso : Tono.Cyan);

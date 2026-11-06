@@ -113,6 +113,8 @@ namespace Nexus.Core.Modelo {
         /// <summary>personaje -> confianza ganada en este nivel. Se vuelca a su flag solo en Cerrar() (INV-6).</summary>
         public Dictionary<string, int> Confianza = new Dictionary<string, int>(StringComparer.Ordinal);
         public List<string> ConversacionesHechas = new List<string>();
+        /// <summary>quien -> retos que llegaron con su ayuda (andamiaje subido). Solo para contarlo en las Lecciones.</summary>
+        public Dictionary<string, int> RetosConAyuda = new Dictionary<string, int>(StringComparer.Ordinal);
         /// <summary>personaje -> ultimo dia en que se hablo con el: una conversacion por persona y dia.</summary>
         public Dictionary<string, int> UltimoDiaHablado = new Dictionary<string, int>(StringComparer.Ordinal);
         /// <summary>"personaje|umbral" de cada ayuda ya concedida: cada una se concede una sola vez.</summary>
@@ -298,6 +300,7 @@ namespace Nexus.Core.Modelo {
             // Guardados anteriores a las relaciones.
             if (Confianza == null) Confianza = new Dictionary<string, int>(StringComparer.Ordinal);
             if (ConversacionesHechas == null) ConversacionesHechas = new List<string>();
+            if (RetosConAyuda == null) RetosConAyuda = new Dictionary<string, int>(StringComparer.Ordinal);
             if (UltimoDiaHablado == null) UltimoDiaHablado = new Dictionary<string, int>(StringComparer.Ordinal);
             if (AyudasConcedidas == null) AyudasConcedidas = new List<string>();
             if (AyudasDisponibles == null) AyudasDisponibles = new Dictionary<string, int>(StringComparer.Ordinal);

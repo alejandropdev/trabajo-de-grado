@@ -35,7 +35,10 @@ namespace Nexus.Unity.Tema {
         private readonly List<Relleno> _rellenos = new List<Relleno>();
         public bool Tiza;
 
-        public void Limpiar() { _trazos.Clear(); _rellenos.Clear(); SetVerticesDirty(); }
+        /// <summary>Lo avisa Limpiar: la lamina olvida donde estaban las etiquetas del dibujo anterior.</summary>
+        public System.Action AlLimpiar;
+
+        public void Limpiar() { _trazos.Clear(); _rellenos.Clear(); SetVerticesDirty(); AlLimpiar?.Invoke(); }
 
         // ================================================================ primitivas
 
@@ -246,6 +249,37 @@ namespace Nexus.Unity.Tema {
         public RectTransform Raiz { get; private set; }
         public DibujoUI Dibujo { get; private set; }
 
+        /// <summary>Donde ya hay una etiqueta escrita: las siguientes la esquivan (Reservar).</summary>
+        private readonly System.Collections.Generic.List<Rect> _etiquetas = new System.Collections.Generic.List<Rect>();
+
+        /// <summary>
+        /// Reserva el sitio de una etiqueta. Si pisa a otra de forma clara (mas de un tercio de la menor), la baja
+        /// 'paso' y vuelve a probar, hasta tres veces; si no encuentra hueco, se queda donde iba. Devuelve el sitio.
+        /// </summary>
+        public Rect Reservar(Rect r, float paso) {
+            var prueba = r;
+            for (var intento = 0; intento < 4; intento++) {
+                if (!PisaAOtra(prueba)) { _etiquetas.Add(prueba); return prueba; }
+                prueba.y += paso;
+            }
+            _etiquetas.Add(r);
+            return r;
+        }
+
+        private bool PisaAOtra(Rect r) {
+            foreach (var o in _etiquetas) {
+                if (!o.Overlaps(r)) continue;
+                var ancho = Mathf.Min(r.xMax, o.xMax) - Mathf.Max(r.xMin, o.xMin);
+                var alto = Mathf.Min(r.yMax, o.yMax) - Mathf.Max(r.yMin, o.yMin);
+                var menor = Mathf.Min(r.width * r.height, o.width * o.height);
+                if (menor > 0 && ancho * alto > menor / 3f) return true;
+            }
+            return false;
+        }
+
+        /// <summary>Al repintar la lamina desde cero, las etiquetas viejas ya no ocupan nada.</summary>
+        public void OlvidarEtiquetas() { _etiquetas.Clear(); }
+
         public Lamina(UiKit ui, Transform padre, float ancho, float alto, string nombre = "Lamina") {
             _ui = ui;
             Raiz = ui.Nodo(padre, nombre);
@@ -255,6 +289,7 @@ namespace Nexus.Unity.Tema {
             fondo.gameObject.AddComponent<CanvasRenderer>();
             Dibujo = fondo.gameObject.AddComponent<DibujoUI>();
             Dibujo.raycastTarget = false;
+            Dibujo.AlLimpiar = OlvidarEtiquetas;
         }
 
         /// <summary>Coloca un RectTransform en (x, y) con su tamaño, medido desde arriba a la izquierda.</summary>
@@ -321,7 +356,7 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Una pastilla de color con texto (etiqueta de flecha, chip de valor, marca).</summary>
         public RectTransform Pastilla(float cx, float cy, string texto, float tam, Color fondo, Color colorTexto, Color? borde = null) {
-            var ancho = texto.Length * tam * 0.55f + 26;
+            var ancho = AnchoDePastilla(texto, tam);
             var rt = _ui.Nodo(Raiz, "Pastilla");
             Colocar(rt, cx - ancho / 2, cy - (tam + 12) / 2, ancho, tam + 12);
             var img = rt.gameObject.AddComponent<Image>();
@@ -335,5 +370,27 @@ namespace Nexus.Unity.Tema {
             UiKit.Rellenar((RectTransform)t.transform);
             return rt;
         }
+
+        /// <summary>
+        /// Lo que mide una pastilla con ese texto, con la letra de la interfaz de verdad (antes se estimaba por
+        /// numero de letras, y las palabras anchas se salian del fondo y montaban sobre lo de al lado).
+        /// </summary>
+        public float AnchoDePastilla(string texto, float tam) {
+            var fuente = _ui.Tema.FuenteCuerpo;
+            if (fuente == null) return (texto ?? "").Length * tam * 0.55f + 26;
+            // Un solo medidor para todo el juego, fuera de cualquier lienzo (no se pinta) y fuera de las laminas, que
+            // se vacian al repintar: si viviera dentro, el segundo repintado usaria un objeto ya destruido.
+            if (_medidor == null) {
+                var go = new GameObject("Medidor de pastillas") { hideFlags = HideFlags.HideAndDontSave };
+                UnityEngine.Object.DontDestroyOnLoad(go);
+                _medidor = go.AddComponent<TextMeshProUGUI>();
+                _medidor.textWrappingMode = TextWrappingModes.NoWrap;
+            }
+            _medidor.font = fuente;
+            _medidor.fontSize = tam;
+            return Mathf.Max(40, _medidor.GetPreferredValues(texto ?? "").x + 26);
+        }
+
+        private static TextMeshProUGUI _medidor;
     }
 }

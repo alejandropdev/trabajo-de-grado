@@ -5,10 +5,10 @@
   "temaPrincipal": "SRS",
   "objetivoAprendizaje": "OA-DOC-01",
   "modulo": "dentro",
-  "enElProyecto": "El diagrama de «Quién sigue dentro», que Mateo dibujó y quiere revisado.",
+  "enElProyecto": "«Quién sigue dentro», el diagrama de Mateo.",
   "presentacion": {
     "titulo": "El diagrama de Mateo",
-    "comoSeJuega": "Mateo te pide revisar su diagrama antes de programarlo. Pincha lo que falle; si todo está bien, apruébalo.",
+    "comoSeJuega": "Pincha lo que falle. Si todo está bien, apruébalo.",
     "quienEspera": "Mateo",
     "textoPresion": "Mateo empieza a programarlo a las 11:00",
     "segundosReloj": 90

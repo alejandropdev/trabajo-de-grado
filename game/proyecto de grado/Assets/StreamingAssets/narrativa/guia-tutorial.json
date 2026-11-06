@@ -76,9 +76,9 @@
       "disparador": "fase1.encargo",
       "orden": 30,
       "titulo": "Para seguir",
-      "texto": "«Siguiente» avanza. Si te pierdes, pulsa «¿Qué hago ahora?».",
+      "texto": "«Siguiente» avanza. Si te pierdes, abre el «?».",
       "resaltar": "fase1.navegacion",
-      "mas": "Con «Siguiente», abajo a la derecha, pasas a la parte siguiente del proyecto, y al acabar las preguntas, a las decisiones. Si te pierdes en cualquier momento, «¿Qué hago ahora?» te lo vuelve a explicar, y «Apuntes» resume todo lo que tienes que saber del nivel: el encargo, tus decisiones, cómo se mide y tu equipo."
+      "mas": "Con «Siguiente», abajo a la derecha, pasas a la parte siguiente del proyecto, y al acabar las preguntas, a las decisiones. Si te pierdes en cualquier momento, en el «?» de arriba «¿Qué hago ahora?» te lo vuelve a explicar, y «Apuntes» resume todo lo que tienes que saber del nivel: el encargo, tus decisiones, cómo se mide y tu equipo."
     },
     {
       "id": "F1-REC-1",
@@ -227,7 +227,7 @@
       "titulo": "Empieza el concurso",
       "texto": "Son cinco días. El reloj avanza solo de 9 a 5.",
       "resaltar": "dia.reloj",
-      "mas": "Son cinco días. Cada día el reloj avanza solo, desde las 9 hasta las 5. Arriba ves la hora y cuánto queda de jornada; al lado puedes pausarlo o hacerlo ir más rápido (×2, ×4). Con «Menú» puedes guardar y salir cuando quieras."
+      "mas": "Son cinco días. Cada día el reloj avanza solo, desde las 9 hasta las 5. Arriba ves la hora y cuánto queda de jornada; al lado puedes pausarlo o hacerlo ir más rápido (el botón ×1 pasa a ×2 y a ×4). Con «Menú» puedes guardar y salir cuando quieras."
     },
     {
       "id": "DIA-ANTES-2",
@@ -268,7 +268,7 @@
       "titulo": "Tu escritorio",
       "texto": "Este es tu escritorio. Los avisos solo se atienden aquí.",
       "resaltar": "dia.mapa",
-      "mas": "Estás en tu puesto de la sala del concurso: es tu escritorio (arriba dice siempre dónde estás). Aquí te llegan los avisos, y solo aquí se pueden atender. Para ir a otro sitio está el «Mapa»."
+      "mas": "Estás en tu puesto de la sala del concurso: es tu escritorio (arriba dice siempre dónde estás). Aquí te llegan los avisos, y solo aquí se pueden atender. Para ir a otro sitio está el «Mapa», dentro de «Más»."
     },
     {
       "id": "DIA1-2",
@@ -276,11 +276,11 @@
       "disparador": "dia.1",
       "orden": 200,
       "titulo": "Explora",
-      "texto": "Pulsa «Mapa» y explora. Ir a otro lugar cuesta minutos.",
+      "texto": "En «Más», abre el «Mapa» y explora. Moverse cuesta minutos.",
       "resaltar": "dia.mapa",
       "esperaAccion": "ir-a-zona",
       "pausaElReloj": false,
-      "mas": "Mientras no pase nada, puedes explorar. Pulsa «Mapa» y elige un lugar, por ejemplo «El pasillo de los concursantes». Mientras miras el mapa el reloj espera; ir sí cuesta minutos."
+      "mas": "Mientras no pase nada, puedes explorar. Abre «Más», luego «Mapa», y elige un lugar, por ejemplo «El pasillo de los concursantes». Mientras miras el mapa el reloj espera; ir sí cuesta minutos."
     },
     {
       "id": "MAPA-1",
@@ -320,7 +320,7 @@
       "titulo": "¡Encontraste algo!",
       "texto": "Guardado en tu Diario de Campo.",
       "resaltar": "dia.diario",
-      "mas": "Ya se guardó solo en tu Diario de Campo: cartas, códigos y consejos de verdad sobre cómo se hace el software. Puedes leerlos cuando quieras con el botón «Diario»."
+      "mas": "Ya se guardó solo en tu Diario de Campo: cartas, códigos y consejos de verdad sobre cómo se hace el software. Puedes leerlos cuando quieras en «Menú» › «Diario de campo»."
     },
     {
       "id": "MAPA-2",
@@ -338,9 +338,9 @@
       "disparador": "oficina.disponible",
       "orden": 240,
       "titulo": "Trabajo en tu escritorio",
-      "texto": "Sin avisos, trabaja en el «Escritorio»: tareas cortas de práctica.",
+      "texto": "Sin avisos, trabaja en el «Escritorio» (en «Más»): tareas cortas.",
       "resaltar": "dia.oficina",
-      "mas": "Cuando no pasa nada, puedes trabajar. Con «Escritorio» (o «Trabajar en tu escritorio») ves tareas cortas: cuestan tiempo, pero ayudan al proyecto. Son práctica: no cuentan para tu nota, y si una no te sale puedes intentarla otra vez."
+      "mas": "Cuando no pasa nada, puedes trabajar. Con «Escritorio», dentro de «Más» (o con «Trabajar en tu escritorio»), ves tareas cortas: cuestan tiempo, pero ayudan al proyecto. Son práctica: no cuentan para tu nota, y si una no te sale puedes intentarla otra vez."
     },
     {
       "id": "OFI-2",
@@ -402,7 +402,7 @@
       "texto": "Cada metodología tiene reuniones. Asiste y elige cómo llevarlas.",
       "textoSolo": "Cada forma de trabajar tiene sus reuniones: se llaman ceremonias. Trabajando solo son un rato contigo mismo: repasar el plan, mirar cómo vas. Cuestan unos minutos y, bien llevadas, rindes más. Si las saltas, nadie las hace por ti.",
       "resaltar": "dia.ceremonias",
-      "mas": "Cada forma de trabajar tiene sus reuniones: se llaman ceremonias. En «Ceremonias» ves las de hoy. Puedes asistir (cuesta unos minutos) y elegir cómo llevarlas: bien llevadas, el equipo rinde más. Si no vas, el equipo las hace sin ti."
+      "mas": "Cada forma de trabajar tiene sus reuniones: se llaman ceremonias. En «Más» › «Ceremonias» ves las de hoy. Puedes asistir (cuesta unos minutos) y elegir cómo llevarlas: bien llevadas, el equipo rinde más. Si no vas, el equipo las hace sin ti."
     },
     {
       "id": "DIA2-1",
@@ -689,7 +689,7 @@
       "disparador": "ayuda.dia",
       "orden": 901,
       "titulo": "¿Qué hago en el día?",
-      "texto": "Mira «La jornada»: siempre dice qué toca. Si no pasa nada, puedes abrir el «Mapa» y moverte, hablar con la gente que haya o trabajar en tu «Escritorio». Si suena un aviso, vuelve a tu escritorio y atiéndelo antes de que caduque. En «Monitoreo» tienes el proyecto en detalle; mirar es gratis.",
+      "texto": "Mira «La jornada»: siempre dice qué toca. Si no pasa nada, en «Más» tienes el «Mapa» para moverte y hablar con la gente, o tu «Escritorio» para trabajar. Si suena un aviso, vuelve a tu escritorio y atiéndelo antes de que caduque. En «Monitoreo», también en «Más», tienes el proyecto en detalle; mirar es gratis.",
       "resaltar": "dia.ahora"
     },
     {
@@ -698,7 +698,7 @@
       "disparador": "ayuda.minijuego",
       "orden": 902,
       "titulo": "¿Cómo era este reto?",
-      "texto": "Pulsa «Receta» arriba: te explica con dibujos cómo se juega y el reloj se para mientras la lees. Cuando termines, pulsa el botón de entregar.",
+      "texto": "En el «?» de arriba está la receta: te explica con dibujos cómo se juega, y el reloj se para mientras la lees. Al terminar, entrega.",
       "resaltar": "mj.tablero"
     },
     {

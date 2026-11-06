@@ -139,54 +139,73 @@ namespace Nexus.Unity.Pantallas {
 
             _pausa = Ui.Boton(hud, "Pausa", () => Runner.Pausado = !Runner.Pausado);
             UiKit.Tamano(_pausa, ancho: 130);
-            foreach (var v in new[] { 1, 2, 4 }) {
-                var velocidad = v;
-                UiKit.Tamano(Ui.Boton(hud, "×" + v, () => Runner.Velocidad = velocidad, VarianteBoton.Fantasma), ancho: 64);
-            }
+            // Un solo boton para la velocidad: cada clic pasa a la siguiente (×1 → ×2 → ×4 → ×1).
+            var velocidad = Ui.Boton(hud, RotuloDeVelocidad(), () => {
+                Runner.Velocidad = Runner.Velocidad < 1.5 ? 2 : Runner.Velocidad < 3 ? 4 : 1;
+                _textoVelocidad.text = RotuloDeVelocidad();
+            }, VarianteBoton.Fantasma);
+            UiKit.Tamano(velocidad, ancho: 96);
+            _textoVelocidad = velocidad.GetComponentInChildren<TMP_Text>();
             GuiaView.Registrar("dia.velocidad", _pausa);
-            Ui.Boton(hud, "Menú", () => App.Router.Apilar<PantallaDePausa>());
+            var menu = Ui.Boton(hud, "Menú", () => App.Router.Apilar<PantallaDePausa>());
+            GuiaView.Registrar("dia.diario", menu);   // el diario vive en «Menú» (la pausa)
+        }
+
+        private string RotuloDeVelocidad() {
+            var v = Runner.Velocidad;
+            return "×" + v.ToString("0.#") + " ▸";
         }
 
         /// <summary>
-        /// El riel: un boton por cada cosa que ya no esta siempre en pantalla. Tambien es a donde señala la guia
-        /// cuando habla de algo que vive dentro de un panel cerrado (RegistrarRespaldo).
+        /// El riel: lo que se usa a cada rato (Tablero, Equipo, Avisos) a la vista, y lo demas tras «Más». Con el HUD
+        /// (Pausa, velocidad, Menú) son siete botones, y no compiten entre si.
+        /// Tambien es a donde señala la guia cuando habla de algo que vive dentro de un panel cerrado
+        /// (RegistrarRespaldo): lo que esta tras «Más» se señala en «Más».
         /// </summary>
         private void ConstruirRiel(Transform padre) {
             var riel = Ui.Fila(padre, "Riel", Tema.Espacio(2));
-            var mapa = Ui.Boton(riel, "Mapa", AbrirMapa);
-            var equipo = Ui.Boton(riel, "Equipo", AbrirEquipo);
-            // Lo que se trajo del recorrido 3D (pizza, café, Guepardex). Solo si se trajo algo.
-            if (S.R.Suministros.Count > 0) {
-                var suministros = Ui.Boton(riel, "Suministros", AbrirSuministros);
-                UiKit.Tamano(suministros, ancho: 240);   // «Suministros · 5»: ancho fijo, como Avisos
-                _textoSuministros = suministros.GetComponentInChildren<TMP_Text>();
-            }
-            var escritorio = Ui.Boton(riel, "Escritorio", AbrirEscritorio);
             var tablero = Ui.Boton(riel, "Tablero", () => AbrirTablero(0));
-            Ui.Boton(riel, "Monitoreo", () => AbrirMonitoreo(0));
-            var ceremonias = Ui.Boton(riel, "Ceremonias", () => AbrirCeremonias(0));
-            GuiaView.Registrar("dia.ceremonias", ceremonias);
-            GuiaView.RegistrarRespaldo("dia.tablero", tablero);
+            var equipo = Ui.Boton(riel, "Equipo", AbrirEquipo);
             var avisos = Ui.Boton(riel, "Avisos", () => AbrirAvisos(0));
             UiKit.Tamano(avisos, ancho: 260);   // su rotulo cambia («Avisos · 2 esperando»): ancho fijo para que quepa
             _textoAvisos = avisos.GetComponentInChildren<TMP_Text>();
-            var diario = Ui.Boton(riel, "Diario", AbrirDiario);
-            // La carpeta del cliente: sus papeles, que van llegando, y lo que dice del producto quien lo va a usar.
-            if (S.Perfil.Proyecto != null && S.Perfil.Proyecto.Papeles.Count > 0) {
-                var cliente = Ui.Boton(riel, "Cliente", AbrirCarpetaDelCliente);
-                UiKit.Tamano(cliente, ancho: 230);
-                _textoCliente = cliente.GetComponentInChildren<TMP_Text>();
-                GuiaView.Registrar("dia.cliente", cliente);
-            }
             Ui.Resorte(riel);
-            GuiaView.BotonDeAyuda(App, riel);
+            var mas = PantallaDeMenu.Boton(App, riel, "Más ▾", "Más", OpcionesDelRiel, VarianteBoton.Secundario);
+            UiKit.Tamano(mas, ancho: 220);   // «Más · 2 nuevos» cuando el cliente manda papeles
+            _textoMas = mas.GetComponentInChildren<TMP_Text>();
 
-            GuiaView.Registrar("dia.diario", diario);
-            GuiaView.RegistrarRespaldo("dia.mapa", mapa);
-            GuiaView.RegistrarRespaldo("dia.aqui", mapa);
-            GuiaView.RegistrarRespaldo("mapa.", mapa);
+            GuiaView.RegistrarRespaldo("dia.tablero", tablero);
             GuiaView.RegistrarRespaldo("dia.equipo", equipo);
-            GuiaView.RegistrarRespaldo("dia.oficina", escritorio);
+            GuiaView.Registrar("dia.ceremonias", mas);
+
+            GuiaView.Registrar("dia.cliente", mas);
+            GuiaView.RegistrarRespaldo("dia.mapa", mas);
+            GuiaView.RegistrarRespaldo("dia.aqui", mas);
+            GuiaView.RegistrarRespaldo("mapa.", mas);
+            GuiaView.RegistrarRespaldo("dia.oficina", mas);
+        }
+
+        /// <summary>Lo que hay tras «Más», con sus contadores del momento.</summary>
+        private List<OpcionDeMenu> OpcionesDelRiel() {
+            var lista = new List<OpcionDeMenu> {
+                new OpcionDeMenu("Mapa de la oficina", AbrirMapa),
+                new OpcionDeMenu("Ceremonias", () => AbrirCeremonias(0)),
+                new OpcionDeMenu("Escritorio", AbrirEscritorio),
+                new OpcionDeMenu("Monitoreo del proyecto", () => AbrirMonitoreo(0)),
+            };
+            // La carpeta del cliente: sus papeles, que van llegando.
+            if (S.Perfil.Proyecto != null && S.Perfil.Proyecto.Papeles.Count > 0) {
+                var papeles = S.PapelesSinLeer();
+                lista.Add(new OpcionDeMenu(papeles > 0 ? $"Carpeta del cliente · {papeles} nuevo{(papeles == 1 ? "" : "s")}" : "Carpeta del cliente",
+                                           AbrirCarpetaDelCliente));
+            }
+            // Lo que se trajo del recorrido 3D (pizza, café, Guepardex). Solo si se trajo algo.
+            if (S.R.Suministros.Count > 0) {
+                var quedan = S.R.Suministros.Values.Sum();
+                lista.Add(new OpcionDeMenu(quedan > 0 ? $"Suministros · {quedan}" : "Suministros", AbrirSuministros));
+            }
+            // El diario y la ayuda de la guia estan en «Menú» (la pausa): asi este menu no pasa de siete.
+            return lista;
         }
 
         /// <summary>
@@ -334,20 +353,20 @@ namespace Nexus.Unity.Pantallas {
                 : $"Día {S.R.DiaActual} de {S.Perfil.DiasTotales}" + (brief != null ? " · " + brief.EtiquetaUnidad : "")) +
                 (zona != null ? "  ·  estás en: " + zona.Nombre : "");
             _pausa.GetComponentInChildren<TMP_Text>().text = Runner.Pausado ? "Seguir" : "Pausa";
+            if (_textoVelocidad != null) _textoVelocidad.text = RotuloDeVelocidad();   // por si Opciones la cambio
         }
 
         /// <summary>El boton «Avisos» dice cuantos esperan: es lo unico del riel que cambia solo.</summary>
         private void PintarRiel() {
             var sonando = AlertasSonando().Count;
-            var papeles = _textoCliente == null ? 0 : S.PapelesSinLeer();
-            var quedan = _textoSuministros == null ? 0 : S.R.Suministros.Values.Sum();
-            var clave = sonando + "|" + papeles + "|" + quedan;
+            var papeles = S.Perfil.Proyecto != null && S.Perfil.Proyecto.Papeles.Count > 0 ? S.PapelesSinLeer() : 0;
+            var clave = sonando + "|" + papeles;
             if (clave == _claveRiel) return;
             _claveRiel = clave;
-            if (_textoCliente != null) _textoCliente.text = papeles > 0 ? $"Cliente · {papeles} nuevo{(papeles == 1 ? "" : "s")}" : "Cliente";
             // Solo cuenta lo que YA sono y espera: lo que vaya a llegar hoy no se anuncia, llega.
             _textoAvisos.text = sonando > 0 ? $"Avisos · {sonando} esperando" : "Avisos";
-            if (_textoSuministros != null) _textoSuministros.text = quedan > 0 ? $"Suministros · {quedan}" : "Suministros";
+            // Papeles nuevos del cliente: se avisa en «Más», que es donde esta su carpeta.
+            _textoMas.text = papeles > 0 ? $"Más · {papeles} nuevo{(papeles == 1 ? "" : "s")}" : "Más ▾";
         }
 
         private ZonaDeNivel ZonaDondeEstoy() {
@@ -484,12 +503,9 @@ namespace Nexus.Unity.Pantallas {
             var j = S.Perfil.Jornada;
             _ahora.Etiqueta("Fase 2 · el desarrollo");
             _ahora.Titulo($"{S.Perfil.DiasTotales} días por delante");
-            _ahora.Parrafo($"Cada día empieza a las {j.HoraInicio:00}:00 y la jornada acaba a las {j.HoraCierre:00}:00. El reloj corre solo: " +
-                           "arriba puedes pausarlo o acelerarlo.");
-            _ahora.Parrafo("En cualquier momento puede llegar un aviso. Tienes unas horas para atenderlo, y solo se atiende desde tu " +
-                           "escritorio. Si lo dejas caducar, alguien decide por ti, y casi nunca bien.");
-            _ahora.Parrafo("Mientras tanto, el edificio es tuyo: con «Mapa», arriba, vas a otras zonas, y cada una tiene algo que no " +
-                           "está en ninguna otra. Pero ir cuesta tiempo, y estar lejos cuando suena un aviso también.");
+            _ahora.Parrafo($"De {j.HoraInicio:00}:00 a {j.HoraCierre:00}:00, con el reloj corriendo solo.");
+            _ahora.Parrafo("Los avisos se atienden desde tu escritorio. Si uno caduca, alguien decide por ti.");
+            _ahora.Parrafo("Lo demás del edificio está en «Más» › «Mapa». Moverse cuesta tiempo.");
             // El product backlog que armo el jugador: que entro bien, que sobraba y que falto, antes de empezar.
             var backlog = S.BacklogCreado;
             if (backlog != null) {
@@ -566,7 +582,7 @@ namespace Nexus.Unity.Pantallas {
 
             var capacidad = _ahora.Tarjeta($"Llevas {suma:0.#} de {plan.CapacidadSugerida:0.#} puntos", pasado ? Tono.Aviso : Tono.Exito);
             Ui.Barra(capacidad, plan.CapacidadSugerida <= 0 ? 1 : Mathf.Clamp01((float)(suma / plan.CapacidadSugerida)), pasado ? Tema.warning : Tema.success);
-            Ui.Texto(capacidad, pasado ? "Te pasas de lo que cabe: no da error, pero genera sobrecompromiso, y el sobrecompromiso genera deuda técnica cada día hasta que el sprint se cierra."
+            Ui.Texto(capacidad, pasado ? "Te pasas de lo que cabe: cada día del sprint suma deuda técnica."
                                        : "Lo que no entre se queda en el product backlog para el siguiente sprint.", EstiloTexto.Pequeno, Tema.ink);
 
             var lista = _ahora.Tarjeta("El product backlog, en su orden");
@@ -624,9 +640,9 @@ namespace Nexus.Unity.Pantallas {
                 }
                 var entra = _ahora.Tarjeta($"Con {_compromiso:0} puntos entran en el sprint {entran.Count} tarjetas");
                 Ui.Texto(entra, entran.Count == 0 ? "Ninguna." : string.Join(" · ", entran), EstiloTexto.Pequeno, Tema.ink);
-                Ui.Texto(entra, "Entran en el orden del backlog: lo de arriba, primero. El resto espera en el product backlog.", EstiloTexto.Pequeno);
+                Ui.Texto(entra, "Entran en orden, de arriba abajo. El resto espera.", EstiloTexto.Pequeno);
             }
-            _ahora.Nota("Prometer más de lo que cabe no da error: genera sobrecompromiso, y el sobrecompromiso genera deuda técnica cada día hasta que se cierra.");
+            _ahora.Nota("Prometer más de lo que cabe suma deuda técnica cada día.");
 
             var fila = _ahora.Fila();
             UiKit.Tamano(Ui.Boton(fila, "−", () => _compromiso = Math.Max(0, _compromiso - 1)), ancho: 64);
@@ -644,7 +660,7 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Etiqueta("La jornada corre");
             _ahora.Titulo(S.HoraActual.StartsWith("0") ? "Buenos días" : "Trabajando");
             // El dia no dice si hoy va a sonar algo ni cuando: los avisos llegan, no se anuncian.
-            _ahora.Parrafo("Puedes recorrer el mapa, hablar con la gente o adelantar trabajo en tu escritorio. Si surge algo que tengas que atender, te llegará un aviso.");
+            _ahora.Parrafo("Recorre la oficina, habla con la gente o adelanta trabajo. Si surge algo, te llegará un aviso.");
 
             // Lo que hoy trae para leer cabe en una linea cada cosa; entero, en «Avisos».
             var brief = S.BriefDeHoy;
@@ -675,7 +691,7 @@ namespace Nexus.Unity.Pantallas {
             // aviso o el cierre de la jornada.
             Ui.Boton(botones, "Adelantar el reloj", () => { if (Runner.AdelantarHastaQuePaseAlgo()) GuiaView.Hecho(App, "cerrar-jornada"); },
                      VarianteBoton.Secundario);
-            _ahora.Nota("«Adelantar el reloj» salta hasta lo siguiente que pase: un aviso, si surge alguno, o el cierre de la jornada. Saltar nunca te ahorra una consecuencia.");
+            _ahora.Nota("Adelantar salta al próximo aviso o al cierre. No te ahorra consecuencias.");
         }
 
         private void EmpezarTarea(Nexus.Core.Oficina.TareaDeOficina tarea) {
@@ -729,7 +745,7 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
             if (!string.IsNullOrEmpty(d.TextoAviso)) _ahora.Parrafo(d.TextoAviso);
-            _ahora.Nota("El reloj está parado mientras decides. Debajo de cada opción, lo que cambia en el momento; lo que llega días después no se ve.");
+            _ahora.Nota("El reloj espera. Bajo cada opción, lo que cambia ya; lo de después no se ve.");
             foreach (var opcion in d.Opciones) {
                 var o = opcion;
                 var detalle = o.Bloqueada ? "No disponible: " + o.MotivoBloqueo : Textos.Previsualizar(o.Previsualizacion);
@@ -744,7 +760,7 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Titulo(_decidido.Titulo);
             _ahora.Parrafo("Elegiste: " + _decidido.OpcionTexto);
             _ahora.Parrafo("En el momento: " + _cambiosDeLaDecision);
-            _ahora.Nota("Si la decisión tiene consecuencias, llegarán en los próximos días. Si estuvo bien o mal, y por qué, lo leerás en el Dashboard de Lecciones al cerrar el nivel.");
+            _ahora.Nota("Si trae consecuencias, llegarán estos días. Si estuvo bien, lo verás en las Lecciones.");
             _ahora.Accion("Volver a la jornada", () => { _decidido = null; });
         }
 
@@ -764,8 +780,8 @@ namespace Nexus.Unity.Pantallas {
         private void Prorroga() {
             _ahora.Etiqueta("Horas extra");
             _ahora.Titulo("Te has quedado");
-            _ahora.Parrafo("Hasta la hora límite no llegan avisos: abre el «Mapa», habla con quien quede y busca lo que no has encontrado.");
-            _ahora.Nota("Las barras del proyecto se moverán cuando el día termine, con las horas extra ya contadas.");
+            _ahora.Parrafo("Ya no llegan avisos. Habla con quien quede o busca lo que te falta.");
+            _ahora.Nota("Las barras se mueven al cerrar el día, con las horas extra.");
             _ahora.Accion("Irme ya", () => { Runner.TerminarLaProrroga(); GuiaView.Hecho(App, "irse"); });
         }
 
@@ -960,9 +976,16 @@ namespace Nexus.Unity.Pantallas {
             // La escena anota la mecanica como guiada cuando el recorrido se termina (PantallaDeMinijuego).
             pendiente.Guiado = pendiente.Guiado || S.Perfil.MinijuegosGuiados || !App.YaSeGuioLaMecanica(def.Verbo);
 
+            // La base del nivel deja los retos sin ayudas automaticas; un buen compañero o una buena relacion las traen.
+            var andamiaje = S.AndamiajePara(def.Verbo);
+            pendiente.NivelAndamiaje = andamiaje.Nivel;
+            pendiente.AyudaDe = andamiaje.Quien;
+            pendiente.AyudaPor = andamiaje.Via;
+
             _escenaApilada = true;
             Runner.EnEscena = true;
             Action<ResultadoMinijuego> alTerminar = resultado => {
+                if (pendiente.AyudaDe != null) S.AnotarRetoConAyuda(pendiente.AyudaDe);
                 alResolver(resultado);
                 App.AnotarMinijuegoJugado(pendiente.MinijuegoId);
                 App.Router.Volver();
@@ -1074,7 +1097,7 @@ namespace Nexus.Unity.Pantallas {
             GuiaView.Avisar(App, "coleccionable");
         }
 
-        private TMP_Text _textoCliente, _textoSuministros;
+        private TMP_Text _textoMas, _textoVelocidad;
 
         /// <summary>La frase de siempre o, si se trabaja solo (sin hojas de vida), la contada en primera persona.</summary>
         private string Solo(string conEquipo, string trabajandoSolo) { return S.TrabajasSolo ? trabajandoSolo : conEquipo; }

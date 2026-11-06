@@ -13,9 +13,15 @@ using UnityEngine.UI;
 
 namespace Nexus.Unity.Pantallas.Minijuegos {
     /// <summary>Hace arrastrable una tarjeta del backlog: la sigue al puntero y, al soltarla, dice a que altura cayo.</summary>
-    public sealed class TarjetaArrastrable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public sealed class TarjetaArrastrable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler {
         public Action<float> AlSoltar;     // la y (hacia abajo, en coordenadas de la lamina) donde quedo su centro
+        /// <summary>Un clic sin arrastrar: la tarjeta queda elegida y se mueve con ↑/↓.</summary>
+        public Action AlPulsar;
         private RectTransform _rt;
+
+        public void OnPointerClick(PointerEventData e) {
+            if (!e.dragging) AlPulsar?.Invoke();
+        }
 
         public void OnBeginDrag(PointerEventData e) {
             _rt = (RectTransform)transform;
@@ -40,7 +46,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
     /// <summary>
     /// V3 · Ordenar. El backlog como un tablero, en DOS FASES para que nunca se mezcle ordenar con contestar:
-    ///   1 · Ordena   — tarjetas que se arrastran (o se suben y bajan con ▲▼), un medidor de esfuerzo y la linea de
+    ///   1 · Ordena   — tarjetas que se arrastran (o se eligen con un clic y se mueven con ↑/↓), un medidor de esfuerzo y la linea de
     ///                  capacidad: lo de abajo se queda fuera. «Listo: enseñárselo al cliente» pasa a la fase 2.
     ///   2 · Contesta — el tablero queda quieto; el cliente pide algo y cada respuesta lo cambia AL MOMENTO (la
     ///                  tarjeta pedida sube, o entra a cambio de otra), con la replica del cliente. Se puede cambiar
@@ -67,12 +73,19 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private const float Fila = 78, Y0 = 20, Izq = 130, Ancho = 1180;
 
         /// <summary>
-        /// Las dependencias ROTAS se marcan en rojo mientras se ordena: modo guiado, ayuda de un compañero o
-        /// andamiaje de tutorial (3).
+        /// Las dependencias ROTAS se marcan en rojo mientras se ordena: modo guiado, ayuda de un compañero, andamiaje
+        /// 3 (que se gana con el equipo o la confianza) o la pista pedida a cambio de segundos.
         /// </summary>
         private bool VerDependencias {
-            get { return Guiado || Andamiaje >= 3 || (Pendiente != null && Pendiente.TieneAyuda(TiposDeAyuda.MostrarDependencias)); }
+            get {
+                return Guiado || Andamiaje >= 3 || _pistaPedida ||
+                       (Pendiente != null && Pendiente.TieneAyuda(TiposDeAyuda.MostrarDependencias));
+            }
         }
+
+        private const int SegundosPorPista = 15;
+        private bool _pistaPedida;
+        private Button _pista;
 
         /// <summary>
         /// Cada tarjeta dice que necesita antes (sin decir si esta bien o mal colocada): con andamiaje normal (2) o
@@ -81,6 +94,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private bool VerLoQueNecesita { get { return VerDependencias || Andamiaje >= 2; } }
 
         private bool _avisadoDeRotas;
+        /// <summary>La tarjeta elegida con un clic: ↑/↓ la mueven. null = ninguna.</summary>
+        private string _elegida;
 
         private string QuienPide { get { return string.IsNullOrEmpty(Def.Presentacion.QuienEspera) || Def.Presentacion.QuienEspera == "Tú mismo" ? "el cliente" : Def.Presentacion.QuienEspera; } }
 
@@ -93,7 +108,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _contestando = false;
             _respuesta = null;
             _avisadoDeRotas = false;
-            _lamina = NuevoLienzo(cuerpo, "El backlog · arrastra las tarjetas o usa ▲▼ · arriba lo primero", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
+            _elegida = null;
+            _lamina = NuevoLienzo(cuerpo, "El backlog · arrastra las tarjetas (o clic y ↑/↓) · arriba lo primero", Izq + Ancho + 20, Y0 + (Cfg.Tarjetas.Count + 1) * Fila + 40);
 
             RectTransform pie;
             var lado = ColumnaLateral(cuerpo, "Cliente", 440, out pie);
@@ -102,6 +118,15 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _faseTexto = Ui.Texto(sprint, "", EstiloTexto.Leyenda, Tema.cyan);
             _resumen = Ui.Texto(sprint, "", EstiloTexto.Cuerpo);
             _ayudaDeps = Ui.Texto(sprint, "", EstiloTexto.Pequeno);
+            _pistaPedida = false;
+            if (!VerDependencias)
+                _pista = Ui.Boton(sprint, $"Pista: ver qué está mal colocado (−{SegundosPorPista} s)", () => {
+                    if (_pistaPedida || _contestando) return;
+                    _pistaPedida = true;
+                    CobrarSegundos(SegundosPorPista);
+                    _pista.interactable = false;
+                    Repintar();
+                }, VarianteBoton.Secundario);
             _listo = Ui.Boton(sprint, "Listo: enseñárselo al cliente  ►", PasarAContestar, VarianteBoton.Primario);
             GuiaView.Registrar("mj.ordenar.resumen", sprint);
 
@@ -389,13 +414,15 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     }
                     continue;
                 }
-                var sube = Ui.Boton(tarjeta, "▲", () => Mover(indice, indice - 1));
-                Lamina.Colocar((RectTransform)sube.transform, Ancho - 124, 8, 52, Fila - 26);
-                sube.interactable = i > 0;
-                var baja = Ui.Boton(tarjeta, "▼", () => Mover(indice, indice + 1));
-                Lamina.Colocar((RectTransform)baja.transform, Ancho - 64, 8, 52, Fila - 26);
-                baja.interactable = i < _orden.Count - 1;
-                tarjeta.gameObject.AddComponent<TarjetaArrastrable>().AlSoltar = yCentro => Soltar(indice, yCentro, linea);
+                // Sin flechas en cada tarjeta (eran dos botones por fila): se arrastra, o clic y ↑/↓ con el teclado.
+                if (_elegida == t.Id) Ui.Borde(tarjeta, Tema.cyan, NexusTheme.RadioSm, 3);
+                var arrastrable = tarjeta.gameObject.AddComponent<TarjetaArrastrable>();
+                arrastrable.AlSoltar = yCentro => { _elegida = t.Id; Soltar(indice, yCentro, linea); };
+                arrastrable.AlPulsar = () => {
+                    _elegida = _elegida == t.Id ? null : t.Id;
+                    if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);   // ↑/↓ mueven la tarjeta, no el foco
+                    Repintar();
+                };
             }
         }
 
@@ -429,6 +456,15 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _orden.Insert(hasta, id);
             if (hasta == destino) Guia.Hecho(AccionGuiada.Mover, id);
             Repintar();
+        }
+
+        /// <summary>↑/↓ mueven la tarjeta elegida un puesto; otro clic en ella la suelta.</summary>
+        protected override void TeclasDelJuego(UnityEngine.InputSystem.Keyboard teclado) {
+            if (_contestando || Guiado || _elegida == null) return;
+            var desde = _orden.IndexOf(_elegida);
+            if (desde < 0) { _elegida = null; return; }
+            if (teclado.upArrowKey.wasPressedThisFrame) Mover(desde, desde - 1);
+            else if (teclado.downArrowKey.wasPressedThisFrame) Mover(desde, desde + 1);
         }
 
         private void Mover(int desde, int hasta) {

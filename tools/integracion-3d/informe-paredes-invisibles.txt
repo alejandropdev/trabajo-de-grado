@@ -1,0 +1,8 @@
+Paredes invisibles del recorrido 3D · 2026-11-05 01:42
+51036 casillas andables · 0 con pared invisible (0 colliders) · 0 junto a paredes atravesables (0) · 0 sin suelo real · 0 trampas (se entra y no se sale) de 56751 alcanzables
+
+CHOCA Y NO SE VE (casillas andables que tapa · collider)
+
+TRAMPAS: SE ENTRA Y NO SE SALE (casillas · collider que las rodea)
+
+SE VE Y SE ATRAVIESA (casillas de borde · renderer de más de 1,5 m)

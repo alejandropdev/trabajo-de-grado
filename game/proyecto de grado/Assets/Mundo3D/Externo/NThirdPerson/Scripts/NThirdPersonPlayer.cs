@@ -147,7 +147,13 @@ namespace AppScript.PlayerController
             if (EntradaNueva.Tecla(walkKey) && mag > 0) { mag = 0.9f; }
             moveSpeed = (mag > 0.95f && canRun) ? runSpeed : walkSpeed;
 
-            moveDirection = (input.x * cameraPlayer.transform.right.normalized + input.z * cameraPlayer.transform.forward.normalized) * moveSpeed;
+            // Nexus (2026-11-05): la direccion de la camara, aplanada sobre el suelo. Sin aplanar, con la camara mirando
+            // hacia abajo (pasillos estrechos, la camara se acerca y queda encima) «adelante» apuntaba al suelo: W empujaba
+            // contra el piso y el personaje parecia atascado. Mirando en vertical se usa el «arriba» de la pantalla.
+            var adelante = Vector3.ProjectOnPlane(cameraPlayer.transform.forward, Vector3.up);
+            if (adelante.sqrMagnitude < 0.01f) adelante = Vector3.ProjectOnPlane(cameraPlayer.transform.up, Vector3.up);
+            var derecha = Vector3.ProjectOnPlane(cameraPlayer.transform.right, Vector3.up);
+            moveDirection = (input.x * derecha.normalized + input.z * adelante.normalized) * moveSpeed;
             moveDirection.y = fallVelocity;
 
 
