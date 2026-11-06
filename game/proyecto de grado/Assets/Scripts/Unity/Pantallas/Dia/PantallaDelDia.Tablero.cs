@@ -648,11 +648,17 @@ namespace Nexus.Unity.Pantallas {
                 var motivo = S.PorQueNoSePuedeAsistir(c.Id);
                 Ui.Texto(t, motivo ?? Solo("¿Cómo la llevas? Si no asistes, el equipo la hace sin ti: no pasa nada malo, pero tampoco lo que ganarías llevándola bien.", "¿Cómo la llevas? Si la saltas, nadie la hace por ti: no pasa nada malo, pero tampoco lo que ganarías llevándola bien."),
                          EstiloTexto.Pequeno, motivo == null ? Tema.inkMuted : Tema.warning);
-                foreach (var opcion in c.Opciones) {
+                // Sin textos cortos no hay post-its (no hay etiquetas): una mano de cartas con el texto entero.
+                var cartas = c.Opciones.Select(opcion => {
                     var o = opcion;
-                    var boton = Ui.BotonDeOpcion(t, o.Texto, null, () => Actuar(() => S.AsistirACeremonia(c.Id, o.Id), $"Asististe a «{c.Nombre}»."));
-                    boton.interactable = motivo == null;
-                }
+                    return new OpcionDeCarta {
+                        Titulo = o.Texto,
+                        Bloqueo = motivo,
+                        AlElegir = () => Actuar(() => S.AsistirACeremonia(c.Id, o.Id), $"Asististe a «{c.Nombre}»."),
+                    };
+                }).ToList();
+                ManoDeCartas.Crear(Ui, Ui.Fila(t, "Mano", 0, alineacion: TextAnchor.MiddleCenter), cartas,
+                                   new ManoDeCartas.Ajustes { Sello = "ACORDADO" });
             }
         }
 
@@ -666,6 +672,7 @@ namespace Nexus.Unity.Pantallas {
             Runner.EnEscena = true;
             App.Router.Apilar<PantallaDeTarjetas>(p => {
                 p.Sesion = S;
+                p.Pizarra = true;   // las ceremonias, en la pizarra de post-its (2026-11-05)
                 p.Etiqueta = "Ceremonia";
                 p.Tarjetas = new List<TarjetaDef> { tarjeta };
                 p.ResuelveOtro = true;

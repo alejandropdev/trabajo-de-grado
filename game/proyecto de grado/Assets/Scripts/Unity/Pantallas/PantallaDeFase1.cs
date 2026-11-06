@@ -435,16 +435,28 @@ namespace Nexus.Unity.Pantallas {
             var indice = Preguntas.FindIndex(p => !_comprobacion.ContainsKey(p.Id));
             var actual = Preguntas[indice];
             Ui.Texto(t, $"{indice + 1}. {actual.Texto}", EstiloTexto.Cuerpo, Tema.ink).fontStyle = FontStyles.Bold;
+            // Una mano de cartas: la buena se sella («¡CORRECTO!»); una mala se sacude y se queda apagada.
+            var cartas = new List<OpcionDeCarta>();
             for (var j = 0; j < actual.Opciones.Count; j++) {
                 var opcion = j;
-                Ui.BotonDeOpcion(t, actual.Opciones[j], null, () => Contestar(actual, opcion));
+                cartas.Add(new OpcionDeCarta {
+                    Titulo = actual.Opciones[j],
+                    Descartada = _opcionesFalladas.Contains(actual.Id + ":" + j),
+                    EsCorrecta = () => opcion == actual.Correcta,
+                    AlElegir = () => Contestar(actual, opcion),
+                });
             }
+            ManoDeCartas.Crear(Ui, Ui.Fila(t, "Mano", 0, alineacion: TextAnchor.MiddleCenter), cartas,
+                               new ManoDeCartas.Ajustes { Sello = "¡CORRECTO!", ColorDelSello = Tema.success, AnchoMaximo = 980 });
             if (_ultimaFallada == actual.Id) Ui.Texto(t, "No es esa. Pista: " + actual.Explicacion, EstiloTexto.Pequeno, Tema.warning);
         }
 
+        /// <summary>Las respuestas ya probadas y falladas («pregunta:opcion»): se pintan apagadas en la mano.</summary>
+        private readonly HashSet<string> _opcionesFalladas = new HashSet<string>();
+
         private void Contestar(Nexus.Core.Proyecto.PreguntaDelProyecto p, int opcion) {
             if (opcion == p.Correcta) { _comprobacion[p.Id] = opcion; _ultimaFallada = null; _ultimaAcertada = p.Id; }
-            else { _falladas.Add(p.Id); _ultimaFallada = p.Id; }
+            else { _falladas.Add(p.Id); _ultimaFallada = p.Id; _opcionesFalladas.Add(p.Id + ":" + opcion); }
             _mantenerScroll = true;
             Repintar();
         }
@@ -493,16 +505,19 @@ namespace Nexus.Unity.Pantallas {
             titulo.fontStyle = FontStyles.Bold;
             // Dos columnas que se reparten el ancho REAL (antes, celdas fijas de 760: en ventanas estrechas se salian
             // por la derecha, y el texto largo se salia de su celda de alto fijo).
-            var rejilla = Ui.Fila(padre, "Razones", Tema.espacio, alineacion: TextAnchor.UpperLeft);
-            var columnas = new[] { Ui.Columna(rejilla, "Razones A", Tema.espacio * 0.5f), Ui.Columna(rejilla, "Razones B", Tema.espacio * 0.5f) };
-            foreach (var c in columnas) UiKit.Tamano(c, ancho: 0, flexAncho: 1);   // ancho 0 + flexible = mitad exacta
+            // Una mano de cartas que se puede cambiar (Seleccionable): con mas de cuatro razones, en rejilla.
+            var rejilla = Ui.Fila(padre, "Razones", 0, alineacion: TextAnchor.MiddleCenter);
             GuiaView.Registrar("fase1.razones", rejilla);
-            var i = 0;
+            var cartas = new List<OpcionDeCarta>();
+            var seleccionada = -1;
             foreach (var r in razones) {
                 var id = r.Key;
-                var boton = Ui.BotonDeOpcion(columnas[i++ % 2], r.Value, null, () => alElegir(id));
-                Ui.Resaltar(boton, elegida == id);
+                if (elegida == id) seleccionada = cartas.Count;
+                cartas.Add(new OpcionDeCarta { Titulo = r.Value, AlElegir = () => alElegir(id) });
             }
+            ManoDeCartas.Crear(Ui, rejilla, cartas, new ManoDeCartas.Ajustes {
+                Seleccionable = true, Seleccionada = seleccionada, AnchoDeCarta = 300, AnchoMaximo = 1000
+            });
         }
 
         /// <summary>«equipo de 4», o, si el equipo sale del recorrido y aun no se ha hecho, que todavia esta por formar.</summary>
@@ -712,23 +727,31 @@ namespace Nexus.Unity.Pantallas {
             // Las tres a la vista, una al lado de otra: antes iban en columna y la tercera (Kanban) quedaba por debajo
             // del borde, y habia que desplazarse para saber que existia. Los motivos y el calendario, debajo.
             var disponibles = S.MetodologiasDisponibles();
-            var opcionesEnFila = Ui.Fila(_hoja.Raiz, "Metodologias", Tema.Espacio(3), alineacion: TextAnchor.UpperLeft);
+            var opcionesEnFila = Ui.Fila(_hoja.Raiz, "Metodologias", 0, alineacion: TextAnchor.MiddleCenter);
             GuiaView.Registrar("fase1.metodologias", opcionesEnFila);
+            // Las metodologias, como una mano de cartas que se puede cambiar: la elegida lleva su sello «ELEGIDA».
+            // Con frases cortas, el resumen largo se queda tras «¿Qué es …?» (la pizarra del concepto).
+            var cartas = new List<OpcionDeCarta>();
+            var seleccionada = -1;
             foreach (var m in disponibles) {
                 var met = m;
-                var opciones = Ui.Columna(opcionesEnFila, "Metodologia " + met.Id, Tema.Espacio(1));
-                UiKit.Tamano(opciones, ancho: 0, flexAncho: 1);
-                // Con frases cortas, el resumen largo se queda tras «¿Qué es …?» (la pizarra del concepto).
-                var tarjeta = Ui.BotonDeOpcion(opciones, met.Nombre, App.Preferencias.modoTarjetas ? null : met.Resumen, () => {
-                    if (_metodologia != met.Id) { _razonMetodologia = null; _duracion = null; }   // otra metodologia, otros motivos y otro calendario
-                    _metodologia = met.Id;
-                    Repintar();
+                if (_metodologia == met.Id) seleccionada = cartas.Count;
+                cartas.Add(new OpcionDeCarta {
+                    Titulo = met.Nombre,
+                    Detalle = App.Preferencias.modoTarjetas ? null : met.Resumen,
+                    AlElegir = () => {
+                        if (_metodologia != met.Id) { _razonMetodologia = null; _duracion = null; }   // otra metodologia, otros motivos y otro calendario
+                        _metodologia = met.Id;
+                        Repintar();
+                    }
                 });
-                Ui.Resaltar(tarjeta, _metodologia == met.Id);
-                // «¿Qué es …?» solo bajo la elegida: tres botones iguales, uno por columna, eran ruido.
-                var e = _metodologia == met.Id ? Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, met.Id) : null;
-                if (e != null) Ui.Boton(opciones, "¿Qué es " + met.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
             }
+            ManoDeCartas.Crear(Ui, opcionesEnFila, cartas, new ManoDeCartas.Ajustes { Seleccionable = true, Seleccionada = seleccionada, AnchoMaximo = 1000 });
+            // «¿Qué es …?» solo de la elegida.
+            var queEs = _metodologia != null ? Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, _metodologia) : null;
+            var elegidaParaAyuda = disponibles.FirstOrDefault(m => m.Id == _metodologia);
+            if (queEs != null && elegidaParaAyuda != null)
+                Ui.Boton(_hoja.Fila(), "¿Qué es " + elegidaParaAyuda.Nombre + "?", () => PantallaDePizarra.AbrirConcepto(App, queEs), VarianteBoton.Fantasma);
 
             var detalle = Ui.Columna(_hoja.Raiz, "Motivos", Tema.espacio);
             var elegida = disponibles.FirstOrDefault(m => m.Id == _metodologia);
@@ -824,28 +847,34 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(Ui.Texto(releer, "Vuelve a leer el encargo antes de elegir: la respuesta está ahí.", EstiloTexto.Cuerpo), flexAncho: 1);
             Ui.Boton(releer, "Releer el encargo", () => DialogosDelExpediente.Encargo(App, Perfil, S.PistasEncontradas()));
 
-            var escena = Ui.Fila(_hoja.Raiz, "Eleccion", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
-            var opciones = Ui.Columna(escena, "Arquitecturas", Tema.Espacio(2));
-            UiKit.Tamano(opciones, ancho: 440);
+            // Las formas, como una mano de cartas que se puede cambiar; debajo, las ayudas de la elegida y sus razones.
+            var fila = Ui.Fila(_hoja.Raiz, "Arquitecturas", 0, alineacion: TextAnchor.MiddleCenter);
+            var cartas = new List<OpcionDeCarta>();
+            var seleccionada = -1;
             foreach (var a in fase1.Arquitecturas) {
                 var arq = a;
-                var boton = Ui.BotonDeOpcion(opciones, arq.Nombre, null, () => {
-                    if (_arquitectura != arq.Id) _razonArquitectura = null;   // otra forma, otras razones
-                    _arquitectura = arq.Id;
-                    Repintar();
+                if (_arquitectura == arq.Id) seleccionada = cartas.Count;
+                cartas.Add(new OpcionDeCarta {
+                    Titulo = arq.Nombre,
+                    AlElegir = () => {
+                        if (_arquitectura != arq.Id) _razonArquitectura = null;   // otra forma, otras razones
+                        _arquitectura = arq.Id;
+                        Repintar();
+                    }
                 });
-                Ui.Resaltar(boton, _arquitectura == arq.Id);
-                // Las ayudas, solo bajo la elegida (antes, dos botones por cada forma).
-                if (_arquitectura != arq.Id) continue;
-                var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, arq.Id);
-                var ayudas = Ui.Fila(opciones, "Ayudas", Tema.Espacio(2));
+            }
+            ManoDeCartas.Crear(Ui, fila, cartas, new ManoDeCartas.Ajustes { Seleccionable = true, Seleccionada = seleccionada, AnchoMaximo = 1000 });
+            if (_arquitectura != null) {
+                // Las ayudas, solo de la elegida.
+                var e = Nexus.Core.Narrativa.Glosario.Buscar(App.Catalogo.Glosario, _arquitectura);
+                var ayudas = _hoja.Fila();
                 if (e != null) Ui.Boton(ayudas, "¿Qué es?", () => PantallaDePizarra.AbrirConcepto(App, e), VarianteBoton.Fantasma);
                 // Como quedaria ESTE sistema con esa forma: el plano con los modulos del proyecto.
-                if (Perfil.Proyecto != null) Ui.Boton(ayudas, "Ver cómo quedaría", () => PantallaDelProducto.AbrirPlano(App, arq.Id, false), VarianteBoton.Fantasma);
+                var id = _arquitectura;
+                if (Perfil.Proyecto != null) Ui.Boton(ayudas, "Ver cómo quedaría", () => PantallaDelProducto.AbrirPlano(App, id, false), VarianteBoton.Fantasma);
             }
 
-            var detalle = Ui.Columna(escena, "Razones", Tema.espacio);
-            UiKit.Tamano(detalle, ancho: 0, flexAncho: 1);
+            var detalle = Ui.Columna(_hoja.Raiz, "Razones", Tema.espacio);
             var elegida = fase1.Arquitecturas.FirstOrDefault(a => a.Id == _arquitectura);
             if (elegida == null) {
                 Ui.Texto(detalle, "Elige una forma, a la izquierda, para ver las razones que la justifican (o no).", EstiloTexto.Pequeno);

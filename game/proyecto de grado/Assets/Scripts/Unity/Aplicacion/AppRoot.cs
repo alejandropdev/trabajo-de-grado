@@ -83,6 +83,7 @@ namespace Nexus.Unity.Aplicacion {
             Ui = new UiKit(_tema);
             UiClasico = new UiKit(Ui.Tema, clasico: true);
 
+            MigracionDeGuardado.MigrarSiHaceFalta();
             var almacen = new AlmacenDeArchivosAtomico(RutasDeGuardado.Raiz);
             Perfiles = new ProfileStore(almacen);
             Partidas = new SaveStore(almacen);
@@ -90,6 +91,8 @@ namespace Nexus.Unity.Aplicacion {
 
             CargarCatalogo();
             Router = new ScreenRouter(this, CrearLienzo());
+            // Las manos de cartas solo escuchan el teclado si son de la pantalla de arriba (no la del dia bajo un panel).
+            Nexus.Unity.Tema.ManoDeCartas.PuedeEscuchar = t => Router.Actual != null && t.IsChildOf(Router.Actual.transform);
             Telemetria = new TelemetriaDePantallas(almacen);
             Router.AlCambiar += pantalla => {
                 Telemetria.EntrarA(pantalla == null ? null : pantalla.GetType().Name, Time.realtimeSinceStartupAsDouble,

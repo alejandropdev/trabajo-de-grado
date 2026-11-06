@@ -543,13 +543,17 @@ namespace Nexus.Unity.Pantallas {
             }
             if (!string.IsNullOrEmpty(retro.Texto)) _ahora.Parrafo(retro.Texto);
             _ahora.Nota(Solo("Lo que elijas cambia cómo trabaja el equipo desde hoy. El reloj espera.", "Lo que elijas cambia cómo trabajas desde hoy. El reloj espera."));
-            foreach (var accion in retro.Acciones) {
+            var cartas = retro.Acciones.Select(accion => {
                 var a = accion;
-                _ahora.Opcion(a.Texto, null, () => {
-                    S.ElegirAccionRetro(a.Id);
-                    Anotar($"Retrospectiva: «{a.Texto}»");
-                });
-            }
+                return new OpcionDeCarta {
+                    Titulo = a.Texto,
+                    AlElegir = () => {
+                        S.ElegirAccionRetro(a.Id);
+                        Anotar($"Retrospectiva: «{a.Texto}»");
+                    }
+                };
+            }).ToList();
+            _ahora.Mano(cartas, new ManoDeCartas.Ajustes { Sello = "ACORDADO" });
         }
 
         private readonly HashSet<string> _alSprint = new HashSet<string>();
@@ -735,24 +739,25 @@ namespace Nexus.Unity.Pantallas {
             var d = S.Decision;
             _ahora.Etiqueta("Decisión");
             _ahora.Titulo(d.Titulo);
-            // Con tarjeta, la decision es una frase y un gesto; el resto (aviso largo, notas) se queda fuera de la vista.
-            var tarjeta = App.Preferencias.modoTarjetas ? TarjetaDeDecision.De(d) : null;
-            if (tarjeta != null) {
-                _ahora.Parrafo(tarjeta.Frase);
-                _ahora.Nota("El reloj está parado mientras decides.");
-                _ahora.Accion("Decidir  ►", () => DecidirConTarjeta(tarjeta));
-                AbrirSola(() => S.Decision != null, () => DecidirConTarjeta(tarjeta));
-                return;
-            }
-            if (!string.IsNullOrEmpty(d.TextoAviso)) _ahora.Parrafo(d.TextoAviso);
-            _ahora.Nota("El reloj espera. Bajo cada opción, lo que cambia ya; lo de después no se ve.");
+            // Todas las decisiones son una mano de cartas (2026-11-05). Con textos cortos, la frase y la etiqueta de cada
+            // opcion; si no, el aviso y el texto entero. Al pie de cada carta, lo que cambia ya; lo de despues no se ve.
+            var corta = App.Preferencias.modoTarjetas && !string.IsNullOrEmpty(d.Frase);
+            if (corta) _ahora.Parrafo(d.Frase);
+            else if (!string.IsNullOrEmpty(d.TextoAviso)) _ahora.Parrafo(d.TextoAviso);
+            _ahora.Nota("El reloj espera. Al pie de cada carta, lo que cambia ya; lo de después no se ve.");
+            var cartas = new List<OpcionDeCarta>();
             foreach (var opcion in d.Opciones) {
                 var o = opcion;
-                var detalle = o.Bloqueada ? "No disponible: " + o.MotivoBloqueo : Textos.Previsualizar(o.Previsualizacion);
-                if (!string.IsNullOrEmpty(o.NotaDeMetodologia) && !o.Bloqueada) detalle += "   ·   " + o.NotaDeMetodologia;
-                var boton = _ahora.Opcion(o.Texto, detalle, () => Resolver(o.Id));
-                boton.interactable = !o.Bloqueada;
+                var pie = Textos.Previsualizar(o.Previsualizacion);
+                if (!string.IsNullOrEmpty(o.NotaDeMetodologia)) pie += (string.IsNullOrEmpty(pie) ? "" : " · ") + o.NotaDeMetodologia;
+                cartas.Add(new OpcionDeCarta {
+                    Titulo = corta && !string.IsNullOrEmpty(o.Etiqueta) ? o.Etiqueta : o.Texto,
+                    Pie = pie,
+                    Bloqueo = o.Bloqueada ? (string.IsNullOrEmpty(o.MotivoBloqueo) ? "no disponible" : o.MotivoBloqueo) : null,
+                    AlElegir = () => Resolver(o.Id),
+                });
             }
+            _ahora.Mano(cartas, new ManoDeCartas.Ajustes { Sello = "DECIDIDO" });
         }
 
         private void Decidido() {
@@ -1005,28 +1010,6 @@ namespace Nexus.Unity.Pantallas {
         }
 
         /// <summary>
-        /// La decision como tarjeta: se elige deslizando o con un boton, y al cerrar se resuelve con ResolverDecision, el
-        /// mismo camino de siempre (multiplicador de la metodologia, diferidos, traza con la rubrica del evento).
-        /// </summary>
-        private void DecidirConTarjeta(TarjetaDef tarjeta) {
-            OpcionTarjeta elegida = null;
-            _escenaApilada = true;
-            Runner.EnEscena = true;
-            App.Router.Apilar<PantallaDeTarjetas>(p => {
-                p.Sesion = S;
-                p.Etiqueta = "Decisión";
-                p.Tarjetas = new List<TarjetaDef> { tarjeta };
-                p.ResuelveOtro = true;
-                p.AlElegir = (_, opcion) => elegida = opcion;
-                p.AlTerminar = () => {
-                    App.Router.Volver();
-                    _escenaApilada = false;
-                    if (elegida != null) Resolver(elegida.Id);
-                };
-            });
-        }
-
-        /// <summary>
         /// La retrospectiva y la planificacion como tarjeta: se elige deslizando o con un boton, y al cerrar se llama al
         /// mismo camino de siempre (ElegirAccionRetro, Comprometer) con lo elegido.
         /// </summary>
@@ -1051,6 +1034,7 @@ namespace Nexus.Unity.Pantallas {
             Runner.EnEscena = true;
             App.Router.Apilar<PantallaDeTarjetas>(p => {
                 p.Sesion = S;
+                p.Pizarra = true;   // las ceremonias, en la pizarra de post-its (2026-11-05)
                 p.Etiqueta = etiqueta;
                 p.Tarjetas = new List<TarjetaDef> { tarjeta };
                 p.ResuelveOtro = true;

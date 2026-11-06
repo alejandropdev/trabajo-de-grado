@@ -268,10 +268,13 @@ namespace Nexus.Unity.Pantallas {
             }
             Hoja.Espacio();
             Ui.Texto(Hoja.Raiz, c.Pregunta.Texto, EstiloTexto.Encabezado, Tema.ink);
+            // Las respuestas, como mano de cartas: se elige, la carta se sella («DICHO») y el personaje contesta.
+            var cartas = new List<OpcionDeCarta>();
             foreach (var o in c.Pregunta.Opciones) {
                 var opcion = o;
-                Hoja.Opcion(opcion.Texto, null, () => Contestar(opcion.Id));
+                cartas.Add(new OpcionDeCarta { Titulo = opcion.Texto, AlElegir = () => Contestar(opcion.Id) });
             }
+            Hoja.Mano(cartas, new ManoDeCartas.Ajustes { Sello = "DICHO", AnchoMaximo = 820 });
         }
 
         private void Contestar(string opcionId) {

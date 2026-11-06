@@ -74,11 +74,14 @@ namespace Nexus.Unity.Pantallas {
             if (!EnLaUltima) {
                 Ui.Boton(Ui.Fila(_acciones), "Siguiente  ►", Avanzar, VarianteBoton.Primario);
             } else if (TieneOpciones) {
-                var opciones = Ui.Fila(_acciones, "Opciones", Tema.espacio, alineacion: TextAnchor.UpperLeft);
+                // La eleccion del guion, como mano de cartas (2026-11-05).
+                var opciones = Ui.Fila(_acciones, "Opciones", Tema.espacio, alineacion: TextAnchor.MiddleCenter);
+                var cartas = new List<OpcionDeCarta>();
                 foreach (var opcion in Guion.Opciones) {
                     var o = opcion;
-                    UiKit.Tamano(Ui.BotonDeOpcion(opciones, o.Texto, null, () => Elegir(o)), ancho: 0, flexAncho: 1);
+                    cartas.Add(new OpcionDeCarta { Titulo = o.Texto, AlElegir = () => Elegir(o) });
                 }
+                ManoDeCartas.Crear(Ui, opciones, cartas, new ManoDeCartas.Ajustes { Sello = "DECIDIDO", AnchoDeCarta = 320 });
             } else {
                 Ui.Boton(Ui.Fila(_acciones), "Continuar  ►", Terminar, VarianteBoton.Primario);
             }

@@ -46,19 +46,19 @@ namespace Nexus.Unity.Pantallas {
 
             var ficha = Ui.Tarjeta(marco, "La entrevista");
             UiKit.Tamano(ficha, ancho: 440);
+            // Marisol a la izquierda y, a su lado, el ascensor: cada respuesta sube un piso (2026-11-05).
+            var lado = Ui.Fila(ficha, "Retrato y ascensor", Tema.espacio, alineacion: TextAnchor.UpperLeft);
+            var persona = Ui.Columna(lado, "Entrevistadora", Tema.Espacio(2));
+            UiKit.Tamano(persona, ancho: 0, flexAncho: 1);
             var e = _prueba.Entrevistadora;
             if (e != null) {
                 // Quien entrevista, con su retrato (o su silueta mientras no haya arte).
-                Ui.Ilustracion(ficha, MaterialesNexus.IdDePersonaje(e.Nombre), null, alto: 300);
-                Ui.Texto(ficha, e.Nombre, EstiloTexto.Encabezado);
-                if (!string.IsNullOrEmpty(e.Rol)) Ui.Texto(ficha, e.Rol, EstiloTexto.Pequeno, Tema.cyan);
-                if (!string.IsNullOrEmpty(e.Descripcion) && !_preguntas.Any(TieneVistaCorta)) Ui.Texto(ficha, e.Descripcion, EstiloTexto.Pequeno);
+                Ui.Ilustracion(persona, MaterialesNexus.IdDePersonaje(e.Nombre), null, alto: 240);
+                Ui.Texto(persona, e.Nombre, EstiloTexto.Encabezado);
+                if (!string.IsNullOrEmpty(e.Rol)) Ui.Texto(persona, e.Rol, EstiloTexto.Pequeno, Tema.cyan);
             }
-            Ui.Separador(ficha);
-            Ui.Texto(ficha, _preguntas.Any(TieneVistaCorta)
-                ? "Quince preguntas. Si no sabes una, dilo: no se descuenta nada."
-                : "Quince preguntas. Si no sabes una, dilo: no se descuenta nada. La entrevista no cambia nada de la partida; " +
-                  "sirve para saber de dónde partes.", EstiloTexto.Pequeno);
+            Ui.Texto(persona, "Quince preguntas, un piso cada una. Si no sabes una, dilo: no se descuenta nada.", EstiloTexto.Pequeno);
+            _ascensor = AscensorDeLaEntrevista.Crear(Ui, lado, _preguntas.Count, _respuestas.Count);
 
             var centro = Ui.Ventana(marco, "Pregunta");
             UiKit.Tamano(centro, flexAncho: 1, flexAlto: 1);
@@ -71,37 +71,71 @@ namespace Nexus.Unity.Pantallas {
         public override void Repintar() {
             if (_hoja == null) return;
             _hoja.Vaciar();
+            _susurroEnPantalla = null;
             var p = _preguntas[_indice];
-            _hoja.Etiqueta($"Pregunta {_indice + 1} de {_preguntas.Count}");
+            string elegida;
+            var respondida = _respuestas.TryGetValue(p.Numero, out elegida);
+            // El ascensor sube un piso por respuesta, sea cual sea (no dice si acertaste).
+            if (_ascensor != null) _ascensor.IrA(_respuestas.Count);
+
+            _hoja.Etiqueta($"Piso {_indice + 1} · pregunta {_indice + 1} de {_preguntas.Count}");
+            // Un respiro a mitad de camino: una linea de Marisol, neutra (ni nota ni pista).
+            if (!respondida && (_indice == 5 || _indice == 10))
+                _hoja.Nota(_indice == 5 ? "Marisol pasa una hoja: «Bien. Seguimos subiendo.»" : "Marisol sonríe a medias: «Ya casi arriba. Cinco más.»", Tema.violet);
             var corta = TieneVistaCorta(p) && !_completa;
             Ui.Texto(_hoja.Raiz, corta ? p.Frase : p.Enunciado, EstiloTexto.Encabezado);
             _hoja.Espacio();
 
-            string elegida;
-            var respondida = _respuestas.TryGetValue(p.Numero, out elegida);
+            // Las opciones, como una mano de cartas en su orden de siempre (A, B, C: el instrumento no se baraja), y
+            // «No lo sé» como una carta menor. El sello es el mismo para todas: ANOTADO.
+            var cartas = new List<OpcionDeCarta>();
+            var indiceElegida = -1;
             foreach (var opcion in p.Opciones) {
                 var o = opcion;
-                var boton = _hoja.Opcion($"{o.Id.ToUpperInvariant()}.  {(corta ? o.Etiqueta : o.Texto)}", null, () => Responder(p, o.Id));
-                if (respondida) {
-                    boton.interactable = false;
-                    if (o.Id == elegida) Ui.Resaltar(boton, true);
-                }
+                if (respondida && o.Id == elegida) indiceElegida = cartas.Count;
+                cartas.Add(new OpcionDeCarta { Titulo = corta ? o.Etiqueta : o.Texto, AlElegir = () => Responder(p, o.Id) });
             }
+            if (respondida && elegida == null) indiceElegida = cartas.Count;
+            cartas.Add(new OpcionDeCarta { Titulo = "No lo sé", Detalle = "Prefiero no adivinar.", Discreta = true, AlElegir = () => Responder(p, null) });
+            _hoja.Mano(cartas, new ManoDeCartas.Ajustes {
+                Sello = "ANOTADO", ColorDelSello = Tema.violet, ConLetras = true, Elegida = respondida ? indiceElegida : -1, AnchoMaximo = 1100
+            });
+
             if (!respondida) {
-                _hoja.Espacio(4);
-                var acciones = _hoja.Fila();
-                Ui.Boton(acciones, "No lo sé", () => Responder(p, null), VarianteBoton.Fantasma);
-                if (TieneVistaCorta(p))
-                    Ui.Boton(acciones, corta ? "Ver pregunta completa" : "Ver versión corta", () => { _completa = !_completa; Repintar(); }, VarianteBoton.Fantasma);
+                if (TieneVistaCorta(p)) {
+                    _hoja.Espacio(2);
+                    Ui.Boton(_hoja.Fila(), corta ? "Ver pregunta completa" : "Ver versión corta", () => { _completa = !_completa; Repintar(); }, VarianteBoton.Fantasma);
+                }
                 return;
             }
 
             _hoja.Espacio();
             _hoja.Nota("El hombre del traje verde se inclina hacia Marisol:", Tema.inkMuted);
-            var susurro = _hoja.Parrafo("«" + _susurro + "»", Tema.violet);   // un momento de historia, no un aviso
-            susurro.fontStyle = TMPro.FontStyles.Italic;
+            // Un momento de historia, no un aviso: el susurro se escribe letra a letra (Enter o Espacio lo completa).
+            _susurroEnPantalla = _hoja.Parrafo("«" + _susurro + "»", Tema.violet);
+            _susurroEnPantalla.fontStyle = TMPro.FontStyles.Italic;
+            _susurroEnPantalla.maxVisibleCharacters = 0;
+            _letras = 0;
             var ultima = _indice == _preguntas.Count - 1;
-            _hoja.Accion(ultima ? "Terminar la entrevista" : "Siguiente pregunta", Siguiente);
+            _hoja.Accion((ultima ? "Terminar la entrevista" : "Siguiente pregunta") + "  ↵", Siguiente);
+        }
+
+        private AscensorDeLaEntrevista _ascensor;
+        private TMPro.TMP_Text _susurroEnPantalla;
+        private float _letras;
+
+        private void Update() {
+            var teclado = UnityEngine.InputSystem.Keyboard.current;
+            var pulsa = teclado != null && (teclado.enterKey.wasPressedThisFrame || teclado.numpadEnterKey.wasPressedThisFrame || teclado.spaceKey.wasPressedThisFrame)
+                        && App != null && App.Router.Actual == this;
+            if (_susurroEnPantalla == null) return;
+            var total = _susurroEnPantalla.text.Length;
+            if (_letras < total) {
+                _letras = pulsa ? total : _letras + Time.unscaledDeltaTime * 55f;
+                _susurroEnPantalla.maxVisibleCharacters = Mathf.Min(total, (int)_letras);
+                return;
+            }
+            if (pulsa) Siguiente();
         }
 
         private void Responder(PreguntaDeAdmision pregunta, string opcionId) {

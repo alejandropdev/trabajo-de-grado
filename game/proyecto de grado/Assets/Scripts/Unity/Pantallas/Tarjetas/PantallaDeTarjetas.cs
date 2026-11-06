@@ -34,6 +34,15 @@ namespace Nexus.Unity.Pantallas {
         public bool ResuelveOtro;
         public Action AlTerminar;
 
+        /// <summary>
+        /// Las ceremonias no se juegan como tarjeta deslizable sino en una PIZARRA DE POST-ITS (PizarraDePostIts,
+        /// 2026-11-05): se arrastra la propuesta a «Lo hacemos». Misma pantalla (la telemetria no cambia de nombre),
+        /// mismas barras de consecuencia al pasar por cada post-it, misma eleccion al final.
+        /// </summary>
+        public bool Pizarra;
+        private RectTransform _mesa;
+        private PizarraDePostIts _pizarra;
+
         private const float PausaTrasElegir = 0.45f;
         private const float AnchoDeTarjeta = 560f;
         private const float AltoDeTarjeta = 300f;
@@ -67,6 +76,14 @@ namespace Nexus.Unity.Pantallas {
             // La mesa: aqui la tarjeta se mueve libre, sin que ningun layout la recoloque.
             var mesa = Ui.Nodo(marco, "Mesa");
             UiKit.Tamano(mesa, flexAncho: 1, flexAlto: 1);
+            _mesa = mesa;
+            if (Pizarra) {
+                // La pizarra ocupa la mesa; debajo, la ayuda y las barras de siempre.
+                _ayuda = Ui.Texto(marco, "", EstiloTexto.Pequeno, Tema.inkMuted, TextAlignmentOptions.Center);
+                _botones = Ui.Fila(marco, "Respuestas", Tema.espacio, alineacion: TextAnchor.MiddleCenter);
+                _barras = new BarrasDeConsecuencia(Ui, marco);
+                return;
+            }
 
             _izquierda = Ui.Texto(mesa, "", EstiloTexto.Encabezado, Tema.cyan, TextAlignmentOptions.Left);
             _derecha = Ui.Texto(mesa, "", EstiloTexto.Encabezado, Tema.cyan, TextAlignmentOptions.Right);
@@ -108,6 +125,17 @@ namespace Nexus.Unity.Pantallas {
             _pausa = 0f;
 
             _progreso.text = $"{indice + 1} / {Tarjetas.Count}";
+            if (Pizarra) {
+                if (_pizarra != null) Destroy(_pizarra.gameObject);
+                _pizarra = PizarraDePostIts.Crear(Ui, _mesa, _actual, Previsualizar, Elegir);
+                _ayuda.text = "";
+                UiKit.Vaciar(_botones);
+                _botonesDeOpcion.Clear();
+                if (!string.IsNullOrEmpty(_actual.Ayuda) || !string.IsNullOrEmpty(_actual.Termino))
+                    Ui.Boton(_botones, "?", Ayuda, VarianteBoton.Fantasma);
+                _barras.Preparar(Sesion.W, StocksQueToca(_actual));
+                return;
+            }
             _personaje.text = _actual.Personaje;
             _frase.text = _actual.Frase;
             _ayuda.text = "";
@@ -162,7 +190,7 @@ namespace Nexus.Unity.Pantallas {
             }
 
             var teclado = Keyboard.current;
-            if (teclado == null) return;
+            if (teclado == null || Pizarra) return;   // la pizarra escucha sus propias teclas (1..4)
             if (teclado.leftArrowKey.wasPressedThisFrame) Elegir(0);
             else if (teclado.rightArrowKey.wasPressedThisFrame) Elegir(UltimaOpcion);
             else if (teclado.upArrowKey.wasPressedThisFrame && _actual.Opciones.Count >= 3) Elegir(1);
@@ -174,7 +202,7 @@ namespace Nexus.Unity.Pantallas {
         private void Elegir(int indiceDeOpcion) {
             if (_terminada || _actual == null || _pausa > 0f) return;
             var opcion = _actual.Opciones[indiceDeOpcion];
-            _gesto.Bloquear(true);
+            if (_gesto != null) _gesto.Bloquear(true);
 
             if (ResuelveOtro) {
                 Previsualizar(indiceDeOpcion);   // las barras se quedan enseñando lo elegido
@@ -185,7 +213,8 @@ namespace Nexus.Unity.Pantallas {
             AlElegir?.Invoke(_actual, opcion);
 
             foreach (var b in _botonesDeOpcion) b.interactable = false;
-            _pausa = PausaTrasElegir;
+            // En la pizarra la animacion del golpe de tiza ya fue la pausa: se sigue casi enseguida.
+            _pausa = Pizarra ? 0.15f : PausaTrasElegir;
         }
 
         private void Ayuda() {
