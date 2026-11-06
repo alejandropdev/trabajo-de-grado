@@ -17,6 +17,9 @@ namespace Mundo3D.UI {
 
         public bool IsOpen => inventoryPanel != null && inventoryPanel.activeSelf;
 
+        /// <summary>El botón del HUD que abre el inventario: el juego le pone encima la tecla (E).</summary>
+        public GameObject Boton => inventoryButton;
+
         public void OpenInventory() {
             if (inventoryPanel == null) {
                 Debug.LogWarning(

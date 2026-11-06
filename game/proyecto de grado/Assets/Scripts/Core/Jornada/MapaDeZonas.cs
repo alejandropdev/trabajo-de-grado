@@ -68,8 +68,18 @@ namespace Nexus.Core.Jornada {
         /// <summary>«El equipo, la moral real, rumores de asignación». Para el plano y para la ficha.</summary>
         public string QueDa;
 
+        /// <summary>
+        /// Donde esta la zona en el plano ilustrado del nivel (MapaDeZonas.Imagen): x, y, ancho y alto en fracciones
+        /// de la imagen, con el origen ARRIBA a la izquierda (como se mide mirando el dibujo). Null si el nivel no
+        /// tiene plano: entonces el mapa se ve como lista.
+        /// </summary>
+        public float[] Area;
+
+        public bool TieneArea { get { return Area != null && Area.Length == 4; } }
+
         public ZonaDeNivel Clone() {
             var c = (ZonaDeNivel)MemberwiseClone();
+            c.Area = Area == null ? null : (float[])Area.Clone();
             c.Puerta = Puerta == null ? null : Puerta.Clone();
             c.QuienEsta = QuienEsta == null ? null : new List<string>(QuienEsta);
             c.Coleccionables = Coleccionables == null ? null : new List<string>(Coleccionables);
@@ -93,6 +103,14 @@ namespace Nexus.Core.Jornada {
         public const char Separador = '>';
 
         public List<ZonaDeNivel> Zonas = new List<ZonaDeNivel>();
+
+        /// <summary>
+        /// El plano ilustrado del nivel, como ruta de Resources ("Mapas/MapaNivel1"). Con el, cada zona dice su
+        /// 'area' en el dibujo y el mapa se juega sobre la ilustracion; sin el, el mapa es una lista.
+        /// </summary>
+        public string Imagen;
+
+        public bool TienePlano { get { return !string.IsNullOrEmpty(Imagen); } }
 
         /// <summary>Lo que cuesta ir de una zona a otra si nadie dijo otra cosa.</summary>
         public int CosteBaseDeViaje = 20;

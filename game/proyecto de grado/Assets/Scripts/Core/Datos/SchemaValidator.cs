@@ -377,6 +377,8 @@ namespace Nexus.Core.Datos {
             else if (anclas > 1)
                 e.Add($"{id}: hay {anclas} zonas marcadas como ancla; solo puede haber una.");
 
+            ValidarPlano(id, mapa, e);
+
             if (mapa.Costes == null) return;
             foreach (var kv in mapa.Costes) {
                 if (kv.Value < 0) e.Add($"{id}: el coste de viaje '{kv.Key}' es negativo.");
@@ -390,6 +392,37 @@ namespace Nexus.Core.Datos {
                     if (!ids.Contains(zona.Trim()))
                         e.Add($"{id}: el coste '{kv.Key}' menciona la zona '{zona.Trim()}', que no esta en el mapa.");
             }
+        }
+
+        /// <summary>
+        /// El plano ilustrado: si el nivel lo tiene, cada zona se pinta sobre su sala del dibujo. Una zona sin area no
+        /// se podria tocar, una fuera de la imagen no se veria, y dos que se pisan se roban los clics.
+        /// </summary>
+        private static void ValidarPlano(string id, MapaDeZonas mapa, List<string> e) {
+            var conArea = new List<ZonaDeNivel>();
+            foreach (var zona in mapa.Zonas) {
+                if (zona == null || string.IsNullOrEmpty(zona.Id)) continue;
+                if (zona.Area == null) {
+                    if (mapa.TienePlano) e.Add($"{id}: el mapa tiene plano ('{mapa.Imagen}') pero la zona '{zona.Id}' no dice su 'area' en el dibujo.");
+                    continue;
+                }
+                if (!zona.TieneArea) { e.Add($"{id}: el 'area' de la zona '{zona.Id}' debe tener 4 numeros: x, y, ancho, alto."); continue; }
+                float x = zona.Area[0], y = zona.Area[1], w = zona.Area[2], h = zona.Area[3];
+                if (w <= 0 || h <= 0 || x < 0 || y < 0 || x + w > 1.0001f || y + h > 1.0001f)
+                    e.Add($"{id}: el 'area' de la zona '{zona.Id}' se sale del dibujo (todo va de 0 a 1).");
+                else conArea.Add(zona);
+            }
+            if (conArea.Count > 0 && !mapa.TienePlano)
+                e.Add($"{id}: hay zonas con 'area' pero el mapa no dice su 'imagen'.");
+
+            for (var i = 0; i < conArea.Count; i++)
+                for (var j = i + 1; j < conArea.Count; j++) {
+                    float[] a = conArea[i].Area, b = conArea[j].Area;
+                    var ancho = Math.Min(a[0] + a[2], b[0] + b[2]) - Math.Max(a[0], b[0]);
+                    var alto = Math.Min(a[1] + a[3], b[1] + b[3]) - Math.Max(a[1], b[1]);
+                    if (ancho > 0.001f && alto > 0.001f)
+                        e.Add($"{id}: en el plano, las zonas '{conArea[i].Id}' y '{conArea[j].Id}' se pisan.");
+                }
         }
 
         /// <summary>

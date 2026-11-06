@@ -76,10 +76,33 @@ namespace Nexus.Unity.Pantallas {
 
         // ==================================================================== el mapa
 
+        /// <summary>Ancho del plano ilustrado dentro del panel; al lado va la ficha de la sala que se mira.</summary>
+        private const float AnchoDelPlano = 1160, AnchoDeLaFicha = 380;
+
+        private string _zonaEnfocada;
+        private RectTransform _fichaDelMapa;
+        private string _rutaDelPlano;
+        private Texture2D _texturaDelPlano;
+
         private void AbrirMapa() {
-            AbrirPanel("Dónde estás y a dónde puedes ir", "El mapa", 1320, PintarPanelDelMapa,
+            _zonaEnfocada = null;
+            var ancho = TexturaDelPlano() != null ? 1680 : 1320;
+            AbrirPanel("Dónde estás y a dónde puedes ir", "El mapa", ancho, PintarPanelDelMapa,
                 () => $"{S.ZonaActual}|{Runner.Estado}|{Runner.PuedeMoverse}|{S.ColeccionablesAqui().Count}|" +
                       $"{S.R.ConversacionesHechas.Count}|{AlertasSonando().Count}");
+        }
+
+        /// <summary>La ilustracion del mapa del nivel (Resources), o null si el nivel no tiene o no se encuentra.</summary>
+        private Texture2D TexturaDelPlano() {
+            var mapa = S.Perfil.Mapa;
+            if (mapa == null || !mapa.TienePlano) return null;
+            if (_rutaDelPlano != mapa.Imagen) {
+                _rutaDelPlano = mapa.Imagen;
+                _texturaDelPlano = Resources.Load<Texture2D>(mapa.Imagen);
+                if (_texturaDelPlano == null)
+                    Debug.LogWarning($"[Nexus] El mapa del nivel pide la imagen «{mapa.Imagen}» y no está en Resources: se ve como lista.");
+            }
+            return _texturaDelPlano;
         }
 
         private void PintarPanelDelMapa(Hoja h) {
@@ -88,6 +111,124 @@ namespace Nexus.Unity.Pantallas {
                 h.Nota("Este nivel no tiene mapa.");
                 return;
             }
+            var textura = TexturaDelPlano();
+            if (textura != null) {
+                PintarPlano(h, mapa, textura);
+                return;
+            }
+            PintarListaDelMapa(h, mapa);
+        }
+
+        // ---- el mapa dibujado (los niveles con plano ilustrado)
+
+        /// <summary>
+        /// El plano ocupa el panel: cada sala sobre su sitio del dibujo, con su nombre. Al lado, la ficha de la sala que
+        /// se mira (o de la actual): quien hay, que da, con quien hablar y las pistas de lo que podria aparecer.
+        /// </summary>
+        private void PintarPlano(Hoja h, MapaDeZonas mapa, Texture2D textura) {
+            AvisoDeAlertaEnPanel(h);
+            var columnas = Ui.Fila(h.Raiz, "Mapa", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
+
+            var datos = new PlanoIlustrado.DatosDelPlano {
+                ZonaActual = S.ZonaActual,
+                PuedeMoverse = Runner.PuedeMoverse,
+                Abierta = S.ZonaAbierta,
+                Detalle = z => DetalleDeZona(mapa, z),
+                Coste = id => id == S.ZonaActual || !S.ZonaAbierta(id) ? null : $"{mapa.CosteDeVisitar(S.ZonaActual, id)} min",
+                AlViajar = IrA,
+                AlEnfocar = id => { _zonaEnfocada = id; PintarFicha(mapa); },
+                AlAtrapar = Recoger,
+                Registrar = GuiaView.Registrar,
+            };
+            foreach (var id in S.ColeccionablesAqui()) {
+                var c = id;
+                var col = App.Catalogo.Coleccionables.FirstOrDefault(x => x.Id == c);
+                var dificultad = col != null && col.Aparicion != null ? col.Aparicion.Dificultad : null;
+                datos.Destellos.Add(new KeyValuePair<string, string>(c, dificultad));
+            }
+            foreach (var col in S.ColeccionablesPorAparecerAqui())
+                datos.PorAparecer.Add(ColorDeDificultad(col.Aparicion.Dificultad));
+
+            var plano = PlanoIlustrado.Crear(Ui, columnas, textura, mapa, datos, AnchoDelPlano);
+            GuiaView.Registrar("dia.mapa", plano);
+
+            // La ficha mide lo mismo de alto que el plano y su tarjeta lo llena: el panel se lee como una sola pieza,
+            // sin un hueco vacio debajo de la ficha.
+            _fichaDelMapa = Ui.Columna(columnas, "Ficha", Tema.espacio);
+            UiKit.Tamano(_fichaDelMapa, ancho: AnchoDeLaFicha, alto: AnchoDelPlano * textura.height / Mathf.Max(1f, textura.width),
+                         flexAncho: 1);   // y se queda el ancho que sobre al lado del plano
+            GuiaView.Registrar("dia.aqui", _fichaDelMapa);
+            _zonaEnfocada = null;
+            PintarFicha(mapa);
+        }
+
+        private string DetalleDeZona(MapaDeZonas mapa, ZonaDeNivel z) {
+            if (S.ZonaActual == z.Id) return z.EsAncla ? "Estás aquí · tu escritorio" : "Estás aquí";
+            if (!S.ZonaAbierta(z.Id)) return "Cerrada por ahora";
+            var detalle = $"{mapa.CosteDeVisitar(S.ZonaActual, z.Id)} min";
+            return z.EsAncla ? detalle + " · tu escritorio" : detalle;
+        }
+
+        /// <summary>La ficha de al lado del plano: se repinta al pasar por otra sala, sin rehacer el plano.</summary>
+        private void PintarFicha(MapaDeZonas mapa) {
+            if (_fichaDelMapa == null) return;
+            UiKit.Vaciar(_fichaDelMapa);
+            var id = _zonaEnfocada ?? S.ZonaActual;
+            var zona = mapa.PorId(id);
+            if (zona == null) return;
+            var aqui = id == S.ZonaActual;
+            var abierta = S.ZonaAbierta(id);
+            var puedeMoverse = Runner.PuedeMoverse;
+
+            var t = Ui.Tarjeta(_fichaDelMapa, aqui ? "Estás aquí" : abierta ? "Para ir" : "Cerrada por ahora",
+                               aqui ? PlanoIlustrado.ColorDelJugador : abierta ? Tema.cyan : Tema.inkMuted);
+            UiKit.Tamano(t, flexAlto: 1);   // la tarjeta llena todo el alto de la ficha (= el del plano)
+            Ui.Texto(t, zona.Nombre, EstiloTexto.Subtitulo, Tema.ink);
+            if (!aqui) Ui.Texto(t, DetalleDeZona(mapa, zona), EstiloTexto.Leyenda, abierta ? Tema.cyan : Tema.inkFaint);
+            if (!string.IsNullOrEmpty(zona.Descripcion)) Ui.Texto(t, zona.Descripcion, EstiloTexto.Pequeno, Tema.ink);
+            if (zona.QuienEsta != null && zona.QuienEsta.Count > 0)
+                Ui.Texto(t, "Aquí están: " + string.Join(", ", zona.QuienEsta), EstiloTexto.Pequeno);
+            if (!string.IsNullOrEmpty(zona.QueDa)) Ui.Texto(t, zona.QueDa, EstiloTexto.Pequeno, Tema.cyan);
+
+            if (!aqui) {
+                if (!abierta) Ui.Texto(t, "Se abrirá más adelante.", EstiloTexto.Pequeno, Tema.inkMuted);
+                else if (puedeMoverse) Ui.Texto(t, "Haz clic en la sala para ir.", EstiloTexto.Pequeno, Tema.inkMuted);
+                else Ui.Texto(t, MotivoParaNoMoverse(), EstiloTexto.Pequeno, Tema.warning);
+                return;
+            }
+
+            var brillan = S.ColeccionablesAqui().Count;
+            if (brillan > 0)
+                Ui.Texto(t, (brillan == 1 ? "Algo brilla en esta sala." : $"{brillan} cosas brillan en esta sala.") +
+                            " Atrápalo con el ratón: al principio se escapa, luego se cansa.",
+                         EstiloTexto.Pequeno, PlanoIlustrado.ColorDelDestello);
+            // Lo que todavia no ha aparecido: solo su pista, con un punto del color de lo dificil que es.
+            foreach (var col in S.ColeccionablesPorAparecerAqui()) {
+                var fila = Ui.Fila(t, "Por aparecer " + col.Id, Tema.Espacio(2), alineacion: TextAnchor.UpperLeft);
+                Ui.Punto(fila, ColorDeDificultad(col.Aparicion.Dificultad), 10);
+                UiKit.Tamano(Ui.Texto(fila, "Algo podría aparecer aquí… <i>" + col.Aparicion.Pista + "</i>", EstiloTexto.Pequeno, Tema.inkMuted),
+                             flexAncho: 1);
+            }
+            foreach (var conv in S.ConversacionesAqui()) {
+                var cv = conv;
+                var p = App.Catalogo.Relaciones.PersonajePorId(cv.Personaje);
+                var detalle = (cv.Pregunta == null ? "charla corta · " : "te quiere preguntar algo · ") +
+                              $"{cv.Minutos} min · confianza {S.Confianza(cv.Personaje)}";
+                Ui.BotonDeOpcion(t, "Hablar con " + (p?.Nombre ?? cv.Personaje), detalle, () => Hablar(cv)).interactable = puedeMoverse;
+            }
+            if (!puedeMoverse && Runner.Estado != EstadoDelDia.DesarrolloTerminado)
+                Ui.Texto(t, MotivoParaNoMoverse(), EstiloTexto.Pequeno, Tema.warning);
+        }
+
+        private string MotivoParaNoMoverse() {
+            return Runner.Pausado ? "El juego está en pausa: pulsa «Seguir», arriba, para poder moverte."
+                 : Runner.EnEscena ? "Estás ocupado aquí: termina lo que tienes abierto antes de irte."
+                 : "Solo te puedes mover mientras corre la jornada.";
+        }
+
+        // ---- el mapa como lista (niveles sin plano ilustrado, o si falta la imagen)
+
+        private void PintarListaDelMapa(Hoja h, MapaDeZonas mapa) {
             AvisoDeAlertaEnPanel(h);
             h.Nota("Mirar es gratis; ir cuesta los minutos que marca cada sitio.");
             var puedeMoverse = Runner.PuedeMoverse;

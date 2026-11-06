@@ -147,8 +147,9 @@ namespace Nexus.Mundo3D {
             Tecla(lista, "W A S D", "Moverte");
             Tecla(lista, "Ratón", "Mirar alrededor");
             Tecla(lista, "Shift", "Caminar despacio");
-            Tecla(lista, "E", "Abrir una puerta (con la tarjeta de acceso)");
-            Tecla(lista, "I", "Abrir o cerrar el inventario (el reloj se para)");
+            Tecla(lista, "F", "Abrir una puerta (con la tarjeta de acceso)");
+            Tecla(lista, "E", "Abrir o cerrar el inventario (el reloj se para)");
+            Tecla(lista, "M", "Ver el mapa y dónde estás (el reloj sigue)");
             Tecla(lista, "Tab", "Soltar o capturar el ratón");
             Tecla(lista, "Esc", "Pausa");
             Tecla(lista, "F3", "Ver el rendimiento (FPS)");

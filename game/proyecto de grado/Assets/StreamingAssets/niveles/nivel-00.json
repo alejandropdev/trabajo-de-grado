@@ -356,9 +356,11 @@
   },
   "mapa": {
     "costeBaseDeViaje": 10,
+    "imagen": "Mapas/MapaNivel0",
     "zonas": [
       {
         "id": "sala-de-concurso",
+        "area": [0.03, 0.45, 0.44, 0.38],
         "nombre": "La sala del concurso",
         "descripcion": "Doce puestos en fila bajo un reloj enorme. En el tuyo hay un portátil de préstamo y un cajón que nadie ha abierto.",
         "esAncla": true,
@@ -370,6 +372,7 @@
       },
       {
         "id": "pasillo",
+        "area": [0.49, 0.45, 0.28, 0.38],
         "nombre": "El pasillo de los concursantes",
         "descripcion": "Una máquina de café, un tablón de corcho y los demás concursantes fingiendo que no se miran.",
         "minutosDeVisita": 20,
@@ -385,6 +388,7 @@
       },
       {
         "id": "terminal",
+        "area": [0.8, 0.45, 0.17, 0.38],
         "nombre": "La terminal pública",
         "descripcion": "Un equipo viejo junto a la escalera, con un cartel de «solo consultas». Nadie lo ha apagado en años.",
         "minutosDeVisita": 20,
@@ -398,6 +402,7 @@
       },
       {
         "id": "auditorio",
+        "area": [0.08, 0.06, 0.85, 0.36],
         "nombre": "El auditorio de N1",
         "descripcion": "Butacas vacías y un escenario donde el viernes se anunciará al ganador. Hoy solo hay técnicos probando el holograma.",
         "minutosDeVisita": 30,

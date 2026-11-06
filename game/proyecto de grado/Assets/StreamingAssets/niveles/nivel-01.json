@@ -465,9 +465,11 @@
   },
   "mapa": {
     "costeBaseDeViaje": 20,
+    "imagen": "Mapas/MapaNivel1",
     "zonas": [
       {
         "id": "escritorio",
+        "area": [0.43, 0.36, 0.19, 0.26],
         "nombre": "Tu escritorio",
         "descripcion": "Un puesto en la planta de becarios de N1, junto a la ventana que da a los patios. Aquí llegan las alertas.",
         "esAncla": true,
@@ -481,6 +483,7 @@
       },
       {
         "id": "bullpen",
+        "area": [0.02, 0.36, 0.4, 0.26],
         "nombre": "El bullpen",
         "descripcion": "La sala abierta donde trabaja tu equipo. Huele a café recalentado y a soldador.",
         "minutosDeVisita": 30,
@@ -499,6 +502,7 @@
       },
       {
         "id": "cafeteria",
+        "area": [0.28, 0.06, 0.285, 0.25],
         "nombre": "La cafetería de N1",
         "descripcion": "Mesas largas, una máquina de café que funciona solo si la golpeas y una pantalla con el menú del día que nadie lee.",
         "minutosDeVisita": 30,
@@ -517,6 +521,7 @@
       },
       {
         "id": "data-hub",
+        "area": [0.02, 0.66, 0.48, 0.29],
         "nombre": "Data Hub, sótano −2",
         "descripcion": "Racks, aire acondicionado demasiado fuerte y una terminal antigua con una silla gastada delante.",
         "minutosDeVisita": 60,
@@ -540,6 +545,7 @@
       },
       {
         "id": "sotano-de-patios",
+        "area": [0.63, 0.68, 0.32, 0.26],
         "nombre": "Sótano de mantenimiento de los patios",
         "descripcion": "Bajo los patios, entre la maquinaria de los ascensores de carga. Hay un rack apagado que nadie recuerda haber instalado.",
         "minutosDeVisita": 45,
@@ -554,6 +560,7 @@
       },
       {
         "id": "archivo-de-voss",
+        "area": [0.02, 0.06, 0.24, 0.25],
         "nombre": "El archivo de la Dra. Voss",
         "descripcion": "Una sala de planos con cajoneras de metal. Voss la usa como despacho porque nadie más la usa.",
         "minutosDeVisita": 60,

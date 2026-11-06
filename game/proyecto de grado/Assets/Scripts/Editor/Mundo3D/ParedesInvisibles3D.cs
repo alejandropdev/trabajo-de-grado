@@ -463,6 +463,11 @@ namespace Nexus.EditorTools.Mundo3D {
             var t = new StringBuilder();
             t.AppendLine("Paredes invisibles del recorrido 3D · " + DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
             t.AppendLine(m.Resumen);
+            // Los limites del suelo andable, en metros: son los que pide StreamingAssets/mapa-3d.json ('mundo') para
+            // poner al jugador sobre el plano ilustrado (tecla M). El PNG de abajo empieza 4 casillas antes de minX/minZ.
+            if (andables.Count > 0)
+                t.AppendLine($"Suelo andable (m): minX {andables.Values.Min(c => c.X) * Paso:F2} · maxX {andables.Values.Max(c => c.X) * Paso:F2} · " +
+                             $"minZ {andables.Values.Min(c => c.Z) * Paso:F2} · maxZ {andables.Values.Max(c => c.Z) * Paso:F2}");
             t.AppendLine();
             if (!string.IsNullOrEmpty(historia)) { t.AppendLine(historia); t.AppendLine(); }
             t.AppendLine("CHOCA Y NO SE VE (casillas andables que tapa · collider)");
