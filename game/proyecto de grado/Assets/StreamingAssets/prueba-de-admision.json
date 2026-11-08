@@ -10,6 +10,7 @@
   "preguntas": [
     {
       "numero": 1,
+      "escena": "q-plano",
       "oa": "OA-INTRO-01",
       "enunciado": "¿Qué distingue a la ingeniería de software de simplemente escribir código?",
       "frase": "¿Qué distingue a la ingeniería de software?",
@@ -36,6 +37,7 @@
     },
     {
       "numero": 2,
+      "escena": "ca-fases",
       "oa": "OA-CICLO-01",
       "enunciado": "En el modelo en cascada, ¿qué pasa si un error de requisitos se descubre en la fase de pruebas?",
       "frase": "Error de requisitos hallado en pruebas, en cascada: ¿qué pasa?",
@@ -62,6 +64,7 @@
     },
     {
       "numero": 3,
+      "escena": "sc-ciclo",
       "oa": "OA-SCRUM-01",
       "enunciado": "¿Quién es responsable de maximizar el valor del producto en Scrum?",
       "frase": "¿Quién maximiza el valor del producto en Scrum?",
@@ -88,6 +91,7 @@
     },
     {
       "numero": 4,
+      "escena": "kb-tablero",
       "oa": "OA-KANBAN-01",
       "enunciado": "¿Para qué sirve un límite de trabajo en curso (WIP) en un tablero Kanban?",
       "frase": "¿Para qué sirve el límite WIP en Kanban?",
@@ -114,6 +118,7 @@
     },
     {
       "numero": 5,
+      "escena": "d-entorno",
       "oa": "OA-DEVOPS-01",
       "enunciado": "¿Qué resuelve principalmente la integración continua (CI)?",
       "frase": "¿Qué resuelve la integración continua?",
@@ -140,6 +145,7 @@
     },
     {
       "numero": 6,
+      "escena": "d-despliegue",
       "oa": "OA-DEVOPS-02",
       "enunciado": "¿Cuál es la diferencia entre entrega continua y despliegue continuo?",
       "frase": "Entrega continua frente a despliegue continuo: ¿en qué se diferencian?",
@@ -166,6 +172,7 @@
     },
     {
       "numero": 7,
+      "escena": "q-piezas",
       "oa": "OA-DIS-01",
       "enunciado": "¿Qué significa que dos módulos tengan «bajo acoplamiento»?",
       "frase": "¿Qué es «bajo acoplamiento»?",
@@ -192,6 +199,7 @@
     },
     {
       "numero": 8,
+      "escena": "g-historia",
       "oa": "OA-DOC-01",
       "enunciado": "¿Para qué sirve un SRS (documento de especificación de requisitos)?",
       "frase": "¿Para qué sirve un SRS?",
@@ -218,6 +226,7 @@
     },
     {
       "numero": 9,
+      "escena": "sc-estimar",
       "oa": "OA-EST-01",
       "enunciado": "¿Por qué las estimaciones de un equipo tienden a ser optimistas, incluso con experiencia?",
       "frase": "¿Por qué las estimaciones salen optimistas?",
@@ -244,6 +253,7 @@
     },
     {
       "numero": 10,
+      "escena": "g-pr",
       "oa": "OA-GIT-01",
       "enunciado": "¿Qué hace un merge en control de versiones?",
       "frase": "¿Qué hace un merge?",
@@ -270,6 +280,7 @@
     },
     {
       "numero": 11,
+      "escena": "g-incidencia",
       "oa": "OA-MLOPS-01",
       "enunciado": "Un modelo de aprendizaje automático en producción falla cada vez más, sin que nadie haya cambiado el código. ¿A qué se debe probablemente?",
       "frase": "Modelo en producción falla más, sin tocar el código. ¿Por qué?",
@@ -296,6 +307,7 @@
     },
     {
       "numero": 12,
+      "escena": "q-mono-dentro",
       "oa": "OA-PAT-01",
       "enunciado": "¿Qué es un patrón de diseño?",
       "frase": "¿Qué es un patrón de diseño?",
@@ -322,6 +334,7 @@
     },
     {
       "numero": 13,
+      "escena": "q-calidad-que",
       "oa": "OA-CAL-01",
       "enunciado": "Según ISO 25010, ¿cuál de estos NO es un atributo de calidad del software?",
       "frase": "Según ISO 25010, ¿cuál NO es atributo de calidad?",
@@ -348,9 +361,10 @@
     },
     {
       "numero": 14,
+      "escena": "g-componentes",
       "oa": "OA-TEST-01",
       "enunciado": "¿Qué diferencia a una prueba unitaria de una prueba de integración?",
-      "frase": "¿Prueba unitaria frente a prueba de integración?",
+      "frase": "¿Qué diferencia hay entre unaPrueba unitaria frente a prueba de integración?",
       "opciones": [
         {
           "id": "A",
@@ -374,6 +388,7 @@
     },
     {
       "numero": 15,
+      "escena": "m-cobertura-que",
       "oa": "OA-TEST-02",
       "enunciado": "Un módulo tiene un 100 % de cobertura de pruebas. ¿Garantiza eso que no tiene errores?",
       "frase": "Cobertura del 100 %: ¿garantiza que no hay errores?",

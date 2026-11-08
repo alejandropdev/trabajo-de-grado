@@ -665,13 +665,7 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>La foto de la persona: su personaje si lo tiene, si no por su nombre; «Tú» es la protagonista.</summary>
         private static string FotoDe(Nexus.Core.Sesion.FichaDeMiembro ficha, string nombre) {
             if (ficha == null) return "personajes/protagonista";
-            var m = ficha.Miembro;
-            // Los que tienen retrato con otro nombre de archivo (2026-11-06). Los demas, por su nombre; si no hay, iniciales.
-            switch (m.Nombre) {
-                case "Javier Webb": return "personajes/javier";
-                case "Óscar Rondón": return "personajes/oscar-rendon";
-            }
-            return !string.IsNullOrEmpty(m.Personaje) ? MaterialesNexus.IdDePersonaje(m.Personaje) : MaterialesNexus.IdDePersonaje(nombre);
+            return RostroDePersonaje.FotoDe(ficha.Miembro);   // el mismo de la Fase 1 (2026-11-08)
         }
 
         /// <summary>
@@ -679,30 +673,9 @@ namespace Nexus.Unity.Pantallas {
         /// la cara arriba al centro), con borde. Sin retrato, sus iniciales.
         /// </summary>
         private void Rostro(RectTransform padre, string id, string nombre, float lado) {
-            var sprite = MaterialesNexus.Ilustracion(id);
             // Dentro de una fila centrada: una columna estira a sus hijos a lo ancho, y el circulo salia ovalado.
             var fila = Ui.Fila(padre, "Rostro", 0, alineacion: TextAnchor.MiddleCenter);
-            var marco = Ui.Nodo(fila, "Marco");
-            UiKit.Tamano(marco, lado, lado);
-            if (sprite == null) {
-                var r = Ui.Retrato(marco, string.IsNullOrEmpty(nombre) ? "?" : nombre.Substring(0, 1), Tono.Cyan, lado / Tema.escala);
-                r.anchorMin = r.anchorMax = r.pivot = new Vector2(0.5f, 0.5f);
-                r.anchoredPosition = Vector2.zero;
-                return;
-            }
-            var mascara = marco.gameObject.AddComponent<Image>();
-            mascara.sprite = Ui.SpriteCircular();
-            marco.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-            mascara.color = Tema.bg900;
-            var cara = Ui.Nodo(marco, "Cara");
-            UiKit.Rellenar(cara);
-            var img = cara.gameObject.AddComponent<RawImage>();
-            img.texture = sprite.texture;
-            // Los retratos con gesto (la mano y el papel ocupan medio cuadro) llevan la cara mas pequeña: recorte mas cerrado.
-            var conGesto = id == "personajes/kenji-sato" || id == "personajes/derek-hartman" || id == "personajes/elena-gomez";
-            img.uvRect = conGesto ? new Rect(0.28f, 0.50f, 0.50f, 0.50f) : new Rect(0.22f, 0.42f, 0.56f, 0.56f);
-            img.raycastTarget = false;
-            Ui.Borde(marco, Tema.cyan, lado / 2f / Tema.escala, 2);
+            RostroDePersonaje.Crear(Ui, fila, id, nombre, lado);   // compartido con la Fase 1 (2026-11-08)
         }
 
         /// <summary>Las estadisticas como lineas de atributo (ficha de personaje): cada habilidad, y el cansancio.</summary>

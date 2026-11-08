@@ -261,22 +261,54 @@ namespace Nexus.Unity.Pantallas {
             var j = S.Perfil.Jornada;
             _ahora.Etiqueta("Fase 2 · el desarrollo");
             _ahora.Titulo($"{S.Perfil.DiasTotales} días por delante");
-            _ahora.Parrafo($"De {j.HoraInicio:00}:00 a {j.HoraCierre:00}:00, con el reloj corriendo solo.");
-            _ahora.Parrafo("Los avisos se atienden desde tu escritorio. Si uno caduca, alguien decide por ti.");
-            _ahora.Parrafo("Lo demás del edificio está en «Más» › «Mapa». Moverse cuesta tiempo.");
-            // El product backlog que armo el jugador: que entro bien, que sobraba y que falto, antes de empezar.
+            Func<TooltipDeCalidad> tip = () => TooltipDeCalidad.Obtener(Ui, Raiz);
+            var ancho = Tema.Px(200); var alto = Tema.Px(72);
+
+            // Lo esencial en tres tarjetas; el detalle, al pasar el ratón.
+            var datos = Ui.Fila(_ahora.Raiz, "Datos", Tema.Espacio(3), 0, TextAnchor.MiddleCenter);
+            UiKit.Tamano(datos, flexAncho: 1);
+            PiezasDeProyecto.Dato(Ui, datos, $"{j.HoraInicio:00} – {j.HoraCierre:00}", "JORNADA", Tema.cyan, "La jornada",
+                                  $"De {j.HoraInicio:00}:00 a {j.HoraCierre:00}:00, con el reloj corriendo solo.", tip, ancho, alto);
+            PiezasDeProyecto.Dato(Ui, datos, "ESCRITORIO", "AVISOS", Tema.warning, "Los avisos",
+                                  "Se atienden desde tu escritorio. Si uno caduca, alguien decide por ti.", tip, ancho, alto);
+            PiezasDeProyecto.Dato(Ui, datos, "MÁS › MAPA", "EL EDIFICIO", Tema.violet, "Lo demás del edificio",
+                                  "Está en «Más» › «Mapa». Moverse cuesta tiempo.", tip, ancho, alto);
+
+            // El product backlog que armo el jugador: cuantas de las pedidas entraron, y lo que sobro y falto (detalle al pasar el raton).
             var backlog = S.BacklogCreado;
             if (backlog != null) {
                 var limpio = backlog.Dejadas == 0 && backlog.DeMas == 0;
-                var t = _ahora.Tarjeta("Tu product backlog, revisado con el cliente", limpio ? Tono.Exito : Tono.Aviso);
-                foreach (var r in backlog.Renglones)
-                    Ui.Texto(t, (r.Tipo == "bien" ? "√ " : r.Tipo == "falta" ? "× " : "! ") + r.Texto, EstiloTexto.Pequeno,
-                             r.Tipo == "bien" ? Tema.success : r.Tipo == "falta" ? Tema.danger : Tema.warning);
-                if (backlog.Cambios.Count > 0)
-                    Ui.Texto(t, "Lo que eso le hizo al proyecto: " + string.Join(" · ", backlog.Cambios.Select(kv => $"{Textos.NombreDeStock(kv.Key)} {Textos.Cambio(kv.Value)}")) + ".",
-                             EstiloTexto.Pequeno, Tema.ink);
-                if (backlog.Dejadas > 0)
-                    Ui.Texto(t, "Lo que faltaba está en el tablero, al final de la fila, como «Se descubrió tarde».", EstiloTexto.Pequeno, Tema.inkMuted);
+                var color = limpio ? Tema.success : Tema.warning;
+                var panel = Ui.Columna(_ahora.Raiz, "Backlog revisado", Tema.Espacio(2), 0, TextAnchor.UpperCenter);
+                UiKit.Tamano(panel, flexAncho: 1);
+                PiezasDeProyecto.Cristal(Ui, panel, NexusTheme.Alfa(color, 0.6f));
+                panel.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(16, 16, 12, 14);
+                var rotulo = Ui.Texto(panel, "TU PRODUCT BACKLOG, REVISADO CON EL CLIENTE", EstiloTexto.Leyenda, color, TextAlignmentOptions.Center);
+                UiKit.Tamano(rotulo, alto: Tema.Px(18));
+                var fila = Ui.Fila(panel, "Resultado", Tema.Espacio(3), 0, TextAnchor.MiddleCenter);
+                var total = backlog.Pedidas + backlog.Dejadas;
+                var anillo = PiezasDeProyecto.Anillo(Ui, fila, Tema.Px(96), total == 0 ? 0 : (float)backlog.Pedidas / total, color, backlog.Pedidas + "/" + total);
+                UiKit.Tamano((RectTransform)anillo, Tema.Px(96), Tema.Px(96));
+                var cifras = Ui.Fila(fila, "Cifras", Tema.Espacio(2), 0, TextAnchor.MiddleCenter);
+                UiKit.Tamano(cifras, flexAncho: 1);
+                var w = Tema.Px(130); var h = Tema.Px(64);
+                string Detalle(string tipo) => string.Join("\n", backlog.Renglones.Where(r => r.Tipo == tipo).Select(r => "· " + r.Texto));
+                if (limpio)
+                    PiezasDeProyecto.Dato(Ui, cifras, "TODAS", "LAS PEDIDAS", Tema.success, "Backlog completo",
+                                          Detalle("bien"), tip, w * 1.4f, h);
+                else {
+                    PiezasDeProyecto.Dato(Ui, cifras, backlog.Pedidas.ToString(), "ENTRARON", Tema.success, "Lo que entró",
+                                          Detalle("bien"), tip, w, h);
+                    if (backlog.Dejadas > 0)
+                        PiezasDeProyecto.Dato(Ui, cifras, backlog.Dejadas.ToString(), "FALTARON", Tema.danger, "Lo que faltó",
+                                              Detalle("falta") + "\n\nEstá en el tablero, al final de la fila, como «Se descubrió tarde».", tip, w, h);
+                    if (backlog.DeMas > 0)
+                        PiezasDeProyecto.Dato(Ui, cifras, backlog.DeMas.ToString(), "SOBRARON", Tema.warning, "Lo que sobraba",
+                                              Detalle("sobra"), tip, w, h);
+                }
+                foreach (var kv in backlog.Cambios)
+                    PiezasDeProyecto.Dato(Ui, cifras, Textos.Cambio(kv.Value), Textos.NombreDeStock(kv.Key).ToUpperInvariant(), Tema.ink,
+                                          "Lo que eso le hizo al proyecto", $"{Textos.NombreDeStock(kv.Key)} {Textos.Cambio(kv.Value)}.", tip, w, h);
             }
             _ahora.Accion("Empezar el día 1", EmpezarDia);
         }

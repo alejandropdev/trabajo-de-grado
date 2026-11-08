@@ -72,6 +72,32 @@ namespace Nexus.Core.Tarjetas {
             return lugares;
         }
 
+        /// <summary>
+        /// Por donde llega cada carta al repartir (2026-11-07). 'e' es lo que lleva de llegada, de 0 a 1 (ya suavizado):
+        /// devuelve lo que hay que sumarle a su lugar (X, Y) y a su giro. Con e = 1 no suma nada: la carta esta en su
+        /// sitio. La entrevista cambia de entrada en cada pregunta para que no se repita siempre igual.
+        /// </summary>
+        public static Lugar Desfase(EntradaDeMano entrada, int i, int n, float e) {
+            var falta = 1 - (e < 0 ? 0 : e > 1 ? 1 : e);
+            var d = i - (n - 1) / 2f;
+            var lado = d < 0 || (d == 0 && i % 2 == 0) ? -1f : 1f;
+            switch (entrada) {
+                case EntradaDeMano.DesdeArriba:
+                    return new Lugar { X = 0, Y = 300 * falta, Angulo = 0 };
+                case EntradaDeMano.Girando:
+                    return new Lugar { X = 0, Y = -120 * falta, Angulo = 180 * falta * (i % 2 == 0 ? 1 : -1) };
+                case EntradaDeMano.DesdeLosLados:
+                    return new Lugar { X = lado * 520 * falta, Y = 0, Angulo = -lado * 25 * falta };
+                default:
+                    return new Lugar { X = 0, Y = -260 * falta, Angulo = 0 };
+            }
+        }
+
+        /// <summary>La entrada de la pregunta 'numero': rota entre las cuatro.</summary>
+        public static EntradaDeMano EntradaPara(int numero) {
+            return (EntradaDeMano)(((numero % 4) + 4) % 4);
+        }
+
         /// <summary>Lo que ocupa la mano entera (para reservar sitio en el layout).</summary>
         public static void Tamano(int n, float ancho, float alto, float hueco, out float total, out float totalAlto) {
             if (n <= 0) { total = totalAlto = 0; return; }
@@ -88,6 +114,9 @@ namespace Nexus.Core.Tarjetas {
             totalAlto = alto + medio * medio * CaidaPorPuesto + Subida + 24;
         }
     }
+
+    /// <summary>Como llegan las cartas al repartir. DesdeAbajo es la de siempre.</summary>
+    public enum EntradaDeMano { DesdeAbajo, DesdeArriba, Girando, DesdeLosLados }
 
     /// <summary>
     /// Las teclas de una mano de elecciones: 1..9 o A..D eligen directamente. La A/B/C es la letra de las opciones de

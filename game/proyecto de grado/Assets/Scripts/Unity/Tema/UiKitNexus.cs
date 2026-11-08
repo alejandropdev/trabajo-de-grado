@@ -168,8 +168,20 @@ namespace Nexus.Unity.Tema {
         /// Un panel del HUD: vidrio oscuro translucido (se adivina la oficina detras) con filo fino. El metal es para las
         /// ventanas (Ventana); un panel es lo que va dentro o junto a ellas. Con color explicito, una caja de ese color.
         /// </summary>
+        /// <summary>
+        /// Con true, los paneles y las tarjetas se crean SIN fondo ni borde (solo estructura): el contenido queda sobre la
+        /// escena. La Fase 1 lo enciende mientras se repinta (2026-11-07) y lo apaga al terminar; nada mas lo usa.
+        /// </summary>
+        public bool SinMarcos { get; set; }
+
         private RectTransform PanelNexus(Transform padre, string nombre, Color? color) {
             var rt = Nodo(padre, nombre);
+            if (SinMarcos) {
+                var vacio = rt.gameObject.AddComponent<Image>();
+                vacio.color = Color.clear;
+                vacio.raycastTarget = false;
+                return rt;
+            }
             Fondo(rt.gameObject.AddComponent<Image>(), color ?? NexusTheme.Alfa(Tema.surface, 0.88f), NexusTheme.RadioMd);
             Borde(rt, color.HasValue ? Tema.line : Tema.lineStrong, NexusTheme.RadioMd);
             return rt;
@@ -179,14 +191,18 @@ namespace Nexus.Unity.Tema {
             // Una plancha de chapa con su titulo en cyan; la de alerta, con borde y resplandor danger.
             var panel = Nodo(padre, "Tarjeta " + titulo);
             var img = panel.gameObject.AddComponent<Image>();
-            Fondo(img, NexusTheme.Alfa(Tema.surface, 0.88f), NexusTheme.RadioMd);
+            if (SinMarcos) { img.color = Color.clear; img.raycastTarget = false; }
+            else Fondo(img, NexusTheme.Alfa(Tema.surface, 0.88f), NexusTheme.RadioMd);
             var grupo = panel.gameObject.AddComponent<VerticalLayoutGroup>();
             Configurar(grupo, Tema.espacio, Tema.Espacio(5), TextAnchor.UpperLeft);
             if (!string.IsNullOrEmpty(titulo)) {
                 var t = Texto(panel, titulo, EstiloTexto.Subtitulo, alerta ? Tema.danger : acento);
                 Tamano(t, flexAncho: 1);
             }
-            if (alerta) {
+            if (SinMarcos) {
+                // sin marco: solo el aviso critico conserva su borde, que es informacion y no decoracion
+                if (alerta) Borde(panel, Tema.danger, NexusTheme.RadioMd, 2);
+            } else if (alerta) {
                 Halo(panel, Tema.danger, NexusTheme.RadioMd);
                 Borde(panel, Tema.danger, NexusTheme.RadioMd, 2);
             } else {

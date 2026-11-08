@@ -489,10 +489,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         /// <summary>El mismo lienzo, para las pantallas que no son un minijuego (la Fase 3, el producto).</summary>
-        public static Lamina CrearLienzo(UiKit Ui, Transform padre, string rotulo, float ancho, float alto, float? anchoFijo = null) {
+        public static Lamina CrearLienzo(UiKit Ui, Transform padre, string rotulo, float ancho, float alto, float? anchoFijo = null,
+                                         bool marcoDeMetal = true) {
             var Tema = Ui.Tema;
-            // El tablero es un documento: una hoja de papel dentro de una ventana de metal, con su titulo en tinta.
-            var panel = Ui.Ventana(padre, "Lienzo", true);
+            // El tablero es un documento: una hoja de papel con su titulo en tinta. Los minijuegos la llevan dentro de una
+            // ventana de metal; las demas pantallas (el despliegue), con un filo de luz (2026-11-08).
+            var panel = marcoDeMetal ? Ui.Ventana(padre, "Lienzo", true) : Ui.LienzoDeCristal(padre, "Lienzo");
             if (anchoFijo.HasValue) UiKit.Tamano(panel, ancho: anchoFijo.Value, flexAlto: 1);
             else UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
             if (!string.IsNullOrEmpty(rotulo)) Ui.Texto(panel, rotulo, EstiloTexto.Subtitulo, Tema.paperInk);

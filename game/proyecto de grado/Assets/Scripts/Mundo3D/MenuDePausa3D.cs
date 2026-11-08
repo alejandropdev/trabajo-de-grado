@@ -66,7 +66,7 @@ namespace Nexus.Mundo3D {
             m._ui = ui;
             m._tema = ui.Tema;
             m._grupo = rt.gameObject.AddComponent<CanvasGroup>();
-            m._ventana = ui.Ventana(rt, "Ventana");
+            m._ventana = ui.Dialogo(rt, "Ventana");   // cristal neon, como los demas dialogos (2026-11-08)
             m._ventana.anchorMin = m._ventana.anchorMax = m._ventana.pivot = new Vector2(0.5f, 0.5f);
             m._ventana.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             m._ventana.sizeDelta = new Vector2(640, 0);

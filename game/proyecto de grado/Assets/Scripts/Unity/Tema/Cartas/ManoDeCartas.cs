@@ -76,6 +76,8 @@ namespace Nexus.Unity.Tema {
             /// jornada lo usa para cambiar la ventana del atardecer segun la carta (2026-11-07).
             /// </summary>
             public Action<int> AlEnfocar;
+            /// <summary>Por donde llegan las cartas al repartir (la entrevista la cambia en cada pregunta, 2026-11-07).</summary>
+            public EntradaDeMano Entrada = EntradaDeMano.DesdeAbajo;
         }
 
         private const float Hueco = 18f, Rapidez = 1f / 0.18f;
@@ -305,10 +307,11 @@ namespace Nexus.Unity.Tema {
                 var l = lugares[i];
                 var llegada = Mathf.Clamp01((_t - i * 0.06f) / 0.35f);
                 var e = 1 - Mathf.Pow(1 - llegada, 3);
-                var destino = new Vector2(l.X, l.Y - (1 - e) * 260f);
+                var desfase = DisposicionDeMano.Desfase(_ajustes.Entrada, i, _cartas.Count, e);
+                var destino = new Vector2(l.X + desfase.X, l.Y + desfase.Y);
                 var escala = i == _encima ? 1.08f : 1f;
                 if (enRejilla && i == _encima) destino.y += 6;
-                _cartas[i].Ir(destino, l.Angulo * e, escala, e, deGolpe || llegada < 1);
+                _cartas[i].Ir(destino, l.Angulo * e + desfase.Angulo, escala, e, deGolpe || llegada < 1);
             }
         }
 

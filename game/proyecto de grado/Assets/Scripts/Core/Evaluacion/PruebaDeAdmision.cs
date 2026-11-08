@@ -51,6 +51,12 @@ namespace Nexus.Core.Evaluacion {
         /// <summary>El id de la opcion correcta.</summary>
         public string Correcta;
 
+        /// <summary>
+        /// La escena de tiza que se dibuja en la pizarra mientras se responde (un id de EscenasDePizarra). Muestra el
+        /// TEMA, no la respuesta: se eligio cada una para no dar pistas. Opcional (2026-11-07).
+        /// </summary>
+        public string Escena;
+
         public string SusurroSiAcierta;
         public string SusurroSiFalla;
     }

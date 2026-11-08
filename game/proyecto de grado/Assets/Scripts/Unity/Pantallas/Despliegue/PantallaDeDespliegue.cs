@@ -178,7 +178,7 @@ namespace Nexus.Unity.Pantallas {
 
         private void PintarJuego() {
             UiKit.Vaciar(_cuerpo);
-            _lamina = PantallaDeMinijuego.CrearLienzo(Ui, _cuerpo, null, W, H);
+            _lamina = PantallaDeMinijuego.CrearLienzo(Ui, _cuerpo, null, W, H, null, false);   // sin marco de metal: no es un minijuego
 
             var lado = Ui.Columna(_cuerpo, "Lado", Tema.espacio);
             UiKit.Tamano(lado, ancho: 440, flexAlto: 1);

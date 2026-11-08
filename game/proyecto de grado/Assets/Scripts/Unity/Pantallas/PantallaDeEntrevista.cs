@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Evaluacion;
+using Nexus.Core.Tarjetas;
 using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Tema;
 using UnityEngine;
@@ -14,6 +15,12 @@ namespace Nexus.Unity.Pantallas {
     ///
     /// Tras cada respuesta, el hombre del traje verde se inclina y le susurra algo a Marisol. Ella no lo repite;
     /// tu si lo oyes. Es la unica retroalimentacion: la entrevista no dice «correcto» ni «incorrecto».
+    ///
+    /// Rediseño 2026-11-07 (sin ventana ni scroll; cada pregunta se ve distinta para no aburrir):
+    ///   izquierda  la ficha de Marisol (retrato, nombre, una linea) y, debajo, el edificio en corte con el ascensor
+    ///   arriba     la pregunta sin marco y las cartas, que llegan de una forma distinta en cada pregunta
+    ///   abajo      la pizarra: el dibujo de tiza del tema de la pregunta, trazo a trazo; al responder, el susurro de HH
+    /// Las preguntas, su orden, la correccion, el guardado y la reanudacion no cambian.
     /// </summary>
     public sealed class PantallaDeEntrevista : Pantalla {
         public Action AlTerminar;
@@ -23,9 +30,16 @@ namespace Nexus.Unity.Pantallas {
         private readonly Dictionary<int, string> _respuestas = new Dictionary<int, string>();
         private int _indice;
         private string _susurro;
-        private Hoja _hoja;
         // La vista corta (frase + etiquetas) es la de siempre; la completa es el instrumento original, a peticion.
         private bool _completa;
+
+        private RectTransform _pregunta;
+        private TMPro.TMP_Text _lineaDeMarisol;
+        private EdificioDeLaEntrevista _edificio;
+        private PizarraDeLaPregunta _pizarra;
+        private int _pizarraDe = -1;
+        private TMPro.TMP_Text _susurroEnPantalla;
+        private float _letras;
 
         public override bool PuedeVolver { get { return false; } }
 
@@ -44,50 +58,59 @@ namespace Nexus.Unity.Pantallas {
 
             var marco = UiKit.Rellenar(Ui.Fila(Raiz, "Marco", Tema.margen * 1.5f, Tema.margen * 1.5f, TextAnchor.UpperLeft));
 
-            var ficha = Ui.Tarjeta(marco, "La entrevista");
-            UiKit.Tamano(ficha, ancho: 440);
-            // Marisol a la izquierda y, a su lado, el ascensor: cada respuesta sube un piso (2026-11-05).
-            var lado = Ui.Fila(ficha, "Retrato y ascensor", Tema.espacio, alineacion: TextAnchor.UpperLeft);
-            var persona = Ui.Columna(lado, "Entrevistadora", Tema.Espacio(2));
-            UiKit.Tamano(persona, ancho: 0, flexAncho: 1);
+            // ---- izquierda: Marisol y el edificio
+            var izquierda = Ui.Columna(marco, "Izquierda", Tema.espacio);
+            UiKit.Tamano(izquierda, ancho: 380, flexAlto: 1);
+            var ficha = PiezasDelMuro.Panel(Ui, izquierda, "La entrevista", Tema.violet, 14);
+            var fila = Ui.Fila(ficha, "Marisol", Tema.espacio, 0, TextAnchor.MiddleLeft);
             var e = _prueba.Entrevistadora;
-            if (e != null) {
-                // Quien entrevista, con su retrato (o su silueta mientras no haya arte).
-                Ui.Ilustracion(persona, MaterialesNexus.IdDePersonaje(e.Nombre), null, alto: 240);
-                Ui.Texto(persona, e.Nombre, EstiloTexto.Encabezado);
-                if (!string.IsNullOrEmpty(e.Rol)) Ui.Texto(persona, e.Rol, EstiloTexto.Pequeno, Tema.cyan);
-            }
-            Ui.Texto(persona, "Quince preguntas, un piso cada una. Si no sabes una, dilo: no se descuenta nada.", EstiloTexto.Pequeno);
-            _ascensor = AscensorDeLaEntrevista.Crear(Ui, lado, _preguntas.Count, _respuestas.Count);
+            if (e != null) Ui.Ilustracion(fila, MaterialesNexus.IdDePersonaje(e.Nombre), null, ancho: 110, alto: 130);
+            var datos = Ui.Columna(fila, "Datos", 4);
+            UiKit.Tamano(datos, flexAncho: 1);
+            if (e != null) Ui.Texto(datos, e.Nombre, EstiloTexto.Encabezado);
+            _lineaDeMarisol = Ui.Texto(datos, "", EstiloTexto.Pequeno, Tema.inkMuted);
+            _edificio = EdificioDeLaEntrevista.Crear(Ui, izquierda, _preguntas.Count, _respuestas.Count);
 
-            var centro = Ui.Ventana(marco, "Pregunta");
-            UiKit.Tamano(centro, flexAncho: 1, flexAlto: 1);
-            RectTransform contenido;
-            var scroll = Ui.Desplazable(centro, out contenido);
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-            _hoja = new Hoja(Ui, contenido);
+            // ---- derecha: la pregunta (sin marco) y la pizarra
+            var derecha = Ui.Columna(marco, "Derecha", Tema.espacio);
+            UiKit.Tamano(derecha, flexAncho: 1, flexAlto: 1);
+            _pregunta = Ui.Columna(derecha, "Pregunta", Tema.espacio);
+            UiKit.Tamano(_pregunta, flexAncho: 1);
+            _pizarra = PizarraDeLaPregunta.Crear(Ui, derecha);
         }
 
         public override void Repintar() {
-            if (_hoja == null) return;
-            _hoja.Vaciar();
+            if (_pregunta == null) return;
+            UiKit.Vaciar(_pregunta);
             _susurroEnPantalla = null;
             var p = _preguntas[_indice];
             string elegida;
             var respondida = _respuestas.TryGetValue(p.Numero, out elegida);
+            var nueva = _pizarraDe != _indice;
             // El ascensor sube un piso por respuesta, sea cual sea (no dice si acertaste).
-            if (_ascensor != null) _ascensor.IrA(_respuestas.Count);
+            if (_edificio != null) _edificio.IrA(_respuestas.Count);
 
-            _hoja.Etiqueta($"Piso {_indice + 1} · pregunta {_indice + 1} de {_preguntas.Count}");
-            // Un respiro a mitad de camino: una linea de Marisol, neutra (ni nota ni pista).
-            if (!respondida && (_indice == 5 || _indice == 10))
-                _hoja.Nota(_indice == 5 ? "Marisol pasa una hoja: «Bien. Seguimos subiendo.»" : "Marisol sonríe a medias: «Ya casi arriba. Cinco más.»", Tema.violet);
+            // Marisol: la linea de siempre y, a mitad de camino, un respiro neutro (ni nota ni pista).
+            var respiro = !respondida && (_indice == 5 || _indice == 10);
+            _lineaDeMarisol.text = !respiro ? "Quince preguntas, un piso cada una. Si no sabes una, dilo: no se descuenta nada."
+                                 : _indice == 5 ? "«Bien. Seguimos subiendo.»" : "«Ya casi arriba. Cinco más.»";
+            _lineaDeMarisol.color = respiro ? Tema.violet : Tema.inkMuted;
+
+            // ---- la pregunta, sin marco
+            var cabecera = Ui.Fila(_pregunta, "Cabecera", Tema.espacio, 0, TextAnchor.MiddleLeft);
+            var rotulo = Ui.Texto(cabecera, $"PISO {_indice + 1} · PREGUNTA {_indice + 1} DE {_preguntas.Count}", EstiloTexto.Leyenda, Tema.cyan);
+            rotulo.characterSpacing = 3;
+            UiKit.Tamano(rotulo, flexAncho: 1);
             var corta = TieneVistaCorta(p) && !_completa;
-            Ui.Texto(_hoja.Raiz, corta ? p.Frase : p.Enunciado, EstiloTexto.Encabezado);
-            _hoja.Espacio();
+            if (!respondida && TieneVistaCorta(p))
+                Ui.Boton(cabecera, corta ? "Ver pregunta completa" : "Ver versión corta", () => { _completa = !_completa; Repintar(); }, VarianteBoton.Fantasma);
+            var enunciado = Ui.Texto(_pregunta, corta ? p.Frase : p.Enunciado, EstiloTexto.Titulo, Tema.ink);
+            enunciado.fontSize = corta ? 40 : 30;
+            if (nueva) enunciado.gameObject.AddComponent<EntradaDePieza>();
 
             // Las opciones, como una mano de cartas en su orden de siempre (A, B, C: el instrumento no se baraja), y
-            // «No lo sé» como una carta menor. El sello es el mismo para todas: ANOTADO.
+            // «No lo sé» como una carta menor. El sello es el mismo para todas: ANOTADO. Llegan de una forma distinta
+            // en cada pregunta.
             var cartas = new List<OpcionDeCarta>();
             var indiceElegida = -1;
             foreach (var opcion in p.Opciones) {
@@ -97,32 +120,24 @@ namespace Nexus.Unity.Pantallas {
             }
             if (respondida && elegida == null) indiceElegida = cartas.Count;
             cartas.Add(new OpcionDeCarta { Titulo = "No lo sé", Detalle = "Prefiero no adivinar.", Discreta = true, AlElegir = () => Responder(p, null) });
-            _hoja.Mano(cartas, new ManoDeCartas.Ajustes {
-                Sello = "ANOTADO", ColorDelSello = Tema.violet, ConLetras = true, Elegida = respondida ? indiceElegida : -1, AnchoMaximo = 1100
+            var mano = Ui.Fila(_pregunta, "Mano", 0, 0, TextAnchor.MiddleCenter);
+            ManoDeCartas.Crear(Ui, mano, cartas, new ManoDeCartas.Ajustes {
+                Sello = "ANOTADO", ColorDelSello = Tema.violet, ConLetras = true, Elegida = respondida ? indiceElegida : -1,
+                AnchoMaximo = 1100, Entrada = DisposicionDeMano.EntradaPara(p.Numero),
             });
 
-            if (!respondida) {
-                if (TieneVistaCorta(p)) {
-                    _hoja.Espacio(2);
-                    Ui.Boton(_hoja.Fila(), corta ? "Ver pregunta completa" : "Ver versión corta", () => { _completa = !_completa; Repintar(); }, VarianteBoton.Fantasma);
-                }
-                return;
+            // ---- la pizarra: el dibujo del tema (una vez por pregunta) y, si ya se respondio, el susurro
+            if (nueva) {
+                _pizarraDe = _indice;
+                _pizarra.Mostrar(p.Escena, p.Numero);
             }
-
-            _hoja.Espacio();
-            _hoja.Nota("El hombre del traje verde se inclina hacia Marisol:", Tema.inkMuted);
+            if (!respondida) return;
+            var ultima = _indice == _preguntas.Count - 1;
             // Un momento de historia, no un aviso: el susurro se escribe letra a letra (Enter o Espacio lo completa).
-            _susurroEnPantalla = _hoja.Parrafo("«" + _susurro + "»", Tema.violet);
-            _susurroEnPantalla.fontStyle = TMPro.FontStyles.Italic;
+            _susurroEnPantalla = _pizarra.Susurro(_susurro, (ultima ? "Terminar la entrevista" : "Siguiente pregunta") + "  ↵", Siguiente);
             _susurroEnPantalla.maxVisibleCharacters = 0;
             _letras = 0;
-            var ultima = _indice == _preguntas.Count - 1;
-            _hoja.Accion((ultima ? "Terminar la entrevista" : "Siguiente pregunta") + "  ↵", Siguiente);
         }
-
-        private AscensorDeLaEntrevista _ascensor;
-        private TMPro.TMP_Text _susurroEnPantalla;
-        private float _letras;
 
         private void Update() {
             var teclado = UnityEngine.InputSystem.Keyboard.current;

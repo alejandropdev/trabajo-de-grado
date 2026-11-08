@@ -19,10 +19,10 @@ namespace Nexus.Unity.Pantallas {
 
         protected override void Construir() {
             var velo = Raiz.gameObject.AddComponent<Image>();
-            velo.color = NexusTheme.Alfa(Tema.bg950, 0.72f);   // raycastTarget: bloquea los clics de la pantalla de debajo
+            velo.color = NexusTheme.Alfa(Tema.bg950, 0.78f);   // raycastTarget: bloquea los clics de la pantalla de debajo
 
-            // Un modal flota sobre el HUD: surface-raised y las esquinas del Panel.
-            var panel = Ui.Ventana(Raiz, "Dialogo");
+            // Un modal flota sobre el HUD: cristal neon con esquinas luminosas (ya no la ventana de metal, 2026-11-08).
+            var panel = Ui.Dialogo(Raiz, "Dialogo");
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0.5f, 0.5f);
             var ajuste = panel.gameObject.AddComponent<ContentSizeFitter>();
             ajuste.verticalFit = ContentSizeFitter.FitMode.PreferredSize;

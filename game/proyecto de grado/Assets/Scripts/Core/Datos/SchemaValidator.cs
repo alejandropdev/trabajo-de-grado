@@ -1336,6 +1336,9 @@ namespace Nexus.Core.Datos {
                 if (string.IsNullOrEmpty(p.Enunciado)) e.Add($"{donde}: falta 'enunciado'.");
                 if (string.IsNullOrEmpty(p.SusurroSiAcierta) || string.IsNullOrEmpty(p.SusurroSiFalla))
                     e.Add($"{donde}: HH tiene que susurrar algo tanto si aciertas como si fallas.");
+                // El dibujo del tema en la pizarra de la entrevista (2026-11-07): opcional, pero si se pone, que exista.
+                if (!string.IsNullOrEmpty(p.Escena) && !Nexus.Core.Narrativa.EscenasDePizarra.Existe(p.Escena))
+                    e.Add($"{donde}: la escena '{p.Escena}' no es ninguna de las de la pizarra (EscenasDePizarra).");
 
                 if (p.Opciones == null || p.Opciones.Count < 2) {
                     e.Add($"{donde}: necesita al menos dos opciones.");
