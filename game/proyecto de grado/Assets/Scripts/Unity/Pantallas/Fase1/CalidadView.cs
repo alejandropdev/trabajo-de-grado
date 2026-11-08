@@ -41,7 +41,7 @@ namespace Nexus.Unity.Pantallas {
         private sealed class Tarjeta {
             public AtributoCalidad Atributo;
             public TMP_Text Numero;
-            public GameObject Aviso, Pips;
+            public GameObject Aviso, Pips, Raiz;
             public Button Menos, Mas;
             public TarjetaViva Viva;
         }
@@ -134,10 +134,35 @@ namespace Nexus.Unity.Pantallas {
 
         // ==================================================================== vista A · tarjetas
 
+        private const int PorPagina = 4;   // con mas atributos, las tarjetas van en carrusel: asi conservan un buen ancho
+        private int _pagina;
+        private Button _anterior, _siguiente;
+
         private void ConstruirTarjetas(RectTransform vista) {
-            var fila = _ui.Fila(vista, "FilaDeTarjetas", _t.Espacio(4), 0, TextAnchor.MiddleCenter);
-            vista.gameObject.AddComponent<EscaladorAlCaber>().Interior = fila;   // si no caben, se encogen: nunca hay scroll
+            var paginado = _cfg.Atributos.Count > PorPagina;
+            var carrusel = _ui.Fila(vista, "Carrusel", _t.Espacio(2), 0, TextAnchor.MiddleCenter);
+            vista.gameObject.AddComponent<EscaladorAlCaber>().Interior = carrusel;   // si no caben, se encogen: nunca hay scroll
+            if (paginado) _anterior = Redondo(carrusel, "◄", _t.Px(44), () => IrAPagina(_pagina - 1, true));
+            var fila = _ui.Fila(carrusel, "FilaDeTarjetas", _t.Espacio(4), 0, TextAnchor.MiddleCenter);
+            UiKit.Tamano(fila, flexAncho: 1, flexAlto: 1);
             for (var i = 0; i < _cfg.Atributos.Count; i++) _tarjetas.Add(CrearTarjeta(fila, _cfg.Atributos[i], i));
+            if (paginado) {
+                _siguiente = Redondo(carrusel, "►", _t.Px(44), () => IrAPagina(_pagina + 1, true));
+                IrAPagina(_pagina, false);
+            }
+        }
+
+        private void IrAPagina(int pagina, bool animar) {
+            var paginas = (_cfg.Atributos.Count + PorPagina - 1) / PorPagina;
+            _pagina = Mathf.Clamp(pagina, 0, paginas - 1);
+            _tip.OcultarYa();
+            for (var i = 0; i < _tarjetas.Count; i++) {
+                var visible = i / PorPagina == _pagina;
+                _tarjetas[i].Raiz.SetActive(visible);
+                if (visible && animar) _tarjetas[i].Viva.Reiniciar(0.08f * (i % PorPagina));
+            }
+            _anterior.interactable = _pagina > 0;
+            _siguiente.interactable = _pagina < paginas - 1;
         }
 
         private Tarjeta CrearTarjeta(Transform padre, AtributoCalidad a, int indice) {
@@ -150,6 +175,7 @@ namespace Nexus.Unity.Pantallas {
             le.minWidth = _t.Px(150); le.preferredWidth = _t.Px(230); le.flexibleWidth = 1; le.flexibleHeight = 1;
             le.preferredHeight = _t.Px(300);   // la altura de diseño: el escalador la encoge si el espacio es menor
 
+            tj.Raiz = raiz.gameObject;
             var cuerpo = _ui.Nodo(raiz, "Cuerpo");
             UiKit.Rellenar(cuerpo);
             var fondo = cuerpo.gameObject.AddComponent<Image>();
@@ -167,7 +193,8 @@ namespace Nexus.Unity.Pantallas {
             var nombre = _ui.Texto(cab, a.Nombre, EstiloTexto.Encabezado, _t.ink);
             nombre.fontSize = _t.Px(21);
             nombre.fontStyle = FontStyles.Bold;
-            UiKit.Tamano(nombre, flexAncho: 1);
+            TextoEnCaja.Ajustar(nombre, _t.Px(21));   // grande, pero se encoge antes que partirse a media palabra
+            UiKit.Tamano(nombre, flexAncho: 1, flexAlto: 1);
             if (_chip != null) _chip(cab, a.Id);
             var realceCab = cab.gameObject.AddComponent<RealceDeCalidad>();
             realceCab.Entra = () => _tip.Mostrar(a.Nombre, De(a.Id) == 0 && !string.IsNullOrEmpty(a.TextoSinInversion)
