@@ -45,6 +45,8 @@
     },
     {
       "id": "daily",
+      "frase": "Quince minutos de pie: ¿qué te bloquea hoy?",
+      "ayuda": "Sirve para quitar bloqueos, no para rendir cuentas al jefe.",
       "solo": {"nombre": "Repaso diario del plan", "texto": "Cinco minutos contigo mismo antes de empezar: qué te bloquea hoy y cómo lo quitas.", "paraQueSirve": "Cada mañana: qué te frena y qué vas a terminar hoy. No es una lista de lo que hiciste ayer.", "opciones": {"bloqueos": {"texto": "Apuntar qué te bloquea y quitarlo hoy", "acta": "Escribiste el bloqueo que llevabas dos días esquivando y lo resolviste antes de comer. Decirlo en voz alta, aunque sea a ti mismo, ya es empezar a quitarlo."}, "parte": {"texto": "Hacer la lista de todo lo que hiciste ayer", "acta": "La lista quedó larga y ordenada. Lo que te tiene parado no salía en ella: repasar lo hecho no es mirar lo que falta."}, "diseno": {"texto": "Repensar otra vez el diseño entero", "acta": "Los cinco minutos fueron una hora. El diseño sigue igual y el día empezó tarde: lo grande se piensa aparte, con tiempo."}}},
       "nombre": "Reunión diaria",
       "cuando": "diario",
@@ -59,6 +61,7 @@
       "opciones": [
         {
           "id": "bloqueos",
+          "etiqueta": "Quitar bloqueos",
           "texto": "Preguntar qué bloquea a cada uno y quitarlo de en medio hoy",
           "efectos": {
             "MoralEquipo": 0.5
@@ -68,6 +71,7 @@
         },
         {
           "id": "parte",
+          "etiqueta": "Parte de ayer",
           "texto": "Que cada uno cuente lo que hizo ayer, para llevar el control",
           "efectos": {
             "MoralEquipo": -1
@@ -76,6 +80,7 @@
         },
         {
           "id": "diseno",
+          "etiqueta": "Rediscutir el diseño",
           "texto": "Aprovechar que están todos para rediscutir el diseño",
           "bonoDeFlujo": -0.03,
           "acta": "Los quince minutos fueron cuarenta y cinco, y medio equipo no tenía nada que ver con la discusión. Lo que necesita más tiempo se habla después, con quien haga falta."
@@ -84,6 +89,8 @@
     },
     {
       "id": "review",
+      "frase": "Le enseñas al cliente lo que está terminado.",
+      "ayuda": "Lo que no está terminado no se enseña. Lo que el cliente pida va al backlog.",
       "solo": {"opciones": {"a-medias": {"texto": "Enseñar también lo que está a medias, como si estuviera", "acta": "Quedó muy bien en la sala. Ahora el cliente cuenta con cosas que no están, y tú tienes que cerrarlas deprisa para que no se note. Lo que no está terminado, no se enseña."}}},
       "nombre": "Revisión de sprint",
       "cuando": "finIteracion",
@@ -96,6 +103,7 @@
       "opciones": [
         {
           "id": "terminado",
+          "etiqueta": "Solo lo terminado",
           "texto": "Enseñar solo lo terminado y apuntar lo que el cliente pida",
           "efectos": {
             "SatisfaccionCliente": 3
@@ -104,6 +112,7 @@
         },
         {
           "id": "a-medias",
+          "etiqueta": "Enseñar a medias",
           "texto": "Enseñar también lo que está a medias, como si estuviera",
           "efectos": {
             "SatisfaccionCliente": 5,
@@ -114,6 +123,7 @@
         },
         {
           "id": "correo",
+          "etiqueta": "Mandar un correo",
           "texto": "Mandar un resumen por correo y ahorrarse la reunión",
           "efectos": {
             "SatisfaccionCliente": -1
@@ -131,9 +141,11 @@
       "verbo": "V4",
       "texto": "Qué salió bien, qué no, y qué vamos a cambiar. Solo se elige una cosa: las listas de diez propósitos no cambian nada.",
       "ajustaCoeficiente": true,
+      "frase": "¿Qué mejoramos el próximo sprint?",
       "acciones": [
         {
           "id": "documentar",
+          "etiqueta": "Documentar al cerrar",
           "texto": "Documentar antes de cerrar cada tarea",
           "coeficiente": "kappa",
           "multiplicador": 0.85,
@@ -141,6 +153,7 @@
         },
         {
           "id": "refactor20",
+          "etiqueta": "Refactorizar 20 %",
           "texto": "Reservar el 20 % del sprint a refactorizar",
           "coeficiente": "beta",
           "multiplicador": 1.25,
@@ -149,6 +162,7 @@
         {
           "id": "pareja",
           "soloEnEquipo": true,
+          "etiqueta": "Programar en pareja",
           "texto": "Programación en pareja obligatoria en los módulos críticos",
           "coeficiente": "alpha",
           "multiplicador": 0.8,
@@ -156,6 +170,7 @@
         },
         {
           "id": "ritmo",
+          "etiqueta": "Respetar el ritmo",
           "texto": "Prohibido comprometerse por encima de la velocidad empírica",
           "coeficiente": "gamma",
           "multiplicador": 0.75,

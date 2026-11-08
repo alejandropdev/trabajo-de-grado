@@ -40,10 +40,22 @@ namespace Nexus.Core.Evaluacion {
         public string Oa;
 
         public string Enunciado;
+
+        /// <summary>
+        /// La pregunta en una linea, para verla de un vistazo. El Enunciado y las opciones completas son el instrumento del
+        /// pre-test y no cambian: siguen disponibles en pantalla («Ver pregunta completa»).
+        /// </summary>
+        public string Frase;
         public List<OpcionDePregunta> Opciones = new List<OpcionDePregunta>();
 
         /// <summary>El id de la opcion correcta.</summary>
         public string Correcta;
+
+        /// <summary>
+        /// La escena de tiza que se dibuja en la pizarra mientras se responde (un id de EscenasDePizarra). Muestra el
+        /// TEMA, no la respuesta: se eligio cada una para no dar pistas. Opcional (2026-11-07).
+        /// </summary>
+        public string Escena;
 
         public string SusurroSiAcierta;
         public string SusurroSiFalla;
@@ -52,6 +64,9 @@ namespace Nexus.Core.Evaluacion {
     public sealed class OpcionDePregunta {
         public string Id;
         public string Texto;
+
+        /// <summary>Lo que dice el boton en la vista corta (tres palabras como mucho).</summary>
+        public string Etiqueta;
     }
 
     /// <summary>

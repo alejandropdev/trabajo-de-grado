@@ -35,7 +35,10 @@ namespace Nexus.Unity.Tema {
         private readonly List<Relleno> _rellenos = new List<Relleno>();
         public bool Tiza;
 
-        public void Limpiar() { _trazos.Clear(); _rellenos.Clear(); SetVerticesDirty(); }
+        /// <summary>Lo avisa Limpiar: la lamina olvida donde estaban las etiquetas del dibujo anterior.</summary>
+        public System.Action AlLimpiar;
+
+        public void Limpiar() { _trazos.Clear(); _rellenos.Clear(); SetVerticesDirty(); AlLimpiar?.Invoke(); }
 
         // ================================================================ primitivas
 
@@ -183,18 +186,56 @@ namespace Nexus.Unity.Tema {
             return new Vector2(r.xMin + p.x, r.yMax - p.y);
         }
 
+        /// <summary>
+        /// Cuanto del dibujo se ve, de 0 a 1 (2026-11-06): con menos de 1 solo se pintan los primeros trazos, el ultimo a
+        /// medias, como si se estuviera dibujando a mano; los rellenos aparecen al final. Por defecto 1: todo.
+        /// </summary>
+        public float Avance {
+            get { return _avance; }
+            set {
+                var v = Mathf.Clamp01(value);
+                if (Mathf.Approximately(v, _avance)) return;
+                _avance = v;
+                SetVerticesDirty();
+            }
+        }
+        private float _avance = 1f;
+
         protected override void OnPopulateMesh(VertexHelper vh) {
             vh.Clear();
+            var alfaRellenos = _avance >= 1f ? 1f : Mathf.Clamp01((_avance - 0.75f) / 0.25f);
             foreach (var f in _rellenos) {
+                if (alfaRellenos <= 0) break;
                 var inicio = vh.currentVertCount;
                 var c = Centro(f.Poligono);
-                vh.AddVert(AMalla(c), f.Color, Vector2.zero);
-                foreach (var p in f.Poligono) vh.AddVert(AMalla(p), f.Color, Vector2.zero);
+                var color = f.Color; color.a *= alfaRellenos;
+                vh.AddVert(AMalla(c), color, Vector2.zero);
+                foreach (var p in f.Poligono) vh.AddVert(AMalla(p), color, Vector2.zero);
                 for (var i = 0; i < f.Poligono.Count; i++)
                     vh.AddTriangle(inicio, inicio + 1 + i, inicio + 1 + (i + 1) % f.Poligono.Count);
             }
+            // Cuantos segmentos se pintan: la fraccion 'Avance' del total, en el orden en que se dibujaron.
+            var quedan = float.MaxValue;
+            if (_avance < 1f) {
+                var total = 0;
+                foreach (var t in _trazos) total += Mathf.Max(0, t.Puntos.Count - 1);
+                quedan = _avance * total;
+            }
             var semilla = 7;
-            foreach (var t in _trazos) {
+            foreach (var t0 in _trazos) {
+                if (quedan <= 0) break;
+                var t = t0;
+                var segmentos = Mathf.Max(0, t.Puntos.Count - 1);
+                if (quedan < segmentos) {
+                    // El trazo que se esta dibujando: sus segmentos enteros y el ultimo a medias.
+                    var enteros = Mathf.FloorToInt(quedan);
+                    var puntos = t.Puntos.GetRange(0, enteros + 1);
+                    var resto = quedan - enteros;
+                    if (resto > 0 && enteros + 1 < t.Puntos.Count)
+                        puntos.Add(Vector2.Lerp(t.Puntos[enteros], t.Puntos[enteros + 1], resto));
+                    t = new Trazo { Puntos = puntos, Color = t.Color, Grosor = t.Grosor, Discontinuo = t.Discontinuo };
+                }
+                quedan -= segmentos;
                 DibujarTrazo(vh, t, Vector2.zero, t.Color);
                 if (Tiza) {
                     // un segundo trazo, un pelo movido y mas tenue: el borde irregular de la tiza
@@ -246,6 +287,37 @@ namespace Nexus.Unity.Tema {
         public RectTransform Raiz { get; private set; }
         public DibujoUI Dibujo { get; private set; }
 
+        /// <summary>Donde ya hay una etiqueta escrita: las siguientes la esquivan (Reservar).</summary>
+        private readonly System.Collections.Generic.List<Rect> _etiquetas = new System.Collections.Generic.List<Rect>();
+
+        /// <summary>
+        /// Reserva el sitio de una etiqueta. Si pisa a otra de forma clara (mas de un tercio de la menor), la baja
+        /// 'paso' y vuelve a probar, hasta tres veces; si no encuentra hueco, se queda donde iba. Devuelve el sitio.
+        /// </summary>
+        public Rect Reservar(Rect r, float paso) {
+            var prueba = r;
+            for (var intento = 0; intento < 4; intento++) {
+                if (!PisaAOtra(prueba)) { _etiquetas.Add(prueba); return prueba; }
+                prueba.y += paso;
+            }
+            _etiquetas.Add(r);
+            return r;
+        }
+
+        private bool PisaAOtra(Rect r) {
+            foreach (var o in _etiquetas) {
+                if (!o.Overlaps(r)) continue;
+                var ancho = Mathf.Min(r.xMax, o.xMax) - Mathf.Max(r.xMin, o.xMin);
+                var alto = Mathf.Min(r.yMax, o.yMax) - Mathf.Max(r.yMin, o.yMin);
+                var menor = Mathf.Min(r.width * r.height, o.width * o.height);
+                if (menor > 0 && ancho * alto > menor / 3f) return true;
+            }
+            return false;
+        }
+
+        /// <summary>Al repintar la lamina desde cero, las etiquetas viejas ya no ocupan nada.</summary>
+        public void OlvidarEtiquetas() { _etiquetas.Clear(); }
+
         public Lamina(UiKit ui, Transform padre, float ancho, float alto, string nombre = "Lamina") {
             _ui = ui;
             Raiz = ui.Nodo(padre, nombre);
@@ -255,6 +327,7 @@ namespace Nexus.Unity.Tema {
             fondo.gameObject.AddComponent<CanvasRenderer>();
             Dibujo = fondo.gameObject.AddComponent<DibujoUI>();
             Dibujo.raycastTarget = false;
+            Dibujo.AlLimpiar = OlvidarEtiquetas;
         }
 
         /// <summary>Coloca un RectTransform en (x, y) con su tamaño, medido desde arriba a la izquierda.</summary>
@@ -321,7 +394,7 @@ namespace Nexus.Unity.Tema {
 
         /// <summary>Una pastilla de color con texto (etiqueta de flecha, chip de valor, marca).</summary>
         public RectTransform Pastilla(float cx, float cy, string texto, float tam, Color fondo, Color colorTexto, Color? borde = null) {
-            var ancho = texto.Length * tam * 0.55f + 26;
+            var ancho = AnchoDePastilla(texto, tam);
             var rt = _ui.Nodo(Raiz, "Pastilla");
             Colocar(rt, cx - ancho / 2, cy - (tam + 12) / 2, ancho, tam + 12);
             var img = rt.gameObject.AddComponent<Image>();
@@ -335,5 +408,27 @@ namespace Nexus.Unity.Tema {
             UiKit.Rellenar((RectTransform)t.transform);
             return rt;
         }
+
+        /// <summary>
+        /// Lo que mide una pastilla con ese texto, con la letra de la interfaz de verdad (antes se estimaba por
+        /// numero de letras, y las palabras anchas se salian del fondo y montaban sobre lo de al lado).
+        /// </summary>
+        public float AnchoDePastilla(string texto, float tam) {
+            var fuente = _ui.Tema.FuenteCuerpo;
+            if (fuente == null) return (texto ?? "").Length * tam * 0.55f + 26;
+            // Un solo medidor para todo el juego, fuera de cualquier lienzo (no se pinta) y fuera de las laminas, que
+            // se vacian al repintar: si viviera dentro, el segundo repintado usaria un objeto ya destruido.
+            if (_medidor == null) {
+                var go = new GameObject("Medidor de pastillas") { hideFlags = HideFlags.HideAndDontSave };
+                UnityEngine.Object.DontDestroyOnLoad(go);
+                _medidor = go.AddComponent<TextMeshProUGUI>();
+                _medidor.textWrappingMode = TextWrappingModes.NoWrap;
+            }
+            _medidor.font = fuente;
+            _medidor.fontSize = tam;
+            return Mathf.Max(40, _medidor.GetPreferredValues(texto ?? "").x + 26);
+        }
+
+        private static TextMeshProUGUI _medidor;
     }
 }

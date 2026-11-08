@@ -13,6 +13,9 @@ namespace Nexus.Core.Sesion {
         public string Nombre;
         public string Texto;
         public string ParaQueSirve;
+        /// <summary>Lo que dice la tarjeta (ver Ceremonia.Frase). Vacio = no hay tarjeta para esta ceremonia.</summary>
+        public string Frase;
+        public string Ayuda;
         public int DuracionMinutos;
         /// <summary>La vista de monitoreo que se pone delante en la reunion (o null).</summary>
         public string Muestra;
@@ -89,6 +92,52 @@ namespace Nexus.Core.Sesion {
             return AvanzarReloj(MinutosDeAsignar);
         }
 
+        /// <summary>
+        /// Si darle esta tarjeta a alguien NO la pondria en marcha (2026-11-07): el equipo solo lleva a la vez tantas
+        /// como su limite (el WIP en Kanban; una por persona en las demas) y en su orden, lo del sprint primero. Una
+        /// tarjeta de la cola asignada se queda esperando su turno aunque tenga dueño, y parecia que no se habia asignado.
+        /// Devuelve el porque (para avisar), o null si empezaria ya.
+        /// </summary>
+        public string PorQueNoEmpezariaAlAsignar(string tarjetaId) {
+            var t = R.Tablero;
+            var c = t == null ? null : t.Tarjeta(tarjetaId);
+            if (c == null || c.EsBug || c.Empezada || c.Terminada) return null;
+            var limite = MotorDelTablero.EnCurso(t);
+            if (MotorDelTablero.EnOrdenDeTrabajo(t).Take(limite).Contains(c)) return null;
+            var enCurso = t.Tarjetas.Count(x => !x.EsBug && x.Empezada && !x.Terminada);
+            var fuera = Politica != null && Politica.SprintCerrado && t.SprintActual >= 0 && c.Sprint != t.SprintActual;
+            return $"Ya hay {enCurso} tarjetas en curso y el límite es {limite}." +
+                   (fuera ? " Además, no está en el sprint." : "") +
+                   " Si solo se la das, esperará su turno sin empezar.";
+        }
+
+        /// <summary>El limite de trabajo en curso que quedaria al asignar subiendolo (para decirlo en el aviso).</summary>
+        public int LimiteEnCursoAlSubir() { return R.Tablero == null ? 0 : MotorDelTablero.EnCurso(R.Tablero) + 1; }
+
+        /// <summary>
+        /// Darle la tarjeta a alguien y que la empiece YA: el limite de trabajo en curso sube uno (y desde ahi rinde un
+        /// poco menos: mas cosas a la vez), la tarjeta pasa la primera de la cola y, con sprint, entra en el sprint en
+        /// marcha (moral −2 y sobrecompromiso, como MeterAlSprint). Cuesta lo que asignar.
+        /// </summary>
+        public ResultadoDeAvance AsignarSubiendoElLimite(string tarjetaId, string miembroId) {
+            Exigir(PorQueNoSePuedeAsignar(tarjetaId, miembroId));
+            var t = R.Tablero;
+            var c = t.Tarjeta(tarjetaId);
+            var limite = MotorDelTablero.EnCurso(t);
+            if (t.LimiteNeutro <= 0) t.LimiteNeutro = limite;
+            t.LimiteEnCurso = limite + 1;
+            R.LimiteWip = t.LimiteEnCurso;
+            if (Politica != null && Politica.SprintCerrado && t.SprintActual >= 0 && c.Sprint != t.SprintActual) {
+                c.Sprint = t.SprintActual;
+                R.SobreCompromiso += c.Restante;
+                EffectApplier.Aplicar(W, new Dictionary<string, object> { { "MoralEquipo", -2.0 } });
+            }
+            c.Orden = t.Tarjetas.Min(x => x.Orden) - 1;
+            c.Asignado = miembroId;
+            c.AsignacionManual = true;
+            return AvanzarReloj(MinutosDeAsignar);
+        }
+
         public string PorQueNoSePuedePriorizar(string tarjetaId, bool haciaArriba) {
             var motivo = PorQueNoSePuedeActuar(MinutosDePriorizar);
             if (motivo != null) return motivo;
@@ -114,6 +163,42 @@ namespace Nexus.Core.Sesion {
             var orden = c.Orden;
             c.Orden = otra.Orden;
             otra.Orden = orden;
+            return AvanzarReloj(MinutosDePriorizar);
+        }
+
+        /// <summary>
+        /// Las tarjetas que se ordenan junto con esta: las no empezadas de su mismo grupo (su sprint, o el product
+        /// backlog), en su orden. Es la fila en la que se suelta una tarjeta arrastrada en el muro.
+        /// </summary>
+        public List<TarjetaDeTrabajo> FilaDeOrden(TarjetaDeTrabajo c) {
+            if (R.Tablero == null || c == null) return new List<TarjetaDeTrabajo>();
+            return R.Tablero.Tarjetas.Where(x => !x.EsBug && !x.Empezada && x.Sprint == c.Sprint).OrderBy(x => x.Orden).ToList();
+        }
+
+        public string PorQueNoSePuedeMover(string tarjetaId, int puesto) {
+            var motivo = PorQueNoSePuedeActuar(MinutosDePriorizar);
+            if (motivo != null) return motivo;
+            var c = R.Tablero.Tarjeta(tarjetaId);
+            if (c == null) return "Esa tarjeta no existe.";
+            if (c.EsBug) return "Un error se arregla cuando sale: no se ordena.";
+            if (c.Empezada) return "Ya está empezada: se ordena lo que aún no se ha tocado.";
+            var fila = FilaDeOrden(c);
+            puesto = Math.Max(0, Math.Min(fila.Count - 1, puesto));
+            return fila.IndexOf(c) == puesto ? "Ya está en ese puesto." : null;
+        }
+
+        /// <summary>
+        /// Lleva una tarjeta a un puesto de su fila de una vez (arrastrarla en el muro): las de en medio se corren.
+        /// Cuesta lo mismo que priorizar un puesto, llegue donde llegue. Los valores de Orden del grupo se reparten de
+        /// nuevo entre las mismas tarjetas, asi que el resto del tablero no se entera.
+        /// </summary>
+        public ResultadoDeAvance MoverTarjetaA(string tarjetaId, int puesto) {
+            Exigir(PorQueNoSePuedeMover(tarjetaId, puesto));
+            var c = R.Tablero.Tarjeta(tarjetaId);
+            var fila = FilaDeOrden(c);
+            var ordenes = fila.Select(x => x.Orden).ToList();
+            OrdenDeLista.Mover(fila, fila.IndexOf(c), puesto);
+            for (var i = 0; i < fila.Count; i++) fila[i].Orden = ordenes[i];
             return AvanzarReloj(MinutosDePriorizar);
         }
 
@@ -452,6 +537,7 @@ namespace Nexus.Core.Sesion {
                 if (c.Opciones == null || c.Opciones.Count == 0) continue;
                 lista.Add(new CeremoniaDeHoy {
                     Id = c.Id, Nombre = NombreDe(c), Texto = TextoDe(c), ParaQueSirve = ParaQueSirveDe(c),
+                    Frase = c.Frase, Ayuda = c.Ayuda,
                     DuracionMinutos = c.DuracionMinutos, Muestra = c.Muestra, Opciones = OpcionesDe(c),
                     Hecha = R.CeremoniasHechasHoy.Contains(c.Id)
                 });

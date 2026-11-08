@@ -104,6 +104,8 @@
   "ceremonias": [
     {
       "id": "kickoff",
+      "frase": "Todos en la sala, con el plan sobre la mesa.",
+      "ayuda": "Se repasa el plan del proyecto una sola vez y se acuerda quién decide qué.",
       "solo": {"nombre": "Arranque del proyecto", "texto": "Una sola vez, con el cliente: el plan del proyecto (PMP) encima de la mesa.", "opciones": {"plan": {"texto": "Repasar el plan con el cliente y dejar por escrito quién decide qué", "acta": "Salieron dos dudas sobre quién aprueba los cambios, y quedaron escritas en el plan. En Cascada el plan es el contrato: lo que no está escrito, se discutirá después y más caro."}, "leido": {"texto": "Dar el plan por leído: ya lo mandaste por correo", "acta": "El cliente no lo había leído. Cada uno se quedó con su propia idea de las fechas."}, "fecha": {"texto": "Prometerle al cliente la fecha que quiere oír, antes de planificar", "acta": "El cliente salió encantado. Tú, con una fecha que no ha calculado nadie."}}},
       "nombre": "Reunión de arranque (kickoff)",
       "cuando": "inicioNivel",
@@ -115,6 +117,7 @@
       "opciones": [
         {
           "id": "plan",
+          "etiqueta": "Repasar el plan",
           "texto": "Repasar el plan con todos y dejar por escrito quién decide qué",
           "efectos": {
             "Documentacion": 3,
@@ -124,6 +127,7 @@
         },
         {
           "id": "leido",
+          "etiqueta": "Darlo por leído",
           "texto": "Dar el plan por leído: ya lo mandaste por correo",
           "efectos": {
             "Documentacion": -1
@@ -132,6 +136,7 @@
         },
         {
           "id": "fecha",
+          "etiqueta": "Prometer la fecha",
           "texto": "Prometerle al cliente la fecha que quiere oír, antes de planificar",
           "efectos": {
             "SatisfaccionCliente": 3,
@@ -144,6 +149,8 @@
     },
     {
       "id": "firma-de-etapa",
+      "frase": "La etapa se cierra con una firma.",
+      "ayuda": "Firmar con secciones a medias deja el documento listo, pero con huecos.",
       "nombre": "La firma del documento",
       "cuando": "finEtapa",
       "costeDias": 0.5,
@@ -159,6 +166,7 @@
       "opciones": [
         {
           "id": "revisar",
+          "etiqueta": "Revisar antes",
           "texto": "Revisar el documento sección por sección antes de firmar",
           "efectos": {
             "Documentacion": 3,
@@ -168,6 +176,7 @@
         },
         {
           "id": "reservas",
+          "etiqueta": "Firmar con reservas",
           "texto": "Firmar con reservas: las secciones a medias quedan anotadas",
           "efectos": {
             "Documentacion": 1
@@ -176,6 +185,7 @@
         },
         {
           "id": "sin-leer",
+          "etiqueta": "Firmar sin leer",
           "texto": "Firmar sin leer: hay que pasar de etapa",
           "efectos": {
             "DeudaTecnica": 3
@@ -195,6 +205,8 @@
     },
     {
       "id": "comite-de-seguimiento",
+      "frase": "Informe de avance ante el cliente y quien paga.",
+      "ayuda": "Se compara el avance real contra el plan, con el retraso incluido.",
       "nombre": "Comité de seguimiento",
       "cuando": "cada",
       "cadaNDias": 5,
@@ -206,6 +218,7 @@
       "opciones": [
         {
           "id": "verdad",
+          "etiqueta": "Curva real",
           "texto": "Enseñar la curva real, con su retraso, y proponer cómo recuperarlo",
           "efectos": {
             "SatisfaccionCliente": -1,
@@ -216,6 +229,7 @@
         },
         {
           "id": "maquillar",
+          "etiqueta": "Maquillar el avance",
           "texto": "Presentar el avance «al 90 %» para ganar tiempo",
           "efectos": {
             "SatisfaccionCliente": 2,
@@ -226,6 +240,7 @@
         },
         {
           "id": "nada",
+          "etiqueta": "No presentar nada",
           "texto": "No presentar informe: «no hay novedades»",
           "efectos": {
             "SatisfaccionCliente": -3
@@ -236,6 +251,8 @@
     },
     {
       "id": "lecciones-aprendidas",
+      "frase": "Último día: ¿qué haríamos distinto?",
+      "ayuda": "Se escribe qué cambiar del proceso, sin buscar culpables.",
       "solo": {"opciones": {"culpables": {"texto": "Buscar qué tuvo la culpa de cada retraso", "acta": "Quedó una lista de culpables: el cliente, el servidor, la mala suerte. Ninguna cosa que hacer distinto."}}},
       "nombre": "Lecciones aprendidas",
       "cuando": "finNivel",
@@ -246,6 +263,7 @@
       "opciones": [
         {
           "id": "escribir",
+          "etiqueta": "Escribir sin nombres",
           "texto": "Escribir qué se haría distinto, sin nombres",
           "efectos": {
             "Documentacion": 3,
@@ -255,6 +273,7 @@
         },
         {
           "id": "culpables",
+          "etiqueta": "Buscar culpables",
           "texto": "Buscar quién tuvo la culpa de cada retraso",
           "efectos": {
             "MoralEquipo": -3

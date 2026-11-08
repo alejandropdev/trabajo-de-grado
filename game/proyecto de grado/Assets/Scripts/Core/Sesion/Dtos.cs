@@ -54,6 +54,8 @@ namespace Nexus.Core.Sesion {
     public sealed class RetroRequest {
         public string CeremoniaId;
         public string Texto;
+        /// <summary>La pregunta de la tarjeta (ver Ceremonia.Frase). null = sigue la vista larga.</summary>
+        public string Frase;
         public List<AccionRetro> Acciones = new List<AccionRetro>();
     }
 
@@ -61,6 +63,8 @@ namespace Nexus.Core.Sesion {
     public sealed class OpcionPresentada {
         public string Id;
         public string Texto;
+        /// <summary>Lo que dice el boton de la tarjeta (ver OpcionEvento.Etiqueta).</summary>
+        public string Etiqueta;
 
         /// <summary>Lo que cambiaria cada stock. SOLO el efecto inmediato: el diferido no se previsualiza nunca.</summary>
         public Dictionary<string, double> Previsualizacion = new Dictionary<string, double>(StringComparer.Ordinal);
@@ -93,6 +97,8 @@ namespace Nexus.Core.Sesion {
     public sealed class PendingDecision {
         public string EventoId;
         public string Titulo;
+        /// <summary>La frase de la tarjeta (ver EventDefinition.Frase). Vacia = sin tarjeta.</summary>
+        public string Frase;
 
         /// <summary>El canal por el que llego el aviso, dias atras. Se repite aqui para dar continuidad.</summary>
         public string Canal;

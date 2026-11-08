@@ -79,6 +79,19 @@ namespace Nexus.Unity.Tema {
             return s;
         }
 
+        /// <summary>
+        /// Personajes cuyo nombre en pantalla no da el nombre de su archivo de arte: la hoja de vida del 3D usa otro
+        /// nombre que el guion, o el retrato se entrego con el apellido de un borrador. Clave: el nombre ya normalizado.
+        /// Los retratos nuevos (kenji-sato, derek-hartman, elena-gomez) no necesitan alias: su archivo ya se llama asi.
+        /// </summary>
+        private static readonly Dictionary<string, string> AliasDeRetrato = new Dictionary<string, string> {
+            { "marta-ayala", "marta-oyola" },       // la Marta de la hoja de vida es la del prologo
+            { "sara-chen", "sarah-lindqvist" },
+            { "sarah-chen", "sarah-lindqvist" },
+            { "javier-webb", "javier" },
+            { "oscar-rondon", "oscar-rendon" },
+        };
+
         /// <summary>"Dra. Voss" → "voss", "Marisol Andrade" → "marisol-andrade": el id de archivo de un personaje.</summary>
         public static string IdDePersonaje(string nombre) {
             if (string.IsNullOrEmpty(nombre)) return null;
@@ -88,7 +101,9 @@ namespace Nexus.Unity.Tema {
                 if (char.GetUnicodeCategory(c) == System.Globalization.UnicodeCategory.NonSpacingMark) continue;
                 sb.Append(char.IsLetterOrDigit(c) ? c : '-');
             }
-            return "personajes/" + sb.ToString().Trim('-');
+            var id = sb.ToString().Trim('-');
+            string archivo;
+            return "personajes/" + (AliasDeRetrato.TryGetValue(id, out archivo) ? archivo : id);
         }
     }
 }

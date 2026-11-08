@@ -4,6 +4,7 @@ using System.Linq;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Sesion;
 using Nexus.Core.Tablero;
+using Nexus.Core.Tarjetas;
 using Nexus.Unity.Guia;
 using Nexus.Unity.Tema;
 using TMPro;
@@ -25,7 +26,7 @@ namespace Nexus.Unity.Pantallas {
     public sealed partial class PantallaDelDia {
         private RectTransform _tableroDelDia;
         private string _claveDelTablero;
-        private int _pestanaDeCeremonias, _pestanaDelTablero;
+        private int _pestanaDeCeremonias;
         private string _ultimoResultado;   // lo que acaba de pasar al actuar, para decirlo arriba del panel
 
         private PoliticaDeTablero Politica { get { return S.Politica; } }
@@ -118,208 +119,17 @@ namespace Nexus.Unity.Pantallas {
 
         // ==================================================================== el tablero, entero
 
+        /// <summary>
+        /// El tablero entero es ahora el muro del backlog (Dia/PantallaDelDia.Muro.cs, 2026-11-06): una pizarra a pantalla
+        /// completa donde las fichas se arrastran. 'pestana' queda por compatibilidad con quien lo llamaba.
+        /// </summary>
         private void AbrirTablero(int pestana) {
-            _pestanaDelTablero = pestana;
-            _ultimoResultado = null;
-            _tarjetaReasignando = null;
-            AbrirPanel(S.Metodologia.Nombre + " · " + (S.BriefDeHoy != null ? S.BriefDeHoy.EtiquetaUnidad : ""), Solo("El tablero del equipo", "Tu tablero"), 1560,
-                       PintarPanelDelTablero, ClaveDelPanelDelTablero);
-        }
-
-        private string ClaveDelPanelDelTablero() {
-            var t = S.Tablero;
-            if (t == null) return "";
-            return S.MinutoDelDia + "|" + S.R.LimiteWip + "|" + (S.PrPendiente != null) + "|" + _ultimoResultado + "|" + _tarjetaReasignando + "|" +
-                   string.Join(",", t.Tarjetas.Select(c => c.Id + c.Columna + c.Asignado + c.Orden + c.Sprint)) + "|" + AlertasSonando().Count;
-        }
-
-        private void PintarPanelDelTablero(Hoja h) {
-            var t = S.Tablero;
-            if (t == null) { h.Nota("El tablero aparece al empezar el desarrollo."); return; }
-            AvisoDeAlertaEnPanel(h);
-            DecirLoUltimo(h);
-            var titulos = new List<string> { "Tablero", "El equipo" };
-            var conBacklog = Politica != null && Politica.Tiene(VistasDeMonitoreo.Backlog);
-            if (conBacklog) titulos.Add("Product backlog");
-            var pestanas = Ui.Pestanas(h.Raiz, titulos, (i, hoja) => {
-                if (i == 0) PintarColumnasDelTablero(hoja);
-                else if (i == 1) PintarEquipoDelTablero(hoja);
-                else PintarBacklog(hoja);
-            }, Mathf.Clamp(_pestanaDelTablero, 0, titulos.Count - 1));
-            pestanas.AlCambiar = i => _pestanaDelTablero = i;
-        }
-
-        private void PintarColumnasDelTablero(RectTransform hoja) {
-            var t = S.Tablero;
-            var p = Politica;
-            PantallaDeGlosario.Palabras(App, hoja, "Palabras del tablero:", "columnas-del-tablero", "historia-de-usuario", "punto-de-historia", "dependencia");
-            if (p != null && !string.IsNullOrEmpty(p.LoQueNoHay)) Ui.Texto(hoja, p.LoQueNoHay, EstiloTexto.Pequeno, Tema.inkMuted);
-
-            // Lo propio de cada metodologia, arriba del tablero.
-            if (p != null && p.LimiteDeWip) {
-                var wip = Ui.Fila(hoja, "WIP", Tema.Espacio(3));
-                var factor = MotorDelTablero.FactorDelWip(t);
-                Ui.Texto(wip, $"Límite de trabajo en curso: {S.R.LimiteWip}", EstiloTexto.Cuerpo, Tema.ink).fontStyle = FontStyles.Bold;
-                var menos = Ui.Boton(wip, "− 1", () => Actuar(() => S.AjustarLimiteWip(-1), "Bajaste el límite de trabajo en curso."));
-                menos.interactable = S.PorQueNoSePuedeAjustarElWip(-1) == null;
-                var mas = Ui.Boton(wip, "+ 1", () => Actuar(() => S.AjustarLimiteWip(1), "Subiste el límite de trabajo en curso."));
-                mas.interactable = S.PorQueNoSePuedeAjustarElWip(1) == null;
-                Ui.Texto(wip, factor > 1.001 ? Solo("El equipo está más enfocado: rinde un poco más.", "Vas más enfocado: rindes un poco más.")
-                            : factor < 0.999 ? $"Demasiadas cosas a la vez (o gente parada): el equipo rinde un {(1 - factor) * 100:0} % menos."
-                            : $"Moverlo cuesta {GameSession.MinutosDeAjustarWip} min. Menos cosas a medias suele ser más cosas terminadas.",
-                         EstiloTexto.Pequeno, factor < 0.999 ? Tema.warning : factor > 1.001 ? Tema.success : Tema.inkMuted);
-            }
-            var etapa = S.EtapaDeHoy();
-            if (etapa != null) {
-                var etapas = Ui.Fila(hoja, "Etapas", Tema.Espacio(2));
-                var pasada = true;
-                foreach (var e in S.Metodologia.Calendario.Etapas) {
-                    var hoy = e.Id == etapa.Id;
-                    if (hoy) pasada = false;
-                    Ui.Badge(etapas, (pasada ? "√ " : "") + e.Nombre + (hoy ? " · hoy" : ""), hoy ? Tono.Cyan : pasada ? Tono.Exito : Tono.Neutro, hoy);
-                }
-            }
-            if (p != null && p.SprintCerrado && t.SprintActual >= 0)
-                Ui.Texto(hoja, $"Sprint {t.SprintActual + 1}: comprometidos {S.R.CompromisoActual:0.#} puntos · quedan {S.RestanteDelSprint():0.#}" +
-                               (S.R.SobreCompromiso > 0.05 ? $" · <color={NexusTheme.Html(Tema.warning)}>sobrecompromiso de {S.R.SobreCompromiso:0.#}: genera deuda cada día</color>" : ""),
-                         EstiloTexto.Cuerpo, Tema.ink);
-            if (S.PrPendiente != null) {
-                var n = Ui.Notificacion(hoja, $"Un cambio espera revisión: «{S.PrPendiente.Titulo}» ({GameSession.MinutosDeRevisarPr} min).", Tono.Aviso);
-                Ui.Boton(n, "Revisar", AbrirRevision);
-            }
-
-            var columnas = Ui.Fila(hoja, "Columnas", Tema.espacio, alineacion: TextAnchor.UpperLeft);
-            foreach (var id in new[] { ColumnasDeBase.PorHacer, ColumnasDeBase.Haciendo, ColumnasDeBase.Hecho }) {
-                var tarjetas = TarjetasDeLaColumna(id);
-                var titulo = NombreDeColumna(id) + " · " + tarjetas.Count +
-                             (id == ColumnasDeBase.Haciendo && p != null && p.LimiteDeWip ? " de " + S.R.LimiteWip : "");
-                var columna = Ui.Tarjeta(columnas, titulo, id == ColumnasDeBase.Hecho ? Tono.Exito : Tono.Neutro);
-                UiKit.Tamano(columna, ancho: 300, flexAncho: id == ColumnasDeBase.Haciendo ? 1.6f : 1);
-                if (tarjetas.Count == 0) Ui.Texto(columna, "Nada aquí.", EstiloTexto.Pequeno, Tema.inkMuted);
-                // Lo hecho se resume: lo que importa de esa columna es que crece.
-                foreach (var c in id == ColumnasDeBase.Hecho ? tarjetas.OrderByDescending(x => x.DiaFin).Take(6) : tarjetas.Take(8))
-                    PintarTarjeta(columna, c);
-                var resto = tarjetas.Count - (id == ColumnasDeBase.Hecho ? 6 : 8);
-                if (resto > 0) Ui.Texto(columna, $"… y {resto} más.", EstiloTexto.Pequeno, Tema.inkMuted);
-            }
-        }
-
-        /// <summary>Las tarjetas de una columna. Con sprint, «por hacer» es solo lo comprometido: el resto esta en el product backlog.</summary>
-        private List<TarjetaDeTrabajo> TarjetasDeLaColumna(string columna) {
-            var t = S.Tablero;
-            var lista = t.Tarjetas.Where(c => !c.EsBug && (c.Columna == columna || (columna == ColumnasDeBase.Haciendo && c.Columna == ColumnasDeBase.Revision)));
-            if (columna == ColumnasDeBase.PorHacer && Politica != null && Politica.SprintCerrado && t.SprintActual >= 0)
-                lista = lista.Where(c => c.Sprint == t.SprintActual);
-            return lista.OrderBy(c => c.Orden).ToList();
-        }
-
-        private void PintarTarjeta(Transform columna, TarjetaDeTrabajo c) {
-            var t = S.Tablero;
-            var ficha = Ui.PanelColumna(columna, "Tarjeta " + c.Id, Tema.Espacio(3), Tema.Espacio(1), Tema.surfaceRaised);
-            Ui.Texto(ficha, c.Titulo, EstiloTexto.Cuerpo, Tema.ink).fontStyle = FontStyles.Bold;
-            Ui.Texto(ficha, $"{c.Puntos:0.#} pts · {NombreDeTipo(c.Tipo)}" + (c.Terminada && c.DiaFin >= 0 ? $" · terminada el día {c.DiaFin}" : ""),
-                     EstiloTexto.Leyenda, Tema.inkFaint);
-            if (c.Terminada) return;
-
-            if (!c.Empezada) {
-                var orden = Ui.Fila(ficha, "Orden", Tema.Espacio(2));
-                var sube = Ui.Boton(orden, "▲ Antes", () => Actuar(() => S.PriorizarTarjeta(c.Id, true), $"«{c.Titulo}» sube en el orden."), VarianteBoton.Fantasma);
-                sube.interactable = S.PorQueNoSePuedePriorizar(c.Id, true) == null;
-                var baja = Ui.Boton(orden, "▼ Después", () => Actuar(() => S.PriorizarTarjeta(c.Id, false), $"«{c.Titulo}» baja en el orden."), VarianteBoton.Fantasma);
-                baja.interactable = S.PorQueNoSePuedePriorizar(c.Id, false) == null;
-                return;
-            }
-
-            Ui.Barra(ficha, (float)(c.Trabajo / Math.Max(0.01, c.Puntos)), c.AsignacionManual ? Tema.success : Tema.cyan);
-            var lleva = t.Miembro(c.Asignado);
-            Ui.Texto(ficha, lleva == null ? "Nadie la lleva." : $"La lleva {lleva.Nombre}" + (c.AsignacionManual ? " (se la diste tú): " + ComoSeLeDa(lleva, c.Tipo) : " (reparto automático)"),
-                     EstiloTexto.Pequeno, Tema.ink);
-            if (t.Miembros.Count < 2) return;   // trabajando solo no hay a quien pasarsela
-
-            // Un solo boton y, al pulsarlo, la lista de personas en vertical: en una fila, con cuatro o mas, los nombres
-            // se aplastaban en la columna y no se entendia a quien se le daba.
-            var abierta = _tarjetaReasignando == c.Id;
-            Ui.Boton(ficha, abierta ? "Cancelar" : "Cambiar quién la lleva…", () => {
-                _tarjetaReasignando = abierta ? null : c.Id;
-                RepintarElPanel();
-            }, VarianteBoton.Fantasma);
-            if (!abierta) return;
-            Ui.Texto(ficha, $"¿A quién se la das? Cuesta {GameSession.MinutosDeAsignar} min.", EstiloTexto.Leyenda, Tema.cyan);
-            foreach (var m in t.Miembros) {
-                var miembro = m;
-                var lleva2 = t.Tarjetas.Count(x => x.Asignado == miembro.Id && x.Empezada && !x.Terminada);
-                var detalle = $"{Capitalizar(ComoSeLeDa(miembro, c.Tipo))} · lleva {lleva2} tarjeta{(lleva2 == 1 ? "" : "s")}" +
-                              (c.Asignado == miembro.Id ? " · la lleva ahora" : "");
-                var boton = Ui.BotonDeOpcion(ficha, miembro.Nombre, detalle, () => {
-                    _tarjetaReasignando = null;
-                    Actuar(() => S.AsignarTarjeta(c.Id, miembro.Id), $"«{c.Titulo}» pasa a {miembro.Nombre}: {ComoSeLeDa(miembro, c.Tipo)}.");
-                });
-                boton.interactable = S.PorQueNoSePuedeAsignar(c.Id, miembro.Id) == null;
-                Ui.Resaltar(boton, c.Asignado == miembro.Id);
-            }
-        }
-
-        private string _tarjetaReasignando;
-
-        private static string Capitalizar(string s) {
-            return string.IsNullOrEmpty(s) ? s : char.ToUpperInvariant(s[0]) + s.Substring(1);
-        }
-
-        /// <summary>Lo que cambia solo en la pantalla (abrir una lista) no cambia la clave del motor: se repinta a mano.</summary>
-        private void RepintarElPanel() {
-            if (_panel != null) _panel.Repintar();
+            AbrirMuro();
         }
 
         private static string ComoSeLeDa(MiembroDelEquipo m, string tipo) {
             var h = m.HabilidadPara(tipo);
             return h >= 1.2 ? "es su fuerte" : h <= 0.85 ? "le cuesta" : "se le da normal";
-        }
-
-        /// <summary>Quien es quien: a que se le da bien cada uno. Es con lo que se decide a quien darle cada tarjeta.</summary>
-        private void PintarEquipoDelTablero(RectTransform hoja) {
-            var t = S.Tablero;
-            Ui.Texto(hoja, $"Darle una tarjeta a quien se le da bien ese tipo de trabajo la hace rendir más; a quien le cuesta, menos. Asignar cuesta {GameSession.MinutosDeAsignar} min. " +
-                           Solo("Si no tocas nada, el equipo se reparte solo, por turnos y sin mirar a quién se le da mejor.", "Todo lo que hay en curso lo llevas tú: tu soltura con cada tipo de trabajo cuenta en todas las tarjetas."), EstiloTexto.Pequeno, Tema.ink);
-            PantallaDeGlosario.Palabras(App, hoja, "Los roles:", "desarrollador", "rol-interfaz", "rol-datos", "rol-servidor", "tester");
-            // De tres en tres: en una sola fila, con cuatro o mas personas, las fichas se salian por la derecha.
-            RectTransform fila = null;
-            for (var i = 0; i < t.Miembros.Count; i++) {
-                var m = t.Miembros[i];
-                if (i % 3 == 0) fila = Ui.Fila(hoja, "Equipo", Tema.espacio, alineacion: TextAnchor.UpperLeft);
-                var ficha = Ui.Tarjeta(fila, m.Nombre);
-                UiKit.Tamano(ficha, ancho: 260, flexAncho: 1);
-                if (!string.IsNullOrEmpty(m.Rol)) Ui.Texto(ficha, m.Rol, EstiloTexto.Pequeno, Tema.inkMuted);
-                foreach (var tipo in new[] { "interfaz", "datos", "logica", "pruebas" }) {
-                    var h = m.HabilidadPara(tipo);
-                    var linea = Ui.Fila(ficha, "Habilidad", Tema.Espacio(2));
-                    UiKit.Tamano(Ui.Texto(linea, NombreDeTipo(tipo), EstiloTexto.Pequeno, Tema.ink), ancho: 90);
-                    Ui.Barra(linea, Mathf.InverseLerp(0.5f, 1.5f, (float)h), h >= 1.2 ? Tema.success : h <= 0.85 ? Tema.warning : Tema.cyan);
-                }
-                var lleva = t.Tarjetas.Where(c => c.Asignado == m.Id && c.Empezada && !c.Terminada).Select(c => c.Titulo).ToList();
-                Ui.Texto(ficha, lleva.Count == 0 ? "Ahora no lleva ninguna tarjeta." : "Lleva: " + string.Join(" · ", lleva), EstiloTexto.Pequeno, Tema.ink);
-            }
-        }
-
-        /// <summary>Scrum: lo que no esta en el sprint. Su orden decide que entra en el siguiente; meterlo en este cuesta.</summary>
-        private void PintarBacklog(RectTransform hoja) {
-            var t = S.Tablero;
-            PantallaDeGlosario.Palabras(App, hoja, "Si alguna palabra no te suena:", "backlog", "sprint", "planificacion-de-sprint");
-            Ui.Texto(hoja, "Lo que está arriba entra primero en el próximo sprint: ordénalo ANTES de planificar. Meter algo en el sprint que ya está en marcha se puede, " +
-                           "pero el equipo se había comprometido con otra cosa: cuesta moral y genera sobrecompromiso.", EstiloTexto.Pequeno, Tema.ink);
-            var fuera = t.Tarjetas.Where(c => !c.EsBug && !c.Terminada && (t.SprintActual < 0 || c.Sprint != t.SprintActual)).OrderBy(c => c.Orden).ToList();
-            if (fuera.Count == 0) { Ui.Texto(hoja, "No queda nada fuera del sprint.", EstiloTexto.Cuerpo); return; }
-            for (var i = 0; i < fuera.Count; i++) {
-                var c = fuera[i];
-                var fila = Ui.PanelColumna(hoja, "Historia", Tema.Espacio(3), Tema.Espacio(1), Tema.surfaceRaised);
-                var linea = Ui.Fila(fila, "Linea", Tema.Espacio(3));
-                UiKit.Tamano(Ui.Texto(linea, $"{i + 1}. {c.Titulo}  ·  {c.Puntos:0.#} pts · {NombreDeTipo(c.Tipo)}", EstiloTexto.Cuerpo, Tema.ink), flexAncho: 1);
-                var sube = Ui.Boton(linea, "▲", () => Actuar(() => S.PriorizarTarjeta(c.Id, true), $"«{c.Titulo}» sube en el backlog."), VarianteBoton.Fantasma);
-                sube.interactable = S.PorQueNoSePuedePriorizar(c.Id, true) == null;
-                var baja = Ui.Boton(linea, "▼", () => Actuar(() => S.PriorizarTarjeta(c.Id, false), $"«{c.Titulo}» baja en el backlog."), VarianteBoton.Fantasma);
-                baja.interactable = S.PorQueNoSePuedePriorizar(c.Id, false) == null;
-                var meter = Ui.Boton(linea, "Meter en este sprint", () => Actuar(() => S.MeterAlSprint(c.Id), $"Metiste «{c.Titulo}» a mitad de sprint: moral −2 y sobrecompromiso."));
-                meter.interactable = S.PorQueNoSePuedeMeterAlSprint(c.Id) == null;
-            }
         }
 
         // ==================================================================== revisar un cambio de codigo
@@ -370,51 +180,35 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
+        /// <summary>
+        /// Revisar un cambio de codigo (2026-11-07): como en un IDE, con el diff animado y las dos decisiones como cartas
+        /// (Revision/PantallaDeRevisionDeCodigo.cs). La escena para el reloj; decidir cobra sus minutos como siempre.
+        /// </summary>
         private void AbrirRevision() {
             var pr = S.PrPendiente;
             if (pr == null) return;
             CerrarPanel();
-            ResultadoDeRevision resultado = null;
             _escenaApilada = true;
             Runner.EnEscena = true;
-            App.Router.Apilar<PantallaDeFicha>(p => {
-                p.Titulo = "Revisión de código · " + pr.Titulo;
-                p.AnchoDeLaFicha = 1100;
+            App.Router.Apilar<PantallaDeRevisionDeCodigo>(p => {
+                p.Pr = pr;
+                p.TrabajasSolo = S.TrabajasSolo;
+                p.Decidir = Revisar;
                 p.AlCerrar = () => _escenaApilada = false;
-                p.Pintar = h => PintarRevision(h, pr, () => resultado, r => { resultado = r; App.Router.Repintar(); });
             });
         }
 
-        private void PintarRevision(Hoja h, MicroPr pr, Func<ResultadoDeRevision> leer, Action<ResultadoDeRevision> alDecidir) {
-            PantallaDeGlosario.Palabras(App, h.Raiz, "¿Primera vez?", "revision-de-codigo");
-            if (!string.IsNullOrEmpty(pr.Descripcion)) h.Parrafo(Solo("Lo que dice quien lo escribió: «", "Lo que pensabas al escribirlo: «") + pr.Descripcion + "»");
-            var codigo = Ui.PanelColumna(h.Raiz, "Diff", Tema.Espacio(4), 2, Tema.bg950);
-            foreach (var linea in pr.Lineas) {
-                var texto = Ui.Texto(codigo, (linea.Tipo == "add" ? "+ " : linea.Tipo == "del" ? "− " : "  ") + linea.Texto, EstiloTexto.Mono);
-                texto.color = linea.Tipo == "add" ? Tema.success : linea.Tipo == "del" ? Tema.danger : Tema.inkMuted;
-            }
-            var r = leer();
-            if (r == null) {
-                h.Nota($"En verde, lo que añade; en rojo, lo que quita. Revisarlo cuesta {GameSession.MinutosDeRevisarPr} min. " + Solo("Si lo cierras sin decidir, el equipo se lo revisa entre ellos.", "Si lo cierras sin decidir, nadie más lo revisa: si tiene un fallo, entra tal cual."));
-                var botones = h.Fila();
-                Ui.Boton(botones, "Aprobar: está bien", () => Revisar(VeredictosDePr.Aprobar, alDecidir), VarianteBoton.Primario);
-                Ui.Boton(botones, "Pedir cambios: algo falla", () => Revisar(VeredictosDePr.PedirCambios, alDecidir));
-                return;
-            }
-            var t = h.Tarjeta(r.Titulo, r.Acierto ? Tono.Exito : Tono.Aviso);
-            Ui.Texto(t, r.Explicacion, EstiloTexto.Cuerpo, Tema.ink);
-            if (r.Cambios.Count > 0) Ui.Texto(t, "Lo que cambió: " + Textos.Previsualizar(r.Cambios), EstiloTexto.Pequeno, Tema.warning);
-        }
-
-        private void Revisar(string veredicto, Action<ResultadoDeRevision> alDecidir) {
+        /// <summary>Hace la revision en el motor y la anota. Devuelve lo que salio, o null si no se pudo.</summary>
+        private ResultadoDeRevision Revisar(string veredicto) {
             try {
                 ResultadoDeAvance avance;
                 var r = S.RevisarPr(veredicto, out avance);
                 Runner.Notificar(avance);
                 Anotar($"{S.HoraActual} · Revisión de código: {r.Titulo.ToLowerInvariant()}.");
-                alDecidir(r);
+                return r;
             } catch (InvalidOperationException e) {
                 Anotar("No se pudo revisar: " + e.Message);
+                return null;
             }
         }
 
@@ -578,98 +372,6 @@ namespace Nexus.Unity.Pantallas {
             probar.interactable = motivo == null;
             if (motivo != null) Ui.Texto(t, motivo, EstiloTexto.Pequeno, Tema.warning);
             if (S.R.VecesQueSeProbo > 0) Ui.Texto(hoja, $"Rondas de pruebas hechas en este proyecto: {S.R.VecesQueSeProbo}.", EstiloTexto.Pequeno);
-        }
-
-        // ==================================================================== ceremonias
-
-        private void AbrirCeremonias(int pestana) {
-            _pestanaDeCeremonias = pestana;
-            _ultimoResultado = null;
-            AbrirPanel(S.Metodologia.Nombre, "Ceremonias", 1320, PintarPanelDeCeremonias,
-                       () => S.R.CeremoniasHechasHoy.Count + "|" + S.R.ActasDeCeremonias.Count + "|" + S.R.DiaActual + "|" + _ultimoResultado + "|" + AlertasSonando().Count);
-        }
-
-        private void PintarPanelDeCeremonias(Hoja h) {
-            AvisoDeAlertaEnPanel(h);
-            if (Politica != null && !string.IsNullOrEmpty(Politica.LoQueNoHay)) h.Nota(Politica.LoQueNoHay);
-            var pestanas = Ui.Pestanas(h.Raiz, new[] { "Hoy", "Agenda del proyecto", "Actas" }, (i, hoja) => {
-                if (i == 0) PintarCeremoniasDeHoy(hoja);
-                else if (i == 1) PintarAgenda(hoja);
-                else PintarActas(hoja);
-            }, _pestanaDeCeremonias);
-            pestanas.AlCambiar = i => _pestanaDeCeremonias = i;
-        }
-
-        private void PintarCeremoniasDeHoy(RectTransform hoja) {
-            if (S.R.DiaActual == 0) { Ui.Texto(hoja, "Las ceremonias empiezan con el día 1.", EstiloTexto.Cuerpo); return; }
-            var plan = S.PlanDeHoy;
-            var hoy = S.CeremoniasDeHoy();
-            // Las que se resuelven al empezar el dia (planificar, la retrospectiva) no se juegan aqui, pero son de hoy.
-            if (plan != null)
-                foreach (var c in plan.Ceremonias.Where(x => x.Opciones == null || x.Opciones.Count == 0)) {
-                    var t = Ui.Tarjeta(hoja, c.Nombre ?? c.Id);
-                    if (!string.IsNullOrEmpty(c.ParaQueSirve)) Ui.Texto(t, c.ParaQueSirve, EstiloTexto.Cuerpo, Tema.ink);
-                    Ui.Texto(t, c.AjustaCoeficiente || string.Equals(c.Verbo, "V5", StringComparison.OrdinalIgnoreCase)
-                                    ? "Se hace al empezar el día, en «La jornada»." : "Hoy toca; pasa sola, sin nada que decidir.", EstiloTexto.Pequeno);
-                }
-            if (hoy.Count == 0 && (plan == null || plan.Ceremonias.Count == 0)) {
-                Ui.Texto(hoja, "Hoy no hay ninguna ceremonia.", EstiloTexto.Cuerpo);
-                return;
-            }
-            foreach (var ceremonia in hoy) {
-                var c = ceremonia;
-                var t = Ui.Tarjeta(hoja, c.Nombre + (c.Hecha ? " · hecha" : $" · {c.DuracionMinutos} min"), c.Hecha ? Tono.Exito : Tono.Cyan);
-                if (!string.IsNullOrEmpty(c.ParaQueSirve)) Ui.Texto(t, c.ParaQueSirve, EstiloTexto.Cuerpo, Tema.ink);
-                if (c.Hecha) {
-                    var acta = S.R.ActasDeCeremonias.LastOrDefault(a => a.Dia == S.R.DiaActual && a.CeremoniaId == c.Id);
-                    if (acta != null) {
-                        Ui.Texto(t, "La llevaste así: " + acta.Opcion, EstiloTexto.Pequeno, Tema.cyan);
-                        Ui.Texto(t, acta.Texto, EstiloTexto.Cuerpo, Tema.ink);
-                    }
-                    continue;
-                }
-                if (!string.IsNullOrEmpty(c.Texto)) Ui.Texto(t, c.Texto, EstiloTexto.Pequeno).fontStyle = FontStyles.Italic;
-                if (!string.IsNullOrEmpty(c.Muestra) && c.Muestra != VistasDeMonitoreo.Tablero) {
-                    var delante = Ui.PanelColumna(t, "Delante", Tema.Espacio(3), Tema.Espacio(2), Tema.surfaceSunken);
-                    Ui.Texto(delante, "LO QUE HAY SOBRE LA MESA", EstiloTexto.Leyenda, Tema.inkFaint);
-                    PintarVistaDeMonitoreo(c.Muestra, delante);
-                }
-                var motivo = S.PorQueNoSePuedeAsistir(c.Id);
-                Ui.Texto(t, motivo ?? Solo("¿Cómo la llevas? Si no asistes, el equipo la hace sin ti: no pasa nada malo, pero tampoco lo que ganarías llevándola bien.", "¿Cómo la llevas? Si la saltas, nadie la hace por ti: no pasa nada malo, pero tampoco lo que ganarías llevándola bien."),
-                         EstiloTexto.Pequeno, motivo == null ? Tema.inkMuted : Tema.warning);
-                foreach (var opcion in c.Opciones) {
-                    var o = opcion;
-                    var boton = Ui.BotonDeOpcion(t, o.Texto, null, () => Actuar(() => S.AsistirACeremonia(c.Id, o.Id), $"Asististe a «{c.Nombre}»."));
-                    boton.interactable = motivo == null;
-                }
-            }
-        }
-
-        private void PintarAgenda(RectTransform hoja) {
-            var agenda = S.AgendaDeCeremonias();
-            if (agenda.Count == 0) { Ui.Texto(hoja, "Esta metodología no tiene ceremonias.", EstiloTexto.Cuerpo); return; }
-            Ui.Texto(hoja, "Lo que marca el ritmo del proyecto con esta metodología, día a día.", EstiloTexto.Pequeno, Tema.ink);
-            // Las diarias se dicen una vez; el resto, con su dia.
-            var diarias = agenda.GroupBy(c => c.Id).Where(g => g.Count() >= S.Perfil.DiasTotales).Select(g => g.First().Nombre).ToList();
-            if (diarias.Count > 0) Ui.Notificacion(hoja, "Todos los días: " + string.Join(" · ", diarias), Tono.Cyan);
-            foreach (var dia in agenda.Where(c => !diarias.Contains(c.Nombre)).GroupBy(c => c.Dia).OrderBy(g => g.Key)) {
-                var cuando = dia.First().Cuando;
-                Ui.Notificacion(hoja, string.Join(" · ", dia.Select(c => c.Nombre)), cuando == "hoy" ? Tono.Aviso : cuando == "pasada" ? Tono.Neutro : Tono.Cyan,
-                                cuando == "hoy" ? $"día {dia.Key} · hoy" : "día " + dia.Key);
-            }
-        }
-
-        private void PintarActas(RectTransform hoja) {
-            var actas = S.R.ActasDeCeremonias;
-            if (actas.Count == 0) { Ui.Texto(hoja, "Todavía no hay actas: se escriben al asistir a una ceremonia o al cerrar el día.", EstiloTexto.Cuerpo); return; }
-            var asistidas = actas.Count(a => a.Asistio);
-            Ui.Texto(hoja, $"Has asistido a {asistidas} de {actas.Count} ceremonias.", EstiloTexto.Cuerpo, Tema.ink);
-            foreach (var a in actas.AsEnumerable().Reverse().Where(x => x.Asistio).Take(20)) {
-                var t = Ui.PanelColumna(hoja, "Acta", Tema.Espacio(3), Tema.Espacio(1), Tema.surfaceRaised);
-                Ui.Texto(t, $"Día {a.Dia} · {a.Nombre}", EstiloTexto.Leyenda, Tema.cyan);
-                Ui.Texto(t, a.Opcion, EstiloTexto.Pequeno, Tema.ink).fontStyle = FontStyles.Bold;
-                Ui.Texto(t, a.Texto, EstiloTexto.Pequeno, Tema.ink);
-            }
         }
     }
 }

@@ -19,10 +19,10 @@ namespace Nexus.Unity.Pantallas {
 
         protected override void Construir() {
             var velo = Raiz.gameObject.AddComponent<Image>();
-            velo.color = NexusTheme.Alfa(Tema.bg950, 0.72f);   // raycastTarget: bloquea los clics de la pantalla de debajo
+            velo.color = NexusTheme.Alfa(Tema.bg950, 0.78f);   // raycastTarget: bloquea los clics de la pantalla de debajo
 
-            // Un modal flota sobre el HUD: surface-raised y las esquinas del Panel.
-            var panel = Ui.Ventana(Raiz, "Dialogo");
+            // Un modal flota sobre el HUD: cristal neon con esquinas luminosas (ya no la ventana de metal, 2026-11-08).
+            var panel = Ui.Dialogo(Raiz, "Dialogo");
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0.5f, 0.5f);
             var ajuste = panel.gameObject.AddComponent<ContentSizeFitter>();
             ajuste.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -50,6 +50,56 @@ namespace Nexus.Unity.Pantallas {
         }
 
         protected abstract void Rellenar();
+    }
+
+    /// <summary>Una entrada de un menu corto: el rotulo y lo que hace. 'Activa' = false la deja gris.</summary>
+    public sealed class OpcionDeMenu {
+        public readonly string Texto;
+        public readonly Action AlPulsar;
+        public bool Activa = true;
+        public VarianteBoton Variante = VarianteBoton.Secundario;
+
+        public OpcionDeMenu(string texto, Action alPulsar, VarianteBoton variante = VarianteBoton.Secundario) {
+            Texto = texto;
+            AlPulsar = alPulsar;
+            Variante = variante;
+        }
+    }
+
+    /// <summary>
+    /// El menu de «Más» y de «?»: lo que no hace falta a cada momento sale de la cabecera y espera aqui. Asi ninguna
+    /// pantalla pasa de siete botones a la vista. Al elegir, el menu se cierra antes de hacer nada.
+    /// </summary>
+    public sealed class PantallaDeMenu : PantallaModal {
+        public string Titulo;
+        public List<OpcionDeMenu> Opciones = new List<OpcionDeMenu>();
+
+        protected override float Ancho { get { return 420; } }
+
+        /// <summary>Un boton que abre el menu. Las opciones se piden al pulsar: asi reflejan el estado de ese momento.</summary>
+        public static Button Boton(AppRoot app, Transform padre, string rotulo, string titulo, Func<List<OpcionDeMenu>> opciones,
+                                   VarianteBoton variante = VarianteBoton.Fantasma) {
+            return app.Ui.Boton(padre, rotulo, () => app.Router.Apilar<PantallaDeMenu>(m => {
+                m.Titulo = titulo;
+                m.Opciones = opciones() ?? new List<OpcionDeMenu>();
+            }), variante);
+        }
+
+        protected override void Rellenar() {
+            if (!string.IsNullOrEmpty(Titulo)) Hoja.Subtitulo(Titulo, Tema.ink);
+            var col = Ui.Columna(Hoja.Raiz, espacio: Tema.espacio);
+            foreach (var o in Opciones) {
+                if (o == null) continue;
+                var opcion = o;
+                var boton = Ui.Boton(col, opcion.Texto, () => {
+                    App.Router.Volver();
+                    opcion.AlPulsar?.Invoke();
+                }, opcion.Variante);
+                boton.interactable = opcion.Activa;
+            }
+            Hoja.Espacio();
+            Ui.Boton(Hoja.Fila(), "Cerrar", () => App.Router.Volver(), VarianteBoton.Fantasma);
+        }
     }
 
     /// <summary>«¿Seguro?» antes de lo que no se deshace: borrar un perfil o una partida.</summary>
@@ -95,64 +145,6 @@ namespace Nexus.Unity.Pantallas {
             var boton = hoja.Accion(TextoBoton, () => (AlPulsar ?? App.MostrarInicio)());
             if (!string.IsNullOrEmpty(TextoSecundario))
                 Ui.Boton(boton.transform.parent, TextoSecundario, () => AlSecundario?.Invoke(), VarianteBoton.Fantasma);
-        }
-    }
-
-    /// <summary>
-    /// La pausa, en cualquier momento de la partida (el dia, la Fase 1, un minijuego). Mientras esta abierta el
-    /// reloj no corre, y desde aqui se puede leer el diario o guardar y salir: la partida se guarda tal cual y se
-    /// retoma en el mismo sitio y con el mismo perfil (INV-7 garantiza que se recupera igual).
-    /// </summary>
-    public sealed class PantallaDePausa : PantallaModal {
-        /// <summary>Lo que la pantalla de debajo tiene que guardar antes de salir (el borrador de la Fase 1).</summary>
-        public Action AntesDeSalir;
-        /// <summary>Dentro de un minijuego: salir lo deja sin hacer (cuenta como no entregado).</summary>
-        public string Aviso;
-
-        protected override float Ancho { get { return 600; } }
-
-        public static bool Abierta { get; private set; }
-
-        protected override void Rellenar() {
-            Abierta = true;
-            if (App.Runner != null) App.Runner.Pausado = true;
-            var s = App.Sesion;
-            Hoja.Titulo("Pausa");
-            if (s != null)
-                Hoja.Nota(s.Fase1Cerrada
-                    ? $"{s.Perfil.Nombre} · día {s.R.DiaActual} · {s.HoraActual}. El reloj está parado."
-                    : $"{s.Perfil.Nombre} · planificando (Fase 1). Lo que lleves elegido se guarda.");
-            if (!string.IsNullOrEmpty(Aviso)) Hoja.Nota(Aviso, Tema.warning);
-            Hoja.Espacio();
-            var col = Ui.Columna(Hoja.Raiz, espacio: Tema.espacio);
-            Ui.Boton(col, "Seguir jugando", Seguir, VarianteBoton.Primario);
-            Ui.Boton(col, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
-            Ui.Boton(col, "Opciones", () => App.Router.Apilar<PantallaDeOpciones>());
-            Ui.Boton(col, "Guardar y volver al menú", Salir);
-            if (s != null)
-                Ui.Boton(col, "Reiniciar el nivel", () => App.Router.Apilar<PantallaDeConfirmacion>(c => {
-                    c.Titulo = "¿Reiniciar el nivel?";
-                    c.Texto = "Vuelves a la Fase 1 de este nivel y se pierde lo jugado en él desde entonces. La entrevista y las escenas de apertura no se repiten.";
-                    c.TextoSi = "Reiniciar";
-                    c.AlConfirmar = () => FlujoDelNivel.ReiniciarNivel(App);
-                }), VarianteBoton.Peligro);
-            Hoja.Nota("Al volver, elige tu perfil y pulsa «Continuar» en esta partida: sigues justo donde lo dejaste.");
-        }
-
-        private void Seguir() {
-            if (App.Runner != null) App.Runner.Pausado = false;
-            App.Router.Volver();
-        }
-
-        private void Salir() {
-            AntesDeSalir?.Invoke();
-            App.CerrarPartida();
-            App.MostrarInicio();
-        }
-
-        private void OnDestroy() {
-            Abierta = false;
-            if (App != null && App.Runner != null) App.Runner.Pausado = false;
         }
     }
 
@@ -213,10 +205,17 @@ namespace Nexus.Unity.Pantallas {
             }
             Hoja.Espacio();
             Ui.Texto(Hoja.Raiz, c.Pregunta.Texto, EstiloTexto.Encabezado, Tema.ink);
-            foreach (var o in c.Pregunta.Opciones) {
+            // Las respuestas, como mano de cartas: se elige, la carta se sella («DICHO») y el personaje contesta.
+            // En orden barajado (fijo para esta charla y este dia): la buena no esta siempre en el mismo sitio.
+            var dia = App.Sesion != null ? App.Sesion.R.DiaActual : 0;
+            var orden = System.Linq.Enumerable.OrderBy(c.Pregunta.Opciones,o => Nexus.Core.Narrativa.Barajar.Clave(c.Id + "|" + dia + "|" + o.Id));
+            // (OrderBy por el nombre completo: este archivo no importa System.Linq.)
+            var cartas = new List<OpcionDeCarta>();
+            foreach (var o in orden) {
                 var opcion = o;
-                Hoja.Opcion(opcion.Texto, null, () => Contestar(opcion.Id));
+                cartas.Add(new OpcionDeCarta { Titulo = opcion.Texto, AlElegir = () => Contestar(opcion.Id) });
             }
+            Hoja.Mano(cartas, new ManoDeCartas.Ajustes { Sello = "DICHO", AnchoMaximo = 820 });
         }
 
         private void Contestar(string opcionId) {

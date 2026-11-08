@@ -156,7 +156,8 @@ namespace Nexus.Unity.Tema {
             contenido.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             // Con el design system, un poco de aire dentro del visor: las esquinas en L y el resplandor de las piezas
             // salen unos pixeles por fuera y el recorte del scroll se los comia.
-            if (!Clasico) contenido.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(4, 4, 4, 4);
+            // 10 y no 4 (2026-11-07): el resplandor de los botones neon sale unos pixeles y el scroll lo cortaba.
+            if (!Clasico) contenido.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(10, 10, 10, 10);
 
             scroll.viewport = visor;
             scroll.content = contenido;
@@ -305,7 +306,8 @@ namespace Nexus.Unity.Tema {
                                    Color? color = null, TextAlignmentOptions alineacion = TextAlignmentOptions.TopLeft) {
             var rt = Nodo(padre, "Texto");
             var tmp = rt.gameObject.AddComponent<TextMeshProUGUI>();
-            tmp.text = texto ?? "";
+            // Sin cuadritos: los simbolos que la letra no tiene se cambian antes de pintar (Glifos).
+            tmp.text = Nexus.Core.Narrativa.Glifos.Seguro(texto ?? "");
             tmp.alignment = alineacion;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.richText = true;
@@ -345,38 +347,8 @@ namespace Nexus.Unity.Tema {
         // ================================================================ botones
 
         public Button Boton(Transform padre, string texto, Action alPulsar, VarianteBoton variante = VarianteBoton.Secundario) {
-            return Clasico ? BotonClasico(padre, texto, alPulsar, variante) : BotonNexus(padre, texto, alPulsar, variante);
-        }
-
-        private Button BotonClasico(Transform padre, string texto, Action alPulsar, VarianteBoton variante) {
-            var rt = Nodo(padre, "Boton " + texto);
-            var img = rt.gameObject.AddComponent<Image>();
-            var boton = rt.gameObject.AddComponent<Button>();
-
-            Color fondo, colorTexto;
-            switch (variante) {
-                case VarianteBoton.Primario: fondo = Tema.cian; colorTexto = Tema.textoSobreCian; break;
-                case VarianteBoton.Peligro: fondo = Tema.mostaza; colorTexto = Tema.textoSobreCian; break;
-                case VarianteBoton.Fantasma: fondo = new Color(0, 0, 0, 0); colorTexto = Tema.cianClaro; break;
-                default: fondo = Tema.pared; colorTexto = Tema.texto; break;
-            }
-
-            Vestir(img, variante == VarianteBoton.Fantasma ? null : Tema.spriteBoton, Color.white);
-            boton.targetGraphic = img;
-            boton.colors = Colores(fondo);
-
-            var etiqueta = Texto(rt, texto, EstiloTexto.Cuerpo, colorTexto, TextAlignmentOptions.Center);
-            etiqueta.fontStyle = FontStyles.Bold;
-            etiqueta.textWrappingMode = TextWrappingModes.NoWrap;
-            etiqueta.margin = new Vector4(EspacioBase * 1.5f, 0, EspacioBase * 1.5f, 0);
-            Rellenar((RectTransform)etiqueta.transform);
-
-            var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.minHeight = le.preferredHeight = AltoBotonBase;
-            le.preferredWidth = Mathf.Max(160, etiqueta.GetPreferredValues(texto).x + EspacioBase * 3);
-
-            if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
-            return boton;
+            // El mismo boton neon en los dos kits (2026-11-07): tambien en la receta y los pizarrones.
+            return BotonNexus(padre, texto, alPulsar, variante);
         }
 
         /// <summary>
@@ -385,27 +357,7 @@ namespace Nexus.Unity.Tema {
         /// del texto puede llevar una segunda linea tenue (lo que va a cambiar, por que esta bloqueado…).
         /// </summary>
         public Button BotonDeOpcion(Transform padre, string texto, string detalle, Action alPulsar) {
-            return Clasico ? BotonDeOpcionClasico(padre, texto, detalle, alPulsar) : BotonDeOpcionNexus(padre, texto, detalle, alPulsar);
-        }
-
-        private Button BotonDeOpcionClasico(Transform padre, string texto, string detalle, Action alPulsar) {
-            var rt = Nodo(padre, "Opcion");
-            var img = rt.gameObject.AddComponent<Image>();
-            Vestir(img, Tema.spriteBoton, Color.white);
-            var boton = rt.gameObject.AddComponent<Button>();
-            boton.targetGraphic = img;
-            boton.colors = Colores(Tema.pared);
-
-            var grupo = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            Configurar(grupo, 4, EspacioBase * 1.5f, TextAnchor.MiddleLeft);
-            Tamano(rt, alto: null).minHeight = AltoBotonBase;
-
-            var t = Texto(rt, texto, EstiloTexto.Cuerpo);
-            t.fontStyle = FontStyles.Bold;
-            if (!string.IsNullOrEmpty(detalle)) Texto(rt, detalle, EstiloTexto.Pequeno);
-
-            if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
-            return boton;
+            return BotonDeOpcionNexus(padre, texto, detalle, alPulsar);
         }
 
         /// <summary>Un campo de texto de una linea (el nombre de un perfil, de una partida, una semilla).</summary>
@@ -481,7 +433,8 @@ namespace Nexus.Unity.Tema {
         /// las piezas de un diagrama, la respuesta al cliente, el atributo de calidad.
         /// </summary>
         public void Resaltar(Button boton, bool elegido, Color? normal = null) {
-            if (!Clasico && ResaltarNexus(boton, elegido, normal)) return;
+            // Todo boton con VisualDeBoton (tambien los del kit clasico, que ahora son neon); los demas, a la antigua.
+            if (ResaltarNexus(boton, elegido, normal)) return;
             var fondo = elegido ? Tema.cian : normal ?? Tema.pared;
             boton.colors = Colores(fondo);
             foreach (var t in boton.GetComponentsInChildren<TMP_Text>())

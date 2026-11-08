@@ -100,6 +100,8 @@ namespace Nexus.Core.Metodologia {
     public sealed class OpcionDeCeremonia {
         public string Id;
         public string Texto;
+        /// <summary>Lo que dice el boton de la tarjeta: tres palabras como mucho. Sin ella, la tarjeta no puede mostrar la opcion.</summary>
+        public string Etiqueta;
         /// <summary>Se aplican al elegirla. Valores double o "+10%".</summary>
         public Dictionary<string, object> Efectos = new Dictionary<string, object>(StringComparer.Ordinal);
         /// <summary>Lo que suma (o resta) hoy al ritmo del equipo: 0,04 = un 4 % mas de avance ese dia.</summary>

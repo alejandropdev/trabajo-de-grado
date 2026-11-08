@@ -1013,7 +1013,7 @@ namespace Nexus.Core.Sesion {
 
                 if (ceremonia.AjustaCoeficiente)
                     PendingRetro = new RetroRequest {
-                        CeremoniaId = ceremonia.Id, Texto = TextoDe(ceremonia),
+                        CeremoniaId = ceremonia.Id, Texto = TextoDe(ceremonia), Frase = ceremonia.Frase,
                         // Solo no hay con quien programar en pareja: esas acciones no se ofrecen.
                         Acciones = (ceremonia.Acciones ?? new List<AccionRetro>()).FindAll(a => a != null && !(TrabajasSolo && a.SoloEnEquipo))
                     };
@@ -1474,6 +1474,12 @@ namespace Nexus.Core.Sesion {
             R.SerieRiesgo.Add(Math.Round(d.RiesgoLatente, 2));
             R.SerieWip.Add(R.WipActual);
             R.SerieLeadTime.Add(Math.Round(d.LeadTime, 2));
+            // Las de los KPIs de la Fase 2 (cada tarjeta del panel lleva su mini-grafica).
+            R.SerieMoral.Add(Math.Round(W.MoralEquipo, 2));
+            R.SerieCansancio.Add(Math.Round(W.Cansancio, 2));
+            R.SerieDeuda.Add(Math.Round(W.DeudaTecnica, 2));
+            R.SerieCobertura.Add(Math.Round(W.Cobertura, 2));
+            R.SerieSatisfaccion.Add(Math.Round(W.SatisfaccionCliente, 2));
         }
 
         // ==================================================================== FASE 3
@@ -1845,7 +1851,7 @@ namespace Nexus.Core.Sesion {
         private PendingDecision Presentar(EventDefinition ev) {
             var telegrafiado = ev.Telegrafiado ?? new Telegrafiado();
             var decision = new PendingDecision {
-                EventoId = ev.Id, Titulo = ev.Nombre,
+                EventoId = ev.Id, Titulo = ev.Nombre, Frase = ev.Frase,
                 Canal = telegrafiado.Canal, TextoAviso = telegrafiado.Texto,
                 Severidad = ev.Severidad, ObjetivoAprendizaje = ev.ObjetivoAprendizaje,
                 EsCambioDeAlcance = ev.EsCambioDeAlcance
@@ -1859,7 +1865,7 @@ namespace Nexus.Core.Sesion {
                     : 1.0;
 
                 var presentada = new OpcionPresentada {
-                    Id = opcion.Id, Texto = opcion.Texto,
+                    Id = opcion.Id, Texto = opcion.Texto, Etiqueta = opcion.Etiqueta,
                     NotaDeMetodologia = opcion.NotaDeMetodologia,
                     Previsualizacion = EffectApplier.Previsualizar(W, opcion.EfectosInmediatos, multiplicador)
                 };

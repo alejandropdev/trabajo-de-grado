@@ -168,8 +168,20 @@ namespace Nexus.Unity.Tema {
         /// Un panel del HUD: vidrio oscuro translucido (se adivina la oficina detras) con filo fino. El metal es para las
         /// ventanas (Ventana); un panel es lo que va dentro o junto a ellas. Con color explicito, una caja de ese color.
         /// </summary>
+        /// <summary>
+        /// Con true, los paneles y las tarjetas se crean SIN fondo ni borde (solo estructura): el contenido queda sobre la
+        /// escena. La Fase 1 lo enciende mientras se repinta (2026-11-07) y lo apaga al terminar; nada mas lo usa.
+        /// </summary>
+        public bool SinMarcos { get; set; }
+
         private RectTransform PanelNexus(Transform padre, string nombre, Color? color) {
             var rt = Nodo(padre, nombre);
+            if (SinMarcos) {
+                var vacio = rt.gameObject.AddComponent<Image>();
+                vacio.color = Color.clear;
+                vacio.raycastTarget = false;
+                return rt;
+            }
             Fondo(rt.gameObject.AddComponent<Image>(), color ?? NexusTheme.Alfa(Tema.surface, 0.88f), NexusTheme.RadioMd);
             Borde(rt, color.HasValue ? Tema.line : Tema.lineStrong, NexusTheme.RadioMd);
             return rt;
@@ -179,14 +191,18 @@ namespace Nexus.Unity.Tema {
             // Una plancha de chapa con su titulo en cyan; la de alerta, con borde y resplandor danger.
             var panel = Nodo(padre, "Tarjeta " + titulo);
             var img = panel.gameObject.AddComponent<Image>();
-            Fondo(img, NexusTheme.Alfa(Tema.surface, 0.88f), NexusTheme.RadioMd);
+            if (SinMarcos) { img.color = Color.clear; img.raycastTarget = false; }
+            else Fondo(img, NexusTheme.Alfa(Tema.surface, 0.88f), NexusTheme.RadioMd);
             var grupo = panel.gameObject.AddComponent<VerticalLayoutGroup>();
             Configurar(grupo, Tema.espacio, Tema.Espacio(5), TextAnchor.UpperLeft);
             if (!string.IsNullOrEmpty(titulo)) {
                 var t = Texto(panel, titulo, EstiloTexto.Subtitulo, alerta ? Tema.danger : acento);
                 Tamano(t, flexAncho: 1);
             }
-            if (alerta) {
+            if (SinMarcos) {
+                // sin marco: solo el aviso critico conserva su borde, que es informacion y no decoracion
+                if (alerta) Borde(panel, Tema.danger, NexusTheme.RadioMd, 2);
+            } else if (alerta) {
                 Halo(panel, Tema.danger, NexusTheme.RadioMd);
                 Borde(panel, Tema.danger, NexusTheme.RadioMd, 2);
             } else {
@@ -215,83 +231,133 @@ namespace Nexus.Unity.Tema {
 
         // ================================================================ botones
 
+        /// <summary>
+        /// El boton neon (2026-11-07): sin texturas, todo generado. El boton es la zona de clic (transparente y de tamaño
+        /// fijo); dentro, el CUERPO, que es lo que se ve y lo que se anima: fondo redondeado, linea de brillo arriba, la
+        /// franja de luz del hover (recortada), la etiqueta, el resplandor y el borde neon (ver VisualDeBoton).
+        ///
+        ///   Primario   relleno cian, texto oscuro y resplandor siempre (mas fuerte al pasar)
+        ///   Secundario cristal oscuro con borde cian; al pasar se llena de cian suave y brilla
+        ///   Menu       como Secundario, con el texto a la izquierda y un poco mas alto
+        ///   Peligro    como Secundario, en rojo
+        ///   Fantasma   solo texto; al pasar, un fondo cian suave
+        ///
+        /// En el kit clasico (receta, pizarrones) es el mismo boton: la etiqueta se pone en la letra del design system.
+        /// Sustituye a las chapas con textura (boton_mostaza, boton_oscuro).
+        /// </summary>
         private Button BotonNexus(Transform padre, string texto, Action alPulsar, VarianteBoton variante) {
             var rt = Nodo(padre, "Boton " + texto);
-            var fondo = rt.gameObject.AddComponent<Image>();
-            Fondo(fondo, Color.clear, NexusTheme.RadioMd);
+            // La zona de clic: transparente y sin dibujarse, pero recibe el raton.
+            var zona = rt.gameObject.AddComponent<Image>();
+            zona.color = new Color(0f, 0f, 0f, 0f);
+            zona.canvasRenderer.cullTransparentMesh = true;
             var boton = rt.gameObject.AddComponent<Button>();
-            boton.targetGraphic = fondo;
+            boton.targetGraphic = zona;
             boton.transition = Selectable.Transition.None;
 
             var menu = variante == VarianteBoton.Menu;
             var fantasma = variante == VarianteBoton.Fantasma;
+            var primario = variante == VarianteBoton.Primario;
+            var peligro = variante == VarianteBoton.Peligro;
             var relleno = fantasma ? Tema.Espacio(3) : Tema.Espacio(5);
-            var etiqueta = Texto(rt, texto, EstiloTexto.Etiqueta, null,
+
+            // El cuerpo: estirado y con el pivote en el centro (crece y se hunde desde el centro, sin mover la zona de clic).
+            var cuerpo = Nodo(rt, "Cuerpo");
+            Rellenar(cuerpo);
+            var fondo = cuerpo.gameObject.AddComponent<Image>();
+            Fondo(fondo, Color.clear, NexusTheme.RadioMd);
+            fondo.raycastTarget = false;
+
+            // La franja de luz del hover: primer hijo (debajo del texto), recortada con borde suave y un poco hacia dentro
+            // para no asomar por las esquinas redondeadas. Apagada: solo existe mientras pasa (VisualDeBoton).
+            var mascara = Nodo(cuerpo, "Barrido");
+            Rellenar(mascara, 3f);
+            var recorte = mascara.gameObject.AddComponent<RectMask2D>();
+            recorte.softness = new Vector2Int(10, 6);
+            var barra = Nodo(mascara, "Luz");
+            barra.sizeDelta = new Vector2(Tema.Px(22), Tema.altoBoton * 2.4f);
+            barra.localRotation = Quaternion.Euler(0f, 0f, -18f);
+            var luz = barra.gameObject.AddComponent<Image>();
+            luz.color = new Color(1f, 1f, 1f, 0f);
+            luz.raycastTarget = false;
+            mascara.gameObject.SetActive(false);
+
+            // El canto de cristal: una linea de luz arriba (mas viva en el principal).
+            var canto = Nodo(cuerpo, "Canto");
+            canto.anchorMin = new Vector2(0f, 1f);
+            canto.anchorMax = new Vector2(1f, 1f);
+            canto.pivot = new Vector2(0.5f, 1f);
+            canto.offsetMin = new Vector2(Tema.Px(8), -3f);
+            canto.offsetMax = new Vector2(-Tema.Px(8), -2f);
+            var imgCanto = canto.gameObject.AddComponent<Image>();
+            imgCanto.color = new Color(1f, 1f, 1f, primario ? 0.35f : 0.09f);
+            imgCanto.raycastTarget = false;
+            if (fantasma) canto.gameObject.SetActive(false);
+
+            var etiqueta = Texto(cuerpo, texto, EstiloTexto.Etiqueta, null,
                                  menu ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center);
+            if (Clasico) EstilizarNexus(etiqueta, EstiloTexto.Etiqueta);
             etiqueta.textWrappingMode = TextWrappingModes.NoWrap;
             etiqueta.margin = new Vector4(relleno, 0, relleno, 0);
             Rellenar((RectTransform)etiqueta.transform);
 
-            var colorHalo = variante == VarianteBoton.Peligro ? Tema.danger : Tema.cyan;
-            var halo = fantasma ? null : Halo(rt, colorHalo, NexusTheme.RadioMd, false);
-            var borde = Borde(rt, Color.clear, NexusTheme.RadioMd);
+            // El resplandor (siempre creado: tambien un fantasma brilla si se elige, como las pestañas) y el borde neon.
+            var halo = Halo(cuerpo, peligro ? Tema.danger : Tema.cyan, NexusTheme.RadioMd, false);
+            var borde = Borde(cuerpo, Color.clear, NexusTheme.RadioMd, 1.5f);
 
             var v = rt.gameObject.AddComponent<VisualDeBoton>();
-            v.Fondo = fondo; v.Borde = borde; v.Halo = halo; v.Etiqueta = etiqueta;
-            // Botones de chapa: ambar para la accion principal, pizarra para el resto. El color de cada estado es el
-            // tinte sobre la textura; elegido = borde y resplandor cyan.
-            var ambar = variante == VarianteBoton.Primario;
-            if (!fantasma && Material(fondo, ambar ? MaterialesNexus.BotonAmbar : MaterialesNexus.BotonPizarra, Tema.Px(7))) {
-                var reposo = new Color(0.9f, 0.9f, 0.9f, 1);
-                var tinta = ambar ? Tema.onWarning : variante == VarianteBoton.Peligro ? Tema.danger : Tema.ink;
-                v.Normal = Estado(reposo, variante == VarianteBoton.Peligro ? Tema.danger : Color.clear, tinta);
-                v.Encima = Estado(Color.white, variante == VarianteBoton.Peligro ? Tema.danger : Color.clear, tinta,
-                                  variante == VarianteBoton.Peligro);
-                v.ElegidoEstado = Estado(new Color(0.75f, 0.95f, 1f, 1), Tema.cyan, tinta, true);
-                etiqueta.alignment = menu ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
-                v.Aplicar();
-                var leM = rt.gameObject.AddComponent<LayoutElement>();
-                leM.minHeight = leM.preferredHeight = menu ? Tema.altoBoton + 8 : Tema.altoBoton;
-                leM.preferredWidth = Mathf.Max(160, etiqueta.GetPreferredValues(texto).x + relleno * 2);
-                if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
-                return boton;
-            }
-            var elegido = Estado(Tema.cyanSoft, Tema.cyan, Tema.ink, true);
+            v.Fondo = fondo;
+            v.Borde = borde;
+            v.Halo = halo;
+            v.Etiqueta = etiqueta;
+            v.Cuerpo = cuerpo;
+            v.Barrido = barra;
+            v.ImagenBarrido = luz;
+            var cristal = NexusTheme.Alfa(Tema.bg900, 0.72f);
             switch (variante) {
                 case VarianteBoton.Primario:
-                    v.Normal = Estado(Tema.cyan, Tema.cyan, Tema.onCyan);
-                    v.Encima = Estado(Color.Lerp(Tema.cyan, Color.white, 0.1f), Tema.cyan, Tema.onCyan, true);
-                    elegido = v.Encima;
+                    v.Normal = Estado(Tema.cyan, Color.Lerp(Tema.cyan, Color.white, 0.35f), Tema.onCyan);
+                    v.Encima = Estado(Color.Lerp(Tema.cyan, Color.white, 0.14f), Color.white, Tema.onCyan, true);
+                    v.ElegidoEstado = v.Encima;
+                    v.BrilloEnReposo = 0.3f;
+                    v.BrilloEncendido = 0.75f;
                     break;
                 case VarianteBoton.Peligro:
-                    v.Normal = Estado(Color.clear, Tema.danger, Tema.danger);
-                    v.Encima = Estado(Tema.dangerSoft, Tema.danger, Tema.danger, true);
-                    elegido = v.Encima;
+                    v.Normal = Estado(cristal, NexusTheme.Alfa(Tema.danger, 0.6f), Tema.danger);
+                    v.Encima = Estado(NexusTheme.Alfa(Tema.dangerSoft, 0.95f), Tema.danger, Color.Lerp(Tema.danger, Color.white, 0.25f), true);
+                    v.ElegidoEstado = v.Encima;
                     break;
                 case VarianteBoton.Fantasma:
                     v.Normal = Estado(Color.clear, Color.clear, Tema.inkMuted);
-                    v.Encima = Estado(Tema.surface, Color.clear, Tema.ink);
-                    elegido = Estado(Tema.cyanSoft, Color.clear, Tema.cyan);
+                    v.Encima = Estado(NexusTheme.Alfa(Tema.cyanSoft, 0.6f), NexusTheme.Alfa(Tema.cyan, 0.4f), Tema.ink);
+                    v.ElegidoEstado = Estado(NexusTheme.Alfa(Tema.cyanSoft, 0.9f), NexusTheme.Alfa(Tema.cyan, 0.75f), Tema.cyan, true);
+                    v.BrilloEncendido = 0.35f;
                     break;
-                case VarianteBoton.Menu:
-                    v.Normal = Estado(Tema.surface, Tema.line, Tema.ink);
-                    v.Encima = Estado(Tema.surface, Tema.cyan, Tema.cyan, true);
-                    elegido = v.Encima;
-                    break;
-                default:
-                    v.Normal = Estado(Tema.surfaceRaised, Tema.line, Tema.ink);
-                    v.Encima = Estado(Color.Lerp(Tema.surfaceRaised, Color.white, 0.04f), Tema.lineStrong, Tema.ink);
+                default:   // Secundario y Menu
+                    v.Normal = Estado(cristal, NexusTheme.Alfa(Tema.cyan, 0.5f), Tema.ink);
+                    v.Encima = Estado(NexusTheme.Alfa(Tema.cyanSoft, 0.92f), Tema.cyan, Color.white, true);
+                    v.ElegidoEstado = Estado(Tema.cyanSoft, Tema.cyan, Tema.ink, true);
                     break;
             }
-            v.ElegidoEstado = elegido;
+            v.Animado = true;
             v.Aplicar();
 
+            var alto = Clasico ? AltoBotonBase : Tema.altoBoton;
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.minHeight = le.preferredHeight = menu ? Tema.altoBoton + 8 : fantasma ? Tema.altoBoton * 0.8f : Tema.altoBoton;
+            le.minHeight = le.preferredHeight = menu ? alto + 8 : fantasma ? alto * 0.8f : alto;
             le.preferredWidth = Mathf.Max(fantasma ? 100 : 160, etiqueta.GetPreferredValues(texto).x + relleno * 2);
 
             if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
             return boton;
+        }
+
+        /// <summary>
+        /// Un texto de una pieza del design system creado desde el kit clasico (la receta, los pizarrones): su letra y su
+        /// color de tiza no se leen sobre el cristal oscuro. Se le pone el estilo del design system y su alto minimo.
+        /// </summary>
+        private void NexusEnClasico(TMP_Text t, EstiloTexto estilo) {
+            EstilizarNexus(t, estilo);
+            if (t.GetComponent<AltoDeTexto>() == null) t.gameObject.AddComponent<AltoDeTexto>();
         }
 
         private static VisualDeBoton.Estado Estado(Color fondo, Color borde, Color texto, bool halo = false) {
@@ -313,7 +379,11 @@ namespace Nexus.Unity.Tema {
             // encogiera la opcion por debajo de su texto (las respuestas al cliente se montaban unas sobre otras).
 
             var t = Texto(rt, texto, EstiloTexto.Encabezado);
-            if (!string.IsNullOrEmpty(detalle)) Texto(rt, detalle, EstiloTexto.Pequeno);
+            if (Clasico) NexusEnClasico(t, EstiloTexto.Encabezado);
+            if (!string.IsNullOrEmpty(detalle)) {
+                var d = Texto(rt, detalle, EstiloTexto.Pequeno);
+                if (Clasico) NexusEnClasico(d, EstiloTexto.Pequeno);
+            }
 
             var v = rt.gameObject.AddComponent<VisualDeBoton>();
             v.Fondo = fondo;
@@ -417,7 +487,7 @@ namespace Nexus.Unity.Tema {
         /// <summary>Marca una pieza elegida con el tono de su significado (una etiqueta danger, un aviso…).</summary>
         public void Resaltar(Button boton, bool elegido, Tono tono) {
             var v = boton != null ? boton.GetComponent<VisualDeBoton>() : null;
-            if (Clasico || v == null) { Resaltar(boton, elegido); return; }
+            if (v == null) { Resaltar(boton, elegido); return; }
             if (v.Fondo != null && v.Fondo.sprite == MaterialesNexus.Sprite(MaterialesNexus.Etiqueta)) {
                 var papel = Tema.EtiquetaDe(tono);
                 v.Normal = Estado(papel, Color.clear, Tema.paperInk);

@@ -58,6 +58,25 @@ git config merge.unityyamlmerge.driver 'UnityYAMLMerge merge -p "$BASE" "$REMOTE
 
 Después, abrir la carpeta `game/proyecto de grado/` desde Unity Hub.
 
+## Compilar la versión de entrega
+
+En Unity: **Nexus > Build > Compilar para Windows**. Deja `builds/NexusProtocol-<versión>/NexusProtocol.exe`
+(release, 64 bits) y abre la carpeta. Antes de compilar aplica la marca del ejecutable: nombre *Nexus Protocol*,
+empresa *Nexus Protocol Team*, icono y pantalla de arranque propios (sin el logo de Unity) y pantalla completa sin
+bordes con Alt+Enter. Esos ajustes están en `Assets/Scripts/Editor/ConfiguracionDeMarca.cs`; la versión se cambia
+en *Project Settings > Player > Version*.
+
+Sin abrir el editor:
+
+```bash
+"C:\Program Files\Unity\Hub\Editor\6000.0.82f1\Editor\Unity.exe" -batchmode -quit \
+  -projectPath "game/proyecto de grado" -logFile builds/build.log \
+  -executeMethod Nexus.EditorTools.ConfiguracionDeMarca.CompilarWindowsLote
+```
+
+El icono y el logo de arranque (`Assets/Art/Branding/`) se generan desde `Assets/Art/Backgrounds/logo.png` con
+`python tools/marca/generar_marca.py` (requiere Pillow).
+
 ## Flujo de trabajo
 
 - `main` — rama de integración: toda funcionalidad se mezcla aquí por *pull request*. Las versiones

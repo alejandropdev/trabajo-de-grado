@@ -51,11 +51,20 @@ namespace Nexus.Unity.Pantallas {
             var nivel = app.Sesion.NivelId;
             var pasos = new List<Action<Action>>();
 
-            foreach (var guion in Guiones(app, nivel, MomentosDeGuion.AntesDelNivel)) {
+            // Una entrevista a medias se retoma en su pregunta: lo de antes (CIN-0.0, ENT-0) ya se vio.
+            var perfil = app.PerfilActivo;
+            var aMedias = perfil != null && !perfil.preTestHecho &&
+                          Nexus.Core.Evaluacion.EntrevistaEnCurso.HayUnaAMedias(perfil.entrevistaEnCurso);
+            var antes = Guiones(app, nivel, MomentosDeGuion.AntesDelNivel).ToList();
+            var saltando = aMedias && app.Catalogo.Admision != null && antes.Any(g => g.Id == GuionDeLaEntrevista);
+            foreach (var guion in antes) {
                 var g = guion;
-                pasos.Add(siguiente => Reproducir(app, g, NarrativeBeat.VarianteDefecto, false, siguiente));
-                if (g.Id == GuionDeLaEntrevista && app.Catalogo.Admision != null)
+                var esLaEntrevista = g.Id == GuionDeLaEntrevista;
+                if (!saltando) pasos.Add(siguiente => Reproducir(app, g, NarrativeBeat.VarianteDefecto, false, siguiente));
+                // Con el pre-test ya hecho, las quince preguntas no se repiten: ya no miden nada.
+                if (esLaEntrevista && app.Catalogo.Admision != null && (perfil == null || !perfil.preTestHecho))
                     pasos.Add(siguiente => app.Router.IrA<PantallaDeEntrevista>(p => p.AlTerminar = siguiente));
+                if (esLaEntrevista) saltando = false;
             }
             foreach (var guion in Guiones(app, nivel, MomentosDeGuion.Apertura)) {
                 var g = guion;

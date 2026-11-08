@@ -119,8 +119,11 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void Update() {
-            if (_paso != Paso.Tuberia && _paso != Paso.Modulo) return;
-            if (GuiaView.PausaActiva || PantallaDePausa.Abierta) return;
+            var corriendo = (_paso == Paso.Tuberia || _paso == Paso.Modulo) && !GuiaView.PausaActiva && !PantallaDePausa.Abierta;
+            // La musica sube en el ultimo cuarto de la cuenta atras (y baja si el reloj se para).
+            if (App.Musica != null)
+                App.Musica.Apremio(corriendo && _restante / Mathf.Max(10f, _total) <= 0.25f);
+            if (!corriendo) return;
             _restante -= Time.unscaledDeltaTime;
             var f = Mathf.Max(0, _restante) / Mathf.Max(10f, _total);
             _reloj.Mostrar(Reloj(_restante), f < 0.15f ? Tono.Peligro : f < 0.3f ? Tono.Aviso : Tono.Cyan);
@@ -141,8 +144,8 @@ namespace Nexus.Unity.Pantallas {
             var hoja = new Hoja(Ui, contenido);
 
             hoja.Parrafo(_plan.EsFinal
-                ? "Se acabaron los días de desarrollo. Antes de la evaluación, lo construido tiene que llegar al cliente: eso es desplegar."
-                : "Cerraste una etapa de trabajo. Lo que ya está listo puede llegar hoy al cliente: eso es desplegar. Mañana se sigue construyendo.");
+                ? "Se acabó el desarrollo. Lo construido tiene que llegar al cliente: eso es desplegar."
+                : "Cerraste una etapa. Lo que está listo llega hoy al cliente: eso es desplegar.");
 
             var salen = hoja.Tarjeta(_plan.Modulos.Count == 0 ? "Hoy no sale ningún módulo" : "Lo que sale hoy", Tono.Cyan);
             if (_plan.Modulos.Count == 0) Ui.Texto(salen, "Ninguno llega todavía al mínimo para entregarse. Aun así hay que dejar armado el camino a producción.", EstiloTexto.Cuerpo, Tema.ink);
@@ -162,9 +165,9 @@ namespace Nexus.Unity.Pantallas {
                 hoja.Nota("Todavía no salen (les falta trabajo): " + string.Join(", ", _plan.NoListos.Select(NombreDe)) + ".", Tema.inkMuted);
 
             var como = hoja.Tarjeta("Cómo se juega");
-            Ui.Texto(como, "1 · <b>La tubería.</b> Arrastra a cada hueco un tramo del camino entre el código y el cliente. Hay más tramos que huecos, y alguno es un atajo que sale caro. Un hueco vacío no da error: esa etapa, simplemente, no ocurre.", EstiloTexto.Cuerpo, Tema.ink);
-            Ui.Texto(como, "2 · <b>Los módulos.</b> Uno por uno: arrastra cada cable a la toma que le corresponde. Fíjate en cuáles son de producción y cuáles de pruebas. Después, enciéndelo.", EstiloTexto.Cuerpo, Tema.ink);
-            Ui.Texto(como, $"Tienes <b>{Reloj(_total)}</b> para todo. Cuando el reloj llega a cero se entrega lo que haya. Lo que salga de aquí cambia las barras del proyecto y pesa en la evaluación final.", EstiloTexto.Cuerpo, Tema.warning);
+            Ui.Texto(como, "1 · <b>La tubería.</b> Arrastra un tramo a cada hueco. Hay más tramos que huecos, y alguno es un atajo.", EstiloTexto.Cuerpo, Tema.ink);
+            Ui.Texto(como, "2 · <b>Los módulos.</b> Arrastra cada cable a su toma (producción, no pruebas) y enciéndelo.", EstiloTexto.Cuerpo, Tema.ink);
+            Ui.Texto(como, $"Tienes <b>{Reloj(_total)}</b>. Al llegar a cero se entrega lo que haya.", EstiloTexto.Cuerpo, Tema.warning);
             PantallaDeGlosario.Palabras(App, hoja.Raiz, "Si alguna palabra no te suena:", "despliegue", "pipeline", "entorno", "secretos");
 
             hoja.Accion("Empezar: armar la tubería  ►", () => { _paso = Paso.Tuberia; PintarJuego(); });
@@ -175,7 +178,7 @@ namespace Nexus.Unity.Pantallas {
 
         private void PintarJuego() {
             UiKit.Vaciar(_cuerpo);
-            _lamina = PantallaDeMinijuego.CrearLienzo(Ui, _cuerpo, null, W, H);
+            _lamina = PantallaDeMinijuego.CrearLienzo(Ui, _cuerpo, null, W, H, null, false);   // sin marco de metal: no es un minijuego
 
             var lado = Ui.Columna(_cuerpo, "Lado", Tema.espacio);
             UiKit.Tamano(lado, ancho: 440, flexAlto: 1);
@@ -270,7 +273,7 @@ namespace Nexus.Unity.Pantallas {
                          "El orden importa: lo que va a la izquierda pasa primero. No hace falta llenarlos todos, pero lo que no pongas no ocurre.\n\n" +
                          (mirado == null ? "Pulsa un tramo para ver qué hace."
                                          : $"<b>{mirado.Nombre}</b>\n{mirado.QueHace}");
-            _principal.GetComponentInChildren<TMP_Text>().text = _plan.Modulos.Count == 0 ? "Tubería lista: entregar" : "Tubería lista: a los módulos  ►";
+            _principal.GetComponentInChildren<TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro(_plan.Modulos.Count == 0 ? "Tubería lista: entregar" : "Tubería lista: a los módulos  ►");
         }
 
         private void SoltarTramo(string id, Vector2 centro, int desde) {
@@ -402,7 +405,7 @@ namespace Nexus.Unity.Pantallas {
                 var titulo = renglon.Estado == EstadosDeDespliegue.Bien ? "ENCENDIÓ" : renglon.Estado == EstadosDeDespliegue.Mal ? "ENCENDIÓ, PERO MAL" : "NO ENCENDIÓ";
                 _lamina.Texto(40, H - 150, 360, 34, titulo, 22, color, TextAlignmentOptions.MidlineLeft, null, true);
                 _info.text = $"<b>{NombreDe(id)}: {titulo.ToLowerInvariant()}.</b>\n{renglon.Texto}";
-                _principal.GetComponentInChildren<TMP_Text>().text = _modulo + 1 >= _plan.Modulos.Count ? "Terminar el despliegue  ►" : "Siguiente módulo  ►";
+                _principal.GetComponentInChildren<TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro(_modulo + 1 >= _plan.Modulos.Count ? "Terminar el despliegue  ►" : "Siguiente módulo  ►");
                 return;
             }
             var sueltos = cables.Count(c => !c.EsDependencia && !puestos.ContainsKey(c.Id));

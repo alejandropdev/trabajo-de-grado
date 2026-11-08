@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Nexus.Core.Relaciones {
     /// <summary>
-    /// Las ayudas que da un compañero cuando confia en ti. Son puntuales y concretas: no suben el andamiaje (los
-    /// niveles del tutorial ya estan en el maximo), cambian UNA cosa de UN minijuego o del dia.
+    /// Las ayudas que da un compañero cuando confia en ti. Son puntuales y concretas: cambian UNA cosa de UN minijuego
+    /// o del dia. Aparte, esa misma confianza sube el andamiaje de los retos de su especialidad (AndamiajeDelReto).
     /// </summary>
     public static class TiposDeAyuda {
         /// <summary>Repartir: cada pila dice cuantos errores hay de verdad.</summary>

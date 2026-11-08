@@ -31,6 +31,12 @@ namespace Nexus.Unity.Aplicacion {
             Construir();
         }
 
+        /// <summary>
+        /// Escape, cuando esta es la pantalla de arriba (2026-11-07). true = la pantalla lo atendio (abrio la pausa, cerro algo
+        /// suyo) y no hay que hacer nada mas; false (por defecto) = lo trata el router: volver atras si PuedeVolver.
+        /// </summary>
+        public virtual bool AlPulsarEscape() { return false; }
+
         /// <summary>Crea la interfaz. Se llama una sola vez.</summary>
         protected abstract void Construir();
 

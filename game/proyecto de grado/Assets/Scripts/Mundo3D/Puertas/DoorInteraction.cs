@@ -56,7 +56,8 @@ namespace Mundo3D.Puertas {
             if (Keyboard.current == null)
                 return;
 
-            if (!Keyboard.current.eKey.wasPressedThisFrame)
+            // F y no E: la E abre el inventario (2026-11-05).
+            if (!Keyboard.current.fKey.wasPressedThisFrame)
                 return;
 
             InteractWithDoor();
@@ -130,8 +131,8 @@ namespace Mundo3D.Puertas {
                 return;
 
             promptText.text = doorController.IsOpen
-                ? "CERRAR PUERTA"
-                : "ABRIR PUERTA";
+                ? "F · CERRAR PUERTA"
+                : "F · ABRIR PUERTA";
         }
 
         private void SetPromptVisible(bool visible) {

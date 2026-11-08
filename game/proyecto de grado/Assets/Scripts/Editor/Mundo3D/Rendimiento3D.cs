@@ -240,6 +240,10 @@ namespace Nexus.EditorTools.Mundo3D {
                 animadores++;
             }
 
+            // Las cajas de PonerCaja y los colliders viejos pueden tapar huecos por donde se ve que se pasa: se miden y
+            // se quitan aqui, para que rehacer la escena no vuelva a meter paredes invisibles.
+            Debug.Log("[Mundo3D] " + ParedesInvisibles3D.QuitarEnEscena(escena));
+
             EditorSceneManager.MarkSceneDirty(escena);
             EditorSceneManager.SaveScene(escena);
 

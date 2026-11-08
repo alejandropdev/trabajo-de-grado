@@ -27,7 +27,7 @@ namespace Nexus.Unity.Pantallas {
         private int _pestanaDeAvisos, _pestanaDeMonitoreo;
 
         private void AbrirPanel(string etiqueta, string titulo, float ancho, Action<Hoja> pintar, Func<string> clave = null) {
-            if (_panel != null) return;
+            if (_panel != null || _muro != null || _salaDeCeremonias != null || _salaDeSuministros != null) return;
             // Abrir un panel es seguir con el dia: la tarjeta «Decidido» ya se leyo. Si se quedara puesta, el reloj
             // seguiria parado al cerrar el panel y desde dentro no se podria hacer nada.
             _decidido = null;
@@ -63,6 +63,9 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>Cierra el panel abierto, si es lo que esta encima. No hace nada si no hay ninguno.</summary>
         private void CerrarPanel() {
             if (_panel != null && App.Router.Actual == _panel) App.Router.Volver();
+            if (_muro != null && App.Router.Actual == _muro) App.Router.Volver();
+            if (_salaDeCeremonias != null && App.Router.Actual == _salaDeCeremonias) App.Router.Volver();
+            if (_salaDeSuministros != null && App.Router.Actual == _salaDeSuministros) App.Router.Volver();
         }
 
         /// <summary>Arriba de un panel desde el que se actua: si ha sonado un aviso mientras tanto, que se sepa.</summary>
@@ -76,10 +79,33 @@ namespace Nexus.Unity.Pantallas {
 
         // ==================================================================== el mapa
 
+        /// <summary>Ancho del plano ilustrado dentro del panel; al lado va la ficha de la sala que se mira.</summary>
+        private const float AnchoDelPlano = 1160, AnchoDeLaFicha = 380;
+
+        private string _zonaEnfocada;
+        private RectTransform _fichaDelMapa;
+        private string _rutaDelPlano;
+        private Texture2D _texturaDelPlano;
+
         private void AbrirMapa() {
-            AbrirPanel("Dónde estás y a dónde puedes ir", "El mapa", 1320, PintarPanelDelMapa,
+            _zonaEnfocada = null;
+            var ancho = TexturaDelPlano() != null ? 1680 : 1320;
+            AbrirPanel("Dónde estás y a dónde puedes ir", "El mapa", ancho, PintarPanelDelMapa,
                 () => $"{S.ZonaActual}|{Runner.Estado}|{Runner.PuedeMoverse}|{S.ColeccionablesAqui().Count}|" +
                       $"{S.R.ConversacionesHechas.Count}|{AlertasSonando().Count}");
+        }
+
+        /// <summary>La ilustracion del mapa del nivel (Resources), o null si el nivel no tiene o no se encuentra.</summary>
+        private Texture2D TexturaDelPlano() {
+            var mapa = S.Perfil.Mapa;
+            if (mapa == null || !mapa.TienePlano) return null;
+            if (_rutaDelPlano != mapa.Imagen) {
+                _rutaDelPlano = mapa.Imagen;
+                _texturaDelPlano = Resources.Load<Texture2D>(mapa.Imagen);
+                if (_texturaDelPlano == null)
+                    Debug.LogWarning($"[Nexus] El mapa del nivel pide la imagen «{mapa.Imagen}» y no está en Resources: se ve como lista.");
+            }
+            return _texturaDelPlano;
         }
 
         private void PintarPanelDelMapa(Hoja h) {
@@ -88,8 +114,126 @@ namespace Nexus.Unity.Pantallas {
                 h.Nota("Este nivel no tiene mapa.");
                 return;
             }
+            var textura = TexturaDelPlano();
+            if (textura != null) {
+                PintarPlano(h, mapa, textura);
+                return;
+            }
+            PintarListaDelMapa(h, mapa);
+        }
+
+        // ---- el mapa dibujado (los niveles con plano ilustrado)
+
+        /// <summary>
+        /// El plano ocupa el panel: cada sala sobre su sitio del dibujo, con su nombre. Al lado, la ficha de la sala que
+        /// se mira (o de la actual): quien hay, que da, con quien hablar y las pistas de lo que podria aparecer.
+        /// </summary>
+        private void PintarPlano(Hoja h, MapaDeZonas mapa, Texture2D textura) {
             AvisoDeAlertaEnPanel(h);
-            h.Nota("Mientras miras el mapa, el reloj espera. Ir a otro lugar sí cuesta: los minutos que dice cada uno.");
+            var columnas = Ui.Fila(h.Raiz, "Mapa", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
+
+            var datos = new PlanoIlustrado.DatosDelPlano {
+                ZonaActual = S.ZonaActual,
+                PuedeMoverse = Runner.PuedeMoverse,
+                Abierta = S.ZonaAbierta,
+                Detalle = z => DetalleDeZona(mapa, z),
+                Coste = id => id == S.ZonaActual || !S.ZonaAbierta(id) ? null : $"{mapa.CosteDeVisitar(S.ZonaActual, id)} min",
+                AlViajar = IrA,
+                AlEnfocar = id => { _zonaEnfocada = id; PintarFicha(mapa); },
+                AlAtrapar = Recoger,
+                Registrar = GuiaView.Registrar,
+            };
+            foreach (var id in S.ColeccionablesAqui()) {
+                var c = id;
+                var col = App.Catalogo.Coleccionables.FirstOrDefault(x => x.Id == c);
+                var dificultad = col != null && col.Aparicion != null ? col.Aparicion.Dificultad : null;
+                datos.Destellos.Add(new KeyValuePair<string, string>(c, dificultad));
+            }
+            foreach (var col in S.ColeccionablesPorAparecerAqui())
+                datos.PorAparecer.Add(ColorDeDificultad(col.Aparicion.Dificultad));
+
+            var plano = PlanoIlustrado.Crear(Ui, columnas, textura, mapa, datos, AnchoDelPlano);
+            GuiaView.Registrar("dia.mapa", plano);
+
+            // La ficha mide lo mismo de alto que el plano y su tarjeta lo llena: el panel se lee como una sola pieza,
+            // sin un hueco vacio debajo de la ficha.
+            _fichaDelMapa = Ui.Columna(columnas, "Ficha", Tema.espacio);
+            UiKit.Tamano(_fichaDelMapa, ancho: AnchoDeLaFicha, alto: AnchoDelPlano * textura.height / Mathf.Max(1f, textura.width),
+                         flexAncho: 1);   // y se queda el ancho que sobre al lado del plano
+            GuiaView.Registrar("dia.aqui", _fichaDelMapa);
+            _zonaEnfocada = null;
+            PintarFicha(mapa);
+        }
+
+        private string DetalleDeZona(MapaDeZonas mapa, ZonaDeNivel z) {
+            if (S.ZonaActual == z.Id) return z.EsAncla ? "Estás aquí · tu escritorio" : "Estás aquí";
+            if (!S.ZonaAbierta(z.Id)) return "Cerrada por ahora";
+            var detalle = $"{mapa.CosteDeVisitar(S.ZonaActual, z.Id)} min";
+            return z.EsAncla ? detalle + " · tu escritorio" : detalle;
+        }
+
+        /// <summary>La ficha de al lado del plano: se repinta al pasar por otra sala, sin rehacer el plano.</summary>
+        private void PintarFicha(MapaDeZonas mapa) {
+            if (_fichaDelMapa == null) return;
+            UiKit.Vaciar(_fichaDelMapa);
+            var id = _zonaEnfocada ?? S.ZonaActual;
+            var zona = mapa.PorId(id);
+            if (zona == null) return;
+            var aqui = id == S.ZonaActual;
+            var abierta = S.ZonaAbierta(id);
+            var puedeMoverse = Runner.PuedeMoverse;
+
+            var t = Ui.Tarjeta(_fichaDelMapa, aqui ? "Estás aquí" : abierta ? "Para ir" : "Cerrada por ahora",
+                               aqui ? PlanoIlustrado.ColorDelJugador : abierta ? Tema.cyan : Tema.inkMuted);
+            UiKit.Tamano(t, flexAlto: 1);   // la tarjeta llena todo el alto de la ficha (= el del plano)
+            Ui.Texto(t, zona.Nombre, EstiloTexto.Subtitulo, Tema.ink);
+            if (!aqui) Ui.Texto(t, DetalleDeZona(mapa, zona), EstiloTexto.Leyenda, abierta ? Tema.cyan : Tema.inkFaint);
+            if (!string.IsNullOrEmpty(zona.Descripcion)) Ui.Texto(t, zona.Descripcion, EstiloTexto.Pequeno, Tema.ink);
+            if (zona.QuienEsta != null && zona.QuienEsta.Count > 0)
+                Ui.Texto(t, "Aquí están: " + string.Join(", ", zona.QuienEsta), EstiloTexto.Pequeno);
+            if (!string.IsNullOrEmpty(zona.QueDa)) Ui.Texto(t, zona.QueDa, EstiloTexto.Pequeno, Tema.cyan);
+
+            if (!aqui) {
+                if (!abierta) Ui.Texto(t, "Se abrirá más adelante.", EstiloTexto.Pequeno, Tema.inkMuted);
+                else if (puedeMoverse) Ui.Texto(t, "Haz clic en la sala para ir.", EstiloTexto.Pequeno, Tema.inkMuted);
+                else Ui.Texto(t, MotivoParaNoMoverse(), EstiloTexto.Pequeno, Tema.warning);
+                return;
+            }
+
+            var brillan = S.ColeccionablesAqui().Count;
+            if (brillan > 0)
+                Ui.Texto(t, (brillan == 1 ? "Algo brilla en esta sala." : $"{brillan} cosas brillan en esta sala.") +
+                            " Atrápalo con el ratón: al principio se escapa, luego se cansa.",
+                         EstiloTexto.Pequeno, PlanoIlustrado.ColorDelDestello);
+            // Lo que todavia no ha aparecido: solo su pista, con un punto del color de lo dificil que es.
+            foreach (var col in S.ColeccionablesPorAparecerAqui()) {
+                var fila = Ui.Fila(t, "Por aparecer " + col.Id, Tema.Espacio(2), alineacion: TextAnchor.UpperLeft);
+                Ui.Punto(fila, ColorDeDificultad(col.Aparicion.Dificultad), 10);
+                UiKit.Tamano(Ui.Texto(fila, "Algo podría aparecer aquí… <i>" + col.Aparicion.Pista + "</i>", EstiloTexto.Pequeno, Tema.inkMuted),
+                             flexAncho: 1);
+            }
+            foreach (var conv in S.ConversacionesAqui()) {
+                var cv = conv;
+                var p = App.Catalogo.Relaciones.PersonajePorId(cv.Personaje);
+                var detalle = (cv.Pregunta == null ? "charla corta · " : "te quiere preguntar algo · ") +
+                              $"{cv.Minutos} min · confianza {S.Confianza(cv.Personaje)}";
+                Ui.BotonDeOpcion(t, "Hablar con " + (p?.Nombre ?? cv.Personaje), detalle, () => Hablar(cv)).interactable = puedeMoverse;
+            }
+            if (!puedeMoverse && Runner.Estado != EstadoDelDia.DesarrolloTerminado)
+                Ui.Texto(t, MotivoParaNoMoverse(), EstiloTexto.Pequeno, Tema.warning);
+        }
+
+        private string MotivoParaNoMoverse() {
+            return Runner.Pausado ? "El juego está en pausa: pulsa «Seguir», arriba, para poder moverte."
+                 : Runner.EnEscena ? "Estás ocupado aquí: termina lo que tienes abierto antes de irte."
+                 : "Solo te puedes mover mientras corre la jornada.";
+        }
+
+        // ---- el mapa como lista (niveles sin plano ilustrado, o si falta la imagen)
+
+        private void PintarListaDelMapa(Hoja h, MapaDeZonas mapa) {
+            AvisoDeAlertaEnPanel(h);
+            h.Nota("Mirar es gratis; ir cuesta los minutos que marca cada sitio.");
             var puedeMoverse = Runner.PuedeMoverse;
 
             var columnas = Ui.Fila(h.Raiz, "Mapa", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
@@ -178,7 +322,7 @@ namespace Nexus.Unity.Pantallas {
             if (fichas.Count == 0) return;
             if (S.TrabajasSolo) { PintarTrabajasSolo(h, fichas[0]); return; }
             h.Subtitulo("Tu equipo de proyecto", Tema.cyan);
-            h.Nota("Son quienes construyen el sistema contigo. Lo que hagas con cada uno cuesta minutos de la jornada.", Tema.inkMuted);
+            h.Nota("Cada cosa que hagas con alguien cuesta minutos.", Tema.inkMuted);
             DecirLoUltimo(h);
             var enDesarrollo = S.Tablero != null && S.R.Fase == 2 && S.R.DiaActual > 0;
             foreach (var f in fichas) {
@@ -191,6 +335,9 @@ namespace Nexus.Unity.Pantallas {
                 var sabe = (f.Fuerte != null ? "Se le da mejor: " + NombreDeTipo(f.Fuerte) : "") +
                            (f.Fuerte != null && f.Flojo != null ? "  ·  " : "") + (f.Flojo != null ? "le cuesta: " + NombreDeTipo(f.Flojo) : "");
                 if (sabe.Length > 0) Ui.Texto(ficha, sabe, EstiloTexto.Leyenda, Tema.cyan);
+                var ayudaEn = Nexus.Core.Minijuegos.AndamiajeDelReto.EnQueAyuda(datos);
+                if (ayudaEn.Count > 0)
+                    Ui.Texto(ficha, "En los retos te echa una mano al " + string.Join(" y al ", ayudaEn) + ".", EstiloTexto.Pequeno, Tema.success);
                 if (!enDesarrollo) continue;
 
                 Ui.Texto(ficha, f.Ahora.Count == 0 ? "Ahora: sin tarjeta."
@@ -300,7 +447,7 @@ namespace Nexus.Unity.Pantallas {
             var rel = App.Catalogo.Relaciones;
             var conocidos = S.R.Confianza.Keys.ToList();
             if (conocidos.Count == 0)
-                Ui.Texto(lista, "Todavía no has hablado con nadie de fuera del equipo. Cuando haya alguien en una sala, aparecerá «Hablar con…» en el mapa, en «Aquí».",
+                Ui.Texto(lista, "Aún no has hablado con nadie. Cuando haya alguien en una sala, verás «Hablar con…».",
                          EstiloTexto.Pequeno, Tema.inkMuted);
             var enEsteNivel = new HashSet<string>(rel.Conversaciones.Where(c => c.Nivel == S.NivelId).Select(c => c.Personaje));
             foreach (var id in conocidos.OrderByDescending(x => enEsteNivel.Contains(x))) {
@@ -336,79 +483,6 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
-        // ==================================================================== los suministros
-
-        private string _suministroAbierto;
-
-        private void AbrirSuministros() {
-            _suministroAbierto = null; _ultimoResultado = null;
-            AbrirPanel("Lo que trajiste del recorrido: úsalo cuando más falta haga", "Suministros", 900, PintarPanelDeSuministros,
-                () => string.Join(",", S.R.Suministros.Select(kv => kv.Key + kv.Value)) + "|" + S.R.UsosDeSuministros.Count + "|" +
-                      Runner.PuedeMoverse + "|" + _suministroAbierto + "|" + _ultimoResultado + "|" + S.MinutoDelDia);
-        }
-
-        /// <summary>
-        /// La pizza, el cafe y la Guepardex que se trajeron del 3D: cuantos quedan, su regla y a quien darselos. Usar uno
-        /// cuesta minutos de la jornada, como hablar con alguien.
-        /// </summary>
-        private void PintarPanelDeSuministros(Hoja h) {
-            DecirLoUltimo(h);
-            var fichas = S.FichasDeSuministros();
-            if (fichas.Count == 0) {
-                h.Nota("No te queda ningún suministro. Se consiguen recorriendo el edificio en la Fase 1.", Tema.inkMuted);
-                return;
-            }
-            h.Nota("Cada uno tiene su regla. Usarlo cuesta unos minutos de la jornada.", Tema.inkMuted);
-            var equipo = S.FichasDelEquipo();
-            foreach (var f in fichas) {
-                var o = f.Objeto; var id = o.Id; var s = o.Suministro;
-                var ficha = Ui.PanelColumna(h.Raiz, "Suministro " + id, Tema.Espacio(4), Tema.Espacio(2), Tema.surfaceRaised);
-                var cabecera = Ui.Fila(ficha, "Cabecera", Tema.Espacio(2));
-                UiKit.Tamano(Ui.Texto(cabecera, o.Nombre, EstiloTexto.Subtitulo, Tema.ink), flexAncho: 1);
-                Ui.Badge(cabecera, "×" + f.Cantidad, Tono.Cyan, solido: true);
-                if (!string.IsNullOrEmpty(o.Texto)) Ui.Texto(ficha, o.Texto, EstiloTexto.Pequeno, Tema.ink);
-                Ui.Texto(ficha, ReglaDe(s), EstiloTexto.Leyenda, Tema.cyan);
-                if (f.PorQueNo != null) Ui.Texto(ficha, f.PorQueNo, EstiloTexto.Pequeno, Tema.warning);
-
-                if (!f.ParaUnaPersona) {
-                    var repartir = Ui.Boton(ficha, $"{Solo("Repartir al equipo", "Usarlo")} ({s.MinutosDeUso} min)", () => UsarSuministro(id, null, o.Nombre), VarianteBoton.Primario);
-                    repartir.interactable = f.PorQueNo == null && Runner.PuedeMoverse;
-                    continue;
-                }
-                var abierto = _suministroAbierto == id;
-                var elegir = Ui.Boton(ficha, abierto ? "Cancelar" : "Dárselo a…", () => _suministroAbierto = abierto ? null : id,
-                                      abierto ? VarianteBoton.Fantasma : VarianteBoton.Primario);
-                elegir.interactable = f.PorQueNo == null && Runner.PuedeMoverse;
-                if (!abierto) continue;
-                Ui.Texto(ficha, $"¿A quién? Cuesta {s.MinutosDeUso} min.", EstiloTexto.Pequeno, Tema.cyan);
-                foreach (var m in equipo) {
-                    var mid = m.Miembro.Id;
-                    var rebota = S.Rebotaria(id, mid);
-                    var b = Ui.BotonDeOpcion(ficha, $"{m.Miembro.Nombre} · cansancio {m.Cansancio:0}",
-                        rebota ? "Ya tomó demasiadas estos días: le hará el efecto contrario." : "Le quita cansancio a esta persona.",
-                        () => { UsarSuministro(id, mid, o.Nombre); _suministroAbierto = null; });
-                    b.interactable = S.PorQueNoSePuedeUsarSuministro(id, mid) == null;
-                }
-            }
-        }
-
-        private void UsarSuministro(string id, string miembro, string nombre) {
-            ResultadoDeSuministro r = null;
-            Actuar(() => { r = S.UsarSuministro(id, miembro); return r.Avance; }, $"Usaste: {nombre}.");
-            if (r == null) return;
-            _ultimoResultado = r.Texto + (r.Cambios.Count > 0 ? "  (" + Textos.Previsualizar(r.Cambios) + ")" : "");
-        }
-
-        /// <summary>La regla de un suministro, en una linea: para quien es, cada cuanto y si se puede abusar de el.</summary>
-        private static string ReglaDe(Nexus.Core.Fase1.SuministroDef s) {
-            var partes = new List<string> { s.Objetivo == Nexus.Core.Fase1.ObjetivosDeSuministro.Miembro ? "Para una persona" : "Para todo el equipo" };
-            if (s.EnfriamientoDias > 0) partes.Add($"una vez cada {s.EnfriamientoDias} días");
-            if (s.VecesPorDia == 1) partes.Add("una vez al día");
-            else if (s.VecesPorDia > 1) partes.Add($"{s.VecesPorDia} veces al día");
-            if (s.ReboteUsos > 0) partes.Add($"más de {s.ReboteUsos} en {s.ReboteVentanaDias} días a la misma persona y rebota");
-            return string.Join(" · ", partes).ToUpperInvariant();
-        }
-
         // ==================================================================== el escritorio
 
         private void AbrirEscritorio() {
@@ -427,8 +501,7 @@ namespace Nexus.Unity.Pantallas {
                 return;
             }
             AvisoDeAlertaEnPanel(h);
-            h.Parrafo("Mientras no suena nada, puedes adelantar trabajo. Cada tarea cuesta tiempo del día y mejora el proyecto. " +
-                      "Es práctica: no cuenta para tu evaluación, y si no te sale puedes intentarla otra vez.");
+            h.Parrafo("Práctica: cuesta tiempo, mejora el proyecto y no cuenta para tu nota.");
             var lista = Ui.Columna(h.Raiz, "Tareas", Tema.Espacio(2));
             GuiaView.Registrar("dia.oficina", lista);
             foreach (var t in S.TareasDeOficina) {
@@ -447,7 +520,7 @@ namespace Nexus.Unity.Pantallas {
         private void AbrirAvisos(int pestana) {
             _pestanaDeAvisos = pestana;
             AbrirPanel("Lo que suena, lo que hoy trae y lo que ya pasó", "Avisos", 1000, PintarPanelDeAvisos,
-                () => AlertasSonando().Count + "|" + _entradas.Count);
+                () => AlertasSonando().Count + "|" + S.R.Bitacora.Count);
         }
 
         private void PintarPanelDeAvisos(Hoja h) {
@@ -488,20 +561,20 @@ namespace Nexus.Unity.Pantallas {
             if (brief != null && brief.Avisos.Count > 0) {
                 nada = false;
                 var anuncios = h.Tarjeta("Anuncios de hoy");
-                Ui.Texto(anuncios, "Avisan de lo que llegará en los próximos días. Léelos: lo que hoy es un comentario suelto, mañana es un problema.",
+                Ui.Texto(anuncios, "Lo que hoy es un comentario suelto, mañana es un problema.",
                          EstiloTexto.Pequeno);
                 foreach (var aviso in brief.Avisos) Ui.Notificacion(anuncios, aviso, Tono.Cyan);
             }
-            if (nada) h.Nota(S.R.DiaActual == 0 ? "Aún no ha empezado el primer día." : "Hoy no hay nada que leer todavía. Cuando suene un aviso, aparecerá aquí y en «La jornada».");
+            if (nada) h.Nota(S.R.DiaActual == 0 ? "Aún no ha empezado el primer día." : "Nada que leer todavía.");
         }
 
         private void PintarBitacora(RectTransform hoja) {
-            if (_entradas.Count == 0) {
+            if (S.R.Bitacora.Count == 0) {
                 Ui.Texto(hoja, "Todavía no ha pasado nada.", EstiloTexto.Pequeno);
                 return;
             }
             Ui.Texto(hoja, "Lo más reciente, arriba.", EstiloTexto.Leyenda, Tema.inkFaint);
-            foreach (var e in _entradas)
+            foreach (var e in S.R.Bitacora)
                 Ui.Texto(hoja, e, EstiloTexto.Pequeno, e.StartsWith("—") ? Tema.cyan : Tema.ink);
         }
 
@@ -515,7 +588,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void PintarPanelDeMonitoreo(Hoja h) {
-            h.Nota("Mirar es gratis: el reloj espera mientras este panel está abierto. Las acciones (probar, inspeccionar) cuestan minutos de la jornada.");
+            h.Nota("Mirar es gratis; probar o inspeccionar cuesta minutos.");
             DecirLoUltimo(h);
             // Lo comun a todo proyecto, y despues lo que es de ESTA metodologia: su diagrama, sus documentos, sus pruebas.
             var vistas = new List<KeyValuePair<string, Action<RectTransform>>> {

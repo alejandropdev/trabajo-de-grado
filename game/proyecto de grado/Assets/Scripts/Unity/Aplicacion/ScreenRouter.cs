@@ -38,11 +38,16 @@ namespace Nexus.Unity.Aplicacion {
 
         /// <summary>Abre T encima de la actual. Si T no es modal, la de debajo se oculta hasta que se vuelva.</summary>
         public T Apilar<T>(Action<T> configurar = null) where T : Pantalla {
-            var debajo = Actual;
+            var anteriores = _pila.ToArray();
             var nueva = Crear(configurar, notificar: false);
-            if (debajo != null && !nueva.EsModal) {
-                debajo.AlOcultar();
-                debajo.gameObject.SetActive(false);
+            if (!nueva.EsModal) {
+                // Una pantalla completa tapa TODO lo de debajo, no solo la de al lado: si lo de debajo era un modal (el panel
+                // de ceremonias sobre el dia), el dia seguia viendose detras.
+                foreach (var debajo in anteriores) {
+                    if (debajo == null || !debajo.gameObject.activeSelf) continue;
+                    debajo.AlOcultar();
+                    debajo.gameObject.SetActive(false);
+                }
             }
             AlCambiar?.Invoke(nueva);
             return nueva;
@@ -57,6 +62,9 @@ namespace Nexus.Unity.Aplicacion {
 
             var ahora = Actual;
             if (!ahora.gameObject.activeSelf) ahora.gameObject.SetActive(true);
+            // Si la que queda arriba es un modal, lo que tiene debajo (el dia) tiene que volver a verse con ella.
+            for (var i = _pila.Count - 1; i > 0 && _pila[i].EsModal; i--)
+                if (!_pila[i - 1].gameObject.activeSelf) _pila[i - 1].gameObject.SetActive(true);
             ahora.AlMostrar();
             AlCambiar?.Invoke(ahora);
         }

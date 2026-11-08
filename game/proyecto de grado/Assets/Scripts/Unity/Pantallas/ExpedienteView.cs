@@ -59,7 +59,9 @@ namespace Nexus.Unity.Pantallas {
             caja.gameObject.AddComponent<Image>().color = Tizador.Pizarra;
             UiKit.Tamano(caja, alto: H * 0.6f, flexAncho: 1);
             var lamina = new Lamina(ui, caja, W, H);
-            lamina.Dibujo.Tiza = true;
+            // El diagrama del sistema es un plano, no una pizarra de clase: trazo limpio y letra de la interfaz, sin el
+            // temblor de la tiza ni la letra a mano, que hacian costoso leer los nombres pequeños.
+            lamina.Dibujo.Tiza = false;
             var rt = lamina.Raiz;
             rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0, 1);
             rt.anchoredPosition = Vector2.zero;
@@ -68,7 +70,8 @@ namespace Nexus.Unity.Pantallas {
             escala.Contenido = rt;
             escala.AnchoBase = W;
             escala.AltoBase = H;
-            diagrama.Dibujar(new Tizador(lamina, ui.FuenteTiza), 20, 20, DiagramaDeContexto.Ancho, diagrama.Alto, resaltado);
+            var letra = ui.Tema.fuenteInterfaz != null ? ui.Tema.fuenteInterfaz : ui.Tema.FuenteCuerpo;
+            diagrama.Dibujar(new Tizador(lamina, letra), 20, 20, DiagramaDeContexto.Ancho, diagrama.Alto, resaltado);
         }
 
         // ==================================================================== palabras del oficio

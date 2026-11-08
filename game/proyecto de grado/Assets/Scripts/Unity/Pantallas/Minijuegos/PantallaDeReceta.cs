@@ -84,14 +84,25 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             return w;
         }
 
-        /// <summary>Texto con la letra de tiza. (x, y) es la linea base, como en SVG; 'centrado' = text-anchor middle.</summary>
+        /// <summary>
+        /// Texto con la letra de tiza. (x, y) es la linea base, como en SVG; 'centrado' = text-anchor middle.
+        /// Una etiqueta suelta (sin 'ancho') mide lo que mide su texto de verdad, no una estimacion por letras; y si cae
+        /// encima de otra etiqueta ya escrita en la misma lamina, baja una linea (hasta tres) en vez de taparla.
+        /// </summary>
         public TMP_Text Texto(float x, float y, string t, float tam, Color? c = null, bool centrado = false, float ancho = 0) {
             var w = (ancho > 0 ? ancho : Mathf.Max(60, t.Length * tam * 0.62f + 20)) * _k;
             var alto = tam * 1.5f * _k;
             var x0 = centrado ? X(x) - w / 2 : X(x);
-            var texto = _l.Texto(x0, Y(y) - tam * 1.05f * _k, w, alto, t, tam * _k, c ?? Tiza,
+            var y0 = Y(y) - tam * 1.05f * _k;
+            var texto = _l.Texto(x0, y0, w, alto, t, tam * _k, c ?? Tiza,
                                  centrado ? TextAlignmentOptions.Top : TextAlignmentOptions.TopLeft, _fuente);
             texto.textWrappingMode = ancho > 0 ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
+            if (ancho <= 0) {
+                w = Mathf.Max(24 * _k, texto.GetPreferredValues(t ?? "").x + 8 * _k);
+                x0 = centrado ? X(x) - w / 2 : X(x);
+            }
+            var sitio = _l.Reservar(new Rect(x0, y0, w, alto), alto * 0.9f);
+            Lamina.Colocar((RectTransform)texto.transform, sitio.x, sitio.y, sitio.width, sitio.height);
             return texto;
         }
     }
@@ -225,7 +236,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     b = Ui.Boton(fila, "Usar: " + NombreCorto(ayuda), () => {
                         if (!AlUsarAyuda(ayuda)) return;
                         b.interactable = false;
-                        b.GetComponentInChildren<TMPro.TMP_Text>().text = "√ " + NombreCorto(ayuda);
+                        b.GetComponentInChildren<TMPro.TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro("√ " + NombreCorto(ayuda));
                     });
                 }
             }
@@ -259,7 +270,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             MarcoDePizarra.Limpiar(_lamina);
             var t = new Tizador(_lamina, Ui.FuenteTiza);
             if (_viendoProyecto) PintarDondeEstamos(t); else Pintar(t);
-            if (_textoPrincipal != null) _textoPrincipal.text = _viendoProyecto ? "Cómo se juega  ►" : Inicio ? "¡A jugar!" : "Volver al reto";
+            // Glifos.Seguro: el boton ya es neon, con la letra del design system, que no tiene «►».
+            if (_textoPrincipal != null)
+                _textoPrincipal.text = Nexus.Core.Narrativa.Glifos.Seguro(_viendoProyecto ? "Cómo se juega  ►" : Inicio ? "¡A jugar!" : "Volver al reto");
             if (_volverAlProyecto != null) _volverAlProyecto.SetActive(!_viendoProyecto);
         }
 

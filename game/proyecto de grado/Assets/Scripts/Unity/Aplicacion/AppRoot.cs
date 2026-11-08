@@ -55,6 +55,9 @@ namespace Nexus.Unity.Aplicacion {
         public PreferenciasStore AlmacenDePreferencias { get; private set; }
         public Preferencias Preferencias { get; private set; } = new Preferencias();
 
+        /// <summary>Tiempo por pantalla y dia de abandono, solo en esta maquina (pruebas con usuarios).</summary>
+        public TelemetriaDePantallas Telemetria { get; private set; }
+
         private AutoGuardado _autoGuardado;
 
         // --- modulos que se enchufan desde otro ensamblado ---
@@ -80,6 +83,7 @@ namespace Nexus.Unity.Aplicacion {
             Ui = new UiKit(_tema);
             UiClasico = new UiKit(Ui.Tema, clasico: true);
 
+            MigracionDeGuardado.MigrarSiHaceFalta();
             var almacen = new AlmacenDeArchivosAtomico(RutasDeGuardado.Raiz);
             Perfiles = new ProfileStore(almacen);
             Partidas = new SaveStore(almacen);
@@ -87,23 +91,54 @@ namespace Nexus.Unity.Aplicacion {
 
             CargarCatalogo();
             Router = new ScreenRouter(this, CrearLienzo());
+            // Las manos de cartas solo escuchan el teclado si son de la pantalla de arriba (no la del dia bajo un panel).
+            Nexus.Unity.Tema.ManoDeCartas.PuedeEscuchar = t => Router.Actual != null && t.IsChildOf(Router.Actual.transform);
+            Telemetria = new TelemetriaDePantallas(almacen);
+            Router.AlCambiar += pantalla => {
+                Telemetria.EntrarA(pantalla == null ? null : pantalla.GetType().Name, Time.realtimeSinceStartupAsDouble,
+                                   Sesion != null && Sesion.R != null ? Sesion.R.DiaActual : 0);
+                Telemetria.Guardar();
+            };
             CrearEventSystem();
             Runner = gameObject.AddComponent<LevelRunner>();
             Preferencias = AlmacenDePreferencias.Cargar();
+            // La musica: entera en los menus, de fondo en la partida, callada en los retos (MusicaDeFondo).
+            Musica = MusicaDeFondo.Crear(gameObject, (float)Preferencias.volumenMusica);
+            Router.AlCambiar += Musica.AlCambiarDePantalla;
+            AuditorDeBotones.Vigilar(this);   // solo en desarrollo: avisa si una pantalla pasa de siete botones
+            AlCambiarPreferencias += p => Musica.CambiarVolumen((float)p.volumenMusica);
             AplicarPreferencias();
         }
 
-        /// <summary>Guarda las opciones y las aplica ya: volumen, modo de ventana y velocidad de la simulacion.</summary>
+        public MusicaDeFondo Musica { get; private set; }
+        private double _velocidadAplicada = double.NaN;
+
+        /// <summary>Lo avisa cada cambio de opciones (la musica, el recorrido 3D): se aplican sin reiniciar nada.</summary>
+        public event Action<Preferencias> AlCambiarPreferencias;
+
+        /// <summary>Guarda las opciones y las aplica ya: volumen, musica, modo de ventana y velocidad de la simulacion.</summary>
         public void CambiarPreferencias(Preferencias nuevas) {
             Preferencias = (nuevas ?? new Preferencias()).Acotadas();
             AlmacenDePreferencias.Guardar(Preferencias);
             AplicarPreferencias();
         }
 
+        /// <summary>Las aplica sin guardarlas: lo que pasa mientras se arrastra un deslizador. Se guardan al soltarlo/cerrar.</summary>
+        public void PrevisualizarPreferencias(Preferencias nuevas) {
+            Preferencias = (nuevas ?? new Preferencias()).Acotadas();
+            AplicarPreferencias();
+        }
+
         private void AplicarPreferencias() {
             AudioListener.volume = (float)Preferencias.volumenGeneral;
-            Screen.fullScreenMode = Preferencias.pantallaCompleta ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
-            if (Runner != null) Runner.Velocidad = Preferencias.velocidadDeSimulacion;
+            if (Screen.fullScreenMode != (Preferencias.pantallaCompleta ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed))
+                Screen.fullScreenMode = Preferencias.pantallaCompleta ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
+            // La velocidad solo se toca si la de Opciones cambio: mover la musica no puede deshacer el ×4 del dia.
+            if (Runner != null && System.Math.Abs(Preferencias.velocidadDeSimulacion - _velocidadAplicada) > 0.001) {
+                Runner.Velocidad = Preferencias.velocidadDeSimulacion;
+                _velocidadAplicada = Preferencias.velocidadDeSimulacion;
+            }
+            AlCambiarPreferencias?.Invoke(Preferencias);
         }
 
         private void Start() {
@@ -352,6 +387,22 @@ namespace Nexus.Unity.Aplicacion {
             GuardarPerfil();
         }
 
+        /// <summary>Si la receta de esta mecanica ya se le abrio sola a este perfil (despues va tras el «?»).</summary>
+        public bool YaVioLaReceta(string verbo) {
+            var canonico = Nexus.Core.Minijuegos.Verbos.Normalizar(verbo);
+            return PerfilActivo != null && canonico != null && PerfilActivo.recetasVistas != null &&
+                   PerfilActivo.recetasVistas.Contains(canonico);
+        }
+
+        public void AnotarRecetaVista(string verbo) {
+            var canonico = Nexus.Core.Minijuegos.Verbos.Normalizar(verbo);
+            if (PerfilActivo == null || canonico == null) return;
+            if (PerfilActivo.recetasVistas == null) PerfilActivo.recetasVistas = new List<string>();
+            if (PerfilActivo.recetasVistas.Contains(canonico)) return;
+            PerfilActivo.recetasVistas.Add(canonico);
+            GuardarPerfil();
+        }
+
         /// <summary>La lista del perfil; un perfil de antes (null) la deduce de las escenas que ya jugo.</summary>
         private List<string> MecanicasGuiadas() {
             if (PerfilActivo == null) return null;
@@ -436,16 +487,19 @@ namespace Nexus.Unity.Aplicacion {
         }
 
         private void OnApplicationQuit() {
+            if (Telemetria != null) Telemetria.Terminar(Time.realtimeSinceStartupAsDouble);
             // Cerrar la ventana a mitad de dia no puede perder el dia: INV-7 dice que recargar da lo mismo.
             if (Sesion != null && !Sesion.NivelTerminado) Guardar("cerrar la aplicacion");
         }
 
         private void Update() {
-            // Escape vuelve atras, salvo en las pantallas que no lo permiten (una decision a medias).
+            // Escape: primero lo que la pantalla de arriba quiera hacer con el (el dia y los retos abren la pausa);
+            // si no lo atiende, vuelve atras, salvo en las pantallas que no lo permiten (una decision a medias).
             var teclado = Keyboard.current;
-            if (teclado != null && teclado.escapeKey.wasPressedThisFrame &&
-                Router?.Actual != null && Router.Actual.PuedeVolver)
-                Router.Volver();
+            if (teclado != null && teclado.escapeKey.wasPressedThisFrame && Router?.Actual != null) {
+                if (Router.Actual.AlPulsarEscape()) return;
+                if (Router.Actual.PuedeVolver) Router.Volver();
+            }
         }
     }
 }

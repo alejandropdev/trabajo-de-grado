@@ -115,9 +115,21 @@ namespace Nexus.Unity.Guia {
         public static void BotonDeAyuda(AppRoot app, Transform padre) {
             var g = Obtener(app);
             if (g == null || g._guia == null || !g._guia.Activa) return;
-            app.Ui.Boton(padre, "¿Qué hago ahora?", () => g.Repetir(), VarianteBoton.Fantasma);
-            // Rotulo corto: las cabeceras ya llevan varios botones y uno largo empujaba el resto fuera de la pantalla.
-            app.Ui.Boton(padre, "Apuntes", () => ApuntesDelProyecto.Abrir(app), VarianteBoton.Fantasma);
+            // Un solo «?» con «¿Qué hago ahora?» y «Apuntes» dentro: eran dos botones fijos en cada cabecera.
+            PantallaDeMenu.Boton(app, padre, "?", "Ayuda", () => OpcionesDeAyuda(app), VarianteBoton.Secundario);
+        }
+
+        /// <summary>
+        /// Las mismas dos entradas de BotonDeAyuda, para meterlas en un menu corto («?» o «Más») en vez de ocupar dos
+        /// botones de la cabecera. Vacio si la guia no esta activa.
+        /// </summary>
+        public static List<OpcionDeMenu> OpcionesDeAyuda(AppRoot app) {
+            var lista = new List<OpcionDeMenu>();
+            var g = Obtener(app);
+            if (g == null || g._guia == null || !g._guia.Activa) return lista;
+            lista.Add(new OpcionDeMenu("¿Qué hago ahora?", () => g.Repetir()));
+            lista.Add(new OpcionDeMenu("Apuntes del proyecto", () => ApuntesDelProyecto.Abrir(app)));
+            return lista;
         }
 
         /// <summary>Al salir de la partida: la burbuja no se queda flotando sobre el menu.</summary>

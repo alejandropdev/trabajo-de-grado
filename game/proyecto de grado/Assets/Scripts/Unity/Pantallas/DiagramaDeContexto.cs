@@ -255,7 +255,7 @@ namespace Nexus.Unity.Pantallas {
             var d = t.En(x + (w - Ancho * k) / 2, y, k);
 
             d.Caja(_sistema.x, _sistema.y, _sistema.width, _sistema.height, null, Tizador.Gris, true);
-            d.Texto(_sistema.center.x, _sistema.y + 32, "EL SISTEMA · " + (_f.Nombre ?? "").ToUpperInvariant(), 18, Tizador.Gris, true, _sistema.width - 30);
+            d.Texto(_sistema.center.x, _sistema.y + 32, "El sistema · " + (_f.Nombre ?? ""), 18, Tizador.Gris, true, _sistema.width - 30);
 
             foreach (var a in _aristas) DibujarFlecha(d, a, resaltado);
             foreach (var n in _nodos) DibujarNodo(d, n, resaltado);
@@ -372,7 +372,7 @@ namespace Nexus.Unity.Pantallas {
         public IEnumerable<KeyValuePair<int, Vector2>> Numeros() { return _aristas.Select(a => new KeyValuePair<int, Vector2>(a.Numero, SitioDelNumero(a))); }
 
         private void DibujarLeyenda(Tizador d, string resaltado) {
-            d.Texto(0, _yLeyenda + 12, "QUÉ DICE CADA FLECHA", 16, Tizador.Gris);
+            d.Texto(0, _yLeyenda + 12, "Qué dice cada flecha", 16, Tizador.Gris);
             var filas = Mathf.CeilToInt(_aristas.Count / 2f);
             for (var i = 0; i < _aristas.Count; i++) {
                 var a = _aristas[i];

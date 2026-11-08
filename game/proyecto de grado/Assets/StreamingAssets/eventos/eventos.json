@@ -4,6 +4,7 @@
 
     {
       "id": "EV-TUT-01",
+      "frase": "Un visitante sin cita: nadie contestó en el ticket.",
       "nombre": "El requisito que nadie escribió",
       "soloNiveles": ["nivel-00"],
       "tags": ["tutorial"],
@@ -21,6 +22,7 @@
       "opciones": [
         {
           "id": "escribirlo",
+          "etiqueta": "Escribirlo como requisito",
           "texto": "Escribirlo como requisito, con su criterio de aceptación: un visitante sin cita queda registrado y se avisa a la persona a la que viene a ver.",
           "efectosInmediatos": { "Alcance": 1, "Documentacion": 5, "Cobertura": 3, "SatisfaccionCliente": 4 },
           "rubrica": {
@@ -31,6 +33,7 @@
         },
         {
           "id": "suponerlo",
+          "etiqueta": "Seguir sin tocarlo",
           "texto": "Suponer que no hace falta y seguir con lo que había.",
           "efectosInmediatos": { "Avance": 1 },
           "efectosDiferidos": [ { "enDias": 2, "efectos": { "Alcance": 3, "SatisfaccionCliente": -8, "DeudaTecnica": 5 } } ],
@@ -45,6 +48,7 @@
 
     {
       "id": "EV-TUT-02",
+      "frase": "Mañana a las once pasa el jurado a ver cómo van.",
       "nombre": "La demo de mañana",
       "soloNiveles": ["nivel-00"],
       "tags": ["tutorial"],
@@ -63,6 +67,7 @@
       "opciones": [
         {
           "id": "ensenar-lo-que-hay",
+          "etiqueta": "Enseñar lo real",
           "texto": "Enseñar lo que funciona de verdad, aunque sea poco.",
           "efectosInmediatos": { "SatisfaccionCliente": 3 },
           "rubrica": {
@@ -73,6 +78,7 @@
         },
         {
           "id": "maquillar",
+          "etiqueta": "Pantalla bonita",
           "texto": "Preparar una pantalla bonita que todavía no hace nada.",
           "efectosInmediatos": { "SatisfaccionCliente": 6 },
           "efectosDiferidos": [ { "enDias": 1, "efectos": { "SatisfaccionCliente": -10, "Reputacion": -5 } } ],

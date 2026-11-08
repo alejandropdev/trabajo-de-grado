@@ -460,13 +460,13 @@
           },
           {
             "id": "b",
-            "texto": "Nada, eso pasa. No se puede probar todo.",
+            "texto": "Nada grave: eso pasa siempre, nadie puede probar todos los casos posibles de un sistema.",
             "confianza": 0,
             "respuesta": "No se puede probar todo, cierto. Pero sí se puede elegir mejor qué probar. Los casos límite son los primeros."
           },
           {
             "id": "c",
-            "texto": "Tenías que haberlo probado más veces.",
+            "texto": "Te faltó repetir más veces las mismas pruebas, hasta estar seguro de que no fallaban.",
             "confianza": -1,
             "respuesta": "¿Doscientas veces mi nombre? No creo que hubiera cambiado nada…"
           }
@@ -540,13 +540,13 @@
           },
           {
             "id": "b",
-            "texto": "Trabajar más horas para avanzar en todas.",
+            "texto": "Trabajar más horas estos días para avanzar a la vez en todas las que tienes abiertas.",
             "confianza": -1,
             "respuesta": "Ya lo intenté anoche. Hoy rindo la mitad. Quedarse es un préstamo."
           },
           {
             "id": "c",
-            "texto": "Mover algunas a «hecho» aunque falte un poco.",
+            "texto": "Mover algunas a «hecho» aunque les falte un poco, y rematarlas cuando haya un hueco.",
             "confianza": -1,
             "respuesta": "¿Mentirle a mi propio tablero? Entonces no me sirve para nada."
           }
@@ -584,13 +584,13 @@
           },
           {
             "id": "b",
-            "texto": "Porque git es lento con historias largas.",
+            "texto": "Porque git se vuelve lento con historias largas y eso bloqueó a todo el equipo.",
             "confianza": -1,
             "respuesta": "No, no… git aguanta historias enormes. El problema no es la velocidad, es lo que se perdió."
           },
           {
             "id": "c",
-            "texto": "No sé qué es un commit.",
+            "texto": "Sinceramente, no sé qué es un commit ni por qué borrarlo es tan grave.",
             "confianza": 1,
             "respuesta": "Tranquilo: un commit es una foto guardada de los cambios, con un mensaje. La historia es la fila de fotos. Borrarlas es borrar el pasado."
           }
@@ -624,13 +624,13 @@
           },
           {
             "id": "b",
-            "texto": "Instalarlo el jueves, por si acaso.",
+            "texto": "Instalarlo el jueves, un día antes de entregar, por si acaso algo sale mal.",
             "confianza": 1,
             "respuesta": "Mejor que el viernes, sí. Pero un día de margen no es lo mismo que haberlo practicado veinte veces."
           },
           {
             "id": "c",
-            "texto": "No tocar el servidor hasta tener todo terminado.",
+            "texto": "No tocar el servidor hasta tener todo terminado, así solo se instala una vez.",
             "confianza": -1,
             "respuesta": "Eso mismo pensó él."
           }
@@ -664,13 +664,13 @@
           },
           {
             "id": "b",
-            "texto": "Decir siempre el doble de lo que creas.",
+            "texto": "Decir siempre el doble de lo que creas: así nunca te quedas corto con nadie.",
             "confianza": 0,
             "respuesta": "Es un truco… pero si siempre inflas, nadie se cree tus números. Mejor aprender de tu historial."
           },
           {
             "id": "c",
-            "texto": "No dar números: «cuando esté, está».",
+            "texto": "No dar números: «cuando esté, está», y que el cliente confíe en el equipo.",
             "confianza": -1,
             "respuesta": "Ya, y el jurado se sienta a esperar. Sin estimación no se puede planificar nada."
           }
@@ -704,13 +704,13 @@
           },
           {
             "id": "b",
-            "texto": "Que tiene razón: más funciones, más calidad.",
+            "texto": "Que tiene razón: cuantas más funciones tenga el sistema, más calidad le estamos dando.",
             "confianza": -1,
             "respuesta": "Hmm. Más funciones también es más cosas que se pueden romper."
           },
           {
             "id": "c",
-            "texto": "Que la calidad es que el código sea bonito.",
+            "texto": "Que la calidad es que el código esté limpio y bonito; lo demás viene solo.",
             "confianza": 0,
             "respuesta": "Un código limpio ayuda a mantenerlo, pero el cliente no lo ve. Calidad es más que eso."
           }
@@ -748,13 +748,13 @@
           },
           {
             "id": "b",
-            "texto": "Muy poca: lo difícil es construirlo.",
+            "texto": "Muy poca: lo difícil de verdad es construirlo; después casi todo funciona solo.",
             "confianza": -1,
             "respuesta": "Ja. Ven a mantener la barrera un invierno y me cuentas."
           },
           {
             "id": "c",
-            "texto": "No tengo ni idea, cuéntame.",
+            "texto": "No tengo ni idea de cuánto es, la verdad. Cuéntame cómo lo ves tú.",
             "confianza": 1,
             "respuesta": "La mayor parte del coste. Construir es una vez; mantener es para siempre. Por eso importa tanto el diseño."
           }
@@ -782,7 +782,7 @@
         "opciones": [
           {
             "id": "a",
-            "texto": "Se queda la versión del que lo subió primero.",
+            "texto": "Se queda la versión del que la subió primero, que para eso llegó antes.",
             "confianza": -1,
             "respuesta": "Así se pierde trabajo sin que nadie se entere. No es una carrera."
           },
@@ -794,7 +794,7 @@
           },
           {
             "id": "c",
-            "texto": "Borrando la rama y empezando de cero.",
+            "texto": "Borrando la rama con conflicto y empezando de cero desde la versión principal.",
             "confianza": -1,
             "respuesta": "Tres días de trabajo a la basura por no leer veinte líneas."
           }
@@ -828,13 +828,13 @@
           },
           {
             "id": "b",
-            "texto": "Porque es más lento.",
+            "texto": "Porque así el sistema va más lento: cada consulta pasa por la base de reservas.",
             "confianza": 0,
             "respuesta": "A lo mejor hasta es más rápido. El problema no es la velocidad, es lo que se rompe cuando algo cambia."
           },
           {
             "id": "c",
-            "texto": "No da miedo: si funciona, no se toca.",
+            "texto": "No debería dar miedo: si funciona y nadie se queja, mejor no tocarlo.",
             "confianza": -1,
             "respuesta": "Eso dijo el que lo escribió. Ahora no se puede tocar nada sin romper dos cosas."
           }
@@ -868,13 +868,13 @@
           },
           {
             "id": "b",
-            "texto": "Instalar en producción lo antes posible.",
+            "texto": "Instalar en producción lo antes posible, para que el cliente vea el cambio enseguida.",
             "confianza": -1,
             "respuesta": "Rápido, sí. Y el carro de HH encerrado otras tres horas."
           },
           {
             "id": "c",
-            "texto": "Mandar un correo al equipo.",
+            "texto": "Mandar un correo al equipo avisando de que hay una versión nueva lista.",
             "confianza": 0,
             "respuesta": "Avisar está bien, pero eso no evita que se cuele un error."
           }
@@ -908,13 +908,13 @@
           },
           {
             "id": "b",
-            "texto": "No, si quiere quedarse que se quede.",
+            "texto": "No: si quiere quedarse más horas es su decisión, y además el proyecto avanza.",
             "confianza": -1,
             "respuesta": "Ya. Y la semana que viene estará enfermo, y su parte a medias."
           },
           {
             "id": "c",
-            "texto": "Que se quede, pero solo los viernes.",
+            "texto": "Que se quede si quiere, pero solo los viernes, que es cuando más falta hace.",
             "confianza": 0,
             "respuesta": "Algo es algo. Lo importante es que no sea lo normal."
           }
@@ -948,13 +948,13 @@
           },
           {
             "id": "b",
-            "texto": "«Arreglos varios v2 final».",
+            "texto": "«Arreglos varios v2 final», que resume todo lo que tocaste hoy.",
             "confianza": -1,
             "respuesta": "«Final». Ya. Siempre hay un «final de verdad» después."
           },
           {
             "id": "c",
-            "texto": "No importa el mensaje, importa el código.",
+            "texto": "No importa mucho el mensaje: lo que de verdad importa es el código que subes.",
             "confianza": -1,
             "respuesta": "El código dice QUÉ hace. Solo el mensaje dice POR QUÉ se cambió."
           }
@@ -992,13 +992,13 @@
           },
           {
             "id": "b",
-            "texto": "Seguir parcheándolo directamente por todas partes.",
+            "texto": "Seguir parcheándolo directamente por todas partes, que es lo más rápido para hoy.",
             "confianza": -1,
             "respuesta": "Así llegamos a donde estamos."
           },
           {
             "id": "c",
-            "texto": "Tirarlo y reescribir todo de cero ya.",
+            "texto": "Tirarlo ya y reescribir todo de cero, para tener por fin el código en nuestras manos.",
             "confianza": 0,
             "respuesta": "Algún día. En veinte días, con tres personas, no."
           }
@@ -1032,13 +1032,13 @@
           },
           {
             "id": "b",
-            "texto": "Elegir yo la más lógica.",
+            "texto": "Elegir yo la más lógica de las tres y explicarles después por qué.",
             "confianza": -1,
             "respuesta": "Y los otros dos te van a odiar en la demo."
           },
           {
             "id": "c",
-            "texto": "Hacer las tres, configurables.",
+            "texto": "Hacer las tres configurables, y que cada uno active la suya cuando la necesite.",
             "confianza": 0,
             "respuesta": "Triple de trabajo y nadie decide nada. A veces la configuración es una forma de no elegir."
           }
@@ -1072,13 +1072,13 @@
           },
           {
             "id": "b",
-            "texto": "Sí, seguro, ya lo dije.",
+            "texto": "Sí, estoy seguro: ya lo dije en la reunión y no voy a cambiar ahora.",
             "confianza": -1,
             "respuesta": "Vale… Pero si no está, la que queda mal soy yo."
           },
           {
             "id": "c",
-            "texto": "Le diré que no sé.",
+            "texto": "Le diré simplemente que no lo sé y que ya veremos cuando llegue.",
             "confianza": 0,
             "respuesta": "Es honesto, pero «no sé» no le sirve para planificar nada. Algo de número hace falta."
           }
@@ -1112,13 +1112,13 @@
           },
           {
             "id": "b",
-            "texto": "Sí, había que haberlo entendido bien desde el principio.",
+            "texto": "Sí: había que haberlo entendido bien desde el principio y no tener que rehacer.",
             "confianza": 0,
             "respuesta": "Ojalá, pero el cliente casi nunca sabe lo que quiere hasta que lo ve."
           },
           {
             "id": "c",
-            "texto": "No le hagas caso, lo pidió así.",
+            "texto": "No le hagas caso: lo pidió exactamente así y ahora cambia de idea.",
             "confianza": -1,
             "respuesta": "Bueno… pero es quien paga. Y quien lo va a usar."
           }
@@ -1152,13 +1152,13 @@
           },
           {
             "id": "b",
-            "texto": "Meterlo todo en el sprint, aunque llegue a mitad.",
+            "texto": "Meterlo todo en el sprint aunque llegue a mitad, para no dejar a nadie esperando.",
             "confianza": -1,
             "respuesta": "Entonces el sprint deja de ser un compromiso: cada día cambia."
           },
           {
             "id": "c",
-            "texto": "Ignorarlas hasta el siguiente sprint.",
+            "texto": "Ignorarlas hasta el siguiente sprint: lo comprometido es lo primero, sin excepciones.",
             "confianza": -1,
             "respuesta": "¿Un ascensor parado dos semanas? Mi jefa me mata."
           }
@@ -1192,13 +1192,13 @@
           },
           {
             "id": "b",
-            "texto": "Que sí, que se puede.",
+            "texto": "Que sí, que se puede: el equipo encontrará la manera de meterlo todo a tiempo.",
             "confianza": -1,
             "respuesta": "Así empezó el último proyecto que se hundió aquí."
           },
           {
             "id": "c",
-            "texto": "Que no, que el alcance está cerrado.",
+            "texto": "Que no, que el alcance está cerrado y firmado, y cambiarlo ahora no es posible.",
             "confianza": 0,
             "respuesta": "Protege al equipo, pero se van a ir enfadados."
           }
@@ -1232,13 +1232,13 @@
           },
           {
             "id": "b",
-            "texto": "Manía: ya se acostumbrará.",
+            "texto": "Es una manía suya: en un par de semanas usándolo se acostumbrará sin problema.",
             "confianza": -1,
             "respuesta": "Ya. Y mientras se acostumbra, deja pasar a quien no debe."
           },
           {
             "id": "c",
-            "texto": "Le haremos un manual.",
+            "texto": "Le haremos un manual bien explicado para que aprenda a usarlo como está.",
             "confianza": 0,
             "respuesta": "Un manual para un botón suele significar que el botón está mal."
           }
@@ -1272,13 +1272,13 @@
           },
           {
             "id": "b",
-            "texto": "El código: está todo ahí.",
+            "texto": "El código: está todo ahí, y un buen programador lo entenderá leyéndolo.",
             "confianza": -1,
             "respuesta": "No saben leer código, te lo acabo de decir…"
           },
           {
             "id": "c",
-            "texto": "Mi número de teléfono.",
+            "texto": "Mi número de teléfono, para que me llamen si algo deja de funcionar.",
             "confianza": 0,
             "respuesta": "Muy amable. Hasta que cambies de número."
           }
@@ -1316,13 +1316,13 @@
           },
           {
             "id": "b",
-            "texto": "Borrar la entrada duplicada a mano.",
+            "texto": "Borrar la entrada duplicada a mano en la base de datos, y seguir con lo demás.",
             "confianza": -1,
             "respuesta": "Y mañana habrá otra. Y pasado."
           },
           {
             "id": "c",
-            "texto": "Esperar a que pase más veces para estar seguro.",
+            "texto": "Esperar a que pase más veces para estar seguro de que es un error de verdad.",
             "confianza": 0,
             "respuesta": "Ya pasó. El log no miente."
           }
@@ -1356,13 +1356,13 @@
           },
           {
             "id": "b",
-            "texto": "Que el sistema tiene un 10 % de errores.",
+            "texto": "Que el sistema tiene un 10 % de errores que todavía nadie ha encontrado.",
             "confianza": -1,
             "respuesta": "No. Ese número no dice nada de errores."
           },
           {
             "id": "c",
-            "texto": "Que está casi perfecto.",
+            "texto": "Que está casi perfecto: con un 90 % ya se puede entregar tranquilo.",
             "confianza": -1,
             "respuesta": "…No."
           }
@@ -1396,13 +1396,13 @@
           },
           {
             "id": "b",
-            "texto": "Una unitaria de las reservas.",
+            "texto": "Una prueba unitaria de las reservas, que es donde estaba el código cambiado.",
             "confianza": 0,
             "respuesta": "Esa ya la tenían. El problema no estaba en las reservas."
           },
           {
             "id": "c",
-            "texto": "Ninguna: eso no se puede prever.",
+            "texto": "Ninguna: eso no se podía prever, son cosas que solo aparecen en producción.",
             "confianza": -1,
             "respuesta": "Se puede. Para eso existen."
           }
@@ -1436,13 +1436,13 @@
           },
           {
             "id": "b",
-            "texto": "Rendimiento.",
+            "texto": "Rendimiento: el sistema tarda demasiado cuando hay mucha gente a la vez.",
             "confianza": -1,
             "respuesta": "Abrió muy rápido, eso sí."
           },
           {
             "id": "c",
-            "texto": "Usabilidad.",
+            "texto": "Usabilidad: los usuarios no entienden bien qué hace cada pantalla.",
             "confianza": 0,
             "respuesta": "Para el intruso fue muy usable, sí. Pero no."
           }
@@ -1476,13 +1476,13 @@
           },
           {
             "id": "b",
-            "texto": "Que el cliente avisara antes.",
+            "texto": "Que el cliente avisara antes de que el problema llegara tan lejos.",
             "confianza": -1,
             "respuesta": "El cliente no es tu sistema de alertas."
           },
           {
             "id": "c",
-            "texto": "Reiniciarlo todos los días por si acaso.",
+            "texto": "Reiniciarlo todos los días por la mañana, por si acaso se queda colgado.",
             "confianza": 0,
             "respuesta": "Tapa el síntoma. Sigues sin saber qué pasó."
           }
@@ -1516,13 +1516,13 @@
           },
           {
             "id": "b",
-            "texto": "Repartir igual entre todo.",
+            "texto": "Repartir el esfuerzo igual entre todo, para que ninguna parte se quede sin probar.",
             "confianza": 0,
             "respuesta": "Justo, pero no listo. Los errores no se reparten igual."
           },
           {
             "id": "c",
-            "texto": "Lo más barato primero, aunque casi no tenga errores.",
+            "texto": "Por lo más barato de probar primero, aunque casi no tenga errores conocidos.",
             "confianza": -1,
             "respuesta": "Barato y vacío. El cliente encontrará el resto."
           }
@@ -1556,13 +1556,13 @@
           },
           {
             "id": "b",
-            "texto": "Singleton: una sola reserva global.",
+            "texto": "Singleton: una sola reserva global a la que todos consultan cuando lo necesitan.",
             "confianza": -1,
             "respuesta": "Eso resuelve otro problema, y suele crear tres más."
           },
           {
             "id": "c",
-            "texto": "Ninguno: que pregunten más rápido.",
+            "texto": "Ninguno: que pregunten más rápido y más a menudo, y listo.",
             "confianza": -1,
             "respuesta": "Fuerza bruta. Funciona hasta que no."
           }
@@ -1596,13 +1596,13 @@
           },
           {
             "id": "b",
-            "texto": "Más comentarios en el if.",
+            "texto": "Poner más comentarios en el if, para que se entienda qué hace cada caso.",
             "confianza": 0,
             "respuesta": "Un if de doscientas líneas bien comentado sigue siendo un if de doscientas líneas."
           },
           {
             "id": "c",
-            "texto": "Copiar el if en cada sitio que lo necesite.",
+            "texto": "Copiar el if en cada sitio que lo necesite, así cada uno es independiente.",
             "confianza": -1,
             "respuesta": "Y cuando cambie una regla, la cambiarás en cinco sitios. O en cuatro, y no te darás cuenta."
           }
@@ -1636,13 +1636,13 @@
           },
           {
             "id": "b",
-            "texto": "En la memoria del equipo.",
+            "texto": "En la memoria del equipo: quienes estuvieron en la reunión lo recuerdan bien.",
             "confianza": -1,
             "respuesta": "La memoria del equipo se va con el equipo."
           },
           {
             "id": "c",
-            "texto": "En el código, si se lee bien.",
+            "texto": "En el código: si está bien escrito, se entiende por qué se hizo así.",
             "confianza": 0,
             "respuesta": "El código dice cómo es. No por qué no es de otra forma."
           }
@@ -1676,13 +1676,13 @@
           },
           {
             "id": "b",
-            "texto": "«El sistema debe ser rápido».",
+            "texto": "«El sistema debe ser rápido y responder bien aunque haya mucha gente».",
             "confianza": -1,
             "respuesta": "Eso es lo que me dijo él… y no se puede probar: ¿rápido para quién?"
           },
           {
             "id": "c",
-            "texto": "No se escribe, se nota al usarlo.",
+            "texto": "No se escribe: la velocidad se nota al usarlo, no en un documento.",
             "confianza": 0,
             "respuesta": "El jurado no lo va a «notar» igual que tú. Mejor medible."
           }
@@ -1716,13 +1716,13 @@
           },
           {
             "id": "b",
-            "texto": "Que haga una copia en un USB el viernes.",
+            "texto": "Que haga una copia en un USB el viernes, al terminar la semana.",
             "confianza": 0,
             "respuesta": "Mejor que nada. Pero el miércoles también existe."
           },
           {
             "id": "c",
-            "texto": "Nada, es su problema.",
+            "texto": "Nada: es su portátil y su problema, cada uno cuida sus cosas.",
             "confianza": -1,
             "respuesta": "Ya… hasta que es el tuyo."
           }
@@ -1756,13 +1756,13 @@
           },
           {
             "id": "b",
-            "texto": "Subirlo: si compila, funciona.",
+            "texto": "Subirlo ya: si compila sin errores, lo normal es que funcione bien.",
             "confianza": -1,
             "respuesta": "Compilar no es funcionar. Lo aprendí hace 19 años."
           },
           {
             "id": "c",
-            "texto": "Esperar a que alguien lo pruebe a mano.",
+            "texto": "Esperar a que alguien del equipo lo pruebe a mano antes de subirlo.",
             "confianza": 0,
             "respuesta": "Alguien… ¿quién? Mejor que lo pruebe una máquina cada vez."
           }
@@ -1796,13 +1796,13 @@
           },
           {
             "id": "b",
-            "texto": "Por la más divertida.",
+            "texto": "Por la más divertida: con ganas se avanza más rápido en todo.",
             "confianza": -1,
             "respuesta": "Ja. Así llegué a tener seis."
           },
           {
             "id": "c",
-            "texto": "Empiezo otra, que está llegando mucho trabajo.",
+            "texto": "Empiezo otra: está llegando mucho trabajo y hay que ir abriendo frentes.",
             "confianza": -1,
             "respuesta": "Siete. Perfecto."
           }
@@ -1836,13 +1836,13 @@
           },
           {
             "id": "b",
-            "texto": "Que trabajaremos más horas.",
+            "texto": "Que trabajaremos más horas el próximo sprint para recuperar lo que faltó.",
             "confianza": -1,
             "respuesta": "Eso dijeron la última vez. Y la anterior."
           },
           {
             "id": "c",
-            "texto": "Que fue mala suerte.",
+            "texto": "Que fue mala suerte: hubo imprevistos que nadie podía ver venir.",
             "confianza": 0,
             "respuesta": "La mala suerte no se puede planificar…"
           }
@@ -1876,13 +1876,13 @@
           },
           {
             "id": "b",
-            "texto": "Sí, el cliente siempre tiene razón.",
+            "texto": "Sí: el cliente siempre tiene razón y es quien paga el sistema.",
             "confianza": -1,
             "respuesta": "Y el siguiente hackeo, también."
           },
           {
             "id": "c",
-            "texto": "No, sin más.",
+            "texto": "No, sin más explicaciones: ese botón no se toca y punto.",
             "confianza": 0,
             "respuesta": "Se va a enfadar si no le explicas por qué."
           }
@@ -1916,13 +1916,13 @@
           },
           {
             "id": "b",
-            "texto": "Con una lista de pasos impresa.",
+            "texto": "Con una lista de pasos impresa que siga siempre la misma persona.",
             "confianza": 0,
             "respuesta": "Mejor que nada. Pero la lista no se ejecuta sola."
           },
           {
             "id": "c",
-            "texto": "Mejor no desplegar tanto.",
+            "texto": "Mejor no desplegar tanto: cada despliegue es un riesgo que nos ahorramos.",
             "confianza": -1,
             "respuesta": "Desplegar poco hace cada despliegue más peligroso."
           }
@@ -1956,13 +1956,13 @@
           },
           {
             "id": "b",
-            "texto": "Ninguno, así está todo en un sitio.",
+            "texto": "Ninguno: así está todo en un solo sitio y es más fácil de encontrar.",
             "confianza": -1,
             "respuesta": "Todo en un sitio es justo el problema."
           },
           {
             "id": "c",
-            "texto": "El de rendimiento.",
+            "texto": "El de rendimiento: tanta lógica junta hace que todo vaya más lento.",
             "confianza": 0,
             "respuesta": "Puede que también sea lenta. Pero el problema es de diseño."
           }
@@ -1996,13 +1996,13 @@
           },
           {
             "id": "b",
-            "texto": "Qué colores te gustan para la pantalla.",
+            "texto": "Qué colores y qué estilo te gustan para las pantallas del sistema.",
             "confianza": -1,
             "respuesta": "Me da igual el color si sigo con la fila hasta la puerta. Primero lo que hace, después cómo se ve."
           },
           {
             "id": "c",
-            "texto": "Cuántas visitas hay al día.",
+            "texto": "Cuántas visitas hay al día y a qué horas llega más gente.",
             "confianza": 0,
             "respuesta": "Sesenta y pico. Pero el número solo no te dice dónde pierdo el tiempo: para eso hay que mirar cómo trabajo."
           }
@@ -2076,13 +2076,13 @@
           },
           {
             "id": "b",
-            "texto": "Los informes del mes, con sus gráficas.",
+            "texto": "Los informes del mes, con sus gráficas, para ver cómo va todo.",
             "confianza": -1,
             "respuesta": "Los informes los pide mi jefe una vez al mes. La fila la tengo yo todos los días a las nueve."
           },
           {
             "id": "c",
-            "texto": "Todo, aunque quede a medias.",
+            "texto": "Todo un poco, aunque cada parte quede a medias por ahora.",
             "confianza": -1,
             "respuesta": "A medias no me sirve nada: un registro que a veces guarda y a veces no es peor que el cuaderno."
           }
@@ -2116,13 +2116,13 @@
           },
           {
             "id": "b",
-            "texto": "No va a fallar.",
+            "texto": "No va a fallar: lo hemos probado bien y el sistema es sólido.",
             "confianza": -1,
             "respuesta": "Eso mismo dijeron de la impresora. Quien no tiene pensado qué hacer si falla, no ha terminado."
           },
           {
             "id": "c",
-            "texto": "Guarda el cuaderno por si acaso.",
+            "texto": "Guarda el cuaderno de siempre por si acaso, a mano cerca de la puerta.",
             "confianza": 1,
             "respuesta": "Lo voy a guardar, sí. Pero ese plan es el mío: dime también cuál es el tuyo para volver atrás."
           }
@@ -2156,13 +2156,13 @@
           },
           {
             "id": "b",
-            "texto": "Que hay que poner una barrera más fuerte.",
+            "texto": "Que hay que poner una barrera más fuerte que nadie pueda forzar.",
             "confianza": -1,
             "respuesta": "La barrera aguanta un camión. Lo que falló fue quién le daba la orden de abrirse."
           },
           {
             "id": "c",
-            "texto": "Que hace falta otra cámara.",
+            "texto": "Que hace falta otra cámara apuntando a la entrada de la garita.",
             "confianza": 0,
             "respuesta": "La cámara me dio la razón después. Pero no impidió nada: el sistema tiene que decidir antes de abrir."
           }
@@ -2196,13 +2196,13 @@
           },
           {
             "id": "b",
-            "texto": "Todos los datos del edificio, para que no te falte nada.",
+            "texto": "Todos los datos del edificio, para que no te falte nada a mano.",
             "confianza": -1,
             "respuesta": "Si tengo que buscar un botón entre veinte, abro a mano y ya. Y entonces el sistema no sirve."
           },
           {
             "id": "c",
-            "texto": "Un manual para aprender a usarlo.",
+            "texto": "Un manual en pantalla para aprender a usarlo paso a paso.",
             "confianza": -1,
             "respuesta": "Si necesita manual para abrir una barrera, está mal hecho. En la garita no se lee: se mira."
           }
@@ -2230,19 +2230,19 @@
         "opciones": [
           {
             "id": "a",
-            "texto": "La garita sigue con la lista de matrículas que ya tenía, y lo que abras a mano queda anotado.",
+            "texto": "Sigue con la lista de matrículas que ya tenía; lo que abras a mano queda anotado.",
             "confianza": 2,
             "respuesta": "Eso es pensar en el día malo. Un sistema que solo funciona cuando todo va bien no es para una garita."
           },
           {
             "id": "b",
-            "texto": "Se espera a que vuelva.",
+            "texto": "Se espera a que el sistema vuelva; a esas horas casi no entra nadie.",
             "confianza": -1,
             "respuesta": "Cuarenta carros en la avenida y la policía pitando. No se espera."
           },
           {
             "id": "c",
-            "texto": "Se deja la barrera abierta mientras tanto.",
+            "texto": "Se deja la barrera abierta mientras tanto, para no hacer esperar a nadie.",
             "confianza": -1,
             "respuesta": "Así empezó todo esto: una barrera abierta sin que nadie supiera por qué."
           }
@@ -2276,13 +2276,13 @@
           },
           {
             "id": "b",
-            "texto": "Todo al final, para no molestarte antes.",
+            "texto": "Todo al final, junto, para no molestarte con versiones a medias.",
             "confianza": -1,
             "respuesta": "Molesta más enterarse el último día de que la pantalla no se ve con el sol de las seis."
           },
           {
             "id": "c",
-            "texto": "Da igual, el resultado es el mismo.",
+            "texto": "Da igual: el resultado final es el mismo, se entregue como se entregue.",
             "confianza": 0,
             "respuesta": "No es el mismo: si sale por partes, lo que falla se nota cuando todavía es barato arreglarlo."
           }

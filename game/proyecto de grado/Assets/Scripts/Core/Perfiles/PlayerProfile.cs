@@ -11,8 +11,12 @@ namespace Nexus.Core {
         public float[] perfilDeCompetencia = new float[12];
         public int[] resultadoPreTest = new int[15];
         // Si la entrevista del N0 ya se hizo con este perfil. El pre-test es UNO: el de la primera vez, antes de
-        // haber jugado. Una segunda partida repite la entrevista, pero ya no mide lo mismo.
+        // haber jugado. Con el pre-test hecho, la entrevista ya no se repite en otra partida.
         public bool preTestHecho;
+        // La entrevista empezada y sin terminar (null si no hay). Se borra al terminarla.
+        public Nexus.Core.Evaluacion.EntrevistaEnCurso entrevistaEnCurso;
+        // Las mecanicas cuya receta ya se le abrio sola a este perfil. Despues, la receta queda tras el boton «?».
+        public List<string> recetasVistas = new List<string>();
         // Los pasos de la guia del tutorial que este perfil ya vio: la guia no se repite en otra partida.
         public List<string> guiaVista = new List<string>();
         // Los minijuegos que este perfil ya terminó alguna vez.

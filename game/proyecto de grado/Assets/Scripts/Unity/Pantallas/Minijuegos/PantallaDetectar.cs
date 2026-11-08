@@ -257,7 +257,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 // El trazo dice que hace la flecha: fina = le pide algo, gruesa = escribe, discontinua = solo lee.
                 var grosorDeFlecha = (c.Tipo == "escribe" ? 5 : 3) + (e == EstadoPieza.Normal ? 0 : 1);
                 l.Dibujo.Flecha(p1.x, p1.y, p2.x, p2.y, col, grosorDeFlecha, c.Tipo == "lee");
-                var ancho = c.Texto.Length * 16 * 0.55f + 26;
+                var ancho = l.AnchoDePastilla(c.Texto, 16);
                 var hueco = Hueco(p1, p2, ancho, ocupados);
                 var con = c;
                 pastillas.Add(() => {
@@ -341,11 +341,14 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         /// <summary>Donde poner la etiqueta de una flecha para que no pise ni cajas ni otras etiquetas.</summary>
         private static Vector2 Hueco(Vector2 a, Vector2 b, float ancho, List<Rect> ocupados) {
-            foreach (var t in new[] { .5f, .35f, .65f, .25f, .75f, .18f, .82f }) {
-                var p = Vector2.Lerp(a, b, t);
-                var r = new Rect(p.x - ancho / 2 - 6, p.y - 19, ancho + 12, 38);
-                if (!ocupados.Any(o => o.Overlaps(r))) { ocupados.Add(r); return p; }
-            }
+            // A lo largo de la flecha y, si no cabe, un poco a cada lado de ella: una etiqueta nunca tapa a otra.
+            var normal = (b - a).sqrMagnitude > 0 ? new Vector2(-(b - a).y, (b - a).x).normalized : Vector2.up;
+            foreach (var lado in new[] { 0f, 30f, -30f, 56f, -56f })
+                foreach (var t in new[] { .5f, .35f, .65f, .25f, .75f, .18f, .82f }) {
+                    var p = Vector2.Lerp(a, b, t) + normal * lado;
+                    var r = new Rect(p.x - ancho / 2 - 6, p.y - 19, ancho + 12, 38);
+                    if (!ocupados.Any(o => o.Overlaps(r))) { ocupados.Add(r); return p; }
+                }
             var m = (a + b) / 2;
             ocupados.Add(new Rect(m.x - ancho / 2, m.y - 15, ancho, 30));
             return m;

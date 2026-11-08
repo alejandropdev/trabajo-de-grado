@@ -108,7 +108,10 @@ namespace Nexus.Core.Guardado {
                         Nombre = s.Partida.Nombre,
                         NivelActualId = s.Partida.NivelActualId,
                         FechaUltimoGuardado = s.Partida.FechaUltimoGuardado,
-                        EntreNiveles = s.Nivel == null
+                        EntreNiveles = s.Nivel == null,
+                        Fase = s.Nivel == null ? 0 : s.Nivel.Lanzamiento != null ? 4 : s.Nivel.Fase1Cerrada ? 2 : 1,
+                        Dia = s.Nivel == null || s.Nivel.R == null ? 0 : s.Nivel.R.DiaActual,
+                        NivelesCompletados = new List<string>(s.Partida.NivelesCompletados ?? new List<string>())
                     });
                 } catch (Exception ex) when (ex is SaveException || ex is ArgumentException) {
                     resultado.Add(new ResumenDePartida { Id = partidaId, Nombre = "(partida dañada)", Danada = true, Error = ex.Message });

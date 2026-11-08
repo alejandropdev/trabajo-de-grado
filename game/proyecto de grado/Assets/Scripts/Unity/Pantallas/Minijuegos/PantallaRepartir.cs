@@ -40,6 +40,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private readonly Dictionary<string, RectTransform> _mas = new Dictionary<string, RectTransform>();
         private readonly Dictionary<string, RectTransform> _tipos = new Dictionary<string, RectTransform>();
         private Button _entregar;
+        private const int SegundosPorPista = 15;
+        private bool _cuentaPedida;
 
         private Color Relleno { get { return NexusTheme.Alfa(Tema.papelCyan, 0.85f); } }
         private const float AltoPila = 540, AnchoPila = 170, Arriba = 150;
@@ -75,6 +77,18 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (Cfg.Propuesta != null && !Guiado)
                 Ui.Texto(lado, $"{(string.IsNullOrEmpty(Cfg.QuienPropone) ? "El equipo" : Cfg.QuienPropone)} ya trae este reparto. Revísalo con las tarjetas: " +
                                "si cubre el riesgo, entrégalo tal cual. Revisar no siempre es cambiar.", EstiloTexto.Pequeno, Tema.cyan);
+            // Sin andamiaje 3, la cuenta de cuantos se escaparian se pide (y cuesta reloj); con el, ya sale sola.
+            _cuentaPedida = false;
+            if (Andamiaje < 3 && !Revelado && !Guiado && Cfg.Depositos.Any(d => d.EstimadoMax > 0)) {
+                Button pista = null;
+                pista = Ui.Boton(pie, $"Pista: hacer la cuenta (−{SegundosPorPista} s)", () => {
+                    if (_cuentaPedida) return;
+                    _cuentaPedida = true;
+                    CobrarSegundos(SegundosPorPista);
+                    pista.interactable = false;
+                    Repintar();
+                }, VarianteBoton.Secundario);
+            }
             _entregar = Ui.Boton(pie, "Entregar el reparto", Entregar, VarianteBoton.Primario);
             GuiaView.Registrar("mj.entregar", _entregar);
             Repintar();
@@ -105,7 +119,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
                 // Con andamiaje de tutorial, la cuenta que el jugador haria de cabeza con las tarjetas: cuantos se
                 // escaparian si hubiera lo maximo (y lo minimo) que cabe esperar. No usa el numero escondido.
-                if (Andamiaje >= 3 && !Revelado && Usado > 0 && Cfg.Depositos.Any(d => d.EstimadoMax > 0)) {
+                if ((Andamiaje >= 3 || _cuentaPedida) && !Revelado && Usado > 0 && Cfg.Depositos.Any(d => d.EstimadoMax > 0)) {
                     var peor = RepartirEvaluador.EscapesEsperados(Cfg, _asignacion, true);
                     var mejor = RepartirEvaluador.EscapesEsperados(Cfg, _asignacion, false);
                     var critico = RepartirEvaluador.PuedeEscaparAlgoCritico(Cfg, _asignacion, true);

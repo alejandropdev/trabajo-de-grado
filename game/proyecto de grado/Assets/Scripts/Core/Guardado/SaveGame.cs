@@ -50,6 +50,12 @@ namespace Nexus.Core.Guardado {
         public string NivelActualId;
         public string FechaUltimoGuardado;
         public bool EntreNiveles;
+        /// <summary>En que fase va el nivel en curso: 1 (preparacion), 2 (desarrollo), 4 (ya lanzado). 0 entre niveles.</summary>
+        public int Fase;
+        /// <summary>El dia del desarrollo en el que va (Fase 2), y cuantos tiene el nivel. 0 si no aplica.</summary>
+        public int Dia;
+        /// <summary>Los niveles ya cerrados de esta partida.</summary>
+        public List<string> NivelesCompletados = new List<string>();
         /// <summary>True si no se pudo leer. Se muestra "(partida dañada)" y se puede borrar, sin tumbar la lista.</summary>
         public bool Danada;
         public string Error;

@@ -33,6 +33,8 @@
   "ceremonias": [
     {
       "id": "reposicion",
+      "frase": "Hay un hueco libre en «En curso».",
+      "ayuda": "El límite de trabajo es un hueco dibujado: solo cabe una tarjeta.",
       "solo": {"opciones": {"apetece": {"texto": "Coger lo que más te apetezca", "acta": "Entraron las tarjetas más entretenidas. La que esperaba el cliente sigue esperando."}}},
       "nombre": "Reposición del tablero",
       "cuando": "cada",
@@ -47,6 +49,7 @@
       "opciones": [
         {
           "id": "valor",
+          "etiqueta": "Lo más valioso",
           "texto": "Meter lo más valioso que quepa, y solo si hay hueco",
           "efectos": {
             "SatisfaccionCliente": 1
@@ -55,6 +58,7 @@
         },
         {
           "id": "todo",
+          "etiqueta": "Meter todo",
           "texto": "Meter todo lo que ha pedido el cliente, para que vea movimiento",
           "efectos": {
             "Cansancio": 2,
@@ -64,6 +68,7 @@
         },
         {
           "id": "apetece",
+          "etiqueta": "Lo que apetezca",
           "texto": "Que cada uno coja lo que le apetezca",
           "efectos": {
             "SatisfaccionCliente": -1,
@@ -75,6 +80,8 @@
     },
     {
       "id": "daily-de-tablero",
+      "frase": "Se habla de las tarjetas, no de las personas.",
+      "ayuda": "De pie ante el tablero: ¿qué falta para terminar cada tarjeta?",
       "solo": {"nombre": "Repaso ante el tablero", "texto": "De pie, delante del tablero, tú solo. Se habla de las tarjetas, no de lo ocupado que estás.", "opciones": {"por-persona": {"texto": "Repasar todo lo que llevas entre manos", "acta": "Estabas ocupado con todo. Las tarjetas atascadas siguieron atascadas: mirarte a ti no es mirar el flujo."}, "empezar-mas": {"texto": "Empezar tarjetas nuevas para no estar parado", "acta": "No estuviste parado. El trabajo sí: saltaste entre tres cosas y ninguna se terminó."}}},
       "nombre": "Reunión diaria ante el tablero",
       "cuando": "diario",
@@ -86,12 +93,14 @@
       "opciones": [
         {
           "id": "derecha-a-izquierda",
+          "etiqueta": "Derecha a izquierda",
           "texto": "Recorrer el tablero de derecha a izquierda: ¿qué falta para terminar esto?",
           "bonoDeFlujo": 0.04,
           "acta": "Dos tarjetas que llevaban días «casi» se cerraron hoy. Mirar primero lo que está más cerca del final es lo que hace que las cosas salgan."
         },
         {
           "id": "por-persona",
+          "etiqueta": "Uno por uno",
           "texto": "Preguntar a cada persona en qué está",
           "efectos": {
             "MoralEquipo": -0.5
@@ -100,6 +109,7 @@
         },
         {
           "id": "empezar-mas",
+          "etiqueta": "Empezar más tarjetas",
           "texto": "Empezar tarjetas nuevas para que nadie esté parado",
           "efectos": {
             "Cansancio": 1
@@ -119,9 +129,11 @@
       "texto": "Se mira el diagrama de flujo acumulado: dónde se ensancha la banda, ahí está el atasco. Nadie lo explica con una fórmula.",
       "muestraLeadTime": true,
       "ajustaCoeficiente": true,
+      "frase": "¿Qué cambiamos del flujo?",
       "acciones": [
         {
           "id": "bajar-wip",
+          "etiqueta": "Bajar el WIP",
           "texto": "Bajar el límite de WIP una unidad",
           "coeficiente": "gamma",
           "multiplicador": 0.8,
@@ -130,6 +142,7 @@
         },
         {
           "id": "clase-de-servicio",
+          "etiqueta": "Carril de urgencias",
           "texto": "Separar las urgencias en su propio carril",
           "coeficiente": "alpha",
           "multiplicador": 0.85,
@@ -137,6 +150,7 @@
         },
         {
           "id": "definicion-de-terminado",
+          "etiqueta": "Definir terminado",
           "texto": "Escribir qué significa «terminado» en cada columna",
           "coeficiente": "iota",
           "multiplicador": 0.85,

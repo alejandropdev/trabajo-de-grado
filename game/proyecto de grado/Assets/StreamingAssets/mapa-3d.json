@@ -1,0 +1,13 @@
+{
+  "_nota": "Plano ilustrado del recorrido 3D (tecla M). 'mundo' es el rectangulo de suelo andable en metros; 'esquinas' son sus 4 esquinas en el dibujo (pixeles, origen arriba a la izquierda) en este orden: (minX,minZ), (maxX,minZ), (maxX,maxZ), (minX,maxZ). El dibujo esta girado: arriba = -X del mundo, derecha = +Z. Calibrado el 2026-11-05 superponiendo tools/integracion-3d/mapa-paredes-invisibles.png sobre la ilustracion. Si el edificio cambia, mide de nuevo con Nexus > Mundo 3D > paredes invisibles (el informe da los limites).",
+  "imagen": "Mapas/Mapa3D",
+  "anchoImagen": 1582,
+  "altoImagen": 994,
+  "mundo": { "minX": -57.9, "maxX": 15.16, "minZ": -45.75, "maxZ": 21.45 },
+  "esquinas": [
+    [300, 28],
+    [35, 830],
+    [1545, 830],
+    [1290, 28]
+  ]
+}

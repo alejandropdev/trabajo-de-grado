@@ -11,10 +11,10 @@ using UnityEngine;
 namespace Nexus.Unity.Pantallas.Minijuegos {
     /// <summary>
     /// Lo comun a los tres verbos:
-    ///   · la RECETA (una pizarra con dibujos, al estilo de Overcooked) sale sola al empezar, con quien espera y por
-    ///     que hay prisa, y se puede volver a abrir en cualquier momento con «Receta». Mientras esta abierta, el
-    ///     reloj del reto espera;
-    ///   · el reloj circular, que corre mientras se juega. Si llega a cero, se entrega lo que haya;
+    ///   · la RECETA (una pizarra con dibujos, al estilo de Overcooked) sale sola la PRIMERA vez de cada mecanica;
+    ///     despues espera tras el «?», junto con repetir el recorrido guiado. Mientras esta abierta, el reloj espera;
+    ///   · el reloj, que corre mientras se juega y cuyo tiempo depende de la dificultad elegida en Opciones. Si llega
+    ///     a cero, se entrega lo que haya;
     ///   · el cierre: el lienzo se vuelve a pintar ENSEÑANDO la solucion (lo que acertaste, lo que se te escapo),
     ///     con la explicacion al lado.
     ///
@@ -30,12 +30,18 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private enum Fase { Receta, Jugando, Cierre }
 
         private Fase _fase = Fase.Receta;
-        private float _restante, _total;
+        private float _restante, _total, _relojInicial;
+        private RectTransform _marco, _area;
         private TemporizadorView _reloj;
         private RectTransform _cuerpo;
         private bool _recetaInicialPendiente = true;
         private bool _recetaAbierta;
         private bool _reintentado;
+        /// <summary>Un empujon para quien se queda quieto: una linea que apunta al «?». Sale una vez por reto.</summary>
+        private TMP_Text _empujon;
+        private float _quieto;
+        private bool _empujado;
+        private const float SegundosQuieto = 12f;
 
         private const float AnchoDelBriefing = 380, AnchoDelBriefingPlegado = 96;
         private UnityEngine.UI.LayoutElement _anchoDelBriefing;
@@ -46,7 +52,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         public override bool PuedeVolver { get { return false; } }
 
-        protected float Segundo { get { return Def.Presentacion.SegundosReloj - _restante; } }
+        protected float Segundo { get { return _relojInicial - _restante; } }
 
         /// <summary>
         /// El modo guiado: Marisol lleva paso a paso por todo el reto (null si se juega libre). Las subclases le
@@ -69,23 +75,30 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         protected override void Construir() {
             var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.espacio, Tema.margen * 0.75f));
+            _marco = marco;
 
             // Cabecera fina: de quien es el ticket, las herramientas y el reloj (LCD). El titulo va en el briefing.
             var cabecera = Ui.Fila(marco);
             var quien = Practica ? "PRÁCTICA EN TU ESCRITORIO · NO CUENTA PARA TU EVALUACIÓN"
                                  : $"TICKET · {(Def.Presentacion.QuienEspera ?? "").ToUpperInvariant()} · {Def.Presentacion.TextoPresion}";
             UiKit.Tamano(Ui.Texto(cabecera, quien, EstiloTexto.Leyenda, Practica ? Tema.cyan : Tema.warning), flexAncho: 1);
-            Ui.Boton(cabecera, "Receta", () => AbrirReceta(false));
-            GuiaView.BotonDeAyuda(App, cabecera);
+            // Quien te echa una mano en este reto (un compañero fuerte en esto, o alguien que confia en ti): se ve.
+            if (Pendiente != null && !string.IsNullOrEmpty(Pendiente.AyudaDe))
+                Ui.Chip(cabecera, "Te echa una mano: " + Pendiente.AyudaDe, Tema.successSoft, Tema.success);
+            PantallaDeMenu.Boton(App, cabecera, "?", "Ayuda", OpcionesDeAyuda, VarianteBoton.Secundario);
             Ui.Boton(cabecera, "Menú", AbrirPausa, VarianteBoton.Fantasma);
 
-            _restante = Math.Max(10, Def.Presentacion.SegundosReloj);
+            _restante = RelojDelReto.Segundos(Def.Presentacion.SegundosReloj, App.Preferencias.dificultad);
+            _relojInicial = _restante;
             _total = _restante;
             // El reloj del reto: cyan con tiempo, warning al final, danger cuando agotarlo entrega el reto.
             _reloj = Ui.Temporizador(cabecera, Reloj(_total), Tono.Cyan);
             GuiaView.Registrar("mj.reloj", _reloj);
+            _empujon = Ui.Texto(marco, "¿Atascado? En el «?» de arriba tienes la receta, o puedes pedir una pista.", EstiloTexto.Pequeno, Tema.warning);
+            _empujon.gameObject.SetActive(false);
 
             var area = Ui.Fila(marco, "Area", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+            _area = area;
             UiKit.Tamano(area, flexAncho: 1, flexAlto: 1);
             ConstruirBriefing(area);
             _cuerpo = Ui.Fila(area, "Cuerpo", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
@@ -93,10 +106,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             GuiaView.Registrar("mj.tablero", _cuerpo);
 
             // El panel de Marisol va entre la cabecera y el tablero: se ve a la vez que la pieza que señala.
-            if (Pendiente != null && Pendiente.Guiado) {
-                Guia = new GuiaDelMinijuego(App, marco, area.GetSiblingIndex(), PiezaGuiada, _ => Repintar());
-                _reloj.gameObject.SetActive(false);   // guiado = sin prisa: el reloj no corre
-            }
+            if (Pendiente != null && Pendiente.Guiado) ActivarGuia();
 
             // Detras de la receta: quien espera el trabajo y, por si alguien la cierra sin empezar, volver a verla.
             var espera = Ui.Ventana(_cuerpo, "Espera");
@@ -160,9 +170,32 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                    (modulo != null && !string.IsNullOrEmpty(Def.EnElProyecto) ? "  ·  " : "") + (Def.EnElProyecto ?? "");
         }
 
+        /// <summary>Marisol acompaña el reto paso a paso. Solo antes de empezar: a mitad de partida confundiria.</summary>
+        private void ActivarGuia() {
+            if (Guia != null || _fase != Fase.Receta || Pendiente == null) return;
+            Pendiente.Guiado = true;
+            Guia = new GuiaDelMinijuego(App, _marco, _area.GetSiblingIndex(), PiezaGuiada, _ => Repintar());
+            _reloj.gameObject.SetActive(false);   // guiado = sin prisa: el reloj no corre
+        }
+
+        /// <summary>Lo que hay tras el «?»: la receta, repetir el tutorial guiado y la guia de Marisol.</summary>
+        private List<OpcionDeMenu> OpcionesDeAyuda() {
+            var lista = new List<OpcionDeMenu> { new OpcionDeMenu("Ver la receta", () => AbrirReceta(false)) };
+            // Las ayudas ganadas con los compañeros se gastan antes de empezar, en la receta de inicio.
+            var ayudas = _fase == Fase.Receta ? AyudasUtiles().Count : 0;
+            if (ayudas > 0) lista.Add(new OpcionDeMenu($"Usar la ayuda de un compañero ({ayudas})", () => AbrirReceta(true)));
+            if (Pendiente != null)
+                lista.Add(new OpcionDeMenu("Jugarlo guiado por Marisol", ActivarGuia) {
+                    Activa = Guia == null && _fase == Fase.Receta
+                });
+            lista.AddRange(GuiaView.OpcionesDeAyuda(App));
+            return lista;
+        }
+
         private void AbrirReceta(bool inicio) {
             if (_recetaAbierta) return;
             _recetaAbierta = true;
+            App.AnotarRecetaVista(Def.Verbo);
             App.Router.Apilar<PantallaDeReceta>(p => {
                 p.Def = Def;
                 p.Inicio = inicio && _fase == Fase.Receta;
@@ -179,6 +212,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// La pausa tambien dentro de un reto. El reloj del reto espera. Salir entrega lo que haya en el tablero
         /// (como si se acabara el tiempo): un reto no puede quedarse a medias en el guardado.
         /// </summary>
+        /// <summary>Escape dentro de un reto abre la pausa, igual que el boton «Menú» (con su aviso y su «entregar al salir»).</summary>
+        public override bool AlPulsarEscape() {
+            if (!PantallaDePausa.Abierta) AbrirPausa();
+            return true;
+        }
+
         private void AbrirPausa() {
             App.Router.Apilar<PantallaDePausa>(p => {
                 p.Aviso = _fase == Fase.Cierre ? null : "Si sales ahora, el reto se entrega tal y como esté.";
@@ -205,7 +244,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private bool UsarAyuda(string tipo) {
             if (Pendiente == null || _fase != Fase.Receta || App.Sesion == null || !App.Sesion.UsarAyuda(tipo)) return false;
             Pendiente.Ayudas.Add(tipo);
-            if (tipo == Nexus.Core.Relaciones.TiposDeAyuda.MinutosExtra) { _restante += 45; _total += 45; }
+            if (tipo == Nexus.Core.Relaciones.TiposDeAyuda.MinutosExtra) { _restante += 45; _total += 45; _relojInicial += 45; }
             return true;
         }
 
@@ -247,16 +286,41 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// <summary>La pieza de la pantalla de la que habla un paso guiado (para señalarla). null = ninguna.</summary>
         protected virtual RectTransform PiezaGuiada(PasoGuiado paso) { return null; }
 
+        /// <summary>
+        /// Quien lleva un rato sin tocar nada probablemente no sabe por donde empezar: se le dice donde esta la ayuda,
+        /// sin abrirla por el (eso seria repetir el tutorial que ya se quito). Con Marisol guiando no hace falta.
+        /// </summary>
+        private void VigilarSiEstaQuieto(UnityEngine.InputSystem.Keyboard teclado) {
+            if (_empujado || Guia != null || _empujon == null) return;
+            var raton = UnityEngine.InputSystem.Mouse.current;
+            var hizoAlgo = (raton != null && (raton.leftButton.wasPressedThisFrame || raton.rightButton.wasPressedThisFrame)) ||
+                           (teclado != null && teclado.anyKey.wasPressedThisFrame);
+            if (hizoAlgo) { _quieto = 0; return; }
+            _quieto += Time.unscaledDeltaTime;
+            if (_quieto < SegundosQuieto) return;
+            _empujado = true;
+            _empujon.gameObject.SetActive(true);
+        }
+
+        /// <summary>El teclado mientras se juega (solo con la escena arriba del todo). Por defecto, nada.</summary>
+        protected virtual void TeclasDelJuego(UnityEngine.InputSystem.Keyboard teclado) { }
+
         /// <summary>Lo que cuesta pedir una pista: segundos del reloj. Nunca lo deja a cero (no entrega por ti).</summary>
         protected void CobrarSegundos(float segundos) { _restante = Mathf.Max(1f, _restante - segundos); }
 
         private void Update() {
             if (_recetaInicialPendiente) {
                 // La receta se apila encima en cuanto la pantalla existe (en Construir el router aun no la tiene).
+                // Solo la primera vez de cada mecanica, o si se juega guiado: despues ya se sabe y queda tras el «?».
                 _recetaInicialPendiente = false;
-                AbrirReceta(true);
+                if (Guia != null || !App.YaVioLaReceta(Def.Verbo)) AbrirReceta(true);
                 GuiaView.Avisar(App, "minijuego.presentacion");
                 return;
+            }
+            if (_fase == Fase.Jugando && !_recetaAbierta && !PantallaDePausa.Abierta && App.Router.Actual == this) {
+                var teclado = UnityEngine.InputSystem.Keyboard.current;
+                if (teclado != null) TeclasDelJuego(teclado);
+                VigilarSiEstaQuieto(teclado);
             }
             if (_fase != Fase.Jugando || _recetaAbierta || GuiaView.PausaActiva || PantallaDePausa.Abierta || Guia != null) return;
             _restante -= Time.unscaledDeltaTime;
@@ -425,10 +489,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         /// <summary>El mismo lienzo, para las pantallas que no son un minijuego (la Fase 3, el producto).</summary>
-        public static Lamina CrearLienzo(UiKit Ui, Transform padre, string rotulo, float ancho, float alto, float? anchoFijo = null) {
+        public static Lamina CrearLienzo(UiKit Ui, Transform padre, string rotulo, float ancho, float alto, float? anchoFijo = null,
+                                         bool marcoDeMetal = true) {
             var Tema = Ui.Tema;
-            // El tablero es un documento: una hoja de papel dentro de una ventana de metal, con su titulo en tinta.
-            var panel = Ui.Ventana(padre, "Lienzo", true);
+            // El tablero es un documento: una hoja de papel con su titulo en tinta. Los minijuegos la llevan dentro de una
+            // ventana de metal; las demas pantallas (el despliegue), con un filo de luz (2026-11-08).
+            var panel = marcoDeMetal ? Ui.Ventana(padre, "Lienzo", true) : Ui.LienzoDeCristal(padre, "Lienzo");
             if (anchoFijo.HasValue) UiKit.Tamano(panel, ancho: anchoFijo.Value, flexAlto: 1);
             else UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
             if (!string.IsNullOrEmpty(rotulo)) Ui.Texto(panel, rotulo, EstiloTexto.Subtitulo, Tema.paperInk);

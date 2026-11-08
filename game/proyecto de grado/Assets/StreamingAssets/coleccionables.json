@@ -105,6 +105,12 @@
       "titulo": "Webvan",
       "nicho": "Supermercado en línea con reparto a domicilio",
       "texto": "Webvan salió a bolsa en noviembre de 1999 y comprometió cerca de mil millones de dólares en construir centros de distribución automatizados antes de tener la demanda que los justificara. Cerró en julio de 2001, menos de dos años después.",
+      "hitos": [
+        { "fecha": "nov 1999", "texto": "Sale a bolsa" },
+        { "fecha": "1999-2001", "texto": "Compromete cerca de mil millones de dólares en centros automatizados" },
+        { "fecha": "1999-2001", "texto": "La demanda que los justificara no llega" },
+        { "fecha": "jul 2001", "texto": "Cierra, menos de dos años después de salir a bolsa" }
+      ],
       "causa": "Construyó la infraestructura para el éxito antes de comprobar que el éxito iba a llegar: escaló primero y validó después.",
       "fuente": "Quiebra de Webvan Group Inc. (julio de 2001), recogida por la prensa económica de la época.",
       "ubicacion": "Recorte de prensa pegado en la pared del Data Hub, con un post-it de Javier: «por si se te olvida»."
@@ -115,6 +121,12 @@
       "titulo": "Pets.com",
       "nicho": "Venta en línea de productos para mascotas",
       "texto": "Pets.com vendía comida y arena para mascotas: productos pesados, de poco margen y caros de enviar. Gastó enormes sumas en publicidad, con una famosa mascota-calcetín, y anunció su liquidación en noviembre de 2000, unos nueve meses después de salir a bolsa.",
+      "hitos": [
+        { "fecha": "2000", "texto": "Sale a bolsa vendiendo comida y arena para mascotas" },
+        { "fecha": "2000", "texto": "Gasta enormes sumas en publicidad, con su mascota-calcetín" },
+        { "fecha": "2000", "texto": "Productos pesados, de poco margen y caros de enviar" },
+        { "fecha": "nov 2000", "texto": "Anuncia su liquidación, unos nueve meses después" }
+      ],
       "causa": "Cada pedido costaba más en envío de lo que dejaba de margen: cuantos más clientes conseguía, más dinero perdía.",
       "fuente": "Anuncio de liquidación de Pets.com (noviembre de 2000), recogido por la prensa económica de la época.",
       "ubicacion": "Recorte de prensa pegado junto al de Webvan, en la pared del Data Hub."

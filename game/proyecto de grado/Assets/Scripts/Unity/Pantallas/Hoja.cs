@@ -52,6 +52,15 @@ namespace Nexus.Unity.Pantallas {
             return _ui.BotonDeOpcion(Raiz, texto, detalle, alPulsar);
         }
 
+        /// <summary>
+        /// Una ELECCION (una decision, una respuesta): una mano de cartas con hover, giro y sello. Opcion queda para
+        /// las listas (ir a una zona, marcar una tarea), que no son decisiones.
+        /// </summary>
+        public ManoDeCartas Mano(IList<OpcionDeCarta> opciones, ManoDeCartas.Ajustes ajustes = null) {
+            var fila = _ui.Fila(Raiz, "Mano", 0, alineacion: TextAnchor.MiddleCenter);
+            return ManoDeCartas.Crear(_ui, fila, opciones, ajustes);
+        }
+
         public RectTransform Tarjeta(string titulo, Color? color = null) { return _ui.Tarjeta(Raiz, titulo, color); }
         public RectTransform Tarjeta(string titulo, Tono tono) { return _ui.Tarjeta(Raiz, titulo, tono); }
 

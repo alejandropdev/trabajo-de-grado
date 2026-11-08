@@ -4,6 +4,14 @@ using NUnit.Framework;
 namespace Nexus.Tests {
     /// <summary>Las opciones del juego (SRS CU-05): se guardan, se recuperan y nunca salen de su rango.</summary>
     public class PreferenciasTests {
+        [NUnit.Framework.Test]
+        public void El_modo_tarjetas_viene_activo_y_se_guarda_aunque_se_desactive() {
+            var almacen = new AlmacenEnMemoria();
+            Assert.IsTrue(new PreferenciasStore(almacen).Cargar().modoTarjetas, "por defecto, tarjetas y frases cortas");
+            new PreferenciasStore(almacen).Guardar(new Preferencias { modoTarjetas = false });
+            Assert.IsFalse(new PreferenciasStore(almacen).Cargar().modoTarjetas, "los textos completos se recuerdan");
+        }
+
         [Test]
         public void Sin_archivo_devuelve_los_valores_por_defecto() {
             var p = new PreferenciasStore(new AlmacenEnMemoria()).Cargar();
