@@ -137,12 +137,38 @@ namespace Nexus.Unity.Pantallas {
             if (r.Danada) {
                 Ui.Texto(datos, "No se puede abrir: " + r.Error, EstiloTexto.Pequeno, Tema.danger);
             } else {
+                // Donde va: terminada, o «Fase N · Nivel M» con su dia, y una tira con un punto por nivel (2026-11-06).
+                var orden = Nexus.Core.Sesion.ProgresionDeNiveles.EnOrden(App.Catalogo);
+                var completada = orden.Count > 0 && orden.All(n => r.NivelesCompletados.Contains(n));
+                var indice = r.NivelActualId == null ? -1 : orden.IndexOf(r.NivelActualId);
                 var nivel = r.NivelActualId != null && App.Catalogo.Niveles.ContainsKey(r.NivelActualId)
                     ? App.Catalogo.Niveles[r.NivelActualId].Nombre : r.NivelActualId;
-                Ui.Texto(datos, $"{nivel} · {(r.EntreNiveles ? "al empezar el nivel" : "nivel en curso")} · guardada el " +
-                                PantallaDePerfiles.Fecha(r.FechaUltimoGuardado), EstiloTexto.Pequeno);
+
+                var estado = Ui.Fila(datos, "Estado", 8, 0, TextAnchor.MiddleLeft);
+                if (completada) {
+                    Ui.Chip(estado, "COMPLETADA", Tema.successSoft, Tema.success);
+                } else {
+                    var fase = r.EntreNiveles || r.Fase == 0 ? "Por empezar" : $"Fase {r.Fase}";
+                    Ui.Chip(estado, $"{fase}, Nivel {Math.Max(0, indice)}", Tema.cyanSoft, Tema.cyan);
+                }
+                for (var i = 0; i < orden.Count; i++) {
+                    var hecho = r.NivelesCompletados.Contains(orden[i]);
+                    var actual = !completada && i == indice;
+                    var color = hecho ? Tema.success : actual ? Tema.cyan : Tema.lineStrong;
+                    var punto = Ui.PanelColumna(estado, "Nivel " + i, 4, 0, NexusTheme.Alfa(color, hecho || actual ? 0.2f : 0.08f));
+                    Ui.Borde(punto, color, NexusTheme.RadioMd, actual ? 2 : 1);
+                    Ui.Texto(punto, "N" + i, EstiloTexto.Leyenda, hecho || actual ? color : Tema.inkFaint, TextAlignmentOptions.Center);
+                }
+
+                string donde;
+                if (completada) donde = $"{orden.Count} de {orden.Count} niveles terminados";
+                else if (r.EntreNiveles || r.Fase == 0) donde = $"{nivel} · al empezar el nivel";
+                else if (r.Fase == 1) donde = $"{nivel} · Fase 1: la preparación";
+                else if (r.Fase == 2) donde = $"{nivel} · Fase 2: el desarrollo, día {Math.Max(1, r.Dia)}";
+                else donde = $"{nivel} · Fase 4: lanzado, falta cerrar el nivel";
+                Ui.Texto(datos, $"{donde} · guardada el {PantallaDePerfiles.Fecha(r.FechaUltimoGuardado)}", EstiloTexto.Pequeno);
                 var id = r.Id;
-                Ui.Boton(linea, "Continuar", () => Abrir(id), VarianteBoton.Primario);
+                Ui.Boton(linea, completada ? "Abrir" : "Continuar", () => Abrir(id), completada ? VarianteBoton.Secundario : VarianteBoton.Primario);
             }
             // Una partida dañada no se puede continuar: su unico boton es borrarla. Las demas se borran desde «Más».
             if (r.Danada) {

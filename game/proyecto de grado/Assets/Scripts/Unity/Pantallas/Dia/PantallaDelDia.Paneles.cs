@@ -27,7 +27,7 @@ namespace Nexus.Unity.Pantallas {
         private int _pestanaDeAvisos, _pestanaDeMonitoreo;
 
         private void AbrirPanel(string etiqueta, string titulo, float ancho, Action<Hoja> pintar, Func<string> clave = null) {
-            if (_panel != null) return;
+            if (_panel != null || _muro != null || _salaDeCeremonias != null || _salaDeSuministros != null) return;
             // Abrir un panel es seguir con el dia: la tarjeta «Decidido» ya se leyo. Si se quedara puesta, el reloj
             // seguiria parado al cerrar el panel y desde dentro no se podria hacer nada.
             _decidido = null;
@@ -63,6 +63,9 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>Cierra el panel abierto, si es lo que esta encima. No hace nada si no hay ninguno.</summary>
         private void CerrarPanel() {
             if (_panel != null && App.Router.Actual == _panel) App.Router.Volver();
+            if (_muro != null && App.Router.Actual == _muro) App.Router.Volver();
+            if (_salaDeCeremonias != null && App.Router.Actual == _salaDeCeremonias) App.Router.Volver();
+            if (_salaDeSuministros != null && App.Router.Actual == _salaDeSuministros) App.Router.Volver();
         }
 
         /// <summary>Arriba de un panel desde el que se actua: si ha sonado un aviso mientras tanto, que se sepa.</summary>
@@ -480,79 +483,6 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
-        // ==================================================================== los suministros
-
-        private string _suministroAbierto;
-
-        private void AbrirSuministros() {
-            _suministroAbierto = null; _ultimoResultado = null;
-            AbrirPanel("Lo que trajiste del recorrido: úsalo cuando más falta haga", "Suministros", 900, PintarPanelDeSuministros,
-                () => string.Join(",", S.R.Suministros.Select(kv => kv.Key + kv.Value)) + "|" + S.R.UsosDeSuministros.Count + "|" +
-                      Runner.PuedeMoverse + "|" + _suministroAbierto + "|" + _ultimoResultado + "|" + S.MinutoDelDia);
-        }
-
-        /// <summary>
-        /// La pizza, el cafe y la Guepardex que se trajeron del 3D: cuantos quedan, su regla y a quien darselos. Usar uno
-        /// cuesta minutos de la jornada, como hablar con alguien.
-        /// </summary>
-        private void PintarPanelDeSuministros(Hoja h) {
-            DecirLoUltimo(h);
-            var fichas = S.FichasDeSuministros();
-            if (fichas.Count == 0) {
-                h.Nota("No te queda ningún suministro. Se consiguen recorriendo el edificio en la Fase 1.", Tema.inkMuted);
-                return;
-            }
-            h.Nota("Cada uno tiene su regla. Usarlo cuesta unos minutos de la jornada.", Tema.inkMuted);
-            var equipo = S.FichasDelEquipo();
-            foreach (var f in fichas) {
-                var o = f.Objeto; var id = o.Id; var s = o.Suministro;
-                var ficha = Ui.PanelColumna(h.Raiz, "Suministro " + id, Tema.Espacio(4), Tema.Espacio(2), Tema.surfaceRaised);
-                var cabecera = Ui.Fila(ficha, "Cabecera", Tema.Espacio(2));
-                UiKit.Tamano(Ui.Texto(cabecera, o.Nombre, EstiloTexto.Subtitulo, Tema.ink), flexAncho: 1);
-                Ui.Badge(cabecera, "×" + f.Cantidad, Tono.Cyan, solido: true);
-                if (!string.IsNullOrEmpty(o.Texto)) Ui.Texto(ficha, o.Texto, EstiloTexto.Pequeno, Tema.ink);
-                Ui.Texto(ficha, ReglaDe(s), EstiloTexto.Leyenda, Tema.cyan);
-                if (f.PorQueNo != null) Ui.Texto(ficha, f.PorQueNo, EstiloTexto.Pequeno, Tema.warning);
-
-                if (!f.ParaUnaPersona) {
-                    var repartir = Ui.Boton(ficha, $"{Solo("Repartir al equipo", "Usarlo")} ({s.MinutosDeUso} min)", () => UsarSuministro(id, null, o.Nombre), VarianteBoton.Primario);
-                    repartir.interactable = f.PorQueNo == null && Runner.PuedeMoverse;
-                    continue;
-                }
-                var abierto = _suministroAbierto == id;
-                var elegir = Ui.Boton(ficha, abierto ? "Cancelar" : "Dárselo a…", () => _suministroAbierto = abierto ? null : id,
-                                      abierto ? VarianteBoton.Fantasma : VarianteBoton.Primario);
-                elegir.interactable = f.PorQueNo == null && Runner.PuedeMoverse;
-                if (!abierto) continue;
-                Ui.Texto(ficha, $"¿A quién? Cuesta {s.MinutosDeUso} min.", EstiloTexto.Pequeno, Tema.cyan);
-                foreach (var m in equipo) {
-                    var mid = m.Miembro.Id;
-                    var rebota = S.Rebotaria(id, mid);
-                    var b = Ui.BotonDeOpcion(ficha, $"{m.Miembro.Nombre} · cansancio {m.Cansancio:0}",
-                        rebota ? "Ya tomó demasiadas estos días: le hará el efecto contrario." : "Le quita cansancio a esta persona.",
-                        () => { UsarSuministro(id, mid, o.Nombre); _suministroAbierto = null; });
-                    b.interactable = S.PorQueNoSePuedeUsarSuministro(id, mid) == null;
-                }
-            }
-        }
-
-        private void UsarSuministro(string id, string miembro, string nombre) {
-            ResultadoDeSuministro r = null;
-            Actuar(() => { r = S.UsarSuministro(id, miembro); return r.Avance; }, $"Usaste: {nombre}.");
-            if (r == null) return;
-            _ultimoResultado = r.Texto + (r.Cambios.Count > 0 ? "  (" + Textos.Previsualizar(r.Cambios) + ")" : "");
-        }
-
-        /// <summary>La regla de un suministro, en una linea: para quien es, cada cuanto y si se puede abusar de el.</summary>
-        private static string ReglaDe(Nexus.Core.Fase1.SuministroDef s) {
-            var partes = new List<string> { s.Objetivo == Nexus.Core.Fase1.ObjetivosDeSuministro.Miembro ? "Para una persona" : "Para todo el equipo" };
-            if (s.EnfriamientoDias > 0) partes.Add($"una vez cada {s.EnfriamientoDias} días");
-            if (s.VecesPorDia == 1) partes.Add("una vez al día");
-            else if (s.VecesPorDia > 1) partes.Add($"{s.VecesPorDia} veces al día");
-            if (s.ReboteUsos > 0) partes.Add($"más de {s.ReboteUsos} en {s.ReboteVentanaDias} días a la misma persona y rebota");
-            return string.Join(" · ", partes).ToUpperInvariant();
-        }
-
         // ==================================================================== el escritorio
 
         private void AbrirEscritorio() {
@@ -590,7 +520,7 @@ namespace Nexus.Unity.Pantallas {
         private void AbrirAvisos(int pestana) {
             _pestanaDeAvisos = pestana;
             AbrirPanel("Lo que suena, lo que hoy trae y lo que ya pasó", "Avisos", 1000, PintarPanelDeAvisos,
-                () => AlertasSonando().Count + "|" + _entradas.Count);
+                () => AlertasSonando().Count + "|" + S.R.Bitacora.Count);
         }
 
         private void PintarPanelDeAvisos(Hoja h) {
@@ -639,12 +569,12 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void PintarBitacora(RectTransform hoja) {
-            if (_entradas.Count == 0) {
+            if (S.R.Bitacora.Count == 0) {
                 Ui.Texto(hoja, "Todavía no ha pasado nada.", EstiloTexto.Pequeno);
                 return;
             }
             Ui.Texto(hoja, "Lo más reciente, arriba.", EstiloTexto.Leyenda, Tema.inkFaint);
-            foreach (var e in _entradas)
+            foreach (var e in S.R.Bitacora)
                 Ui.Texto(hoja, e, EstiloTexto.Pequeno, e.StartsWith("—") ? Tema.cyan : Tema.ink);
         }
 

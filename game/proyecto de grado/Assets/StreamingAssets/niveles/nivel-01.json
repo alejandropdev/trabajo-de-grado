@@ -483,6 +483,7 @@
       },
       {
         "id": "bullpen",
+        "minijuegoDeZona": "rumores",
         "area": [0.02, 0.36, 0.4, 0.26],
         "nombre": "El bullpen",
         "descripcion": "La sala abierta donde trabaja tu equipo. Huele a café recalentado y a soldador.",
@@ -502,6 +503,7 @@
       },
       {
         "id": "cafeteria",
+        "minijuegoDeZona": "cafe",
         "area": [0.28, 0.06, 0.285, 0.25],
         "nombre": "La cafetería de N1",
         "descripcion": "Mesas largas, una máquina de café que funciona solo si la golpeas y una pantalla con el menú del día que nadie lee.",
@@ -521,6 +523,7 @@
       },
       {
         "id": "data-hub",
+        "minijuegoDeZona": "logs",
         "area": [0.02, 0.66, 0.48, 0.29],
         "nombre": "Data Hub, sótano −2",
         "descripcion": "Racks, aire acondicionado demasiado fuerte y una terminal antigua con una silla gastada delante.",

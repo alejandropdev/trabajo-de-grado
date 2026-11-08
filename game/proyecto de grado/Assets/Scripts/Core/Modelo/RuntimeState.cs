@@ -216,6 +216,62 @@ namespace Nexus.Core.Modelo {
         public List<double> SerieWip = new List<double>();
         public List<double> SerieLeadTime = new List<double>();
 
+        // --- Series de los KPIs de la Fase 2 (las tarjetas del panel con su mini-grafica), una muestra por dia ---
+        public List<double> SerieMoral = new List<double>();
+        public List<double> SerieCansancio = new List<double>();
+        public List<double> SerieDeuda = new List<double>();
+        public List<double> SerieCobertura = new List<double>();
+        public List<double> SerieSatisfaccion = new List<double>();
+
+        /// <summary>
+        /// La bitacora de la jornada (lo mas nuevo primero, como mucho BitacoraMaxima lineas). Antes vivia en la pantalla y
+        /// se perdia al cargar la partida; ahora se guarda con ella (bandeja «M», 2026-11-06).
+        /// </summary>
+        public List<string> Bitacora = new List<string>();
+        public const int BitacoraMaxima = 60;
+
+        /// <summary>Zona -> ultimo dia en que se jugo su minijuego de zona (una vez al dia cada uno).</summary>
+        public Dictionary<string, int> MinijuegoDeZonaJugado = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        /// <summary>Lineas escritas en la bitacora desde el principio, y cuantas de ellas ya se abrieron en el buzon «M».</summary>
+        public int BitacoraTotal, BitacoraVista;
+
+        /// <summary>Las novedades de la bitacora que aun no se han abierto (como mucho las que quedan guardadas).</summary>
+        public int BitacoraSinVer { get { return Novedades == null ? 0 : Novedades.Count; } }
+
+        /// <summary>
+        /// Las novedades sin abrir del buzon «M», de la mas antigua a la mas nueva: SOLO lo que paso sin el jugador. Lista
+        /// propia (antes se contaba por posicion en la bitacora, y lo que hacia el jugador acababa contando tambien).
+        /// </summary>
+        public List<string> Novedades = new List<string>();
+
+        public void VerNovedad(string linea) {
+            if (Novedades != null && Novedades.Remove(linea)) BitacoraVista++;
+        }
+
+        /// <summary>
+        /// Escribe en la bitacora. 'novedad' = algo que el jugador no hizo y conviene que vea (un aviso que caduco, lo que
+        /// trae el dia): cuenta en la «M». Lo que hizo el mismo jugador (una ronda de pruebas, asistir, usar algo) se
+        /// anota ya visto.
+        /// </summary>
+        public void Anotar(string linea, bool novedad = true) {
+            if (string.IsNullOrEmpty(linea)) return;
+            if (Bitacora == null) Bitacora = new List<string>();
+            Bitacora.Insert(0, linea);
+            BitacoraTotal++;
+            if (novedad) {
+                if (Novedades == null) Novedades = new List<string>();
+                Novedades.Add(linea);
+                while (Novedades.Count > 30) Novedades.RemoveAt(0);
+            }
+            while (Bitacora.Count > BitacoraMaxima) Bitacora.RemoveAt(Bitacora.Count - 1);
+        }
+
+        /// <summary>Abre (da por vista) la novedad mas antigua sin ver.</summary>
+        public void VerUnaNovedad() {
+            if (Novedades != null && Novedades.Count > 0) VerNovedad(Novedades[0]);
+        }
+
         private static readonly string[] _consultables = {
             "diaActual", "fase", "wipActual", "limiteWip", "sobreCompromiso",
             "diasConHorasExtra", "diasSeguidosTrabajando", "cambiosAceptados",
@@ -324,6 +380,15 @@ namespace Nexus.Core.Modelo {
             if (Suministros == null) Suministros = new Dictionary<string, int>(StringComparer.Ordinal);
             if (UsosDeSuministros == null) UsosDeSuministros = new List<UsoDeSuministro>();
             if (AccionesSoloHoy == null) AccionesSoloHoy = new List<string>();
+            // Guardados anteriores al rediseño de la Fase 2 (carrusel, bandeja M, minijuegos de zona).
+            if (SerieMoral == null) SerieMoral = new List<double>();
+            if (SerieCansancio == null) SerieCansancio = new List<double>();
+            if (SerieDeuda == null) SerieDeuda = new List<double>();
+            if (SerieCobertura == null) SerieCobertura = new List<double>();
+            if (SerieSatisfaccion == null) SerieSatisfaccion = new List<double>();
+            if (Bitacora == null) Bitacora = new List<string>();
+            if (Novedades == null) Novedades = new List<string>();
+            if (MinijuegoDeZonaJugado == null) MinijuegoDeZonaJugado = new Dictionary<string, int>(StringComparer.Ordinal);
         }
 
         // IContadoresDeSimulacion, implementado de forma explicita: para leerlos hay que pedir el puerto,

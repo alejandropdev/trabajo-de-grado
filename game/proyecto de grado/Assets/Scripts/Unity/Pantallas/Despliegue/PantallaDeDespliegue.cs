@@ -273,7 +273,7 @@ namespace Nexus.Unity.Pantallas {
                          "El orden importa: lo que va a la izquierda pasa primero. No hace falta llenarlos todos, pero lo que no pongas no ocurre.\n\n" +
                          (mirado == null ? "Pulsa un tramo para ver qué hace."
                                          : $"<b>{mirado.Nombre}</b>\n{mirado.QueHace}");
-            _principal.GetComponentInChildren<TMP_Text>().text = _plan.Modulos.Count == 0 ? "Tubería lista: entregar" : "Tubería lista: a los módulos  ►";
+            _principal.GetComponentInChildren<TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro(_plan.Modulos.Count == 0 ? "Tubería lista: entregar" : "Tubería lista: a los módulos  ►");
         }
 
         private void SoltarTramo(string id, Vector2 centro, int desde) {
@@ -405,7 +405,7 @@ namespace Nexus.Unity.Pantallas {
                 var titulo = renglon.Estado == EstadosDeDespliegue.Bien ? "ENCENDIÓ" : renglon.Estado == EstadosDeDespliegue.Mal ? "ENCENDIÓ, PERO MAL" : "NO ENCENDIÓ";
                 _lamina.Texto(40, H - 150, 360, 34, titulo, 22, color, TextAlignmentOptions.MidlineLeft, null, true);
                 _info.text = $"<b>{NombreDe(id)}: {titulo.ToLowerInvariant()}.</b>\n{renglon.Texto}";
-                _principal.GetComponentInChildren<TMP_Text>().text = _modulo + 1 >= _plan.Modulos.Count ? "Terminar el despliegue  ►" : "Siguiente módulo  ►";
+                _principal.GetComponentInChildren<TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro(_modulo + 1 >= _plan.Modulos.Count ? "Terminar el despliegue  ►" : "Siguiente módulo  ►");
                 return;
             }
             var sueltos = cables.Count(c => !c.EsDependencia && !puestos.ContainsKey(c.Id));

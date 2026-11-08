@@ -236,7 +236,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                     b = Ui.Boton(fila, "Usar: " + NombreCorto(ayuda), () => {
                         if (!AlUsarAyuda(ayuda)) return;
                         b.interactable = false;
-                        b.GetComponentInChildren<TMPro.TMP_Text>().text = "√ " + NombreCorto(ayuda);
+                        b.GetComponentInChildren<TMPro.TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro("√ " + NombreCorto(ayuda));
                     });
                 }
             }
@@ -270,7 +270,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             MarcoDePizarra.Limpiar(_lamina);
             var t = new Tizador(_lamina, Ui.FuenteTiza);
             if (_viendoProyecto) PintarDondeEstamos(t); else Pintar(t);
-            if (_textoPrincipal != null) _textoPrincipal.text = _viendoProyecto ? "Cómo se juega  ►" : Inicio ? "¡A jugar!" : "Volver al reto";
+            // Glifos.Seguro: el boton ya es neon, con la letra del design system, que no tiene «►».
+            if (_textoPrincipal != null)
+                _textoPrincipal.text = Nexus.Core.Narrativa.Glifos.Seguro(_viendoProyecto ? "Cómo se juega  ►" : Inicio ? "¡A jugar!" : "Volver al reto");
             if (_volverAlProyecto != null) _volverAlProyecto.SetActive(!_viendoProyecto);
         }
 

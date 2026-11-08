@@ -77,6 +77,12 @@ namespace Nexus.Core.Jornada {
 
         public bool TieneArea { get { return Area != null && Area.Length == 4; } }
 
+        /// <summary>
+        /// El minijuego propio de esta zona (TiposDeMinijuegoDeZona: cafe, logs, rumores, tablon), o null. Se juega una
+        /// vez al dia en la escena de la zona (Fase 2, 2026-11-06).
+        /// </summary>
+        public string MinijuegoDeZona;
+
         public ZonaDeNivel Clone() {
             var c = (ZonaDeNivel)MemberwiseClone();
             c.Area = Area == null ? null : (float[])Area.Clone();

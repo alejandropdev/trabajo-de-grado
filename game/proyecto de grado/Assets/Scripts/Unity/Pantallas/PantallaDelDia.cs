@@ -42,18 +42,9 @@ namespace Nexus.Unity.Pantallas {
 
         // interfaz
         private Hoja _ahora;
-        private TMP_Text _titulo, _etiqueta, _riesgo, _satisfaccion, _textoAvisos;
         private Button _pausa;
-        private readonly TMP_Text[] _valores = new TMP_Text[5];
-        private readonly TMP_Text[] _efectos = new TMP_Text[5];
-        private TMP_Text _pronosticoTitulo, _pronosticoDetalle;
-        private BarraView _pronosticoBarra;
-        /// <summary>Por modulo del proyecto: el texto del porcentaje y su barra.</summary>
-        private readonly List<KeyValuePair<TMP_Text, BarraView>> _modulos = new List<KeyValuePair<TMP_Text, BarraView>>();
-        private float _siguientePronostico;
-        private readonly BarraView[] _barras = new BarraView[5];
         private readonly List<KeyValuePair<Alerta, TMP_Text>> _cuentasAtras = new List<KeyValuePair<Alerta, TMP_Text>>();
-        private string _claveAhora, _claveRiel;
+        private string _claveAhora;
         private Paso _pasoAnterior;
 
         // lo que la pantalla sabe y la sesion no
@@ -65,7 +56,6 @@ namespace Nexus.Unity.Pantallas {
         private double[] _alEmpezarElDia = new double[5];
         private int _decisionesDeHoy;
         private bool _tengoElInicioDelDia;   // false al recuperar una partida: no se sabe como empezo ese dia
-        private readonly List<string> _entradas = new List<string>();
 
         /// <summary>Los cinco medidores del proyecto: nombre corto (el panel), nombre largo (el detalle) y su entrada del glosario.</summary>
         private static readonly string[] MedidoresCortos = { "Avance", "Deuda", "Moral", "Cobertura", "Cansancio" };
@@ -77,22 +67,9 @@ namespace Nexus.Unity.Pantallas {
         // ==================================================================== construir
 
         protected override void Construir() {
-            var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.espacio, Tema.margen * 0.75f));
-            ConstruirHud(marco);
-            ConstruirRiel(marco);
-
-            var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen * 0.75f, alineacion: TextAnchor.UpperLeft);
-            UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);
-
-            var centro = Ui.PanelColumna(cuerpo, "Ahora", Tema.margen, Tema.espacio);
-            UiKit.Tamano(centro, flexAncho: 1, flexAlto: 1);
-            RectTransform contenido;
-            var scroll = Ui.Desplazable(centro, out contenido);
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-            _ahora = new Hoja(Ui, contenido);
-            GuiaView.Registrar("dia.ahora", centro);
-
-            ConstruirProyecto(cuerpo);
+            // Fase 2 rediseñada (2026-11-06): HUD fijo, carrusel o escena de zona, carta del momento, tiras de avisos y
+            // bandeja M (Dia/PantallaDelDia.Escenario.cs).
+            ConstruirEscenario();
 
             Runner.Usar(S);
             if (S.R.DiaActual > 0) Runner.ReanudarDia();
@@ -127,158 +104,11 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
-        /// <summary>El HUD: que dia es y donde estas, el reloj, y el control del tiempo. Una sola franja.</summary>
-        private void ConstruirHud(Transform padre) {
-            var hud = Ui.Fila(padre, "HUD");
-            var titulos = Ui.Columna(hud, espacio: Tema.Espacio(1));
-            UiKit.Tamano(titulos, flexAncho: 1);
-            _etiqueta = Ui.Texto(titulos, "", EstiloTexto.Leyenda, Tema.cyan);
-            _titulo = Ui.Texto(titulos, "", EstiloTexto.Subtitulo, Tema.ink);
-
-            GuiaView.Registrar("dia.reloj", RelojView.CrearCompacto(Ui, hud, Runner));
-
-            _pausa = Ui.Boton(hud, "Pausa", () => Runner.Pausado = !Runner.Pausado);
-            UiKit.Tamano(_pausa, ancho: 130);
-            // Un solo boton para la velocidad: cada clic pasa a la siguiente (×1 → ×2 → ×4 → ×1).
-            var velocidad = Ui.Boton(hud, RotuloDeVelocidad(), () => {
-                Runner.Velocidad = Runner.Velocidad < 1.5 ? 2 : Runner.Velocidad < 3 ? 4 : 1;
-                _textoVelocidad.text = RotuloDeVelocidad();
-            }, VarianteBoton.Fantasma);
-            UiKit.Tamano(velocidad, ancho: 96);
-            _textoVelocidad = velocidad.GetComponentInChildren<TMP_Text>();
-            GuiaView.Registrar("dia.velocidad", _pausa);
-            var menu = Ui.Boton(hud, "Menú", () => App.Router.Apilar<PantallaDePausa>());
-            GuiaView.Registrar("dia.diario", menu);   // el diario vive en «Menú» (la pausa)
-        }
-
         private string RotuloDeVelocidad() {
             var v = Runner.Velocidad;
-            return "×" + v.ToString("0.#") + " ▸";
-        }
-
-        /// <summary>
-        /// El riel: lo que se usa a cada rato (Tablero, Equipo, Avisos) a la vista, y lo demas tras «Más». Con el HUD
-        /// (Pausa, velocidad, Menú) son siete botones, y no compiten entre si.
-        /// Tambien es a donde señala la guia cuando habla de algo que vive dentro de un panel cerrado
-        /// (RegistrarRespaldo): lo que esta tras «Más» se señala en «Más».
-        /// </summary>
-        private void ConstruirRiel(Transform padre) {
-            var riel = Ui.Fila(padre, "Riel", Tema.Espacio(2));
-            var tablero = Ui.Boton(riel, "Tablero", () => AbrirTablero(0));
-            var equipo = Ui.Boton(riel, "Equipo", AbrirEquipo);
-            var avisos = Ui.Boton(riel, "Avisos", () => AbrirAvisos(0));
-            UiKit.Tamano(avisos, ancho: 260);   // su rotulo cambia («Avisos · 2 esperando»): ancho fijo para que quepa
-            _textoAvisos = avisos.GetComponentInChildren<TMP_Text>();
-            Ui.Resorte(riel);
-            var mas = PantallaDeMenu.Boton(App, riel, "Más ▾", "Más", OpcionesDelRiel, VarianteBoton.Secundario);
-            UiKit.Tamano(mas, ancho: 220);   // «Más · 2 nuevos» cuando el cliente manda papeles
-            _textoMas = mas.GetComponentInChildren<TMP_Text>();
-
-            GuiaView.RegistrarRespaldo("dia.tablero", tablero);
-            GuiaView.RegistrarRespaldo("dia.equipo", equipo);
-            GuiaView.Registrar("dia.ceremonias", mas);
-
-            GuiaView.Registrar("dia.cliente", mas);
-            GuiaView.RegistrarRespaldo("dia.mapa", mas);
-            GuiaView.RegistrarRespaldo("dia.aqui", mas);
-            GuiaView.RegistrarRespaldo("mapa.", mas);
-            GuiaView.RegistrarRespaldo("dia.oficina", mas);
-        }
-
-        /// <summary>Lo que hay tras «Más», con sus contadores del momento.</summary>
-        private List<OpcionDeMenu> OpcionesDelRiel() {
-            var lista = new List<OpcionDeMenu> {
-                new OpcionDeMenu("Mapa de la oficina", AbrirMapa),
-                new OpcionDeMenu("Ceremonias", () => AbrirCeremonias(0)),
-                new OpcionDeMenu("Escritorio", AbrirEscritorio),
-                new OpcionDeMenu("Monitoreo del proyecto", () => AbrirMonitoreo(0)),
-            };
-            // La carpeta del cliente: sus papeles, que van llegando.
-            if (S.Perfil.Proyecto != null && S.Perfil.Proyecto.Papeles.Count > 0) {
-                var papeles = S.PapelesSinLeer();
-                lista.Add(new OpcionDeMenu(papeles > 0 ? $"Carpeta del cliente · {papeles} nuevo{(papeles == 1 ? "" : "s")}" : "Carpeta del cliente",
-                                           AbrirCarpetaDelCliente));
-            }
-            // Lo que se trajo del recorrido 3D (pizza, café, Guepardex). Solo si se trajo algo.
-            if (S.R.Suministros.Count > 0) {
-                var quedan = S.R.Suministros.Values.Sum();
-                lista.Add(new OpcionDeMenu(quedan > 0 ? $"Suministros · {quedan}" : "Suministros", AbrirSuministros));
-            }
-            // El diario y la ayuda de la guia estan en «Menú» (la pausa): asi este menu no pasa de siete.
-            return lista;
-        }
-
-        /// <summary>
-        /// «El proyecto»: lo que se esta construyendo y como va, de un vistazo. Una linea por medidor (el efecto de
-        /// cada uno solo aparece cuando ya esta haciendo daño); el detalle completo, con sus «?», esta en Monitoreo.
-        /// </summary>
-        private void ConstruirProyecto(Transform padre) {
-            var panel = Ui.PanelColumna(padre, "Proyecto", Tema.margen * 0.75f, Tema.espacio);
-            UiKit.Tamano(panel, ancho: 640, flexAlto: 1);
-            GuiaView.Registrar("dia.proyecto", panel);
-
-            var ficha = S.Perfil.Proyecto;
-            var cabecera = Ui.Fila(panel, "Cabecera");
-            UiKit.Tamano(Ui.Texto(cabecera, "EL PROYECTO" + (ficha != null ? " · " + ficha.Nombre.ToUpperInvariant() : ""),
-                                  EstiloTexto.Leyenda, Tema.cyan), flexAncho: 1);
-            Ui.Boton(cabecera, "Ver el detalle", () => AbrirMonitoreo(0), VarianteBoton.Fantasma);
-
-            RectTransform contenido;
-            var scroll = Ui.Desplazable(panel, out contenido, "Proyecto (scroll)");
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-
-            // Lo primero: como saldria el lanzamiento si se entregara al ritmo de hoy. Es lo que da peso a cada barra.
-            var pronostico = Ui.Columna(contenido, "Pronostico", Tema.Espacio(1));
-            GuiaView.Registrar("dia.pronostico", pronostico);
-            _pronosticoTitulo = Ui.Texto(pronostico, "", EstiloTexto.Cuerpo, Tema.ink);
-            _pronosticoBarra = Ui.Barra(pronostico, 0, Tema.cyan);
-            _pronosticoDetalle = Ui.Texto(pronostico, "", EstiloTexto.Pequeno, Tema.inkMuted);
-            Ui.Separador(contenido);
-
-            var colores = new[] { Tema.cyan, Tema.warning, Tema.cyan, Tema.cyan, Tema.warning };
-            for (var i = 0; i < MedidoresCortos.Length; i++) {
-                var fila = Ui.Fila(contenido, "Medidor", Tema.Espacio(3));
-                UiKit.Tamano(Ui.Texto(fila, MedidoresCortos[i], EstiloTexto.Pequeno, Tema.ink), ancho: 120);
-                _barras[i] = Ui.Barra(fila, 0, colores[i]);
-                _valores[i] = Ui.Texto(fila, "", EstiloTexto.Pequeno, Tema.ink, TextAlignmentOptions.Right);
-                UiKit.Tamano(_valores[i], ancho: 130);
-                _efectos[i] = Ui.Texto(contenido, "", EstiloTexto.Leyenda, Tema.danger);
-                _efectos[i].gameObject.SetActive(false);
-            }
-            _riesgo = Ui.Texto(contenido, "", EstiloTexto.Pequeno);
-            _satisfaccion = Ui.Texto(contenido, "", EstiloTexto.Pequeno);
-
-            // Lo que el equipo tiene entre manos ahora mismo: el tablero, en pequeño.
-            Ui.Separador(contenido);
-            ConstruirTableroDelDia(contenido);
-
-            // El avance, parte por parte del sistema: que se construye de verdad cada dia (ronda 4).
-            if (ficha != null && ficha.Modulos.Count > 0) {
-                Ui.Separador(contenido);
-                var modulos = Ui.Columna(contenido, "Modulos", Tema.Espacio(2));
-                GuiaView.Registrar("dia.modulos", modulos);
-                var titulo = Ui.Fila(modulos, "Titulo");
-                UiKit.Tamano(Ui.Texto(titulo, "LAS PARTES DEL SISTEMA", EstiloTexto.Leyenda, Tema.cyan), flexAncho: 1);
-                // La maqueta viva: como se ve hoy cada parte (boceto, mockup, prototipo, MVP), para tocarla.
-                var producto = Ui.Boton(titulo, "Ver el producto", () => PantallaDelProducto.Abrir(App));
-                GuiaView.Registrar("dia.producto", producto);
-                // La arquitectura elegida no se queda en la Fase 1: aqui esta, con su plano y lo que le hace al dia.
-                var arq = S.Perfil.Fase1 == null ? null : S.Perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == S.ArquitecturaElegida);
-                if (arq != null) {
-                    var filaArq = Ui.Fila(modulos, "Arquitectura", Tema.Espacio(2));
-                    UiKit.Tamano(Ui.Texto(filaArq, "Arquitectura: <b>" + arq.Nombre + "</b>", EstiloTexto.Pequeno, Tema.ink), flexAncho: 1);
-                    Ui.Boton(filaArq, "Ver el plano", () => PantallaDelProducto.AbrirPlano(App, arq.Id, true), VarianteBoton.Fantasma);
-                    Ui.Texto(modulos, DibujosDeArquitectura.EnElDia(arq.Id), EstiloTexto.Leyenda, Tema.inkMuted);
-                }
-                foreach (var m in ficha.Modulos) {
-                    var fila = Ui.Fila(modulos, "Modulo", Tema.Espacio(3));
-                    UiKit.Tamano(Ui.Texto(fila, m.Nombre, EstiloTexto.Pequeno, Tema.ink), ancho: 220);
-                    var barra = Ui.Barra(fila, 0, Tema.cyan);
-                    var pct = Ui.Texto(fila, "", EstiloTexto.Pequeno, Tema.ink, TextAlignmentOptions.Right);
-                    UiKit.Tamano(pct, ancho: 70);
-                    _modulos.Add(new KeyValuePair<TMP_Text, BarraView>(pct, barra));
-                }
-            }
+            // Sin símbolo detras: «▸» no existe en Rajdhani y, como este texto se reasigna directo (sin pasar por
+            // Glifos.Seguro), se pintaba como un cuadro junto al ×1.
+            return "×" + v.ToString("0.#");
         }
 
         private void OnDestroy() {
@@ -338,79 +168,12 @@ namespace Nexus.Unity.Pantallas {
                     ? $"Caduca a las {RelojDeJornada.Formatear(kv.Key.MinutoDeExpiracion)} · quedan {kv.Key.MinutosParaExpirar(S.MinutoDelDia)} min"
                     : "";
 
-            PintarCabecera();
-            PintarRiel();
-            PintarProyecto();
-            PintarTableroDelDia();
-        }
-
-        private void PintarCabecera() {
-            var brief = S.BriefDeHoy;
-            _etiqueta.text = S.Perfil.Nombre.ToUpperInvariant() + " · " + S.Metodologia.Nombre.ToUpperInvariant();
-            var zona = ZonaDondeEstoy();
-            _titulo.text = (S.R.DiaActual == 0
-                ? "Antes del día 1"
-                : $"Día {S.R.DiaActual} de {S.Perfil.DiasTotales}" + (brief != null ? " · " + brief.EtiquetaUnidad : "")) +
-                (zona != null ? "  ·  estás en: " + zona.Nombre : "");
-            _pausa.GetComponentInChildren<TMP_Text>().text = Runner.Pausado ? "Seguir" : "Pausa";
-            if (_textoVelocidad != null) _textoVelocidad.text = RotuloDeVelocidad();   // por si Opciones la cambio
-        }
-
-        /// <summary>El boton «Avisos» dice cuantos esperan: es lo unico del riel que cambia solo.</summary>
-        private void PintarRiel() {
-            var sonando = AlertasSonando().Count;
-            var papeles = S.Perfil.Proyecto != null && S.Perfil.Proyecto.Papeles.Count > 0 ? S.PapelesSinLeer() : 0;
-            var clave = sonando + "|" + papeles;
-            if (clave == _claveRiel) return;
-            _claveRiel = clave;
-            // Solo cuenta lo que YA sono y espera: lo que vaya a llegar hoy no se anuncia, llega.
-            _textoAvisos.text = sonando > 0 ? $"Avisos · {sonando} esperando" : "Avisos";
-            // Papeles nuevos del cliente: se avisa en «Más», que es donde esta su carpeta.
-            _textoMas.text = papeles > 0 ? $"Más · {papeles} nuevo{(papeles == 1 ? "" : "s")}" : "Más ▾";
+            ActualizarEscenario(paso);
         }
 
         private ZonaDeNivel ZonaDondeEstoy() {
             var mapa = S.Perfil.Mapa;
             return mapa == null || mapa.Vacio ? null : mapa.PorId(S.ZonaActual);
-        }
-
-        private void PintarProyecto() {
-            var w = S.W;
-            _valores[0].text = $"{w.Avance:0} / {w.Alcance:0} pts";
-            _barras[0].Valor = w.Alcance > 0 ? (float)(w.Avance / w.Alcance) : 0;
-            _valores[1].text = $"{w.DeudaTecnica:0} / 100";
-            _barras[1].Valor = (float)w.DeudaTecnica / 100f;
-            _valores[2].text = $"{w.MoralEquipo:0} / 100";
-            _barras[2].Valor = (float)w.MoralEquipo / 100f;
-            _valores[3].text = $"{w.Cobertura:0} %";
-            _barras[3].Valor = (float)w.Cobertura / 100f;
-            _valores[4].text = $"{w.Cansancio:0} / 100";
-            _barras[4].Valor = (float)w.Cansancio / 100f;
-            var d = S.BriefDeHoy != null ? S.BriefDeHoy.Derivadas : null;
-            _riesgo.text = d == null ? "" : $"Riesgo latente al empezar el día: {d.RiesgoLatente:0} / 100";
-            _satisfaccion.text = $"Satisfacción del cliente: {w.SatisfaccionCliente:0} / 100" +
-                                 (w.SatisfaccionCliente <= 35 ? $" · <color={NexusTheme.Html(Tema.danger)}>tan baja que pedirán explicaciones</color>" : "");
-
-            // Debajo de un medidor solo se escribe cuando ya esta haciendo daño: asi el rojo significa algo.
-            bool[] malos;
-            var efectos = EfectosDeLosMedidores(out malos);
-            for (var i = 0; i < _efectos.Length; i++) {
-                var go = _efectos[i].gameObject;
-                if (go.activeSelf != malos[i]) go.SetActive(malos[i]);
-                if (malos[i]) _efectos[i].text = efectos[i];
-            }
-
-            if (_modulos.Count > 0) {
-                var porModulo = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(S.Perfil.Proyecto, w.Avance, w.Alcance);
-                for (var i = 0; i < _modulos.Count && i < porModulo.Count; i++) {
-                    _modulos[i].Key.text = $"{porModulo[i].Value:0} %";
-                    _modulos[i].Value.Valor = (float)(porModulo[i].Value / 100.0);
-                }
-            }
-            if (Time.unscaledTime >= _siguientePronostico) {
-                _siguientePronostico = Time.unscaledTime + 1f;
-                PintarPronostico();
-            }
         }
 
         /// <summary>
@@ -435,16 +198,6 @@ namespace Nexus.Unity.Pantallas {
                 $"~{errCob:0} errores sin probar llegarían al cliente",
                 $"El equipo va un {lentoFatiga:0} % más lento por cansancio" + (malos[4] ? " · se equivoca más" : "")
             };
-        }
-
-        private void PintarPronostico() {
-            if (S.R.Fase != 2) return;
-            var c = S.Pronostico();
-            var color = NexusTheme.Html(ColorDelNivel(c.Nivel));
-            _pronosticoTitulo.text = $"Si sigues así: <color={color}><b>{Nexus.Core.Evaluacion.NivelesDeLanzamiento.Titulo(c.Nivel).ToLowerInvariant()}</b></color> ({c.Puntaje:0}/100)";
-            _pronosticoBarra.Valor = (float)(c.Puntaje / 100.0);
-            var peor = c.Factores.OrderBy(f => f.Maximo > 0 ? f.Puntos / f.Maximo : 1).First();
-            _pronosticoDetalle.text = $"Lo que más te resta: {peor.Nombre.ToLowerInvariant()} ({peor.Valor}).";
         }
 
         private Color ColorDelNivel(string nivel) {
@@ -474,6 +227,11 @@ namespace Nexus.Unity.Pantallas {
         private void PintarAhora(Paso paso) {
             _cuentasAtras.Clear();
             _ahora.Vaciar();
+            // El resumen del dia y el cierre de la jornada no se desplazan: tienen su carta fija (Dia/PantallaDelDia.Resumen.cs, .Cierre.cs).
+            var fijo = paso == Paso.Resumen || paso == Paso.Cierre || paso == Paso.FinDelDesarrollo || (paso == Paso.Planificacion && S.SeArmaElSprintBacklog);
+            _scrollMomento.gameObject.SetActive(!fijo);
+            _fijoMomento.gameObject.SetActive(fijo);
+            UiKit.Vaciar(_fijoMomento);
             switch (paso) {
                 case Paso.AntesDeEmpezar: AntesDeEmpezar(); break;
                 case Paso.Retro: Retro(); break;
@@ -559,9 +317,20 @@ namespace Nexus.Unity.Pantallas {
         private readonly HashSet<string> _alSprint = new HashSet<string>();
         private int _diaDelSprintBacklog = -1;
 
+        private RectTransform _capaDelDia;
+        private bool _ayudaDelSprint;
+
+        /// <summary>La capa por encima de todo el dia donde vuelan las fichas (y los sellos) fuera del muro.</summary>
+        private RectTransform CapaDelDia() {
+            if (_capaDelDia == null) _capaDelDia = PiezasDelMuro.CapaDeArrastre(Ui, Raiz);
+            _capaDelDia.SetAsLastSibling();
+            return _capaDelDia;
+        }
+
         /// <summary>
-        /// La planificacion cuando hay mas de un sprint: se arma el sprint backlog tarjeta a tarjeta. A la izquierda de
-        /// cada una, si entra; arriba, la capacidad que se va llenando.
+        /// La planificacion cuando hay mas de un sprint (2026-11-06, sin scroll): dos carriles, el product backlog y
+        /// «Este sprint», con el tubo de lo que cabe en medio. Las fichas se arrastran de uno a otro (o un clic las pasa);
+        /// lo ya empezado entra si o si, con candado. Pasada la raya, el tubo se vuelve ambar y lo que no cabe se marca.
         /// </summary>
         private void ArmarElSprintBacklog() {
             var plan = S.PendingPlanning;
@@ -576,39 +345,95 @@ namespace Nexus.Unity.Pantallas {
                     _alSprint.Add(c.Id); cabe += c.Restante;
                 }
             }
-            var suma = candidatas.Where(c => _alSprint.Contains(c.Id) || c.Empezada).Sum(c => c.Restante);
+            var dentro = candidatas.Where(c => _alSprint.Contains(c.Id) || c.Empezada).ToList();
+            var fuera = candidatas.Where(c => !_alSprint.Contains(c.Id) && !c.Empezada).ToList();
+            var suma = dentro.Sum(c => c.Restante);
             var pasado = suma > plan.CapacidadSugerida + 0.5;
+            var raiz = _fijoMomento;
+            var capa = CapaDelDia();
 
-            _ahora.Etiqueta("Ceremonia · planificación de " + plan.Unidad);
-            _ahora.Titulo("Arma el sprint backlog");
-            _ahora.Parrafo($"Del product backlog, elige lo que {Solo("el equipo se compromete", "te comprometes")} a terminar en este sprint. Caben unos {plan.CapacidadSugerida:0.#} puntos; quedan {plan.PuntosPendientes:0} por hacer en total.");
-            PantallaDeGlosario.Palabras(App, _ahora.Raiz, "Si alguna palabra no te suena:", "backlog", "sprint", "planificacion-de-sprint");
+            // ---- cabecera: que es, cuanto cabe, y las palabras detras de «?»
+            var cabecera = Ui.Fila(raiz, "Cabecera", Tema.espacio, 0, TextAnchor.MiddleLeft);
+            var titulos = Ui.Columna(cabecera, "Titulos", 2);
+            UiKit.Tamano(titulos, flexAncho: 1);
+            Ui.Texto(titulos, ("Planificación de " + plan.Unidad).ToUpperInvariant(), EstiloTexto.Leyenda, Tema.cyan).characterSpacing = 3;
+            var titulo = Ui.Texto(titulos, "ARMA EL SPRINT", EstiloTexto.Titulo, Tema.ink);
+            titulo.font = Tema.FuenteDisplay;
+            Ui.Texto(titulos, $"Caben unos {plan.CapacidadSugerida:0.#} puntos. Pasa al sprint lo que {Solo("el equipo se compromete", "te comprometes")} a terminar.",
+                     EstiloTexto.Pequeno, Tema.inkMuted);
+            Ui.Boton(cabecera, _ayudaDelSprint ? "Ocultar palabras" : "?", () => { _ayudaDelSprint = !_ayudaDelSprint; _claveAhora = null; }, VarianteBoton.Fantasma);
+            if (_ayudaDelSprint) PantallaDeGlosario.Palabras(App, raiz, "Si alguna palabra no te suena:", "backlog", "sprint", "planificacion-de-sprint");
 
-            var capacidad = _ahora.Tarjeta($"Llevas {suma:0.#} de {plan.CapacidadSugerida:0.#} puntos", pasado ? Tono.Aviso : Tono.Exito);
-            Ui.Barra(capacidad, plan.CapacidadSugerida <= 0 ? 1 : Mathf.Clamp01((float)(suma / plan.CapacidadSugerida)), pasado ? Tema.warning : Tema.success);
-            Ui.Texto(capacidad, pasado ? "Te pasas de lo que cabe: cada día del sprint suma deuda técnica."
-                                       : "Lo que no entre se queda en el product backlog para el siguiente sprint.", EstiloTexto.Pequeno, Tema.ink);
+            // ---- los dos carriles y el tubo en medio
+            var mesa = Ui.Fila(raiz, "Mesa", Tema.espacio * 1.5f, 0, TextAnchor.UpperLeft);
+            UiKit.Tamano(mesa, flexAncho: 1, flexAlto: 1);
+            Action<string> alternar = id => {
+                var c = candidatas.FirstOrDefault(x => x.Id == id);
+                if (c == null || c.Empezada) return;
+                if (!_alSprint.Remove(id)) _alSprint.Add(id);
+            };
 
-            var lista = _ahora.Tarjeta("El product backlog, en su orden");
-            foreach (var c in candidatas) {
-                var id = c.Id;
-                var dentro = _alSprint.Contains(id) || c.Empezada;
-                var modulo = S.Perfil.Proyecto == null ? null : S.Perfil.Proyecto.Modulo(c.Modulo);
-                var boton = Ui.BotonDeOpcion(lista, (dentro ? "√  " : "＋  ") + c.Titulo + $"  ·  {c.Restante:0.#} pts",
-                    (c.Empezada ? "Ya está empezada: entra sí o sí. " : dentro ? "Entra en el sprint. " : "Se queda en el product backlog. ") +
-                    (modulo != null ? "Módulo: " + modulo.Nombre + "." : ""),
-                    () => { if (!_alSprint.Remove(id)) _alSprint.Add(id); });
-                boton.interactable = !c.Empezada;
-                Ui.Resaltar(boton, dentro);
+            RectTransform listaFuera, listaDentro;
+            DestinoDeFicha destinoFuera, destinoDentro;
+            var carrilFuera = PiezasDelMuro.Carril(Ui, mesa, "Product backlog", fuera.Count.ToString(), Tema.inkMuted, out listaFuera, out destinoFuera, fuera.Sum(c => c.Restante));
+            UiKit.Tamano(carrilFuera, ancho: 0, flexAncho: 1, flexAlto: 1);
+            if (fuera.Count == 0) PiezasDelMuro.Vacio(Ui, listaFuera, "Todo entra en el sprint.");
+            foreach (var c in fuera) FichaDePlanificacion(listaFuera, capa, c, "fuera", false, alternar);
+
+            var medio = Ui.Columna(mesa, "Medio", Tema.espacio, 0, TextAnchor.MiddleCenter);
+            UiKit.Tamano(medio, 150, flexAlto: 1);
+            PiezasDelMuro.Flecha(Ui, medio, 110, 40, false, Tema.cyan);
+            var medidor = MedidorDeCapacidad.Crear(Ui, medio, "plan." + S.R.DiaActual, true, 320, 46);
+            medidor.Fijar(suma, plan.CapacidadSugerida);
+            var nota = Ui.Texto(medio, pasado ? "Te pasas: cada día suma deuda." : "Lo que no entre espera al siguiente sprint.", EstiloTexto.Leyenda,
+                                pasado ? Tema.warning : Tema.inkMuted, TextAlignmentOptions.Center);
+            UiKit.Tamano(nota, 140);
+
+            var carrilDentro = PiezasDelMuro.Carril(Ui, mesa, "Este sprint", dentro.Count.ToString(), Tema.cyan, out listaDentro, out destinoDentro, suma);
+            UiKit.Tamano(carrilDentro, ancho: 0, flexAncho: 1, flexAlto: 1);
+            if (dentro.Count == 0) PiezasDelMuro.Vacio(Ui, listaDentro, "Arrastra aquí lo que entra.");
+            var acumulado = 0.0;
+            foreach (var c in dentro) {
+                acumulado += c.Restante;
+                FichaDePlanificacion(listaDentro, capa, c, "dentro", acumulado > plan.CapacidadSugerida + 0.5, alternar);
             }
 
-            var comprometer = _ahora.Accion($"Comprometerse a estas tarjetas ({suma:0.#} puntos)", () => {
+            destinoDentro.Motivo = (f, _) => null;
+            destinoDentro.Coste = f => {
+                if (f.Origen != "fuera") return null;
+                var c = candidatas.FirstOrDefault(x => x.Id == f.Id);
+                return c == null ? null : $"+{c.Restante:0.#} pts";
+            };
+            destinoDentro.AlRecibir = (f, _) => { if (f.Origen == "fuera") alternar(f.Id); };
+            destinoFuera.Motivo = (f, _) => null;
+            destinoFuera.AlRecibir = (f, _) => { if (f.Origen == "dentro") alternar(f.Id); };
+
+            // ---- abajo: comprometerse
+            var pie = Ui.Fila(raiz, "Pie", Tema.espacio, 0, TextAnchor.MiddleRight);
+            UiKit.Tamano(Ui.Nodo(pie, "Hueco"), flexAncho: 1);
+            var comprometer = Ui.Boton(pie, $"Comprometerse con {suma:0.#} puntos", () => {
                 var n = S.CandidatasAlSprint().Count(c => _alSprint.Contains(c.Id) || c.Empezada);
+                PiezasDelMuro.Marca(Ui, capa, capa.TransformPoint(Vector3.zero), "COMPROMETIDO", pasado ? Tema.warning : Tema.success);
                 S.ComprometerTarjetas(_alSprint);
                 _diaDelSprintBacklog = -1;
                 Anotar($"Planificación: {Solo("el equipo se compromete", "te comprometes")} a {n} tarjetas ({suma:0.#} puntos).");
-            });
+            }, VarianteBoton.Primario);
             comprometer.interactable = suma > 0.005;
+        }
+
+        /// <summary>Una ficha de la planificacion: un clic (o arrastrarla al otro carril) la pasa de uno a otro.</summary>
+        private void FichaDePlanificacion(RectTransform lista, RectTransform capa, Nexus.Core.Tablero.TarjetaDeTrabajo c, string origen, bool noCabe, Action<string> alternar) {
+            var modulo = S.Perfil.Proyecto == null ? null : S.Perfil.Proyecto.Modulo(c.Modulo);
+            var ficha = PiezasDelMuro.Ficha(Ui, lista, new DatosDeFicha {
+                Id = c.Id, Titulo = c.Titulo, Tipo = c.Tipo, Puntos = c.Restante, EsBug = c.EsBug,
+                Avance = c.Empezada ? (float)(c.Trabajo / Math.Max(0.01, c.Puntos)) : -1,
+                Fija = c.Empezada, PorQueFija = "Ya está empezada: entra sí o sí.", NoCabe = noCabe, Tarde = c.DescubiertaTarde,
+                Lineas = modulo == null ? null : new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("módulo", modulo.Nombre) }
+            }, capa);
+            ficha.Origen = origen;
+            var id = c.Id;
+            ficha.AlPulsar = () => alternar(id);
+            ficha.AlFallar = motivo => PiezasDelMuro.Aviso(Ui, capa, motivo, Tema.warning);
         }
 
         private void Planificacion() {
@@ -689,13 +514,8 @@ namespace Nexus.Unity.Pantallas {
             if (S.TareasDeOficina.Count > 0) GuiaView.Avisar(App, "oficina.disponible");
 
             _ahora.Espacio();
-            var botones = _ahora.Fila();
-            if (S.TareasDeOficina.Count > 0) Ui.Boton(botones, "Trabajar en tu escritorio", AbrirEscritorio);
-            // Un solo boton para dejar correr el tiempo, que no delata nada: salta hasta lo siguiente que pase, sea un
-            // aviso o el cierre de la jornada.
-            Ui.Boton(botones, "Adelantar el reloj", () => { if (Runner.AdelantarHastaQuePaseAlgo()) GuiaView.Hecho(App, "cerrar-jornada"); },
-                     VarianteBoton.Secundario);
-            _ahora.Nota("Adelantar salta al próximo aviso o al cierre. No te ahorra consecuencias.");
+            // Sin «Adelantar el reloj» (2026-11-07): el tiempo corre solo y se acelera con la velocidad (×1/×2/×4).
+            if (S.TareasDeOficina.Count > 0) Ui.Boton(_ahora.Fila(), "Trabajar en tu escritorio", AbrirEscritorio);
         }
 
         private void EmpezarTarea(Nexus.Core.Oficina.TareaDeOficina tarea) {
@@ -769,131 +589,16 @@ namespace Nexus.Unity.Pantallas {
             _ahora.Accion("Volver a la jornada", () => { _decidido = null; });
         }
 
-        private void Cierre() {
-            var j = S.Perfil.Jornada;
-            _ahora.Etiqueta("Cierre de la jornada");
-            _ahora.Titulo($"Son las {S.HoraActual}");
-            _ahora.Parrafo(Solo("Irte a casa: descansas, y el equipo también.", "Irte a casa: descansas.") + " Quedarte hasta las " + $"{j.HoraLimite:00}:00" +
-                           ": hoy avanzas un 25 % más, pero lo pagas en cansancio, salud y deuda técnica, y se acumula.");
-            _ahora.Parrafo("Si te quedas, hasta esa hora no llegan avisos: es tiempo libre para recorrer el mapa.");
-            var botones = _ahora.Fila();
-            Ui.Boton(botones, "Irme a casa", () => { Runner.Irse(); Anotar("Te fuiste a casa."); GuiaView.Hecho(App, "irse"); }, VarianteBoton.Primario);
-            // Quedarse hace imposible el «Irme a casa» que pudiera estar pidiendo la guia: se cancela, no se cuelga.
-            Ui.Boton(botones, "Quedarme", () => { Runner.Quedarse(); Anotar("Te quedaste haciendo horas extra."); GuiaView.Cancelar("irse"); }, VarianteBoton.Peligro);
-        }
+        // Cierre(): Dia/PantallaDelDia.Cierre.cs (la ventana del atardecer, 2026-11-07).
 
         private void Prorroga() {
             _ahora.Etiqueta("Horas extra");
             _ahora.Titulo("Te has quedado");
             _ahora.Parrafo("Ya no llegan avisos. Habla con quien quede o busca lo que te falta.");
-            _ahora.Nota("Las barras se mueven al cerrar el día, con las horas extra.");
-            _ahora.Accion("Irme ya", () => { Runner.TerminarLaProrroga(); GuiaView.Hecho(App, "irse"); });
+            _ahora.Nota("Las barras se mueven al cerrar el día, con las horas extra. El día acaba solo a la hora límite.");
         }
 
-        private void Resumen() {
-            var w = S.W;
-            _ahora.Etiqueta("Fin del día");
-            _ahora.Titulo($"Día {S.R.DiaActual} de {S.Perfil.DiasTotales}, terminado");
-            if (_tengoElInicioDelDia) {
-                // De como empezo el dia a como acaba: es aqui, y no a las 18:00, donde se ve pasar el dia.
-                var t = _ahora.Tarjeta(S.JornadaProrrogada ? "Cómo cambió el proyecto hoy (con las horas extra)" : "Cómo cambió el proyecto hoy");
-                var nombres = new[] { "Avance", "Deuda técnica", "Moral del equipo", "Cobertura de pruebas", "Cansancio" };
-                var ahora = new[] { w.Avance, w.DeudaTecnica, w.MoralEquipo, w.Cobertura, w.Cansancio };
-                for (var i = 0; i < nombres.Length; i++)
-                    Ui.Texto(t, $"· {nombres[i]}: {_alEmpezarElDia[i]:0.#} → {ahora[i]:0.#}  ({Textos.Cambio(ahora[i] - _alEmpezarElDia[i])})", EstiloTexto.Pequeno, Tema.ink);
-            }
-            if (_tengoElInicioDelDia) PintarPorQueAvanzaste(w.Avance - _alEmpezarElDia[0]);
-            if (_tengoElInicioDelDia) PintarQueSeConstruyo(_alEmpezarElDia[0], w.Avance, w.Alcance);
-            if (_tengoElInicioDelDia) _ahora.Parrafo(_decisionesDeHoy == 0 ? "Hoy no tomaste ninguna decisión." :
-                           _decisionesDeHoy == 1 ? "Hoy tomaste 1 decisión." : $"Hoy tomaste {_decisionesDeHoy} decisiones.");
-            _ahora.Nota("La partida se ha guardado.");
-            // Dia de despliegue: antes de seguir construyendo, lo que esta listo sale a produccion (Fase 3).
-            if (S.DesplieguePendiente) {
-                var t = _ahora.Tarjeta("Hoy toca desplegar", Tono.Aviso);
-                Ui.Texto(t, "Cerraste una etapa de trabajo: lo que ya está listo puede llegar al cliente. Es la Fase 3, con el reloj en cuenta atrás. " +
-                            "Después se vuelve al desarrollo.", EstiloTexto.Pequeno, Tema.ink);
-                _ahora.Accion("Ir al despliegue (Fase 3)  ►", () => FlujoDelNivel.Desplegar(App, () => App.Router.IrA<PantallaDelDia>()));
-                return;
-            }
-            var proximo = S.DiasDeDespliegue().Where(d => d > S.R.DiaActual).Select(d => (int?)d).FirstOrDefault();
-            if (proximo.HasValue) _ahora.Nota($"Próximo despliegue: al cerrar el día {proximo.Value}.", Tema.inkMuted);
-            _ahora.Accion($"Empezar el día {S.R.DiaActual + 1}", EmpezarDia);
-        }
-
-        /// <summary>Que partes del sistema avanzaron hoy, y cuanto: el avance en puntos traducido a lo que se construye.</summary>
-        private void PintarQueSeConstruyo(double avanceAntes, double avanceAhora, double alcance) {
-            var f = S.Perfil.Proyecto;
-            if (f == null || f.Modulos.Count == 0) return;
-            var antes = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, avanceAntes, alcance);
-            var ahora = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, avanceAhora, alcance);
-            var cambios = Enumerable.Range(0, ahora.Count).Where(i => ahora[i].Value - antes[i].Value >= 0.5)
-                .Select(i => $"{ahora[i].Key.Nombre} ({antes[i].Value:0} → {ahora[i].Value:0} %)").ToList();
-            _ahora.Parrafo(cambios.Count == 0 ? "Hoy no avanzó ninguna parte del sistema."
-                                              : "Hoy se construyó: " + string.Join(" · ", cambios) + ".", Tema.cyan);
-            // Cuando la arquitectura elegida pesa sobre el modelo (o venia con un coste), se dice: no es mala suerte.
-            var arqDelDia = S.Perfil.Fase1 == null ? null : S.Perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == S.ArquitecturaElegida);
-            if (arqDelDia != null && (!arqDelDia.EsLaAdecuada || (arqDelDia.ModificadoresModelo != null && arqDelDia.ModificadoresModelo.Count > 0)))
-                _ahora.Nota($"Por tu arquitectura ({arqDelDia.Nombre}): {DibujosDeArquitectura.EnElDia(arqDelDia.Id)}", Tema.warning);
-
-            // Lo que cambio a la vista: una parte que deja de ser un dibujo y empieza a responder, o a funcionar.
-            var subieron = Nexus.Core.Proyecto.MaquetaDelProducto.QueSubieron(f, avanceAntes, avanceAhora, alcance, S.R.ModulosDesplegados);
-            var plan = S.PlanDeHoy;
-            var hayDemo = plan != null && plan.EsUltimoDiaDeUnidad && S.VocesDelProducto().Count > 0;
-            if (subieron.Count > 0) {
-                var t = _ahora.Tarjeta("El producto cambió de etapa", Tono.Exito);
-                foreach (var m in subieron)
-                    Ui.Texto(t, $"· «{m.Modulo.Nombre}» ya es un {Nexus.Core.Proyecto.EtapasDelProducto.Nombre(m.Etapa)}: " +
-                                Nexus.Core.Proyecto.EtapasDelProducto.QueEs(m.Etapa), EstiloTexto.Pequeno, Tema.ink);
-                var voz = S.VocesDelProducto().FirstOrDefault(v => subieron.Any(m => m.Modulo.Id == v.ModuloId));
-                if (voz != null && !hayDemo) Ui.Texto(t, $"{voz.Quien}: «{voz.Frase}»", EstiloTexto.Dialogo, Tema.cyan);
-                if (!hayDemo) Ui.Boton(Ui.Fila(t), "Ver el producto", () => PantallaDelProducto.Abrir(App), VarianteBoton.Fantasma);
-            }
-
-            // La demo: al cerrar un sprint, una etapa o un tramo del flujo, quienes van a usar el sistema lo miran
-            // tal y como esta hoy, y cada uno habla de su parte.
-            if (!hayDemo) return;
-            var demo = _ahora.Tarjeta("La demo con el cliente", Tono.Neutro);
-            Ui.Texto(demo, "Les enseñaste el producto como está hoy. Esto es lo que dijeron:", EstiloTexto.Pequeno, Tema.inkMuted);
-            foreach (var v in S.VocesDelProducto().Take(3))
-                Ui.Texto(demo, $"{v.Quien}: «{v.Frase}»", EstiloTexto.Dialogo, Tema.cyan);
-            Ui.Boton(Ui.Fila(demo), "Ver el producto", () => PantallaDelProducto.Abrir(App), VarianteBoton.Fantasma);
-        }
-
-        /// <summary>
-        /// Por que el equipo avanzo lo que avanzo hoy: la velocidad base por cada barra que la frena o la empuja.
-        /// Es ForresterModel en palabras: deja ver que la deuda, el cansancio y la moral SI cuentan cada dia.
-        /// </summary>
-        private void PintarPorQueAvanzaste(double avanzado) {
-            var t = _ahora.Tarjeta("Por qué avanzaste " + avanzado.ToString("0.#") + " puntos");
-            var m = Nexus.Core.Simulacion.ForresterModel.FMoral(_alEmpezarElDia[2]);
-            var f = Nexus.Core.Simulacion.ForresterModel.FFatiga(_alEmpezarElDia[4]);
-            var d = Nexus.Core.Simulacion.ForresterModel.FDeuda(_alEmpezarElDia[1]);
-            var c = Nexus.Core.Simulacion.ForresterModel.FComp(S.W.Competencia);
-            Ui.Texto(t, $"Un equipo en perfectas condiciones haría unos {S.Perfil.VelocidadBase:0.#} puntos al día. Hoy:", EstiloTexto.Pequeno, Tema.ink);
-            Factor(t, "Moral del equipo", _alEmpezarElDia[2], m);
-            Factor(t, "Cansancio", _alEmpezarElDia[4], f);
-            Factor(t, "Deuda técnica", _alEmpezarElDia[1], d);
-            Factor(t, "Competencia del equipo", S.W.Competencia, c);
-            Ui.Texto(t, "Si te quedaste, las horas extra sumaron un 25 %, pero subieron el cansancio para mañana.", EstiloTexto.Pequeno, Tema.inkMuted);
-        }
-
-        private void Factor(Transform padre, string nombre, double valor, double mult) {
-            var pct = (mult - 1) * 100;
-            var color = pct < -5 ? Tema.danger : pct > 0.5 ? Tema.success : Tema.ink;
-            Ui.Texto(padre, $"· {nombre} ({valor:0}): {(pct >= 0 ? "+" : "")}{pct:0} %", EstiloTexto.Pequeno, color);
-        }
-
-        private void FinDelDesarrollo() {
-            var falta = S.DesplieguePendiente;
-            _ahora.Etiqueta(falta ? "Fase 3 · el último despliegue" : "Fase 4 · el lanzamiento");
-            _ahora.Titulo("Se acabaron los días");
-            _ahora.Parrafo(falta
-                ? "El desarrollo ha terminado. Queda llevar a producción todo lo construido: el último despliegue, con el reloj en cuenta atrás. " +
-                  "Cómo salga pesa en la evaluación."
-                : "El desarrollo ha terminado. Ahora el cliente ve lo que has hecho, y el riesgo que acumulaste durante todos " +
-                  "estos días decide si sale bien. Después, el nivel se cierra y se evalúa.");
-            _ahora.Accion(falta ? "Ir al despliegue (Fase 3)  ►" : "Ir al lanzamiento", () => FlujoDelNivel.Lanzar(App));
-        }
+        // FinDelDesarrollo(): Dia/PantallaDelDia.Cierre.cs (la tuberia hacia produccion, 2026-11-07).
 
         // ==================================================================== acciones
 
@@ -913,18 +618,21 @@ namespace Nexus.Unity.Pantallas {
             var brief = Runner.EmpezarDia();
             if (brief == null) return;
             GuiaView.Hecho(App, "empezar-dia");
+            // Cada dia empieza mirando los indicadores: como esta el proyecto antes de hacer nada.
+            _diapositivaRecordada = Nexus.Core.Jornada.DiapositivasDelDia.Kpis;
+            if (_carrusel != null) _carrusel.IrA(Nexus.Core.Jornada.DiapositivasDelDia.Kpis);
             var dia = brief.Dia;
-            Anotar($"— Día {brief.Dia} · {brief.EtiquetaUnidad} —");
-            if (brief.Ceremonias.Count > 0) Anotar("Ceremonias: " + string.Join(", ", brief.Ceremonias));
+            AnotarNovedad($"— Día {brief.Dia} · {brief.EtiquetaUnidad} —");
+            if (brief.Ceremonias.Count > 0) AnotarNovedad("Ceremonias: " + string.Join(", ", brief.Ceremonias));
             if (brief.Incidencia != null)
             {
-                Anotar($"Consecuencia de tu {NombreDeEstadistica(brief.Incidencia.Estadistica)} ({brief.Incidencia.Valor:0}): {brief.Incidencia.Titulo}.");
+                AnotarNovedad($"Consecuencia de tu {NombreDeEstadistica(brief.Incidencia.Estadistica)} ({brief.Incidencia.Valor:0}): {brief.Incidencia.Titulo}.");
                 GuiaView.Avisar(App, "incidencia");
             }
             foreach (var origen in brief.EfectosQueVencieronHoy.Distinct())
-                Anotar("Hoy se cobra algo de antes: " + NombreDeOrigen(origen) + ".");
+                AnotarNovedad("Hoy se cobra algo de antes: " + NombreDeOrigen(origen) + ".");
             foreach (var papel in S.PapelesDelCliente().Where(p => p.Dia == brief.Dia))
-                Anotar($"Llegó un papel del cliente: «{papel.Titulo}». Está en «Cliente».");
+                AnotarNovedad($"Llegó un papel del cliente: «{papel.Titulo}». Está en «Cliente».");
 
             if (S.Beat != null) {
                 var guion = App.Catalogo.Guiones.FirstOrDefault(g => g.Id == S.Beat.BeatId);
@@ -1073,7 +781,7 @@ namespace Nexus.Unity.Pantallas {
             Anotar($"Encontraste {PantallaDelDiario.NombreDeSerie(col.Serie, true)}: «{col.Titulo}».");
             _escenaApilada = true;
             Runner.EnEscena = true;
-            App.Router.Apilar<PantallaDeColeccionable>(p => {
+            App.Router.Apilar<EscenaDeHallazgo>(p => {
                 p.Coleccionable = col;
                 p.AlCerrar = () => _escenaApilada = false;
             });
@@ -1150,7 +858,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void AlExpirar(Alerta alerta) {
-            Anotar($"{RelojDeJornada.Formatear(alerta.MinutoDeExpiracion)} · Un aviso caducó sin que nadie lo atendiera. Alguien decidió por ti.");
+            AnotarNovedad($"{RelojDeJornada.Formatear(alerta.MinutoDeExpiracion)} · Un aviso caducó sin que nadie lo atendiera. Alguien decidió por ti.");
             // La guia podia estar esperando «Atender»: ya no hay nada que atender, asi que no se queda colgada.
             if (AlertasSonando().Count == 0) GuiaView.Cancelar("atender");
         }
@@ -1195,8 +903,12 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void Anotar(string linea) {
-            _entradas.Insert(0, linea);
-            if (_entradas.Count > 60) _entradas.RemoveAt(_entradas.Count - 1);
+            S.R.Anotar(linea, false);   // lo que hizo el jugador: se guarda, pero no cuenta como novedad en la M
+        }
+
+        /// <summary>Algo que paso sin que el jugador lo hiciera (lo que trae el dia, un aviso que caduco): novedad en la M.</summary>
+        private void AnotarNovedad(string linea) {
+            S.R.Anotar(linea, true);
         }
     }
 }

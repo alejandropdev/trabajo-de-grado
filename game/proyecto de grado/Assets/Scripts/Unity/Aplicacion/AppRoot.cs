@@ -493,11 +493,13 @@ namespace Nexus.Unity.Aplicacion {
         }
 
         private void Update() {
-            // Escape vuelve atras, salvo en las pantallas que no lo permiten (una decision a medias).
+            // Escape: primero lo que la pantalla de arriba quiera hacer con el (el dia y los retos abren la pausa);
+            // si no lo atiende, vuelve atras, salvo en las pantallas que no lo permiten (una decision a medias).
             var teclado = Keyboard.current;
-            if (teclado != null && teclado.escapeKey.wasPressedThisFrame &&
-                Router?.Actual != null && Router.Actual.PuedeVolver)
-                Router.Volver();
+            if (teclado != null && teclado.escapeKey.wasPressedThisFrame && Router?.Actual != null) {
+                if (Router.Actual.AlPulsarEscape()) return;
+                if (Router.Actual.PuedeVolver) Router.Volver();
+            }
         }
     }
 }

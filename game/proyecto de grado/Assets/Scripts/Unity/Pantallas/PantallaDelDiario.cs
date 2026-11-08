@@ -4,6 +4,7 @@ using System.Linq;
 using Nexus.Core.Coleccion;
 using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Guia;
+using Nexus.Unity.Pantallas.Minijuegos;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -70,31 +71,59 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Texto(_lista, "Esta serie todavía no tiene piezas en esta versión.", EstiloTexto.Cuerpo, Tema.inkMuted);
                 return;
             }
+            // Una rejilla de miniaturas (2026-11-06): lo encontrado con su emblema o pictograma, y al pulsarlo se vuelve
+            // a ver su escena; lo que falta, en silueta con su pista.
+            var rejilla = Ui.Nodo(_lista, "Rejilla");
+            var grid = rejilla.gameObject.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(230, 230);
+            grid.spacing = new Vector2(Tema.espacio, Tema.espacio);
+            grid.startAxis = GridLayoutGroup.Axis.Horizontal;
+            var ajuste = rejilla.gameObject.AddComponent<ContentSizeFitter>();
+            ajuste.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            UiKit.Tamano(rejilla, flexAncho: 1);
             foreach (var col in deLaSerie) {
-                if (encontrados.Contains(col.Id)) Tarjeta(Ui, _lista, col);
-                else Hueco(col);
+                if (encontrados.Contains(col.Id)) Miniatura(rejilla, col);
+                else Hueco(rejilla, col);
             }
         }
 
-        private void Hueco(Coleccionable col) {
-            var t = Ui.PanelColumna(_lista, "Hueco", Tema.espacio, 4, Tema.surfaceSunken);
-            Ui.Texto(t, "???", EstiloTexto.Subtitulo, Tema.inkFaint);
-            Ui.Texto(t, "Todavía no lo has encontrado.", EstiloTexto.Pequeno);
+        /// <summary>Lo encontrado: su dibujo, su titulo; al pulsarlo, su escena otra vez.</summary>
+        private void Miniatura(RectTransform padre, Coleccionable col) {
+            var color = col.Serie == SeriesDeColeccionables.Carta ? Hallazgos.ColorDePalo(Tema, col.Palo) : EscenaDeHallazgo.ColorDeSerie(Tema, col.Serie);
+            var t = Ui.PanelColumna(padre, "Miniatura", Tema.Espacio(3), 6, Tema.surfaceRaised);
+            Ui.Borde(t, NexusTheme.Alfa(color, 0.6f), NexusTheme.RadioMd, 1.5f);
+            var lamina = new Lamina(Ui, t, 200, 130, "Dibujo");
+            var tiza = new Tizador(lamina, Ui.FuenteTiza);
+            string clave;
+            Action<Tizador, Color> emblema;
+            if (col.Serie == SeriesDeColeccionables.Carta && EmblemasDeColeccionables.DeCartas.TryGetValue(col.Id, out clave) &&
+                DibujosDeHallazgos.Emblemas.TryGetValue(clave, out emblema))
+                emblema(tiza.En(40, 4, 0.55f), color);
+            else if (col.Serie == SeriesDeColeccionables.Advertencia) {
+                KeyValuePair<string, string> v;
+                Action<Tizador, Color> icono;
+                if (EmblemasDeColeccionables.DeAdvertencias.TryGetValue(col.Id, out v) && DibujosDeHallazgos.IconosDeAdvertencia.TryGetValue(v.Value, out icono))
+                    icono(tiza.En(50, 2, 1.05f), color);
+            } else DibujosDeHallazgos.Pictograma(tiza.En(30, 10, 1.15f), col.Serie, color);
+            var titulo = Ui.Texto(t, col.Titulo, EstiloTexto.Pequeno, Tema.ink, TextAlignmentOptions.Center);
+            titulo.maxVisibleLines = 2;
+            titulo.overflowMode = TextOverflowModes.Ellipsis;
+            var boton = t.gameObject.AddComponent<Button>();
+            boton.transition = Selectable.Transition.None;
+            var elegido = col;
+            boton.onClick.AddListener(() => App.Router.Apilar<EscenaDeHallazgo>(p => { p.Coleccionable = elegido; p.Repeticion = true; }));
+            t.gameObject.AddComponent<PiezaViva>().Escala = 1.05f;
         }
 
-        /// <summary>La cara de un coleccionable encontrado. La usan el diario y la pantalla de recogida.</summary>
-        public static RectTransform Tarjeta(UiKit ui, Transform padre, Coleccionable col) {
-            var tema = ui.Tema;
-            var t = ui.Tarjeta(padre, NombreDeSerie(col.Serie, false) + (string.IsNullOrEmpty(col.Palo) ? "" : " · " + Textos.Humanizar(col.Palo)));
-            ui.Texto(t, col.Titulo, EstiloTexto.Encabezado);
-            if (!string.IsNullOrEmpty(col.Nicho)) ui.Badge(ui.Fila(t), "Nicho: " + col.Nicho, Tono.Cyan);
-            if (!string.IsNullOrEmpty(col.Texto)) ui.Texto(t, col.Texto, EstiloTexto.Cuerpo);
-            if (!string.IsNullOrEmpty(col.Causa)) ui.Texto(t, "Por qué fracasó: " + col.Causa, EstiloTexto.Cuerpo, tema.warning);
-            if (!string.IsNullOrEmpty(col.Comando)) ui.Texto(t, "> " + col.Comando, EstiloTexto.Mono);
-            if (!string.IsNullOrEmpty(col.Revela)) ui.Texto(t, col.Revela, EstiloTexto.Cuerpo, tema.cyan);
-            if (!string.IsNullOrEmpty(col.PreguntaDeAplicacion)) ui.Texto(t, "Para pensar: " + col.PreguntaDeAplicacion, EstiloTexto.Pequeno, tema.ink);
-            if (!string.IsNullOrEmpty(col.Fuente)) ui.Texto(t, "Fuente: " + col.Fuente, EstiloTexto.Pequeno);
-            return t;
+        private void Hueco(RectTransform padre, Coleccionable col) {
+            var t = Ui.PanelColumna(padre, "Hueco", Tema.Espacio(3), 6, Tema.surfaceSunken);
+            var lamina = new Lamina(Ui, t, 200, 110, "Silueta");
+            DibujosDeHallazgos.Pictograma(new Tizador(lamina, Ui.FuenteTiza).En(40, 6, 1f), col.Serie, NexusTheme.Alfa(Tema.inkFaint, 0.5f));
+            Ui.Texto(t, "???", EstiloTexto.Subtitulo, Tema.inkFaint, TextAlignmentOptions.Center);
+            var pista = col.Aparicion != null && !string.IsNullOrEmpty(col.Aparicion.Pista) ? col.Aparicion.Pista : "Todavía no lo has encontrado.";
+            var tp = Ui.Texto(t, pista, EstiloTexto.Pequeno, Tema.inkMuted, TextAlignmentOptions.Center);
+            tp.maxVisibleLines = 3;
+            tp.overflowMode = TextOverflowModes.Ellipsis;
         }
 
         public static HashSet<string> Encontrados(AppRoot app) {
@@ -115,33 +144,6 @@ namespace Nexus.Unity.Pantallas {
                 case SeriesDeColeccionables.Nota: return singular ? "una nota adhesiva" : "Notas";
                 default: return singular ? "algo" : Textos.Humanizar(serie);
             }
-        }
-    }
-
-    /// <summary>
-    /// Lo que se acaba de encontrar, en grande. Ya esta guardado en el diario (se guarda solo al recogerlo): aqui
-    /// solo se lee, y se puede ir directamente al diario a verlo con lo demas. El reloj espera.
-    /// </summary>
-    public sealed class PantallaDeColeccionable : PantallaModal {
-        public Coleccionable Coleccionable;
-        public Action AlCerrar;
-
-        public override bool PuedeVolver { get { return false; } }
-        protected override float Ancho { get { return 900; } }
-
-        protected override void Rellenar() {
-            Hoja.Etiqueta("Encontraste " + PantallaDelDiario.NombreDeSerie(Coleccionable.Serie, true), Tema.violet);
-            PantallaDelDiario.Tarjeta(Ui, Hoja.Raiz, Coleccionable);
-            Hoja.Nota("√ Guardado en tu diario de campo.", Tema.success);
-            var fila = Hoja.Fila();
-            Ui.Boton(fila, "Seguir", () => {
-                App.Router.Volver();
-                AlCerrar?.Invoke();
-            }, VarianteBoton.Primario);
-            Ui.Boton(fila, "Revisar el diario", () => {
-                App.Router.Volver();
-                App.Router.Apilar<PantallaDelDiario>(p => p.AlCerrar = AlCerrar);
-            });
         }
     }
 }

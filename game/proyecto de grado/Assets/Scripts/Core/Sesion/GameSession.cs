@@ -1474,6 +1474,12 @@ namespace Nexus.Core.Sesion {
             R.SerieRiesgo.Add(Math.Round(d.RiesgoLatente, 2));
             R.SerieWip.Add(R.WipActual);
             R.SerieLeadTime.Add(Math.Round(d.LeadTime, 2));
+            // Las de los KPIs de la Fase 2 (cada tarjeta del panel lleva su mini-grafica).
+            R.SerieMoral.Add(Math.Round(W.MoralEquipo, 2));
+            R.SerieCansancio.Add(Math.Round(W.Cansancio, 2));
+            R.SerieDeuda.Add(Math.Round(W.DeudaTecnica, 2));
+            R.SerieCobertura.Add(Math.Round(W.Cobertura, 2));
+            R.SerieSatisfaccion.Add(Math.Round(W.SatisfaccionCliente, 2));
         }
 
         // ==================================================================== FASE 3

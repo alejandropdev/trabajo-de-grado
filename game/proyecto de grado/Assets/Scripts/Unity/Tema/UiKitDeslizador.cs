@@ -40,12 +40,16 @@ namespace Nexus.Unity.Tema {
 
             // El tirador: un circulo claro con borde cian, un poco mas grande que la pista para que se vea que se agarra.
             var zonaTirador = Nodo(raiz, "Zona del tirador");
-            zonaTirador.anchorMin = Vector2.zero;
-            zonaTirador.anchorMax = Vector2.one;
-            zonaTirador.offsetMin = new Vector2(LadoDelTirador / 2, 0);
-            zonaTirador.offsetMax = new Vector2(-LadoDelTirador / 2, 0);
+            // ★ El Slider de Unity estira el tirador en vertical: le pone anclas de 0 a 1 en el eje que no mueve, asi que su
+            // alto es el de ESTA zona (+ su sizeDelta.y). Con la zona tan alta como la pista (28) y un sizeDelta de 22, salia
+            // un ovalo de 22 x 50. La zona mide justo lo que el tirador (en el centro de la pista) y su sizeDelta.y es 0:
+            // 22 x 22, un circulo.
+            zonaTirador.anchorMin = new Vector2(0, 0.5f);
+            zonaTirador.anchorMax = new Vector2(1, 0.5f);
+            zonaTirador.offsetMin = new Vector2(LadoDelTirador / 2, -LadoDelTirador / 2);
+            zonaTirador.offsetMax = new Vector2(-LadoDelTirador / 2, LadoDelTirador / 2);
             var tirador = Nodo(zonaTirador, "Tirador");
-            tirador.sizeDelta = new Vector2(LadoDelTirador, LadoDelTirador);
+            tirador.sizeDelta = new Vector2(LadoDelTirador, 0);
             var imgTirador = tirador.gameObject.AddComponent<Image>();
             imgTirador.sprite = SpriteCircular();
             imgTirador.color = Tema.ink;

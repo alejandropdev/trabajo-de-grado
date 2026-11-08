@@ -35,7 +35,7 @@ namespace Nexus.Core.Tablero {
         }
 
         /// <summary>El orden en que se trabaja: lo del sprint en curso primero; despues, el orden de construccion.</summary>
-        private static IEnumerable<TarjetaDeTrabajo> EnOrdenDeTrabajo(TableroDelEquipo t) {
+        public static IEnumerable<TarjetaDeTrabajo> EnOrdenDeTrabajo(TableroDelEquipo t) {
             return t.Tarjetas.Where(x => !x.EsBug && !x.Terminada)
                     .OrderBy(x => t.SprintActual >= 0 && x.Sprint == t.SprintActual ? 0 : 1).ThenBy(x => x.Orden);
         }

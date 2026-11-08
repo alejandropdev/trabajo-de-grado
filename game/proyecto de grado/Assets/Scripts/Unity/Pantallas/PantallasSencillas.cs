@@ -149,69 +149,6 @@ namespace Nexus.Unity.Pantallas {
     }
 
     /// <summary>
-    /// La pausa, en cualquier momento de la partida (el dia, la Fase 1, un minijuego). Mientras esta abierta el
-    /// reloj no corre, y desde aqui se puede leer el diario o guardar y salir: la partida se guarda tal cual y se
-    /// retoma en el mismo sitio y con el mismo perfil (INV-7 garantiza que se recupera igual).
-    /// </summary>
-    public sealed class PantallaDePausa : PantallaModal {
-        /// <summary>Lo que la pantalla de debajo tiene que guardar antes de salir (el borrador de la Fase 1).</summary>
-        public Action AntesDeSalir;
-        /// <summary>Dentro de un minijuego: salir lo deja sin hacer (cuenta como no entregado).</summary>
-        public string Aviso;
-
-        protected override float Ancho { get { return 600; } }
-
-        public static bool Abierta { get; private set; }
-
-        protected override void Rellenar() {
-            Abierta = true;
-            if (App.Runner != null) App.Runner.Pausado = true;
-            var s = App.Sesion;
-            Hoja.Titulo("Pausa");
-            if (s != null)
-                Hoja.Nota(s.Fase1Cerrada
-                    ? $"{s.Perfil.Nombre} · día {s.R.DiaActual} · {s.HoraActual}. El reloj está parado."
-                    : $"{s.Perfil.Nombre} · planificando (Fase 1). Lo que lleves elegido se guarda.");
-            if (!string.IsNullOrEmpty(Aviso)) Hoja.Nota(Aviso, Tema.warning);
-            Hoja.Espacio();
-            var col = Ui.Columna(Hoja.Raiz, espacio: Tema.espacio);
-            Ui.Boton(col, "Seguir jugando", Seguir, VarianteBoton.Primario);
-            // La ayuda de la guia (si esta activa): «¿Qué hago ahora?» y los apuntes, siempre a mano desde la pausa.
-            foreach (var o in Nexus.Unity.Guia.GuiaView.OpcionesDeAyuda(App)) {
-                var opcion = o;
-                Ui.Boton(col, opcion.Texto, () => { Seguir(); opcion.AlPulsar?.Invoke(); });
-            }
-            Ui.Boton(col, "Diario de campo", () => App.Router.Apilar<PantallaDelDiario>());
-            Ui.Boton(col, "Opciones", () => App.Router.Apilar<PantallaDeOpciones>());
-            Ui.Boton(col, "Guardar y volver al menú", Salir);
-            if (s != null)
-                Ui.Boton(col, "Reiniciar el nivel", () => App.Router.Apilar<PantallaDeConfirmacion>(c => {
-                    c.Titulo = "¿Reiniciar el nivel?";
-                    c.Texto = "Vuelves a la Fase 1 de este nivel y se pierde lo jugado en él desde entonces. La entrevista y las escenas de apertura no se repiten.";
-                    c.TextoSi = "Reiniciar";
-                    c.AlConfirmar = () => FlujoDelNivel.ReiniciarNivel(App);
-                }), VarianteBoton.Peligro);
-            Hoja.Nota("Al volver, elige tu perfil y pulsa «Continuar» en esta partida: sigues justo donde lo dejaste.");
-        }
-
-        private void Seguir() {
-            if (App.Runner != null) App.Runner.Pausado = false;
-            App.Router.Volver();
-        }
-
-        private void Salir() {
-            AntesDeSalir?.Invoke();
-            App.CerrarPartida();
-            App.MostrarInicio();
-        }
-
-        private void OnDestroy() {
-            Abierta = false;
-            if (App != null && App.Runner != null) App.Runner.Pausado = false;
-        }
-    }
-
-    /// <summary>
     /// El «?» que hay junto a cada termino de la asignatura. Abre su pizarron (PantallaDePizarra): varias paginas
     /// con dibujos de tiza que explican que es, que conlleva y donde se ve en Nexus.
     /// </summary>
@@ -269,8 +206,12 @@ namespace Nexus.Unity.Pantallas {
             Hoja.Espacio();
             Ui.Texto(Hoja.Raiz, c.Pregunta.Texto, EstiloTexto.Encabezado, Tema.ink);
             // Las respuestas, como mano de cartas: se elige, la carta se sella («DICHO») y el personaje contesta.
+            // En orden barajado (fijo para esta charla y este dia): la buena no esta siempre en el mismo sitio.
+            var dia = App.Sesion != null ? App.Sesion.R.DiaActual : 0;
+            var orden = System.Linq.Enumerable.OrderBy(c.Pregunta.Opciones,o => Nexus.Core.Narrativa.Barajar.Clave(c.Id + "|" + dia + "|" + o.Id));
+            // (OrderBy por el nombre completo: este archivo no importa System.Linq.)
             var cartas = new List<OpcionDeCarta>();
-            foreach (var o in c.Pregunta.Opciones) {
+            foreach (var o in orden) {
                 var opcion = o;
                 cartas.Add(new OpcionDeCarta { Titulo = opcion.Texto, AlElegir = () => Contestar(opcion.Id) });
             }

@@ -71,6 +71,11 @@ namespace Nexus.Unity.Tema {
             public bool Seleccionable;
             /// <summary>En una mano Seleccionable: la que ya esta elegida (se pinta sin repartir de nuevo).</summary>
             public int Seleccionada = -1;
+            /// <summary>
+            /// Opcional: avisa de la carta que se esta mirando (raton o flechas), -1 cuando ninguna. El cierre de la
+            /// jornada lo usa para cambiar la ventana del atardecer segun la carta (2026-11-07).
+            /// </summary>
+            public Action<int> AlEnfocar;
         }
 
         private const float Hueco = 18f, Rapidez = 1f / 0.18f;
@@ -174,7 +179,10 @@ namespace Nexus.Unity.Tema {
             var padre = _rt.parent as RectTransform;
             if (padre == null || padre.rect.width < 10) return;
             _ajustado = true;
-            if (padre.rect.width < _rt.sizeDelta.x - 1) Dimensionar(padre.rect.width);
+            // Siempre se vuelve a medir aqui, ya activa: una mano construida dentro de algo inactivo (la carta del
+            // momento se enciende un fotograma despues) mide sus textos como si no partieran linea, y las cartas
+            // salian bajitas con el texto desbordado (2026-11-06).
+            Dimensionar(padre.rect.width < _rt.sizeDelta.x - 1 ? padre.rect.width : _ajustes.AnchoMaximo);
         }
 
         // ==================================================================== lo que hace el jugador
@@ -185,6 +193,7 @@ namespace Nexus.Unity.Tema {
         private void Mirar(int i) {
             if (_encima == i) return;
             _encima = i;
+            if (_ajustes.AlEnfocar != null) _ajustes.AlEnfocar(i);
             // La que se mira se pinta encima de las demas; las otras, en su orden.
             for (var k = 0; k < _cartas.Count; k++) _cartas[k].transform.SetSiblingIndex(k);
             if (i >= 0) _cartas[i].transform.SetAsLastSibling();

@@ -100,10 +100,17 @@ namespace Nexus.Core.Coleccion {
         // --- startups ---
         public string Nicho;
         public string Causa;
+        /// <summary>
+        /// La historia en fragmentos para la escena del hallazgo: fecha y lo que paso, en orden. Sale SOLO del texto y
+        /// la fuente del propio coleccionable (nunca hechos nuevos). El ultimo es el cierre.
+        /// </summary>
+        public List<HitoDeStartup> Hitos = new List<HitoDeStartup>();
 
         // --- codigos de terminal ---
         public string Comando;
         public string Revela;
+        /// <summary>En que se escribio: null o "bash" es un comando de terminal; otro valor ("csharp", "python"…) va en un IDE.</summary>
+        public string Lenguaje;
 
         // --- fragmentos del USB ---
         public int Fragmento;
@@ -112,5 +119,14 @@ namespace Nexus.Core.Coleccion {
         public AparicionDeColeccionable Aparicion;
 
         public bool TieneCondicion { get { return Aparicion != null && Aparicion.Precondiciones != null && Aparicion.Precondiciones.Count > 0; } }
+
+        /// <summary>Un comando de terminal (bash) y no codigo de otro lenguaje.</summary>
+        public bool EsDeTerminal { get { return string.IsNullOrEmpty(Lenguaje) || string.Equals(Lenguaje, "bash", StringComparison.OrdinalIgnoreCase); } }
+    }
+
+    /// <summary>Un momento de la historia de una startup: cuando y que paso, en una frase corta.</summary>
+    public sealed class HitoDeStartup {
+        public string Fecha;
+        public string Texto;
     }
 }

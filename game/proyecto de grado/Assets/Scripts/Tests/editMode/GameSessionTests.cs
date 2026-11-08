@@ -21,7 +21,7 @@ namespace Nexus.Tests {
     /// recargar no puede cambiar la partida. Es la invariante que impide que el jugador esquive
     /// una consecuencia que no le gusto, y la que hace que el "modo aula" sea un instrumento fiable.
     /// </summary>
-    public class GameSessionTests {
+    public partial class GameSessionTests {
         private const double Tol = 1e-9;
 
         // ================================================================ catalogo de prueba

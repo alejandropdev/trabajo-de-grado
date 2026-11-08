@@ -372,6 +372,7 @@
       },
       {
         "id": "pasillo",
+        "minijuegoDeZona": "tablon",
         "area": [0.49, 0.45, 0.28, 0.38],
         "nombre": "El pasillo de los concursantes",
         "descripcion": "Una máquina de café, un tablón de corcho y los demás concursantes fingiendo que no se miran.",

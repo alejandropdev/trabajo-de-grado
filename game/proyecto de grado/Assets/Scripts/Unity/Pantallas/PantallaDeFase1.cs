@@ -7,6 +7,7 @@ using Nexus.Core.Narrativa;
 using Nexus.Core.Sesion;
 using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Guia;
+using Nexus.Unity.Pantallas.Minijuegos;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -100,7 +101,7 @@ namespace Nexus.Unity.Pantallas {
 
         /// <summary>
         /// Lo elegido hasta ahora viaja en el guardado (sin entregarse al motor: eso solo pasa al confirmar). Asi
-        /// «Guardar y volver al menú» no obliga a planificar otra vez desde cero.
+        /// «Guardar y salir» (la pausa) no obliga a planificar otra vez desde cero.
         /// </summary>
         private void GuardarBorrador() {
             if (S == null || S.Fase1Cerrada) return;
@@ -190,7 +191,7 @@ namespace Nexus.Unity.Pantallas {
             foreach (var kv in _chips) {
                 var hecho = Completo(kv.Key) && kv.Key != _paso;
                 Ui.Resaltar(kv.Value, kv.Key == _paso, hecho ? Tema.successSoft : Tema.surfaceRaised);
-                kv.Value.GetComponentInChildren<TMP_Text>().text = (hecho ? "√ " : "") + NombreDe(kv.Key);
+                kv.Value.GetComponentInChildren<TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro((hecho ? "√ " : "") + NombreDe(kv.Key));
             }
             var posicion = _scroll.content.anchoredPosition;
             _hoja.Vaciar();
@@ -901,78 +902,156 @@ namespace Nexus.Unity.Pantallas {
             _hoja.Etiqueta("Antes de construir");
             if (!S.SeCreaElBacklog) {
                 _hoja.Titulo("El product backlog ya existe");
-                _hoja.Parrafo("Ya hay trabajo hecho y una lista de lo que falta, escrita por otra persona. Entiéndela y decide el orden.");
-                PantallaDeGlosario.Palabras(App, _hoja.Raiz, "Si alguna palabra no te suena:", "backlog", "historia-de-usuario", "mvp");
-                var heredado = _hoja.Tarjeta("Lo que falta, por partes del sistema");
-                foreach (var m in f.Modulos)
-                    Ui.Texto(heredado, $"· <b>{m.Nombre}</b>: " + (m.AvanceInicial > 0 ? $"{m.AvanceInicial:0} % ya hecho, falta el resto." : "por hacer.") + " " + m.QueHace,
-                             EstiloTexto.Pequeno, Tema.ink);
-                _hoja.Nota("Durante el desarrollo lo ves entero en «Tablero», y ahí puedes cambiar el orden.");
+                _hoja.Parrafo("Alguien ya empezó: esto es lo que falta, parte por parte. Durante el desarrollo lo ordenas en tu muro.");
+                BotonDePalabras("backlog", "historia-de-usuario", "mvp");
+                var partes = Ui.Fila(_hoja.Raiz, "Partes", Tema.espacio, 0, TextAnchor.UpperLeft);
+                for (var i = 0; i < f.Modulos.Count; i++) {
+                    var m = f.Modulos[i];
+                    var color = ColorDeModulo(i);
+                    var ficha = Ui.PanelColumna(partes, "Parte " + m.Nombre, Tema.Espacio(3), Tema.Espacio(2), Tema.surfaceRaised);
+                    UiKit.Tamano(ficha, ancho: 0, flexAncho: 1);
+                    ficha.localRotation = Quaternion.Euler(0, 0, (i % 3 - 1) * 0.6f);
+                    PiezasDelMuro.Cinta(Ui, ficha, m.Nombre, color, i % 2 == 0 ? -1.4f : 1.1f);
+                    UiKit.Tamano(Ui.Barra(ficha, (float)(m.AvanceInicial / 100.0), color), flexAncho: 1);
+                    Ui.Texto(ficha, m.AvanceInicial > 0 ? $"{m.AvanceInicial:0} % hecho" : "sin empezar", EstiloTexto.Leyenda, color);
+                    if (!App.Preferencias.modoTarjetas) Ui.Texto(ficha, m.QueHace, EstiloTexto.Pequeno, Tema.inkMuted);
+                }
                 return;
             }
 
             _hoja.Titulo("Arma el product backlog");
-            _hoja.Parrafo("Empieza de cero. Elige qué historias entran y en qué orden; no todas deben entrar.");
-            PantallaDeGlosario.Palabras(App, _hoja.Raiz, "Si alguna palabra no te suena:", "backlog", "historia-de-usuario", "mvp", "alcance");
+            _hoja.Parrafo("Arrastra a tu backlog lo que el cliente necesita, en el orden en que se hará. No todo debe entrar.");
+            BotonDePalabras("backlog", "historia-de-usuario", "mvp", "alcance");
+            var capa = CapaDeArrastre();
 
+            if (string.IsNullOrEmpty(_moduloVisto) || f.Modulos.All(x => x.Id != _moduloVisto)) _moduloVisto = f.Modulos.Count > 0 ? f.Modulos[0].Id : null;
             var escena = Ui.Fila(_hoja.Raiz, "Backlog", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
+
+            // ---- a la izquierda: el monton de historias, una parte del sistema cada vez (pestañas con su punto)
             var candidatas = Ui.Columna(escena, "Candidatas", Tema.espacio);
             UiKit.Tamano(candidatas, ancho: 0, flexAncho: 3);
             GuiaView.Registrar("fase1.historias", candidatas);
-            foreach (var m in f.Modulos) {
-                var delModulo = f.Historias.Where(x => x.Modulo == m.Id).ToList();
-                if (delModulo.Count == 0) continue;
-                var tarjeta = Ui.Tarjeta(candidatas, m.Nombre);
-                if (!App.Preferencias.modoTarjetas) Ui.Texto(tarjeta, m.QueHace, EstiloTexto.Pequeno, Tema.inkMuted);
-                foreach (var historia in delModulo) {
-                    var h = historia;
-                    var dentro = _backlog.Contains(h.Id);
-                    var boton = Ui.BotonDeOpcion(tarjeta, (dentro ? "√  " : "＋  ") + h.Titulo, App.Preferencias.modoTarjetas ? null : h.Texto, () => {
-                        if (!_backlog.Remove(h.Id)) _backlog.Add(h.Id);
-                        _mantenerScroll = true;
-                        Repintar();
-                    });
-                    Ui.Resaltar(boton, dentro);
-                }
+            var pestanas = Ui.Fila(candidatas, "Partes", Tema.Espacio(2), 0, TextAnchor.MiddleLeft);
+            for (var i = 0; i < f.Modulos.Count; i++) {
+                var m = f.Modulos[i];
+                if (f.Historias.All(x => x.Modulo != m.Id)) continue;
+                var cubierta = _backlog.Any(id => { var h = f.Historia(id); return h != null && h.Modulo == m.Id; });
+                var pestana = Ui.Fila(pestanas, "Pestaña", 6, 0, TextAnchor.MiddleLeft);
+                Ui.Punto(pestana, cubierta ? ColorDeModulo(i) : NexusTheme.Alfa(Tema.inkFaint, 0.5f), 10);
+                var id = m.Id;
+                var boton = Ui.Boton(pestana, m.Nombre, () => { _moduloVisto = id; _mantenerScroll = true; Repintar(); }, VarianteBoton.Fantasma);
+                Ui.Resaltar(boton, m.Id == _moduloVisto);
             }
+            var indiceVisto = f.Modulos.FindIndex(x => x.Id == _moduloVisto);
+            var modulo = indiceVisto < 0 ? null : f.Modulos[indiceVisto];
+            if (modulo != null && !App.Preferencias.modoTarjetas) Ui.Texto(candidatas, modulo.QueHace, EstiloTexto.Pequeno, Tema.inkMuted);
+            var monton = Ui.Columna(candidatas, "Monton", 12, 10);
+            Ui.Fondo(monton.gameObject.AddComponent<Image>(), new Color(1, 1, 1, 0.03f), 16);
+            UiKit.Tamano(monton, flexAncho: 1).minHeight = 240;
+            var destinoMonton = monton.gameObject.AddComponent<DestinoDeFicha>();
+            destinoMonton.Ui = Ui;
+            destinoMonton.Acento = Tema.inkMuted;
+            destinoMonton.Radio = 16;
+            destinoMonton.Motivo = (ficha, _) => null;
+            destinoMonton.Coste = ficha => ficha.Origen == "backlog" ? "sacarla" : null;
+            destinoMonton.AlRecibir = (ficha, _) => {
+                if (ficha.Origen != "backlog") return;
+                _backlog.Remove(ficha.Id);
+                _mantenerScroll = true;
+                Repintar();
+            };
+            var quedan = modulo == null ? new List<Nexus.Core.Proyecto.HistoriaCandidata>()
+                                        : f.Historias.Where(x => x.Modulo == modulo.Id && !_backlog.Contains(x.Id)).ToList();
+            if (quedan.Count == 0) PiezasDelMuro.Vacio(Ui, monton, "De esta parte ya no queda nada en el montón.");
+            foreach (var h in quedan) FichaDeHistoria(monton, capa, h, indiceVisto, 0, "monton");
 
+            // ---- a la derecha: tu backlog, numerado, con lo de arriba primero
             var lado = Ui.Columna(escena, "Elegidas", Tema.espacio);
             UiKit.Tamano(lado, ancho: 0, flexAncho: 2);
-            var mio = Ui.Tarjeta(lado, $"Tu product backlog · {_backlog.Count} historia{(_backlog.Count == 1 ? "" : "s")}");
-            GuiaView.Registrar("fase1.mibacklog", mio);
-            if (_backlog.Count == 0) Ui.Texto(mio, "Vacío. Pulsa una historia, a la izquierda, para meterla.", EstiloTexto.Pequeno, Tema.inkMuted);
-            else Ui.Texto(mio, "Arriba, lo que más le vale al cliente. Con «⋯» la subes, la bajas o la quitas.", EstiloTexto.Pequeno, Tema.inkMuted);
+            RectTransform lista;
+            DestinoDeFicha destino;
+            var carril = PiezasDelMuro.Carril(Ui, lado, "Tu product backlog", _backlog.Count.ToString(), Tema.cyan, out lista, out destino);
+            UiKit.Tamano(carril, alto: 620, flexAncho: 1);
+            GuiaView.Registrar("fase1.mibacklog", carril);
+            var arriba = Ui.Fila(lista, "Arriba", 8, 0, TextAnchor.MiddleLeft);
+            PiezasDelMuro.Flecha(Ui, arriba, 26, 34, true, Tema.cyan);
+            Ui.Texto(arriba, "arriba, lo que más le vale al cliente", EstiloTexto.Leyenda, Tema.cyan);
             for (var i = 0; i < _backlog.Count; i++) {
-                var indice = i;
                 var h = f.Historia(_backlog[i]);
-                var fila = Ui.Fila(mio, "Historia", Tema.Espacio(2));
-                UiKit.Tamano(Ui.Texto(fila, $"{i + 1}. {h.Titulo}", EstiloTexto.Cuerpo, Tema.ink), flexAncho: 1);
-                // Un «⋯» por historia en vez de tres botones (▲ ▼ ×): la lista se lee, no se esquiva.
-                var total = _backlog.Count;
-                PantallaDeMenu.Boton(App, fila, "⋯", h.Titulo, () => new List<OpcionDeMenu> {
-                    new OpcionDeMenu("Subir", () => MoverHistoria(indice, -1)) { Activa = indice > 0 },
-                    new OpcionDeMenu("Bajar", () => MoverHistoria(indice, 1)) { Activa = indice < total - 1 },
-                    new OpcionDeMenu("Quitar del backlog", () => { _backlog.RemoveAt(indice); _mantenerScroll = true; Repintar(); }, VarianteBoton.Peligro),
-                });
+                if (h == null) continue;
+                FichaDeHistoria(lista, capa, h, f.Modulos.FindIndex(x => x.Id == h.Modulo), i + 1, "backlog");
             }
+            // Los huecos que faltan: uno por cada parte del sistema que aun no tiene ninguna historia.
             if (_backlog.Count < MinimoDeHistorias)
-                Ui.Texto(mio, $"Hacen falta al menos {MinimoDeHistorias}: una por cada parte del sistema.", EstiloTexto.Pequeno, Tema.warning);
+                foreach (var m in f.Modulos.Where(m => !_backlog.Any(id => { var h = f.Historia(id); return h != null && h.Modulo == m.Id; })))
+                    PiezasDelMuro.Vacio(Ui, lista, "falta una de " + m.Nombre);
+            destino.Motivo = (ficha, _) => null;
+            destino.AlRecibir = (ficha, puesto) => {
+                if (Nexus.Core.Tablero.OrdenDeLista.Poner(_backlog, ficha.Id, Mathf.Max(0, puesto))) {
+                    _mantenerScroll = true;
+                    Repintar();
+                }
+            };
 
-            // Los papeles del cliente son la pista de lo que pidio de verdad: se pueden releer desde aqui.
-            var pistas = Ui.Tarjeta(lado, "¿Qué pidió el cliente?");
-            foreach (var u in f.Usuarios) Ui.Texto(pistas, $"· <b>{u.Nombre}</b>: {u.QueNecesita}", EstiloTexto.Pequeno, Tema.ink);
-            Ui.Texto(pistas, "Lo que nadie de esta lista necesita, nadie lo pidió. Una historia dice qué necesita alguien, no qué programar.",
-                     EstiloTexto.Pequeno, Tema.cyan);
+            // ---- lo que pidio el cliente, como una nota pegada con cinta
+            var nota = PiezasDelMuro.Panel(Ui, lado, "", Tema.violet, 14);
+            var cabecera = Ui.Fila(nota, "Cabecera", 8, 0, TextAnchor.MiddleLeft);
+            var titulo = Ui.Texto(cabecera, "¿QUÉ PIDIÓ EL CLIENTE?", EstiloTexto.Leyenda, Tema.violet);
+            UiKit.Tamano(titulo, flexAncho: 1);
+            Ui.Boton(cabecera, _notaDelClienteAbierta ? "Plegar" : "Desplegar", () => { _notaDelClienteAbierta = !_notaDelClienteAbierta; _mantenerScroll = true; Repintar(); },
+                     VarianteBoton.Fantasma);
+            var caras = Ui.Fila(nota, "Quienes", 6, 0, TextAnchor.MiddleLeft);
+            foreach (var u in f.Usuarios) Ui.Retrato(caras, string.IsNullOrEmpty(u.Nombre) ? "?" : u.Nombre.Substring(0, 1), Tono.Violeta, 30);
+            if (_notaDelClienteAbierta) {
+                foreach (var u in f.Usuarios) Ui.Texto(nota, $"<b>{u.Nombre}</b>: {u.QueNecesita}", EstiloTexto.Pequeno, Tema.ink);
+                Ui.Texto(nota, "Lo que nadie de aquí necesita, nadie lo pidió.", EstiloTexto.Pequeno, Tema.inkMuted).fontStyle = FontStyles.Italic;
+            }
         }
 
-        private void MoverHistoria(int indice, int delta) {
-            var j = indice + delta;
-            if (j < 0 || j >= _backlog.Count) return;
-            var id = _backlog[indice];
-            _backlog[indice] = _backlog[j];
-            _backlog[j] = id;
-            _mantenerScroll = true;
-            Repintar();
+        private string _moduloVisto;
+        private bool _notaDelClienteAbierta = true, _palabrasDelBacklog;
+        private RectTransform _capaDeArrastre;
+
+        private RectTransform CapaDeArrastre() {
+            if (_capaDeArrastre == null) _capaDeArrastre = PiezasDelMuro.CapaDeArrastre(Ui, Raiz);
+            _capaDeArrastre.SetAsLastSibling();
+            return _capaDeArrastre;
+        }
+
+        /// <summary>Las palabras del glosario, detras de «?»: el paso se lee sin ellas.</summary>
+        private void BotonDePalabras(params string[] palabras) {
+            var fila = _hoja.Fila();
+            Ui.Boton(fila, _palabrasDelBacklog ? "Ocultar palabras" : "? Palabras", () => { _palabrasDelBacklog = !_palabrasDelBacklog; _mantenerScroll = true; Repintar(); },
+                     VarianteBoton.Fantasma);
+            if (_palabrasDelBacklog) PantallaDeGlosario.Palabras(App, fila, "", palabras);
+        }
+
+        private Color ColorDeModulo(int i) {
+            var paleta = new[] { Tema.cyan, Tema.violet, Tizador.Mostaza, Tema.success, Tizador.Roja, Tizador.Cian };
+            return paleta[Mathf.Abs(i) % paleta.Length];
+        }
+
+        /// <summary>
+        /// Una historia como ficha: su titulo y «como / quiero / para» (sin el valor ni si la pidieron: eso es lo que se
+        /// decide). Un clic la mete al final del backlog, o la saca; arrastrarla la pone en su puesto.
+        /// </summary>
+        private void FichaDeHistoria(RectTransform padre, RectTransform capa, Nexus.Core.Proyecto.HistoriaCandidata h, int indiceDeModulo, int numero, string origen) {
+            var lineas = App.Preferencias.modoTarjetas || string.IsNullOrEmpty(h.Como) ? null : new List<KeyValuePair<string, string>> {
+                new KeyValuePair<string, string>("como", h.Como),
+                new KeyValuePair<string, string>("quiero", h.Quiero),
+                new KeyValuePair<string, string>("para", h.Para)
+            };
+            var ficha = PiezasDelMuro.Ficha(Ui, padre, new DatosDeFicha {
+                Id = h.Id, Titulo = h.Titulo, Numero = numero, Lineas = lineas, Cinta = ColorDeModulo(indiceDeModulo)
+            }, capa);
+            ficha.Origen = origen;
+            var id = h.Id;
+            ficha.AlPulsar = () => {
+                if (!_backlog.Remove(id)) _backlog.Add(id);
+                _mantenerScroll = true;
+                Repintar();
+            };
+            ficha.AlFallar = motivo => PiezasDelMuro.Aviso(Ui, capa, motivo, Tema.warning);
         }
 
         // ==================================================================== 7 · resumen

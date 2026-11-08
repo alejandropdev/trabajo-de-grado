@@ -212,6 +212,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// La pausa tambien dentro de un reto. El reloj del reto espera. Salir entrega lo que haya en el tablero
         /// (como si se acabara el tiempo): un reto no puede quedarse a medias en el guardado.
         /// </summary>
+        /// <summary>Escape dentro de un reto abre la pausa, igual que el boton «Menú» (con su aviso y su «entregar al salir»).</summary>
+        public override bool AlPulsarEscape() {
+            if (!PantallaDePausa.Abierta) AbrirPausa();
+            return true;
+        }
+
         private void AbrirPausa() {
             App.Router.Apilar<PantallaDePausa>(p => {
                 p.Aviso = _fase == Fase.Cierre ? null : "Si sales ahora, el reto se entrega tal y como esté.";

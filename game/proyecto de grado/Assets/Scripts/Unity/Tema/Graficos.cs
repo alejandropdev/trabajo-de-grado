@@ -186,18 +186,56 @@ namespace Nexus.Unity.Tema {
             return new Vector2(r.xMin + p.x, r.yMax - p.y);
         }
 
+        /// <summary>
+        /// Cuanto del dibujo se ve, de 0 a 1 (2026-11-06): con menos de 1 solo se pintan los primeros trazos, el ultimo a
+        /// medias, como si se estuviera dibujando a mano; los rellenos aparecen al final. Por defecto 1: todo.
+        /// </summary>
+        public float Avance {
+            get { return _avance; }
+            set {
+                var v = Mathf.Clamp01(value);
+                if (Mathf.Approximately(v, _avance)) return;
+                _avance = v;
+                SetVerticesDirty();
+            }
+        }
+        private float _avance = 1f;
+
         protected override void OnPopulateMesh(VertexHelper vh) {
             vh.Clear();
+            var alfaRellenos = _avance >= 1f ? 1f : Mathf.Clamp01((_avance - 0.75f) / 0.25f);
             foreach (var f in _rellenos) {
+                if (alfaRellenos <= 0) break;
                 var inicio = vh.currentVertCount;
                 var c = Centro(f.Poligono);
-                vh.AddVert(AMalla(c), f.Color, Vector2.zero);
-                foreach (var p in f.Poligono) vh.AddVert(AMalla(p), f.Color, Vector2.zero);
+                var color = f.Color; color.a *= alfaRellenos;
+                vh.AddVert(AMalla(c), color, Vector2.zero);
+                foreach (var p in f.Poligono) vh.AddVert(AMalla(p), color, Vector2.zero);
                 for (var i = 0; i < f.Poligono.Count; i++)
                     vh.AddTriangle(inicio, inicio + 1 + i, inicio + 1 + (i + 1) % f.Poligono.Count);
             }
+            // Cuantos segmentos se pintan: la fraccion 'Avance' del total, en el orden en que se dibujaron.
+            var quedan = float.MaxValue;
+            if (_avance < 1f) {
+                var total = 0;
+                foreach (var t in _trazos) total += Mathf.Max(0, t.Puntos.Count - 1);
+                quedan = _avance * total;
+            }
             var semilla = 7;
-            foreach (var t in _trazos) {
+            foreach (var t0 in _trazos) {
+                if (quedan <= 0) break;
+                var t = t0;
+                var segmentos = Mathf.Max(0, t.Puntos.Count - 1);
+                if (quedan < segmentos) {
+                    // El trazo que se esta dibujando: sus segmentos enteros y el ultimo a medias.
+                    var enteros = Mathf.FloorToInt(quedan);
+                    var puntos = t.Puntos.GetRange(0, enteros + 1);
+                    var resto = quedan - enteros;
+                    if (resto > 0 && enteros + 1 < t.Puntos.Count)
+                        puntos.Add(Vector2.Lerp(t.Puntos[enteros], t.Puntos[enteros + 1], resto));
+                    t = new Trazo { Puntos = puntos, Color = t.Color, Grosor = t.Grosor, Discontinuo = t.Discontinuo };
+                }
+                quedan -= segmentos;
                 DibujarTrazo(vh, t, Vector2.zero, t.Color);
                 if (Tiza) {
                     // un segundo trazo, un pelo movido y mas tenue: el borde irregular de la tiza

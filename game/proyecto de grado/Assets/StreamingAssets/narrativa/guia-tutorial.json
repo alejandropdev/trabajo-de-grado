@@ -237,7 +237,7 @@
       "titulo": "Las dos cosas que importan",
       "texto": "«La jornada» te dice qué hacer. «El proyecto» muestra cómo vas.",
       "resaltar": "dia.ahora",
-      "mas": "Aquí, «La jornada»: siempre te dice qué pasa y qué puedes hacer ahora. A su derecha, «El proyecto»: cómo va lo que estás construyendo. Todo lo demás (el mapa, tu equipo, tu escritorio, los avisos) se abre con los botones de arriba."
+      "mas": "Las flechas ‹ › de los lados pasan de pantalla: indicadores, la gráfica, el tablero, el equipo, el escritorio. Cuando haya que decidir algo, saldrá una carta encima. Abajo: «M» (mensajes) y «Producto»."
     },
     {
       "id": "DIA-ANTES-3",
@@ -268,7 +268,7 @@
       "titulo": "Tu escritorio",
       "texto": "Este es tu escritorio. Los avisos solo se atienden aquí.",
       "resaltar": "dia.mapa",
-      "mas": "Estás en tu puesto de la sala del concurso: es tu escritorio (arriba dice siempre dónde estás). Aquí te llegan los avisos, y solo aquí se pueden atender. Para ir a otro sitio está el «Mapa», dentro de «Más»."
+      "mas": "Estás en tu escritorio (bajo el reloj dice siempre dónde estás). Aquí se atienden los avisos. Para ir a otro sitio, «Mapa», arriba a la izquierda."
     },
     {
       "id": "DIA1-2",
@@ -276,11 +276,11 @@
       "disparador": "dia.1",
       "orden": 200,
       "titulo": "Explora",
-      "texto": "En «Más», abre el «Mapa» y explora. Moverse cuesta minutos.",
+      "texto": "Abre el «Mapa» (arriba) y explora. Moverse cuesta minutos.",
       "resaltar": "dia.mapa",
       "esperaAccion": "ir-a-zona",
       "pausaElReloj": false,
-      "mas": "Mientras no pase nada, puedes explorar. Abre «Más», luego «Mapa», y elige un lugar, por ejemplo «El pasillo de los concursantes». Mientras miras el mapa el reloj espera; ir sí cuesta minutos."
+      "mas": "Mientras no pase nada, explora: «Mapa», arriba a la izquierda, y elige un lugar, por ejemplo «El pasillo de los concursantes». Mirar el mapa es gratis; ir cuesta minutos."
     },
     {
       "id": "MAPA-1",
@@ -308,9 +308,9 @@
       "disparador": "ayuda.disponible",
       "orden": 216,
       "titulo": "¡Tienes una ayuda!",
-      "texto": "Alguien te ofrece ayuda. Mírala en «Equipo».",
+      "texto": "Alguien te ofrece ayuda. Mírala en la pantalla «Equipo».",
       "resaltar": "dia.equipo",
-      "mas": "Alguien confía en ti y te ofrece una ayuda. La verás al pulsar «Equipo», arriba. Las ayudas para retos se eligen en la receta, antes de jugar; las del día se usan desde ahí."
+      "mas": "Alguien confía en ti y te ofrece una ayuda. La verás en la pantalla «Equipo» (con las flechas). Las ayudas para retos se eligen en la receta, antes de jugar."
     },
     {
       "id": "COL-1",
@@ -338,9 +338,9 @@
       "disparador": "oficina.disponible",
       "orden": 240,
       "titulo": "Trabajo en tu escritorio",
-      "texto": "Sin avisos, trabaja en el «Escritorio» (en «Más»): tareas cortas.",
+      "texto": "Sin avisos, practica en la pantalla «Escritorio».",
       "resaltar": "dia.oficina",
-      "mas": "Cuando no pasa nada, puedes trabajar. Con «Escritorio», dentro de «Más» (o con «Trabajar en tu escritorio»), ves tareas cortas: cuestan tiempo, pero ayudan al proyecto. Son práctica: no cuentan para tu nota, y si una no te sale puedes intentarla otra vez."
+      "mas": "Cuando no pasa nada, practica: en la pantalla «Escritorio», el mosaico «Práctica». Cuestan tiempo y ayudan al proyecto; no cuentan para tu nota."
     },
     {
       "id": "OFI-2",
@@ -388,10 +388,10 @@
       "disparador": "dia.2",
       "orden": 255,
       "titulo": "El tablero del equipo",
-      "texto": "Tu equipo trabaja solo. Con «Abrir el tablero» puedes dirigirlo.",
-      "textoSolo": "Mientras decides, el trabajo sigue: aquí ves lo que tienes entre manos y cuánto llevas. Cada tarjeta es un trozo del proyecto, y todas son tuyas. Con «Abrir el tablero» decides qué va primero. Trabajando solo, no puedes con todo a la vez: elige bien.",
+      "texto": "Tu equipo trabaja solo. Con «Backlog» lo diriges: arrastra las fichas.",
+      "textoSolo": "El trabajo sigue mientras decides. Cada tarjeta es un trozo del proyecto, y todas son tuyas. En «Backlog», arrástralas para decidir qué va primero. Solo, no puedes con todo: elige bien.",
       "resaltar": "dia.tablero",
-      "mas": "Mientras tú decides, tu equipo trabaja. Aquí ves qué tiene cada uno entre manos y cuánto lleva: cada tarjeta es un trozo del proyecto. Con «Abrir el tablero» puedes darle una tarjeta a quien mejor se le dé, o cambiar qué se hace primero. Si no tocas nada, se reparten solos."
+      "mas": "Mientras decides, tu equipo trabaja: cada post-it es un trozo del proyecto, con quién lo lleva y cuánto falta. En «Backlog», arrastra una ficha a otro puesto para cambiar el orden, o suéltala en la cara de quien mejor se le dé. Si no tocas nada, se reparten solos."
     },
     {
       "id": "CEREMONIAS-1",
@@ -402,7 +402,7 @@
       "texto": "Cada metodología tiene reuniones. Asiste y elige cómo llevarlas.",
       "textoSolo": "Cada forma de trabajar tiene sus reuniones: se llaman ceremonias. Trabajando solo son un rato contigo mismo: repasar el plan, mirar cómo vas. Cuestan unos minutos y, bien llevadas, rindes más. Si las saltas, nadie las hace por ti.",
       "resaltar": "dia.ceremonias",
-      "mas": "Cada forma de trabajar tiene sus reuniones: se llaman ceremonias. En «Más» › «Ceremonias» ves las de hoy. Puedes asistir (cuesta unos minutos) y elegir cómo llevarlas: bien llevadas, el equipo rinde más. Si no vas, el equipo las hace sin ti."
+      "mas": "Cada forma de trabajar tiene sus reuniones: las ceremonias. Las de hoy brillan en el mosaico «Ceremonias» del «Escritorio». Asistir cuesta unos minutos; bien llevadas, el equipo rinde más."
     },
     {
       "id": "DIA2-1",
@@ -411,7 +411,7 @@
       "orden": 290,
       "titulo": "Los avisos",
       "texto": "Llegarán avisos sin previo aviso. Atiéndelos antes de que caduquen.",
-      "mas": "Cuando surja algo que tengas que atender, te llegará un aviso: nadie te dice antes qué día ni a qué hora. Lo verás en «La jornada», con una cuenta atrás, y el botón «Avisos» dirá cuántos esperan. Si lo dejas caducar, alguien decide por ti, y casi nunca bien."
+      "mas": "Cuando surja algo, bajará un aviso arriba, con su cuenta atrás y «Atender»; la «M» dirá cuántos esperan. Nadie te dice antes cuándo. Si lo dejas caducar, alguien decide por ti, y casi nunca bien."
     },
     {
       "id": "ALERTA-1",
@@ -527,8 +527,8 @@
       "disparador": "prorroga",
       "orden": 430,
       "titulo": "Horas extra",
-      "texto": "No llegan avisos ahora. Pulsa «Irme ya» cuando quieras.",
-      "mas": "Te quedaste. Hasta la hora límite no llegan avisos: aprovecha para explorar o hablar con quien quede. Cuando quieras, pulsa «Irme ya»."
+      "texto": "Ya no llegan avisos. El día acaba solo.",
+      "mas": "Te quedaste. Hasta la hora límite no llegan avisos: aprovecha para explorar o hablar con quien quede. El día acaba solo al llegar esa hora; si no quieres esperar, sube la velocidad del reloj (×2 o ×4)."
     },
     {
       "id": "DESP-1",

@@ -368,6 +368,9 @@ namespace Nexus.Core.Datos {
 
                 if (zona.Puerta != null)
                     ValidarExpresiones(zona.Puerta.Precondiciones, $"{id}: puerta de la zona '{zona.Id}'", e);
+                if (!string.IsNullOrEmpty(zona.MinijuegoDeZona) && !TiposDeMinijuegoDeZona.EsValido(zona.MinijuegoDeZona))
+                    e.Add($"{id}: la zona '{zona.Id}' tiene el minijuego '{zona.MinijuegoDeZona}', que no existe " +
+                          $"({string.Join(", ", TiposDeMinijuegoDeZona.Todos)}).");
             }
 
             // ★ El escritorio es siempre el ancla: es donde llegan las alertas y donde hay que volver
@@ -1393,6 +1396,10 @@ namespace Nexus.Core.Datos {
                         if (string.IsNullOrEmpty(c.Causa)) e.Add($"{c.Id}: falta 'causa'. La causa es la leccion.");
                         if (string.IsNullOrEmpty(c.Fuente))
                             e.Add($"{c.Id}: es un caso real y tiene que citar fuente verificable.");
+                        if (c.Hitos != null)
+                            for (var h = 0; h < c.Hitos.Count; h++)
+                                if (c.Hitos[h] == null || string.IsNullOrEmpty(c.Hitos[h].Fecha) || string.IsNullOrEmpty(c.Hitos[h].Texto))
+                                    e.Add($"{c.Id}: el hito {h + 1} necesita 'fecha' y 'texto'.");
                         break;
                     case SeriesDeColeccionables.Codigo:
                         if (string.IsNullOrEmpty(c.Comando)) e.Add($"{c.Id}: falta 'comando'.");
