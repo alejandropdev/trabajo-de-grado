@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de los informes que recibe Facilities cada mañana.",
   "presentacion": {
     "titulo": "Práctica: el diagrama de los informes diarios",
-    "comoSeJuega": "El diagrama de los informes diarios. Míralo entero: ¿cada pieza habla con las demás por su sitio? Si encuentras un problema, púlsalo y di cuál es. Si lo revisas todo y no falla nada, pulsa «Está bien: lo apruebo». No todo lo que llega a revisión está mal.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -126,35 +126,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "falla_de_seguridad",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": false
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "dependencia_circular",
-        "falla_de_seguridad",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": false
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "dependencia_circular"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -202,5 +186,31 @@
   "cierre": {
     "texto": "Revisar no es encontrar algo a la fuerza. Un diseño limpio se aprueba."
   },
-  "sinDefectos": true
+  "sinDefectos": true,
+  "cartas": [
+    {
+      "id": "cola",
+      "nombre": "Cola de mensajes",
+      "descripcion": "Los mensajes esperan en una cola y se procesan en orden.",
+      "icono": "cola",
+      "tipo": "patron",
+      "porQueNo": "encolar lo mismo que antes no arregla nada."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    },
+    {
+      "id": "microservicios",
+      "nombre": "Partir en microservicios",
+      "descripcion": "Separar cada módulo en un servicio con su propio despliegue.",
+      "icono": "cubos",
+      "tipo": "practica",
+      "porQueNo": "partirlo lo complica todo, y el problema viaja con él."
+    }
+  ]
 }

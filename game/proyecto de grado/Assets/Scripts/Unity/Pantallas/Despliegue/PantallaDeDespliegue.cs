@@ -5,6 +5,7 @@ using Nexus.Core.Despliegue;
 using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Guia;
 using Nexus.Unity.Pantallas.Minijuegos;
+using Nexus.Unity.Pantallas.Minijuegos.Corregir;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -13,9 +14,9 @@ using UnityEngine.UI;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>
-    /// Una pieza que se arrastra por la lamina en las dos direcciones (un tramo de tuberia, un cable). Al soltarla
-    /// dice donde quedo su centro, en coordenadas de la lamina; quien la creo decide que pasa y vuelve a pintar.
-    /// Un clic sin arrastre tambien cuenta: todo lo que se hace arrastrando se puede hacer pulsando.
+    /// Una pieza que se arrastra por la lamina en las dos direcciones. Al soltarla dice donde quedo su centro, en
+    /// coordenadas de la lamina; quien la creo decide que pasa y vuelve a pintar. Un clic sin arrastre tambien cuenta.
+    /// (La Fase 3 ya no la usa desde 2026-11-09, pero otras pantallas la nombran.)
     /// </summary>
     public sealed class PiezaArrastrable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler {
         public Action<Vector2> AlSoltar;
@@ -49,23 +50,33 @@ namespace Nexus.Unity.Pantallas {
         }
     }
 
+    /// <summary>Avisa de cuando el puntero entra o sale (un globo con lo que hace una pieza, sin tener que pulsarla).</summary>
+    public sealed class AlPasarElRaton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+        public Action AlEntrar, AlSalir;
+        public void OnPointerEnter(PointerEventData e) { if (AlEntrar != null) AlEntrar(); }
+        public void OnPointerExit(PointerEventData e) { if (AlSalir != null) AlSalir(); }
+    }
+
     /// <summary>
-    /// La Fase 3: desplegar. Con una sola cuenta atras para todo:
-    ///   1 · La tuberia — se arrastran los tramos (compilar, probar, ensayar, produccion, vigilar…) a los huecos del
-    ///       camino entre el codigo y el cliente. Hay mas tramos que huecos, y algunos son atajos.
-    ///   2 · Los modulos — uno por cada modulo que sale hoy: cada cable a su toma del entorno. Hay tomas de pruebas
-    ///       y claves a la vista; al encender, el modulo prende o salta.
-    /// Al acabar (o al agotarse el tiempo) se enseña renglon a renglon que estuvo bien y que falto, y lo que le hace
-    /// al proyecto. Las reglas estan en EvaluadorDeDespliegue; esto solo pinta y recoge la respuesta.
+    /// La Fase 3: desplegar (2026-11-09, rediseñada). Una sola cuenta atras para todo, y cuatro pasos que se suceden con
+    /// una transicion de camara (zoom y fundido), sin scroll ni columnas: todo ocupa la pantalla y lo demas flota como
+    /// globos de cristal.
+    ///   0 · Intro   — tres tarjetas: lo que sale hoy, tu arquitectura y como se juega.
+    ///   1 · Tuberia — se arman las etapas del camino del codigo al cliente y se PRUEBA: una luz recorre la tuberia y se
+    ///                 detiene en la primera que falla. No se pasa al siguiente juego hasta tenerla perfecta.
+    ///   2 · Cuartos — los modulos, a oscuras y con una linterna: en cada cuarto, una toma buena y un señuelo y la palanca
+    ///                 de despliegue. Acertar enciende la luz; fallar salta en chispas y deja el cuarto a oscuras.
+    ///   3 · Resultado — tarjetas y barras, no parrafos.
+    /// Al agotarse el tiempo se entrega lo que haya. Las reglas estan en Core (RevisorDeTuberia, EvaluadorDeDespliegue);
+    /// esto solo pinta, anima y recoge la respuesta. Cada paso vive en su archivo parcial (Intro, Tuberia, Cuartos,
+    /// Resultado).
     /// </summary>
-    public sealed class PantallaDeDespliegue : Pantalla {
+    public sealed partial class PantallaDeDespliegue : Pantalla {
         public Action AlTerminar;
 
         public override bool PuedeVolver { get { return false; } }
 
-        private enum Paso { Intro, Tuberia, Modulo, Resultado }
-
-        private const float W = 1300, H = 640;
+        private enum Paso { Intro, Tuberia, Cuartos, Resultado }
 
         private DespliegueDef _def;
         private PlanDeDespliegue _plan;
@@ -73,17 +84,16 @@ namespace Nexus.Unity.Pantallas {
         private Paso _paso = Paso.Intro;
         private string[] _huecos;
         private readonly Dictionary<string, Dictionary<string, string>> _enchufes = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
-        private int _modulo;
-        private bool _encendido;            // el modulo actual ya se encendio: se ve como quedo y se pasa al siguiente
-        private string _cableElegido, _tramoMirado;
+        private int _intentos;
         private float _restante, _total;
         private ResultadoDeDespliegue _resultado;
 
-        private RectTransform _cuerpo;
+        private Animador _anim;
+        private RectTransform _escena, _hud, _capa, _accion;
         private TemporizadorView _reloj;
-        private Lamina _lamina;
-        private TMP_Text _info, _titulo;
-        private Button _principal;
+        private TMP_Text _antetitulo, _dialogo;
+        private RectTransform _chipIntentos;
+        private bool _tutorialAbierto, _transicionando;
 
         protected override void Construir() {
             var s = App.Sesion;
@@ -93,19 +103,65 @@ namespace Nexus.Unity.Pantallas {
             _huecos = new string[Math.Max(1, _def.Tuberia.Huecos)];
             foreach (var m in _plan.Modulos) _enchufes[m] = new Dictionary<string, string>(StringComparer.Ordinal);
             _total = _restante = _plan.Segundos;
+            _anim = Raiz.GetComponent<Animador>();
+            if (_anim == null) _anim = Raiz.gameObject.AddComponent<Animador>();
 
-            var marco = UiKit.Rellenar(Ui.Columna(Raiz, "Marco", Tema.espacio, Tema.margen * 0.75f));
-            var cabecera = Ui.Fila(marco);
-            var titulos = Ui.Columna(cabecera, "Titulos", Tema.Espacio(1));
-            UiKit.Tamano(titulos, flexAncho: 1);
-            Ui.Texto(titulos, ("Fase 3 · despliegue · día " + _plan.Dia + (_plan.EsFinal ? " · el último" : "")).ToUpperInvariant(), EstiloTexto.Leyenda, Tema.warning);
-            _titulo = Ui.Texto(titulos, "", EstiloTexto.Subtitulo, Tema.ink);
-            GuiaView.BotonDeAyuda(App, cabecera);
-            _reloj = Ui.Temporizador(cabecera, Reloj(_total), Tono.Cyan);
-
-            _cuerpo = Ui.Fila(marco, "Cuerpo", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
-            UiKit.Tamano(_cuerpo, flexAncho: 1, flexAlto: 1);
+            // Tres capas a pantalla completa: la escena del paso (que cambia), los globos fijos y, encima, los avisos.
+            var marco = UiKit.Rellenar(Ui.Nodo(Raiz, "Marco"));
+            _escena = UiKit.Rellenar(Ui.Nodo(marco, "Escena"));
+            _hud = UiKit.Rellenar(Ui.Nodo(marco, "Globos fijos"));
+            _capa = UiKit.Rellenar(Ui.Nodo(marco, "Avisos"));
+            ConstruirGlobosFijos();
             PintarIntro();
+        }
+
+        // ==================================================================== los globos fijos
+
+        /// <summary>Arriba a la izquierda, el dialogo; arriba a la derecha, intentos, la accion del paso, la ayuda y el reloj.</summary>
+        private void ConstruirGlobosFijos() {
+            var dialogo = Globo(_hud, "Dialogo", false);
+            Anclar(dialogo, new Vector2(0, 1), new Vector2(16, -14));
+            dialogo.sizeDelta = new Vector2(700, 10);
+            Crecer(dialogo, false);
+            _antetitulo = Ui.Texto(dialogo, "", EstiloTexto.Leyenda, Tema.warning);
+            _dialogo = Ui.Texto(dialogo, "", EstiloTexto.Dialogo, Tema.ink);
+            var alto = _dialogo.GetComponent<AltoDeTexto>();
+            if (alto != null) Destroy(alto);   // caja fija con letra que se ajusta: que no crezca el globo
+            _dialogo.enableAutoSizing = true; _dialogo.fontSizeMin = 14; _dialogo.fontSizeMax = 21;
+            UiKit.Tamano(_dialogo, alto: 78);
+
+            var fila = Ui.Fila(_hud, "Acciones", Tema.espacio * 0.75f, 0, TextAnchor.MiddleRight);
+            Anclar(fila, new Vector2(1, 1), new Vector2(-16, -14));
+            Crecer(fila, true);
+            fila.gameObject.AddComponent<ListaDeElementos>();
+            _chipIntentos = Ui.Chip(fila, "", Tema.warningSoft, Tema.warning);
+            _chipIntentos.gameObject.SetActive(false);
+            _accion = Ui.Fila(fila, "Accion del paso", Tema.espacio * 0.75f, 0, TextAnchor.MiddleRight);
+            GuiaView.BotonDeAyuda(App, fila);
+            _reloj = Ui.Temporizador(fila, Reloj(_total), Tono.Cyan);
+        }
+
+        /// <summary>Un globo de cristal: vidrio oscuro con un filo de luz, como los de la Fase 1 y los del diagrama.</summary>
+        private RectTransform Globo(Transform padre, string nombre, bool fila, Color? filo = null, float? relleno = null) {
+            var rt = fila ? Ui.Fila(padre, nombre, Tema.espacio * 0.75f, relleno ?? Tema.espacio, TextAnchor.MiddleLeft)
+                          : Ui.Columna(padre, nombre, Tema.espacio * 0.75f, relleno ?? Tema.espacio);
+            var fondo = rt.gameObject.AddComponent<Image>();
+            Ui.Fondo(fondo, NexusTheme.Alfa(Tema.bg950, 0.86f), NexusTheme.RadioLg);
+            fondo.raycastTarget = true;
+            Ui.Halo(rt, NexusTheme.Alfa(Tema.cyan, 0.16f), NexusTheme.RadioLg);
+            Ui.Borde(rt, filo ?? NexusTheme.Alfa(Tema.cyan, 0.5f), NexusTheme.RadioLg, 1.5f);
+            return rt;
+        }
+
+        private static void Anclar(RectTransform rt, Vector2 ancla, Vector2 pos) {
+            rt.anchorMin = rt.anchorMax = rt.pivot = ancla;
+            rt.anchoredPosition = pos;
+        }
+
+        private static void Crecer(RectTransform rt, bool aLoAncho) {
+            var f = rt.gameObject.AddComponent<ContentSizeFitter>();
+            f.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            f.horizontalFit = aLoAncho ? ContentSizeFitter.FitMode.PreferredSize : ContentSizeFitter.FitMode.Unconstrained;
         }
 
         private static string Reloj(float segundos) {
@@ -118,11 +174,129 @@ namespace Nexus.Unity.Pantallas {
             return m == null ? modulo : m.Nombre;
         }
 
+        /// <summary>El dialogo escribe la frase letra a letra (con un tope: nunca hace esperar).</summary>
+        private void Decir(string frase) {
+            if (_dialogo == null) return;
+            var texto = Nexus.Core.Narrativa.Glifos.Seguro(frase ?? "");
+            _dialogo.text = texto;
+            _dialogo.maxVisibleCharacters = 0;
+            var total = texto.Length;
+            var d = _dialogo;
+            _anim.Lanzar(Mathf.Clamp(total * 0.016f, 0.25f, 1.1f), t => {
+                if (d == null || d.text != texto) return;
+                d.maxVisibleCharacters = Mathf.CeilToInt(total * t);
+            }, () => { if (d != null && d.text == texto) d.maxVisibleCharacters = 99999; }, 0, d.gameObject);
+        }
+
+        private void PonerAntetitulo(string paso) {
+            _antetitulo.text = ("Fase 3 · despliegue · día " + _plan.Dia + (_plan.EsFinal ? " · el último" : "") + " · " + paso).ToUpperInvariant();
+        }
+
+        private void PonerIntentos() {
+            if (_chipIntentos == null) return;
+            _chipIntentos.gameObject.SetActive(_intentos > 0 && _paso == Paso.Tuberia);
+            var t = _chipIntentos.GetComponentInChildren<TMP_Text>();
+            if (t != null) t.text = _intentos == 1 ? "1 prueba fallida" : _intentos + " pruebas fallidas";
+        }
+
+        /// <summary>Entra con un fundido y una escala de 0,88 a 1 tras 'retraso' segundos.</summary>
+        private void Aparecer(RectTransform rt, float retraso) {
+            var g = rt.gameObject.GetComponent<CanvasGroup>();
+            if (g == null) g = rt.gameObject.AddComponent<CanvasGroup>();
+            g.alpha = 0;
+            _anim.Lanzar(0.38f, t => {
+                if (g == null) return;
+                var e = Curvas.SalidaAtras(t);
+                g.alpha = Mathf.Clamp01(t * 2.5f);
+                rt.localScale = Vector3.one * Mathf.LerpUnclamped(0.88f, 1f, e);
+            }, () => { if (g != null) g.alpha = 1; }, retraso, rt.gameObject);
+        }
+
+        /// <summary>
+        /// Chispas que salen disparadas en circulo y caen. 'centro' esta en coordenadas de lamina (origen arriba a la
+        /// izquierda, y hacia abajo) si 'arribaIzquierda'; si no, en las del padre centrado.
+        /// </summary>
+        private void Chispas(Transform padre, Vector2 centro, Color color, int n, float alcance, bool arribaIzquierda) {
+            for (var i = 0; i < n; i++) {
+                var p = Ui.Nodo(padre, "Chispa");
+                if (arribaIzquierda) { p.anchorMin = p.anchorMax = new Vector2(0, 1); } else { p.anchorMin = p.anchorMax = new Vector2(0.5f, 0.5f); }
+                p.pivot = new Vector2(0.5f, 0.5f);
+                p.sizeDelta = new Vector2(8 + (i % 3) * 3, 8 + (i % 3) * 3);
+                var img = p.gameObject.AddComponent<Image>();
+                img.sprite = Ui.SpriteCircular();
+                img.raycastTarget = false;
+                var ang = (i / (float)n) * Mathf.PI * 2 + (i % 2) * 0.4f;
+                var dir = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
+                var lejos = alcance * (0.55f + (i % 4) * 0.18f);
+                var origen = arribaIzquierda ? new Vector2(centro.x, -centro.y) : centro;
+                p.anchoredPosition = origen;
+                _anim.Lanzar(0.75f, t => {
+                    if (p == null) return;
+                    var e = Curvas.SalidaCubica(t);
+                    p.anchoredPosition = origen + dir * lejos * e + new Vector2(0, -50f * t * t);
+                    img.color = NexusTheme.Alfa(color, 1 - t);
+                    p.localScale = Vector3.one * (1 - 0.6f * t);
+                }, () => { if (p != null) Destroy(p.gameObject); }, 0.02f * (i % 5), p.gameObject);
+            }
+        }
+
+        // ==================================================================== de un paso al siguiente
+
+        /// <summary>
+        /// La camara avanza: lo que habia se acerca y se funde, se monta lo siguiente y entra desde un poco mas lejos.
+        /// 'cambiar' pinta el paso nuevo (la escena ya esta vacia).
+        /// </summary>
+        private void Transicion(Action cambiar) {
+            if (_transicionando) { UiKit.Vaciar(_escena); cambiar(); return; }
+            _transicionando = true;
+            var g = _escena.GetComponent<CanvasGroup>();
+            if (g == null) g = _escena.gameObject.AddComponent<CanvasGroup>();
+            g.interactable = false;
+            _anim.Lanzar(0.28f, t => {
+                if (g == null) return;
+                g.alpha = 1 - t;
+                _escena.localScale = Vector3.one * Mathf.Lerp(1f, 1.08f, Curvas.EntradaSalida(t));
+            }, () => {
+                UiKit.Vaciar(_escena);
+                cambiar();
+                _anim.Lanzar(0.4f, t => {
+                    if (g == null) return;
+                    g.alpha = Mathf.Clamp01(t * 1.6f);
+                    _escena.localScale = Vector3.one * Mathf.LerpUnclamped(0.93f, 1f, Curvas.SalidaAtras(t));
+                }, () => {
+                    if (g == null) return;
+                    g.alpha = 1; g.interactable = true; _escena.localScale = Vector3.one; _transicionando = false;
+                }, 0, gameObject);
+            }, 0, gameObject);
+        }
+
+        /// <summary>Un paso no deja nada del anterior: ni su boton de accion, ni sus avisos, ni su tutorial.</summary>
+        private void LimpiarPaso() {
+            if (_accion != null) UiKit.Vaciar(_accion);
+            for (var i = _capa.childCount - 1; i >= 0; i--) Destroy(_capa.GetChild(i).gameObject);
+            _tutorialAbierto = false;
+            LimpiarTuberia();
+            LimpiarCuartos();
+        }
+
+        /// <summary>El tutorial en globos de un paso, solo la primera vez (despues, el «?» de la guia).</summary>
+        private void TutorialDelPaso(string clave, List<PasoDeTutorial> pasos) {
+            if (App.YaVioLaReceta(clave)) return;
+            App.AnotarRecetaVista(clave);
+            _tutorialAbierto = true;
+            GloboDeTutorial.Abrir(Ui, _capa, _anim, pasos, () => _tutorialAbierto = false);
+        }
+
+        // ==================================================================== reloj, teclado y entrega
+
         private void Update() {
-            var corriendo = (_paso == Paso.Tuberia || _paso == Paso.Modulo) && !GuiaView.PausaActiva && !PantallaDePausa.Abierta;
+            var jugando = _paso == Paso.Tuberia || _paso == Paso.Cuartos;
+            var corriendo = jugando && !_tutorialAbierto && !GuiaView.PausaActiva && !PantallaDePausa.Abierta;
             // La musica sube en el ultimo cuarto de la cuenta atras (y baja si el reloj se para).
             if (App.Musica != null)
                 App.Musica.Apremio(corriendo && _restante / Mathf.Max(10f, _total) <= 0.25f);
+            if (_paso == Paso.Cuartos) ActualizarLuzDeLosCuartos();
+            if (_paso == Paso.Tuberia) TeclasDeLaTuberia();
             if (!corriendo) return;
             _restante -= Time.unscaledDeltaTime;
             var f = Mathf.Max(0, _restante) / Mathf.Max(10f, _total);
@@ -130,374 +304,26 @@ namespace Nexus.Unity.Pantallas {
             if (_restante <= 0) Entregar(true);
         }
 
-        // ==================================================================== 0 · que se despliega hoy
-
-        private void PintarIntro() {
-            _paso = Paso.Intro;
-            _titulo.text = "Hoy sale a producción lo que está listo";
-            UiKit.Vaciar(_cuerpo);
-            var panel = Ui.PanelColumna(_cuerpo, "Intro", Tema.margen, Tema.espacio);
-            UiKit.Tamano(panel, flexAncho: 1, flexAlto: 1);
-            RectTransform contenido;
-            var scroll = Ui.Desplazable(panel, out contenido);
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-            var hoja = new Hoja(Ui, contenido);
-
-            hoja.Parrafo(_plan.EsFinal
-                ? "Se acabó el desarrollo. Lo construido tiene que llegar al cliente: eso es desplegar."
-                : "Cerraste una etapa. Lo que está listo llega hoy al cliente: eso es desplegar.");
-
-            var salen = hoja.Tarjeta(_plan.Modulos.Count == 0 ? "Hoy no sale ningún módulo" : "Lo que sale hoy", Tono.Cyan);
-            if (_plan.Modulos.Count == 0) Ui.Texto(salen, "Ninguno llega todavía al mínimo para entregarse. Aun así hay que dejar armado el camino a producción.", EstiloTexto.Cuerpo, Tema.ink);
-            foreach (var m in _plan.Modulos) {
-                var modulo = _ficha == null ? null : _ficha.Modulo(m);
-                Ui.Texto(salen, $"· <b>{NombreDe(m)}</b>" + (modulo == null ? "" : ": " + modulo.QueHace), EstiloTexto.Cuerpo, Tema.ink);
-            }
-            var arq = App.Sesion.Perfil.Fase1 == null ? null : App.Sesion.Perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == App.Sesion.ArquitecturaElegida);
-            if (arq != null) {
-                var comoSale = hoja.Tarjeta("Cómo sale con tu arquitectura · " + arq.Nombre);
-                Ui.Texto(comoSale, DibujosDeArquitectura.AlDesplegar(arq.Id), EstiloTexto.Cuerpo, Tema.ink);
-                Ui.Boton(Ui.Fila(comoSale), "Ver el plano", () => PantallaDelProducto.AbrirPlano(App, arq.Id, true), VarianteBoton.Fantasma);
-            }
-            if (_plan.YaDesplegados.Count > 0)
-                hoja.Nota("Ya estaban en producción: " + string.Join(", ", _plan.YaDesplegados.Select(NombreDe)) + ".", Tema.success);
-            if (_plan.NoListos.Count > 0)
-                hoja.Nota("Todavía no salen (les falta trabajo): " + string.Join(", ", _plan.NoListos.Select(NombreDe)) + ".", Tema.inkMuted);
-
-            var como = hoja.Tarjeta("Cómo se juega");
-            Ui.Texto(como, "1 · <b>La tubería.</b> Arrastra un tramo a cada hueco. Hay más tramos que huecos, y alguno es un atajo.", EstiloTexto.Cuerpo, Tema.ink);
-            Ui.Texto(como, "2 · <b>Los módulos.</b> Arrastra cada cable a su toma (producción, no pruebas) y enciéndelo.", EstiloTexto.Cuerpo, Tema.ink);
-            Ui.Texto(como, $"Tienes <b>{Reloj(_total)}</b>. Al llegar a cero se entrega lo que haya.", EstiloTexto.Cuerpo, Tema.warning);
-            PantallaDeGlosario.Palabras(App, hoja.Raiz, "Si alguna palabra no te suena:", "despliegue", "pipeline", "entorno", "secretos");
-
-            hoja.Accion("Empezar: armar la tubería  ►", () => { _paso = Paso.Tuberia; PintarJuego(); });
-            GuiaView.Avisar(App, "despliegue.intro");
-        }
-
-        // ==================================================================== el tablero de juego
-
-        private void PintarJuego() {
-            UiKit.Vaciar(_cuerpo);
-            _lamina = PantallaDeMinijuego.CrearLienzo(Ui, _cuerpo, null, W, H, null, false);   // sin marco de metal: no es un minijuego
-
-            var lado = Ui.Columna(_cuerpo, "Lado", Tema.espacio);
-            UiKit.Tamano(lado, ancho: 440, flexAlto: 1);
-            var tarjeta = Ui.PanelColumna(lado, "Info", Tema.margen * 0.75f, Tema.espacio);
-            UiKit.Tamano(tarjeta, flexAlto: 1);
-            RectTransform contenido;
-            var scroll = Ui.Desplazable(tarjeta, out contenido);
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-            _info = Ui.Texto(contenido, "", EstiloTexto.Cuerpo, Tema.ink);
-            PantallaDeGlosario.Palabras(App, lado, "", "pipeline", "entorno", "secretos");
-            _principal = Ui.Boton(lado, "", Avanzar, VarianteBoton.Primario);
-            Repintar();
-            GuiaView.Avisar(App, _paso == Paso.Tuberia ? "despliegue.tuberia" : "despliegue.modulos");
-        }
-
-        public override void Repintar() {
-            if (_lamina == null || (_paso != Paso.Tuberia && _paso != Paso.Modulo)) return;
-            for (var i = _lamina.Raiz.childCount - 1; i >= 0; i--) {
-                var hijo = _lamina.Raiz.GetChild(i);
-                if (hijo.gameObject != _lamina.Dibujo.gameObject) Destroy(hijo.gameObject);
-            }
-            _lamina.Dibujo.Limpiar();
-            if (_paso == Paso.Tuberia) PintarTuberia(); else PintarModulo();
-        }
-
-        private void Avanzar() {
-            if (_paso == Paso.Tuberia) {
-                if (_plan.Modulos.Count == 0) { Entregar(false); return; }
-                _paso = Paso.Modulo; _modulo = 0; _encendido = false; _cableElegido = null;
-                Repintar();
-                GuiaView.Avisar(App, "despliegue.modulos");
-                return;
-            }
-            if (!_encendido) { _encendido = true; _cableElegido = null; Repintar(); return; }
-            if (_modulo + 1 >= _plan.Modulos.Count) { Entregar(false); return; }
-            _modulo++; _encendido = false; _cableElegido = null;
-            Repintar();
-        }
-
-        // ==================================================================== 1 · la tuberia
-
-        private const float TuboY = 150, HuecoAlto = 110, BandejaY = 300, PiezaW = 300, PiezaH = 96;
-
-        private Rect RectDelHueco(int i) {
-            var n = _huecos.Length;
-            const float x0 = 150, x1 = 1150, gap = 12;
-            var w = (x1 - x0 - gap * (n - 1)) / n;
-            return new Rect(x0 + i * (w + gap), TuboY - HuecoAlto / 2, w, HuecoAlto);
-        }
-
-        private void PintarTuberia() {
-            _titulo.text = "1 · La tubería: del código al cliente";
-            var d = _lamina.Dibujo;
-            // los dos extremos y el tubo
-            d.Rect(20, TuboY - 60, 110, 120, Tema.papelTrazo, 3, Tema.papelCaja, false, 12);
-            _lamina.Texto(20, TuboY - 60, 110, 120, "EL\nCÓDIGO", 18, Tema.paperInk, TextAlignmentOptions.Center, null, true);
-            d.Rect(1170, TuboY - 60, 110, 120, Tema.papelTrazo, 3, Tema.papelCaja, false, 12);
-            _lamina.Texto(1170, TuboY - 60, 110, 120, "EL\nCLIENTE", 18, Tema.paperInk, TextAlignmentOptions.Center, null, true);
-            d.Linea(130, TuboY - 22, 1170, TuboY - 22, Tema.papelCyan, 5);
-            d.Linea(130, TuboY + 22, 1170, TuboY + 22, Tema.papelCyan, 5);
-            d.Flecha(134, TuboY, 1164, TuboY, NexusTheme.Alfa(Tema.papelCyan, 0.35f), 3, true);
-            _lamina.Texto(150, TuboY - 100, 1000, 30, "Arrastra un tramo a cada hueco, en el orden en que debe pasar. Pulsa un tramo puesto para quitarlo.", 16, Tema.paperMuted);
-
-            var puestos = new HashSet<string>(_huecos.Where(h => h != null));
-            for (var i = 0; i < _huecos.Length; i++) {
-                var r = RectDelHueco(i);
-                var indice = i;
-                if (_huecos[i] == null) {
-                    d.Rect(r.x, r.y, r.width, r.height, Tema.papelTrazo, 3, Tema.paperBg, true, 10);
-                    _lamina.Texto(r.x, r.y, r.width, r.height, (i + 1).ToString(), 26, Tema.paperLine, TextAlignmentOptions.Center, null, true);
-                    continue;
-                }
-                var tramo = _def.Tramo(_huecos[i]);
-                var pieza = Pieza(r.x, r.y, r.width, r.height, tramo.Nombre, null, Tema.papelCyan, _tramoMirado == tramo.Id);
-                pieza.AlPulsar = () => { _huecos[indice] = null; _tramoMirado = tramo.Id; Repintar(); };
-                pieza.AlSoltar = centro => SoltarTramo(tramo.Id, centro, indice);
-            }
-
-            _lamina.Texto(20, BandejaY - 40, 900, 30, "TRAMOS DISPONIBLES", 16, Tema.papelCyan, TextAlignmentOptions.MidlineLeft, null, true);
-            var libres = _def.Tuberia.Tramos.Where(t => !puestos.Contains(t.Id)).ToList();
-            for (var k = 0; k < libres.Count; k++) {
-                var tramo = libres[k];
-                var x = 20 + (k % 4) * (PiezaW + 20); var y = BandejaY + (k / 4) * (PiezaH + 14);
-                var pieza = Pieza(x, y, PiezaW, PiezaH, tramo.Nombre, tramo.QueHace, Tema.papelTrazo, _tramoMirado == tramo.Id);
-                pieza.AlPulsar = () => { _tramoMirado = tramo.Id; var libre = Array.IndexOf(_huecos, null); if (libre >= 0) _huecos[libre] = tramo.Id; Repintar(); };
-                pieza.AlSoltar = centro => SoltarTramo(tramo.Id, centro, -1);
-            }
-
-            var mirado = _tramoMirado == null ? null : _def.Tramo(_tramoMirado);
-            var puestosCuenta = _huecos.Count(h => h != null);
-            _info.text = $"<b>{puestosCuenta} de {_huecos.Length} huecos ocupados.</b>\n" +
-                         "El orden importa: lo que va a la izquierda pasa primero. No hace falta llenarlos todos, pero lo que no pongas no ocurre.\n\n" +
-                         (mirado == null ? "Pulsa un tramo para ver qué hace."
-                                         : $"<b>{mirado.Nombre}</b>\n{mirado.QueHace}");
-            _principal.GetComponentInChildren<TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro(_plan.Modulos.Count == 0 ? "Tubería lista: entregar" : "Tubería lista: a los módulos  ►");
-        }
-
-        private void SoltarTramo(string id, Vector2 centro, int desde) {
-            _tramoMirado = id;
-            var destino = -1;
-            for (var i = 0; i < _huecos.Length; i++) {
-                var r = RectDelHueco(i);
-                if (centro.x >= r.xMin - 6 && centro.x <= r.xMax + 6 && centro.y >= r.yMin - 40 && centro.y <= r.yMax + 40) destino = i;
-            }
-            if (desde >= 0) _huecos[desde] = null;
-            if (destino >= 0) {
-                // Si el hueco estaba ocupado, los dos tramos se cambian de sitio (o el otro vuelve a la bandeja).
-                var otro = _huecos[destino];
-                _huecos[destino] = id;
-                if (otro != null && desde >= 0) _huecos[desde] = otro;
-            }
-            Repintar();
-        }
-
-        /// <summary>Una ficha de papel con su nombre (y, si cabe, lo que hace) que se puede arrastrar o pulsar.</summary>
-        private PiezaArrastrable Pieza(float x, float y, float w, float h, string nombre, string detalle, Color borde, bool resaltada) {
-            var rt = Ui.Nodo(_lamina.Raiz, "Pieza " + nombre);
-            Lamina.Colocar(rt, x, y, w, h);
-            var img = rt.gameObject.AddComponent<Image>();
-            Ui.Fondo(img, Color.white, NexusTheme.RadioSm);
-            Ui.Borde(rt, resaltada ? Tema.papelAviso : borde, NexusTheme.RadioSm, resaltada ? 3 : 2);
-            var texto = new Lamina(Ui, rt, w, h, "Contenido");
-            UiKit.Rellenar(texto.Raiz);
-            texto.Dibujo.raycastTarget = false;
-            if (string.IsNullOrEmpty(detalle)) {
-                var t = texto.Texto(6, 0, w - 12, h, nombre, w < 140 ? 14 : 17, Tema.paperInk, TextAlignmentOptions.Center, null, true);
-                t.raycastTarget = false;
-            } else {
-                texto.Texto(12, 6, w - 24, 28, nombre, 18, Tema.paperInk, TextAlignmentOptions.MidlineLeft, null, true).raycastTarget = false;
-                texto.Texto(12, 34, w - 24, h - 40, detalle, 14, Tema.paperMuted, TextAlignmentOptions.TopLeft).raycastTarget = false;
-            }
-            return rt.gameObject.AddComponent<PiezaArrastrable>();
-        }
-
-        // ==================================================================== 2 · enchufar cada modulo
-
-        private const float CableX = 40, CableW = 360, CableH = 62, TomaW = 300, TomaH = 70;
-
-        private Rect RectDeLaToma(int i) {
-            return new Rect(640 + (i % 2) * (TomaW + 30), 90 + (i / 2) * (TomaH + 22), TomaW, TomaH);
-        }
-
-        private void PintarModulo() {
-            var id = _plan.Modulos[_modulo];
-            var modulo = _ficha == null ? null : _ficha.Modulo(id);
-            var cables = _def.CablesDe(id);
-            var puestos = _enchufes[id];
-            _titulo.text = $"2 · Módulo {_modulo + 1} de {_plan.Modulos.Count}: {NombreDe(id)}";
-            var d = _lamina.Dibujo;
-
-            // Como quedaria (o quedo) este modulo con lo enchufado hasta ahora.
-            RenglonDeDespliegue renglon = null;
-            if (_encendido) renglon = EvaluadorDeDespliegue.Evaluar(_def, _ficha, _plan, Respuesta(false)).Renglones.FirstOrDefault(x => x.Que == "modulo" && x.Id == id);
-            var color = renglon == null ? Tema.papelTrazo : renglon.Estado == EstadosDeDespliegue.Bien ? Tema.papelExito : renglon.Estado == EstadosDeDespliegue.Mal ? Tema.papelAviso : Tema.papelPeligro;
-
-            d.Rect(20, 20, 400, H - 40, color, renglon == null ? 3 : 5, Tema.papelCaja, false, 14);
-            _lamina.Texto(40, 30, 360, 34, NombreDe(id).ToUpperInvariant(), 20, Tema.paperInk, TextAlignmentOptions.MidlineLeft, null, true);
-            if (modulo != null) _lamina.Texto(40, 64, 360, 64, modulo.QueHace, 14, Tema.paperMuted, TextAlignmentOptions.TopLeft);
-            _lamina.Texto(40, 132, 360, 24, "SUS CABLES", 14, Tema.papelCyan, TextAlignmentOptions.MidlineLeft, null, true);
-
-            _lamina.Texto(640, 30, 640, 30, "EL ENTORNO · arrastra cada cable a su toma (o pulsa el cable y después la toma)", 15, Tema.paperMuted);
-            for (var i = 0; i < _def.Tomas.Count; i++) {
-                var toma = _def.Tomas[i];
-                var r = RectDeLaToma(i);
-                var dePruebas = toma.Entorno == "pruebas";
-                var ocupada = puestos.Values.Contains(toma.Id);
-                d.Rect(r.x, r.y, r.width, r.height, ocupada ? Tema.papelCyan : dePruebas ? Tema.paperMuted : Tema.papelTrazo, ocupada ? 4 : 2, Color.white, dePruebas, 10);
-                d.Circulo(r.x + 22, r.center.y, 9, Tema.papelTrazo, 3, ocupada ? Tema.papelCyan : (Color?)null);
-                _lamina.Texto(r.x + 42, r.y + 6, r.width - 50, 34, toma.Nombre, 16, Tema.paperInk, TextAlignmentOptions.MidlineLeft, null, true);
-                _lamina.Texto(r.x + 42, r.y + 38, r.width - 50, 24, dePruebas ? "PRUEBAS" : "PRODUCCIÓN", 12, dePruebas ? Tema.paperMuted : Tema.papelCyan);
-                if (_encendido) continue;
-                var destino = toma.Id;
-                _lamina.Zona(r.x, r.y, r.width, r.height, () => {
-                    if (_cableElegido == null) return;
-                    puestos[_cableElegido] = destino; _cableElegido = null; Repintar();
-                }, "Toma " + toma.Id);
-            }
-
-            for (var i = 0; i < cables.Count; i++) {
-                var cable = cables[i];
-                var y = 164 + i * (CableH + 14);
-                if (cable.EsDependencia) {
-                    var listo = _plan.YaDesplegados.Contains(cable.ModuloNecesario) || _plan.Modulos.Contains(cable.ModuloNecesario);
-                    d.Rect(CableX, y, CableW, CableH, listo ? Tema.papelExito : Tema.papelPeligro, 2, Tema.paperBg, true, 10);
-                    _lamina.Texto(CableX + 12, y, CableW - 24, CableH, cable.Nombre + (listo
-                        ? (_plan.YaDesplegados.Contains(cable.ModuloNecesario) ? "\n<size=80%>ya está en producción</size>" : "\n<size=80%>sale hoy: tiene que encender</size>")
-                        : "\n<size=80%>no sale hoy: este módulo no podrá encender</size>"), 15, Tema.paperInk, TextAlignmentOptions.MidlineLeft);
-                    continue;
-                }
-                string enchufadoEn;
-                puestos.TryGetValue(cable.Id, out enchufadoEn);
-                if (enchufadoEn != null) {
-                    var indice = _def.Tomas.FindIndex(t => t.Id == enchufadoEn);
-                    if (indice >= 0) {
-                        var r = RectDeLaToma(indice);
-                        d.CurvaCubica(new Vector2(CableX + CableW, y + CableH / 2), new Vector2(520, y + CableH / 2),
-                                      new Vector2(540, r.center.y), new Vector2(r.x + 22, r.center.y), Tema.papelCyan, 4);
-                    }
-                }
-                if (_encendido) {
-                    d.Rect(CableX, y, CableW, CableH, Tema.papelTrazo, 2, Color.white, false, 10);
-                    _lamina.Texto(CableX + 12, y, CableW - 24, CableH, cable.Nombre, 16, Tema.paperInk, TextAlignmentOptions.MidlineLeft, null, true);
-                    continue;
-                }
-                var cableId = cable.Id;
-                var pieza = Pieza(CableX, y, CableW, CableH, cable.Nombre, enchufadoEn == null ? "sin enchufar" : "en «" + _def.Toma(enchufadoEn).Nombre + "» · pulsa para soltarlo",
-                                  enchufadoEn == null ? Tema.papelAviso : Tema.papelCyan, _cableElegido == cable.Id);
-                pieza.AlPulsar = () => {
-                    if (puestos.ContainsKey(cableId)) { puestos.Remove(cableId); _cableElegido = null; }
-                    else _cableElegido = _cableElegido == cableId ? null : cableId;
-                    Repintar();
-                };
-                pieza.AlSoltar = centro => {
-                    for (var k = 0; k < _def.Tomas.Count; k++) {
-                        var r = RectDeLaToma(k);
-                        if (centro.x >= r.xMin - 30 && centro.x <= r.xMax + 30 && centro.y >= r.yMin - 12 && centro.y <= r.yMax + 12) puestos[cableId] = _def.Tomas[k].Id;
-                    }
-                    _cableElegido = null;
-                    Repintar();
-                };
-            }
-
-            if (renglon != null) {
-                var titulo = renglon.Estado == EstadosDeDespliegue.Bien ? "ENCENDIÓ" : renglon.Estado == EstadosDeDespliegue.Mal ? "ENCENDIÓ, PERO MAL" : "NO ENCENDIÓ";
-                _lamina.Texto(40, H - 150, 360, 34, titulo, 22, color, TextAlignmentOptions.MidlineLeft, null, true);
-                _info.text = $"<b>{NombreDe(id)}: {titulo.ToLowerInvariant()}.</b>\n{renglon.Texto}";
-                _principal.GetComponentInChildren<TMP_Text>().text = Nexus.Core.Narrativa.Glifos.Seguro(_modulo + 1 >= _plan.Modulos.Count ? "Terminar el despliegue  ►" : "Siguiente módulo  ►");
-                return;
-            }
-            var sueltos = cables.Count(c => !c.EsDependencia && !puestos.ContainsKey(c.Id));
-            var elegido = cables.FirstOrDefault(c => c.Id == _cableElegido);
-            _info.text = (sueltos == 0 ? "<b>Todo enchufado.</b> Revisa que cada cable esté en una toma de producción y enciéndelo."
-                                       : $"<b>Quedan {sueltos} cable(s) sin enchufar.</b>") +
-                         "\n\nCada cable es algo que el módulo necesita para funcionar. En producción tiene que apuntar a lo de verdad, y las claves, a un sitio donde nadie las lea." +
-                         (elegido == null ? "" : $"\n\n<b>Elegido: {elegido.Nombre}.</b> Ahora pulsa su toma.");
-            _principal.GetComponentInChildren<TMP_Text>().text = "Encender el módulo";
-        }
-
-        // ==================================================================== entregar y ver como salio
-
         private RespuestaDeDespliegue Respuesta(bool sinTiempo) {
             return new RespuestaDeDespliegue {
                 Tuberia = _huecos.ToList(),
                 Enchufes = _enchufes.ToDictionary(kv => kv.Key, kv => new Dictionary<string, string>(kv.Value, StringComparer.Ordinal), StringComparer.Ordinal),
                 SegundosUsados = _total - Mathf.Max(0, _restante),
-                SeAcaboElTiempo = sinTiempo
+                SeAcaboElTiempo = sinTiempo,
+                IntentosFallidosDeTuberia = _intentos
             };
         }
 
         private void Entregar(bool sinTiempo) {
             if (_paso == Paso.Resultado) return;
             _paso = Paso.Resultado;
-            _lamina = null;
             _reloj.Mostrar(Reloj(_restante), sinTiempo ? Tono.Peligro : Tono.Cyan);
             _resultado = App.Sesion.ResolverDespliegue(Respuesta(sinTiempo));
-            PintarResultado();
+            PonerIntentos();
+            LimpiarPaso();
+            Transicion(PintarResultado);
         }
 
-        private void PintarResultado() {
-            var r = _resultado;
-            _titulo.text = r.Titulo;
-            UiKit.Vaciar(_cuerpo);
-
-            var izquierda = Ui.PanelColumna(_cuerpo, "Detalle", Tema.margen, Tema.espacio);
-            UiKit.Tamano(izquierda, flexAncho: 1, flexAlto: 1);
-            RectTransform contenido;
-            var scroll = Ui.Desplazable(izquierda, out contenido);
-            UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);
-            var hoja = new Hoja(Ui, contenido);
-            hoja.Etiqueta("Qué estuvo bien y qué faltó");
-            if (r.SeAcaboElTiempo) hoja.Nota("Se acabó el tiempo: se entregó lo que había puesto.", Tema.warning);
-
-            foreach (var grupo in new[] { new { que = "tuberia", titulo = "La tubería" }, new { que = "modulo", titulo = "Los módulos" } }) {
-                var renglones = r.Renglones.Where(x => x.Que == grupo.que).ToList();
-                if (renglones.Count == 0) continue;
-                var t = hoja.Tarjeta(grupo.titulo);
-                foreach (var x in renglones) {
-                    var bien = x.Estado == EstadosDeDespliegue.Bien; var mal = x.Estado == EstadosDeDespliegue.Mal;
-                    var color = bien ? Tema.success : mal ? Tema.warning : Tema.danger;
-                    Ui.Texto(t, $"<b>{(bien ? "√" : mal ? "~" : "×")} {x.Nombre}</b>  <size=85%>{(bien ? "bien" : mal ? "mal puesto" : "faltó")}</size>", EstiloTexto.Cuerpo, color);
-                    if (!string.IsNullOrEmpty(x.Texto)) Ui.Texto(t, x.Texto, EstiloTexto.Pequeno, Tema.inkMuted);
-                }
-            }
-
-            // Las consecuencias van en un scroll y el boton de seguir, fijo debajo: con varios efectos y lo que dice
-            // el cliente no siempre caben de alto, y el boton no puede quedar fuera de la pantalla.
-            var lado = Ui.Columna(_cuerpo, "Consecuencias", Tema.espacio);
-            UiKit.Tamano(lado, ancho: 520, flexAlto: 1);
-            RectTransform derecha;
-            var scrollDeLado = Ui.Desplazable(lado, out derecha);
-            UiKit.Tamano(scrollDeLado, flexAncho: 1, flexAlto: 1);
-            derecha.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(4, 18, 4, 4);
-            var tono = r.Nivel == "bien" ? Tono.Exito : r.Nivel == "mal" ? Tono.Peligro : Tono.Aviso;
-            var cliente = Ui.Tarjeta(derecha, "Lo que notó el cliente", tono);
-            Ui.Texto(cliente, r.ParaElCliente, EstiloTexto.Cuerpo, Tema.ink);
-            // Quien usa lo que acaba de salir, en sus palabras.
-            foreach (var voz in App.Sesion.VocesDelProducto().Where(v => r.ModulosEncendidos.Contains(v.ModuloId)).Take(2))
-                Ui.Texto(cliente, $"{voz.Quien}: «{voz.Frase}»", EstiloTexto.Pequeno, Tema.cyan);
-
-            var hoy = Ui.Tarjeta(derecha, "Lo que cambia hoy en el proyecto");
-            if (r.Efectos.Count == 0) Ui.Texto(hoy, "Nada: las barras se quedan como estaban.", EstiloTexto.Pequeno, Tema.inkMuted);
-            foreach (var kv in r.Efectos) {
-                var v = Convert.ToDouble(kv.Value);
-                // En estas barras, subir es malo: deuda y cansancio.
-                var malo = (kv.Key == "DeudaTecnica" || kv.Key == "Cansancio") ? v > 0 : v < 0;
-                Ui.Texto(hoy, $"· {Textos.NombreDeStock(kv.Key)}: {Textos.Cambio(v)}", EstiloTexto.Cuerpo, malo ? Tema.danger : Tema.success);
-            }
-            if (r.AvanceQueCostaraManana > 0 && !r.EsFinal)
-                Ui.Texto(hoy, $"· Mañana, arreglar lo que salió mal costará {r.AvanceQueCostaraManana:0.#} puntos de avance.", EstiloTexto.Cuerpo, Tema.danger);
-
-            var final = Ui.Tarjeta(derecha, r.EsFinal ? "Lo que se lleva a la evaluación" : "Lo que se lleva al lanzamiento final");
-            Ui.Texto(final, $"· Riesgo del lanzamiento: {Textos.Cambio(r.Riesgo)}", EstiloTexto.Cuerpo, r.Riesgo > 0 ? Tema.danger : r.Riesgo < 0 ? Tema.success : Tema.ink);
-            Ui.Texto(final, r.Defectos > 0 ? $"· Errores que se escaparon por desplegar así: +{r.Defectos}" : "· No se escapó ningún error por el despliegue.",
-                     EstiloTexto.Cuerpo, r.Defectos > 0 ? Tema.danger : Tema.success);
-            var s = App.Sesion;
-            Ui.Texto(final, $"Acumulado del nivel: riesgo {Textos.Cambio(s.RiesgoPorDespliegues())}, errores +{s.DefectosPorDespliegues()}.", EstiloTexto.Pequeno, Tema.inkMuted);
-
-            Ui.Boton(lado, r.EsFinal ? "Ir al lanzamiento  ►" : "Volver al desarrollo  ►", () => AlTerminar?.Invoke(), VarianteBoton.Primario);
-            GuiaView.Avisar(App, "despliegue.resultado");
-        }
+        public override void Repintar() { }
     }
 }

@@ -56,17 +56,40 @@ namespace Nexus.Unity.Pantallas {
             }
 
             // ---- las flechas (debajo de los nodos)
+            // Rectas con codos que no pisan ninguna caja y se cruzan lo menos posible (RutaDeFlechas).
             var d = lamina.Dibujo;
             var flujos = new List<Flujo>();
+            var ids = new List<string>(); var partes = new List<List<Rect>>(); var sinAbajo = new List<bool>();
+            foreach (var kv in rects) {
+                ids.Add(kv.Key);
+                var esPersona = personas.Any(p => p.Id == kv.Key);
+                var partesDeCaja = new List<Rect> { kv.Value };
+                if (esPersona) partesDeCaja.Add(new Rect(kv.Value.center.x - 70, kv.Value.yMax, 140, 38));   // su nombre
+                partes.Add(partesDeCaja); sinAbajo.Add(esPersona);
+            }
+            foreach (var cx in new[] { 110f, 640f, 1130f }) {   // las leyendas de arriba tambien estorban
+                partes.Add(new List<Rect> { new Rect(cx - 130, 8, 260, 28) }); sinAbajo.Add(false);
+            }
+            var pares = new List<int[]>(); var validos = new List<Flujo>();
             foreach (var fl in f.Contexto.Flujos) {
-                Rect a, b;
-                if (!rects.TryGetValue(fl.Desde, out a) || !rects.TryGetValue(fl.Hasta, out b)) continue;
-                var dir = (b.center - a.center).normalized;
-                var desde = BordeHacia(a, b.center) + dir * 4;
-                var hasta = BordeHacia(b, a.center) - dir * 4;
-                d.Linea(desde.x, desde.y, hasta.x, hasta.y, NexusTheme.Alfa(t.cyan, 0.5f), 3);
-                d.Punta(desde, hasta, NexusTheme.Alfa(t.cyan, 0.8f), 3, 14);
-                flujos.Add(new Flujo { Desde = desde, Hasta = hasta, Texto = fl.Texto });
+                var i = ids.IndexOf(fl.Desde); var j = ids.IndexOf(fl.Hasta);
+                if (i < 0 || j < 0) continue;
+                pares.Add(new[] { i, j }); validos.Add(new Flujo { Texto = fl.Texto });
+            }
+            var rutas = RutaDeFlechas.Calcular(partes, sinAbajo, pares, W, H);
+            for (var k = 0; k < validos.Count; k++) {
+                var ruta = rutas[k];
+                if (ruta == null) {   // sin camino limpio: la recta de siempre
+                    var a = rects[ids[pares[k][0]]]; var b = rects[ids[pares[k][1]]];
+                    ruta = new List<Vector2> { BordeHacia(a, b.center), BordeHacia(b, a.center) };
+                }
+                // la punta se queda a 4 px de la caja de destino
+                var u = ruta[ruta.Count - 1]; var v = ruta[ruta.Count - 2];
+                ruta[ruta.Count - 1] = u + (v - u).normalized * 4;
+                for (var i = 0; i + 1 < ruta.Count; i++) d.Linea(ruta[i].x, ruta[i].y, ruta[i + 1].x, ruta[i + 1].y, NexusTheme.Alfa(t.cyan, 0.5f), 3);
+                d.Punta(ruta[ruta.Count - 2], ruta[ruta.Count - 1], NexusTheme.Alfa(t.cyan, 0.8f), 3, 14);
+                validos[k].Ruta = ruta;
+                flujos.Add(validos[k]);
             }
 
             // ---- las leyendas de las tres columnas
@@ -83,7 +106,7 @@ namespace Nexus.Unity.Pantallas {
             var puntos = new List<RectTransform>();
             for (var i = 0; i < flujos.Count; i++) {
                 var fl = flujos[i];
-                var medio = (fl.Desde + fl.Hasta) / 2;
+                var medio = fl.Medio();
                 var marca = ui.Nodo(lamina.Raiz, "Flujo " + i);
                 PonerCentro(marca, medio, 22, 22);
                 var im = marca.gameObject.AddComponent<Image>();
@@ -109,7 +132,26 @@ namespace Nexus.Unity.Pantallas {
             viajero.Puntos = puntos; viajero.Flujos = flujos;
         }
 
-        private sealed class Flujo { public Vector2 Desde, Hasta; public string Texto; }
+        private sealed class Flujo {
+            public List<Vector2> Ruta; public string Texto;
+            public float Largo() { var l = 0f; for (var i = 0; i + 1 < Ruta.Count; i++) l += Vector2.Distance(Ruta[i], Ruta[i + 1]); return l; }
+            /// <summary>El punto a lo largo de la ruta (0 = salida, 1 = llegada).</summary>
+            public Vector2 En(float x) {
+                var objetivo = Mathf.Clamp01(x) * Largo();
+                for (var i = 0; i + 1 < Ruta.Count; i++) {
+                    var tramo = Vector2.Distance(Ruta[i], Ruta[i + 1]);
+                    if (objetivo <= tramo || i + 2 == Ruta.Count) return Vector2.Lerp(Ruta[i], Ruta[i + 1], tramo < 0.01f ? 0 : Mathf.Clamp01(objetivo / tramo));
+                    objetivo -= tramo;
+                }
+                return Ruta[0];
+            }
+            /// <summary>El centro del tramo mas largo: ahi cabe el circulo «i» sin pisar un codo.</summary>
+            public Vector2 Medio() {
+                var mejor = 0; var largo = -1f;
+                for (var i = 0; i + 1 < Ruta.Count; i++) { var l = Vector2.Distance(Ruta[i], Ruta[i + 1]); if (l > largo) { largo = l; mejor = i; } }
+                return (Ruta[mejor] + Ruta[mejor + 1]) / 2;
+            }
+        }
 
         private static string Mayuscula(string s) { return string.IsNullOrEmpty(s) ? "" : char.ToUpperInvariant(s[0]) + s.Substring(1) + "."; }
 
@@ -219,7 +261,7 @@ namespace Nexus.Unity.Pantallas {
                 if (Puntos == null) return;
                 for (var i = 0; i < Puntos.Count; i++) {
                     var x = Mathf.Repeat(Time.unscaledTime * 0.32f + i * 0.19f, 1f);
-                    var p = Vector2.Lerp(Flujos[i].Desde, Flujos[i].Hasta, x);
+                    var p = Flujos[i].En(x);
                     Puntos[i].anchoredPosition = new Vector2(p.x, -p.y);
                     var s = Mathf.Sin(Mathf.PI * x);
                     Puntos[i].localScale = Vector3.one * (0.4f + 0.8f * s);

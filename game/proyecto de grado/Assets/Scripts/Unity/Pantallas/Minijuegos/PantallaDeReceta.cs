@@ -303,11 +303,14 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 c.Texto(70, 32, $"{Def.Presentacion.QuienEspera} espera · {Def.Presentacion.TextoPresion}", 24, Tizador.Mostaza);
                 y0 += 70;
             }
+            // El diagrama se juega con cartas de solucion (2026-11-09): su receta es otra.
+            var conCartas = Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.Aplica(Def);
             var una = paleta.Count <= 4;
-            var kP = verbo == Verbos.Detectar && !una ? (Inicio ? 0.9f : 1f) : 1.18f;
+            var kP = verbo == Verbos.Detectar && !una && !conCartas ? (Inicio ? 0.9f : 1f) : 1.18f;
             var pasos = t.En(70, y0 + 30, kP);
             if (verbo == Verbos.Ordenar) PasosOrdenar(pasos);
             else if (verbo == Verbos.Repartir) PasosRepartir(pasos);
+            else if (conCartas) PasosCorregir(pasos);
             else PasosDetectar(pasos, paleta);
             var yL = y0 + 30 + 200 * kP + 20;
 
@@ -340,6 +343,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 var niveles = new[] { 0.5f, 0.35f, 0.25f, 0.4f };
                 for (var i = 0; i < 4; i++) { bu.Pila(i * 110, 0, 70, 150, niveles[i]); bu.Check(i * 110 + 35, -18); }
                 bu.Texto(210, 190, "repartido según el riesgo = se escapa poco", 22, Tizador.Cian, true);
+            } else if (conCartas) {
+                pie = "ELIGE UN PUNTO, JUÉGALE LA CARTA QUE LO ARREGLA Y VERIFICA ANTES DE QUE ACABE EL RELOJ.";
+                t.Texto(60, yL, "EL TRUCO", 26, Tizador.Cian);
+                t.Texto(60, yL + 50, "Cada carta sirve una sola vez: si la pones en un punto, ya no está para otro.", 26);
+                t.Texto(60, yL + 96, "Algunos puntos están bien: para esos, «Está bien así». Arreglar lo que funciona también cuenta en contra.", 26, Tizador.Mostaza);
+                var mano = t.En(300, yL + 160);
+                for (var i = 0; i < 4; i++) mano.Caja(i * 120, i == 1 ? 50 : 0, 100, 140, i == 1 ? "EN #1" : null, i == 1 ? Tizador.Gris : Tizador.Tiza);
+                mano.Texto(230, 190, "una carta jugada se queda hundida: no se repite", 22, Tizador.Mostaza, true);
+                var bien = t.En(1000, yL + 160);
+                bien.Caja(0, 0, 120, 140, null, Tizador.Cian, true); bien.Check(60, 70);
+                bien.Texto(60, 190, "«Está bien así» no se gasta", 22, Tizador.Cian, true);
             } else {
                 pie = "PINCHA LO QUE ESTÁ MAL, DILE QUÉ LE PASA Y ENTREGA ANTES DE QUE ACABE EL RELOJ.";
                 t.Texto(60, yL, "¿CUÁNDO ES CADA COSA?  (ejemplos de otra tienda, no de tu reto)", 26, Tizador.Cian);
@@ -380,6 +394,20 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var d = p.En(920, 0); d.Caja(0, 30, 130, 70, "bien", Tizador.Cian); d.Check(105, 65);
             d.Texto(160, 72, "marcar", 20); d.Texto(160, 100, "= resta", 22, Tizador.Roja);
             d.Texto(110, 150, "¡Ojo! Lo que está bien no se marca", 19, Tizador.Mostaza, true);
+        }
+
+        private static void PasosCorregir(Tizador p) {
+            var a = p.En(0, 0); a.Caja(0, 30, 150, 70, "pieza"); a.Circulo(150, 30, 20, Tizador.Mostaza); a.Texto(150, 38, "#1", 18, Tizador.Mostaza, true);
+            a.Mano(110, 70); a.Texto(75, 150, "1 · Elige un punto", 22, null, true);
+            p.Curva(200, 60, 240, 30, 280, 60);
+            var b = p.En(300, 0);
+            for (var i = 0; i < 3; i++) b.Caja(i * 62, 10 + Math.Abs(i - 1) * 10, 56, 84, null, i == 1 ? Tizador.Cian : Tizador.Tiza);
+            b.Flecha(90, 4, 90, -40, Tizador.Cian);
+            b.Texto(90, 150, "2 · Juégale la carta que lo arregla", 22, null, true);
+            p.Curva(560, 60, 590, 30, 620, 60);
+            var c = p.En(640, 0); c.Reloj(60, 60); c.Caja(110, 40, 120, 42, "Verificar", Tizador.Cian); c.Texto(120, 150, "3 · Verifica a tiempo", 22, null, true);
+            var d = p.En(960, 0); d.Circulo(40, 60, 26, Tizador.Cian); d.Check(40, 62); d.Circulo(130, 60, 26, Tizador.Roja); d.Cruz(130, 60, Tizador.Roja, 12);
+            d.Texto(90, 150, "Se revela punto por punto", 19, Tizador.Mostaza, true);
         }
 
         private static void PasosOrdenar(Tizador p) {

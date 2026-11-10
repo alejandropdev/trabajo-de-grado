@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de cómo se marca la salida de una visita y se actualiza la lista «Quién sigue dentro».",
   "presentacion": {
     "titulo": "Práctica: el diagrama de la salida de las visitas",
-    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza y cada flecha dice quién le habla a quién. Busca lo que no está bien (hay uno), púlsalo y elige a la derecha qué problema tiene. Es práctica: si no te sale, inténtalo otra vez.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,10 @@
       ],
       "defecto": "dependencia_circular",
       "explicacion": "«Registrar salida» llama a «Quién sigue dentro» y esta vuelve a llamar a «Registrar salida»: cada una espera a la otra. Basta con que la lista lea las salidas de la base de datos.",
-      "pista": "Sigue las flechas entre «Registrar salida» y «Quién sigue dentro». ¿Ves un camino que vuelve a donde empezó?"
+      "pista": "Sigue las flechas entre «Registrar salida» y «Quién sigue dentro». ¿Ves un camino que vuelve a donde empezó?",
+      "soluciones": [
+        "romper-ciclo"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -129,33 +132,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "dependencia_circular",
-        "acoplamiento_indebido"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "dependencia_circular",
-        "acoplamiento_indebido",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "elemento_sin_especificar"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -202,5 +191,39 @@
   },
   "cierre": {
     "texto": "Si dos piezas se necesitan mutuamente, en realidad son una sola mal partida. Que una le pregunte a los datos, no a la otra."
-  }
+  },
+  "cartas": [
+    {
+      "id": "reintentos",
+      "nombre": "Reintentar si falla",
+      "descripcion": "Si una llamada falla, repetirla unas cuantas veces.",
+      "icono": "reintento",
+      "tipo": "practica",
+      "porQueNo": "reintentar algo mal diseñado solo repite el fallo."
+    },
+    {
+      "id": "cola",
+      "nombre": "Cola de mensajes",
+      "descripcion": "Los mensajes esperan en una cola y se procesan en orden.",
+      "icono": "cola",
+      "tipo": "patron",
+      "porQueNo": "encolar lo mismo que antes no arregla nada."
+    },
+    {
+      "id": "romper-ciclo",
+      "nombre": "Romper el ciclo",
+      "descripcion": "Una de las dos piezas deja de preguntar a la otra y lee el dato de donde se guarda.",
+      "icono": "ciclo",
+      "tipo": "patron",
+      "porQueNo": "aquí no hay ningún círculo de llamadas."
+    },
+    {
+      "id": "singleton",
+      "nombre": "Singleton",
+      "descripcion": "Que solo exista una instancia de la pieza en todo el sistema.",
+      "icono": "uno",
+      "tipo": "patron",
+      "porQueNo": "tener una sola instancia no cambia quién habla con quién ni qué hace cada pieza."
+    }
+  ]
 }

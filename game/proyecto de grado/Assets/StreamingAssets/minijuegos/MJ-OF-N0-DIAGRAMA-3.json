@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama del aviso: cómo se entera el anfitrión de que su visita ha llegado a la recepción.",
   "presentacion": {
     "titulo": "Práctica: el diagrama del aviso al anfitrión",
-    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza y cada flecha dice quién le habla a quién. Busca lo que no está bien (hay uno), púlsalo y elige a la derecha qué problema tiene. Es práctica: si no te sale, inténtalo otra vez.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,10 @@
       ],
       "defecto": "elemento_sin_especificar",
       "explicacion": "El avisador no dice cómo avisa, ni qué pasa si el anfitrión no contesta. Una pieza sin especificar la programa cada uno a su manera.",
-      "pista": "Pulsa cada caja y lee qué hace. ¿Hay alguna de la que no sabrías decir qué hace exactamente?"
+      "pista": "Pulsa cada caja y lee qué hace. ¿Hay alguna de la que no sabrías decir qué hace exactamente?",
+      "soluciones": [
+        "especificar"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -129,33 +132,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "elemento_sin_especificar",
-        "acoplamiento_indebido"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "elemento_sin_especificar",
-        "acoplamiento_indebido",
-        "requisito_ambiguo"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "requisito_ambiguo"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -202,5 +191,39 @@
   },
   "cierre": {
     "texto": "Antes de programar una pieza hay que poder decir qué hace, con qué y qué pasa cuando falla."
-  }
+  },
+  "cartas": [
+    {
+      "id": "comentar-codigo",
+      "nombre": "Comentar el código",
+      "descripcion": "Explicar con comentarios lo que hace cada función.",
+      "icono": "comentario",
+      "tipo": "practica",
+      "porQueNo": "los comentarios llegan tarde: el fallo está en el diseño, antes del código."
+    },
+    {
+      "id": "reintentos",
+      "nombre": "Reintentar si falla",
+      "descripcion": "Si una llamada falla, repetirla unas cuantas veces.",
+      "icono": "reintento",
+      "tipo": "practica",
+      "porQueNo": "reintentar algo mal diseñado solo repite el fallo."
+    },
+    {
+      "id": "especificar",
+      "nombre": "Especificar la pieza",
+      "descripcion": "Escribir qué hace, con qué regla y qué pasa cuando falla.",
+      "icono": "plano",
+      "tipo": "practica",
+      "porQueNo": "la pieza ya dice qué hace: el fallo es otro."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    }
+  ]
 }

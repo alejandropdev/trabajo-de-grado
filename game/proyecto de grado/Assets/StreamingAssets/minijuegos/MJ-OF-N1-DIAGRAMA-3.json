@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama del control de acceso a los patios N1 y N2 con tarjeta.",
   "presentacion": {
     "titulo": "Práctica: el diagrama del acceso a los patios",
-    "comoSeJuega": "El diagrama de el acceso a los patios. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,10 @@
       ],
       "defecto": "falla_de_seguridad",
       "explicacion": "Desde el panel del guardia se pueden dar permisos sin que quede registrado quién ni cuándo. Nadie podrá saber después por qué entró alguien.",
-      "pista": "Mira quién puede cambiar los permisos. ¿Queda rastro de cada cambio?"
+      "pista": "Mira quién puede cambiar los permisos. ¿Queda rastro de cada cambio?",
+      "soluciones": [
+        "auditoria"
+      ]
     },
     {
       "id": "Z2",
@@ -118,7 +121,10 @@
       ],
       "defecto": "requisito_ambiguo",
       "explicacion": "«Quien tenga permiso» no dice quién da los permisos ni cuánto duran. Un requisito así lo interpreta cada uno distinto.",
-      "pista": "Lee lo que dice cada pieza. ¿Hay alguna regla que se pueda entender de dos maneras?"
+      "pista": "Lee lo que dice cada pieza. ¿Hay alguna regla que se pueda entender de dos maneras?",
+      "soluciones": [
+        "acordar-regla"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -140,35 +146,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "falla_de_seguridad",
-        "requisito_ambiguo",
-        "acoplamiento_indebido"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "falla_de_seguridad",
-        "requisito_ambiguo",
-        "acoplamiento_indebido",
-        "dependencia_circular"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "dependencia_circular"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -215,5 +205,47 @@
   },
   "cierre": {
     "texto": "Quién puede entrar es una regla de negocio: tiene que estar escrita sin ambigüedad y cada cambio tiene que dejar huella."
-  }
+  },
+  "cartas": [
+    {
+      "id": "cifrar-bd",
+      "nombre": "Cifrar la base de datos",
+      "descripcion": "Guardar los datos cifrados en el disco.",
+      "icono": "llave",
+      "tipo": "practica",
+      "porQueNo": "protege el disco, pero no lo que se enseña ni quién da las órdenes."
+    },
+    {
+      "id": "auditoria",
+      "nombre": "Registro de auditoría",
+      "descripcion": "Cada cambio deja quién, qué y cuándo, y no se puede borrar.",
+      "icono": "bitacora",
+      "tipo": "practica",
+      "porQueNo": "dejar rastro no arregla lo que está mal aquí."
+    },
+    {
+      "id": "estrategia",
+      "nombre": "Estrategia: regla intercambiable",
+      "descripcion": "Poder cambiar la forma de decidir sin tocar el resto.",
+      "icono": "bifurcacion",
+      "tipo": "patron",
+      "porQueNo": "deja cambiar la regla, pero nadie ha dicho todavía cuál es."
+    },
+    {
+      "id": "acordar-regla",
+      "nombre": "Acordar la regla con el cliente",
+      "descripcion": "Escribir con el cliente cómo se decide, con un ejemplo de cada caso.",
+      "icono": "acuerdo",
+      "tipo": "practica",
+      "porQueNo": "aquí no falta una decisión del cliente: el fallo está en el diseño."
+    },
+    {
+      "id": "singleton",
+      "nombre": "Singleton",
+      "descripcion": "Que solo exista una instancia de la pieza en todo el sistema.",
+      "icono": "uno",
+      "tipo": "patron",
+      "porQueNo": "tener una sola instancia no cambia quién habla con quién ni qué hace cada pieza."
+    }
+  ]
 }

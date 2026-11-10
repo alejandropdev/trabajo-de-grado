@@ -35,6 +35,7 @@ namespace Nexus.Core.Audio {
                     m = new Mezcla { Pista = Nexus, Nivel = EnMenus };
                     break;
                 case "PantallaDetectar":
+                case "PantallaCorregirDiagrama":
                 case "PantallaOrdenar":
                 case "PantallaRepartir":
                     m = new Mezcla { Pista = null, Nivel = 0f };

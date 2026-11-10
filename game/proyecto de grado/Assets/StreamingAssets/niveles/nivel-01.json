@@ -1268,9 +1268,84 @@
         "entorno": "produccion"
       },
       {
+        "id": "ascensor-simulado",
+        "nombre": "Ascensor simulado",
+        "entorno": "pruebas",
+        "trampa": true,
+        "porque": "Los ascensores de carga de verdad nunca recibirían la orden de reservar."
+      },
+      {
+        "id": "correo-de-pruebas",
+        "nombre": "Buzón de pruebas",
+        "entorno": "pruebas",
+        "trampa": true,
+        "porque": "Los avisos irían a un buzón que nadie lee: nadie se entera de lo que pasó."
+      },
+      {
+        "id": "tu-computador",
+        "nombre": "Tu computador",
+        "entorno": "pruebas",
+        "trampa": true,
+        "porque": "Solo funcionaría en tu computador: en la garita no habría nada que abrir."
+      },
+      {
         "id": "equipo-garita",
         "nombre": "Equipo de la garita",
         "entorno": "produccion"
+      },
+      {
+        "id": "copia-de-ayer",
+        "nombre": "Copia de ayer de la base de datos",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Los datos de hoy no estarían: se guardaría en una copia que mañana se borra."
+      },
+      {
+        "id": "replica-lectura",
+        "nombre": "Réplica de solo lectura",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Solo se puede leer de ahí: lo que se intente guardar se pierde."
+      },
+      {
+        "id": "archivo-compartido",
+        "nombre": "Archivo de configuración compartido",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Lo pueden cambiar otros equipos sin avisar: mañana el sistema leería otra cosa."
+      },
+      {
+        "id": "servidor-antiguo",
+        "nombre": "Servidor antiguo",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Es el de antes del cambio: nadie lo mira y puede estar apagado cuando se necesite."
+      },
+      {
+        "id": "buzon-personal",
+        "nombre": "Buzón personal de un compañero",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Los avisos le llegarían a una sola persona, que quizá hoy no esté."
+      },
+      {
+        "id": "controlador-de-reserva",
+        "nombre": "Controlador de reserva",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Es el de repuesto: la orden llegaría a un aparato que no está conectado a nada."
+      },
+      {
+        "id": "entorno-de-ensayo",
+        "nombre": "Entorno de ensayo",
+        "entorno": "pruebas"
+      },
+      {
+        "id": "produccion-directa",
+        "nombre": "Producción directa",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Soltarlo sin ensayar es jugársela delante del cliente: el ensayo existe para fallar sin que nadie lo vea."
       }
     ],
     "modulos": {
@@ -1279,7 +1354,15 @@
           "id": "camara",
           "nombre": "De dónde lee",
           "toma": "camara-garita",
+          "alternativa": "camara-de-prueba",
           "porque": "Tiene que leer las placas de los carros que llegan de verdad."
+        },
+        {
+          "id": "ensayo",
+          "nombre": "Dónde se ensaya antes de soltar",
+          "toma": "entorno-de-ensayo",
+          "alternativa": "produccion-directa",
+          "porque": "Antes de soltar algo a los patios se ensaya en un entorno aparte: ahí se puede fallar sin que ningún carro espere."
         }
       ],
       "acceso": [
@@ -1287,18 +1370,21 @@
           "id": "datos",
           "nombre": "Dónde guarda",
           "toma": "bd-produccion",
+          "alternativa": "copia-de-ayer",
           "porque": "Los accesos reales van a la base de datos de producción."
         },
         {
           "id": "clave",
           "nombre": "Su clave de la barrera",
           "toma": "caja-de-secretos",
+          "alternativa": "clave-a-la-vista",
           "porque": "La clave que abre la barrera es justo la que no puede estar a la vista."
         },
         {
           "id": "barrera",
           "nombre": "A quién le da la orden",
           "toma": "barrera-real",
+          "alternativa": "controlador-de-reserva",
           "porque": "La orden de abrir tiene que llegar al controlador de verdad."
         },
         {
@@ -1313,18 +1399,21 @@
           "id": "datos",
           "nombre": "Dónde guarda",
           "toma": "bd-produccion",
+          "alternativa": "replica-lectura",
           "porque": "Las reservas reales van a la base de datos de producción."
         },
         {
           "id": "ascensor",
           "nombre": "Qué ascensor bloquea",
           "toma": "ascensor-real",
+          "alternativa": "ascensor-simulado",
           "porque": "Tiene que bloquear el ascensor de verdad a su hora."
         },
         {
           "id": "correo",
           "nombre": "Por dónde avisa",
           "toma": "correo-nexus",
+          "alternativa": "buzon-personal",
           "porque": "Quien reservó tiene que recibir el aviso en su correo real."
         }
       ],
@@ -1333,6 +1422,7 @@
           "id": "datos",
           "nombre": "De dónde lee",
           "toma": "bd-produccion",
+          "alternativa": "archivo-compartido",
           "porque": "Decide las prioridades con las reservas reales."
         },
         {
@@ -1347,6 +1437,7 @@
           "id": "pantalla",
           "nombre": "Dónde se abre",
           "toma": "equipo-garita",
+          "alternativa": "servidor-antiguo",
           "porque": "El guardia lo mira en el equipo de la garita."
         },
         {
@@ -1361,12 +1452,14 @@
           "id": "datos",
           "nombre": "De dónde lee",
           "toma": "bd-produccion",
+          "alternativa": "bd-pruebas",
           "porque": "El informe del mes sale de los accesos reales."
         },
         {
           "id": "correo",
           "nombre": "A quién se lo manda",
           "toma": "correo-nexus",
+          "alternativa": "correo-de-pruebas",
           "porque": "El jefe de mantenimiento lo recibe por correo."
         },
         {

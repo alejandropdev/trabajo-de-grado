@@ -29,6 +29,12 @@ namespace Nexus.Core.Minijuegos
         public List<string> PaletaEtiquetas = new List<string>();
 
         /// <summary>
+        /// Solo lienzo "diagrama" (2026-11-09): las cartas de solucion que se reparten. Cada punto del diagrama (una zona
+        /// o un señuelo) se resuelve jugando una carta, o «Está bien así»; una carta en uso no se puede jugar en otro.
+        /// </summary>
+        public List<CartaDeSolucion> Cartas = new List<CartaDeSolucion>();
+
+        /// <summary>
         /// Solo verbo V1: cuantos señuelos se pueden marcar sin que el resultado sea «falsoPositivo». Con 0 (lo de
         /// siempre) un solo señuelo manda sobre haber acertado todo; con 1, quien lo encontro todo y acuso una pieza
         /// sana se queda en «parcial».
@@ -247,6 +253,23 @@ namespace Nexus.Core.Minijuegos
         public string Explicacion;
         /// <summary>Lo que hay que preguntarse para encontrarla, sin decir la respuesta. Lo usa el modo guiado.</summary>
         public string Pista;
+        /// <summary>Lienzo "diagrama": los ids de las cartas que arreglan esta zona (al menos una).</summary>
+        public List<string> Soluciones = new List<string>();
+    }
+
+    /// <summary>Una carta de solucion del lienzo "diagrama": un patron o una practica.</summary>
+    public sealed class CartaDeSolucion
+    {
+        public string Id;
+        public string Nombre;
+        /// <summary>Una linea: para que sirve.</summary>
+        public string Descripcion;
+        /// <summary>La clave del dibujo de la carta (DibujosDeSoluciones).</summary>
+        public string Icono;
+        /// <summary>"patron" | "practica": solo cambia el rotulo de la carta.</summary>
+        public string Tipo;
+        /// <summary>Por que no arregla lo que se le pidio, para el cierre cuando se juega donde no toca.</summary>
+        public string PorQueNo;
     }
 
     public sealed class Senuelo

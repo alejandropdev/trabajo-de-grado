@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nexus.Core.Minijuegos.Corregir;
 using Nexus.Core.Minijuegos.Detectar;
 using Nexus.Core.Minijuegos.Ordenar;
 using Nexus.Core.Minijuegos.Repartir;
@@ -23,7 +24,11 @@ namespace Nexus.Core.Minijuegos {
         /// <summary>Repartir: dejar el deposito 'Objetivo' con 'Valor' horas.</summary>
         Asignar,
         /// <summary>Pulsar «Entregar».</summary>
-        Entregar
+        Entregar,
+        /// <summary>Diagrama con cartas: pinchar el punto 'Objetivo' (id del punto).</summary>
+        ElegirPunto,
+        /// <summary>Diagrama con cartas: jugar la carta 'Objetivo' en el punto elegido («esta_bien» = Está bien así).</summary>
+        JugarCarta
     }
 
     public sealed class PasoGuiado {
@@ -53,7 +58,7 @@ namespace Nexus.Core.Minijuegos {
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar: pasos = Ordenar(def); break;
                 case Verbos.Repartir: pasos = Repartir(def); break;
-                default: pasos = Detectar(def); break;
+                default: pasos = PuntosDelDiagrama.Aplica(def) ? Corregir(def) : Detectar(def); break;
             }
             // Lo primero: en que parte del proyecto estamos. Sin eso, las piezas son nombres sueltos.
             if (!string.IsNullOrEmpty(def.EnElProyecto))
@@ -135,6 +140,53 @@ namespace Nexus.Core.Minijuegos {
             pasos.Add(new PasoGuiado {
                 Accion = AccionGuiada.Entregar, Texto = "Ya está todo marcado. Pulsa «Entregar».",
                 Porque = "Revisar bien es encontrar lo que falla sin acusar a lo que funciona."
+            });
+            return pasos;
+        }
+
+        // ==================================================================== V1 · el diagrama con cartas
+
+        private static List<PasoGuiado> Corregir(MinijuegoDef def) {
+            var pasos = new List<PasoGuiado> {
+                new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Antes de jugar ninguna carta: qué se busca aquí.",
+                    Porque = "Cada punto marcado del diagrama es una sospecha: unas son problemas de verdad y otras parecen raras y están bien. " +
+                             "Te preguntas tres cosas: ¿hace TODO lo que pide el encargo? ¿cada pieza habla con otra solo por su puerta? " +
+                             "¿alguna decide algo sin que nadie haya dicho cómo? Cada carta solo se puede usar una vez.",
+                    EsLeccion = true
+                }
+            };
+            var ganadora = PuntosDelDiagrama.SolucionGanadora(def) ?? new Dictionary<string, string>();
+            foreach (var p in PuntosDelDiagrama.De(def)) {
+                var pieza = Nombre(def, p.Pieza);
+                pasos.Add(new PasoGuiado {
+                    Accion = AccionGuiada.ElegirPunto, Objetivo = p.Id,
+                    Texto = $"Pincha el punto #{p.Numero}, sobre {pieza}.",
+                    Porque = p.EsReal ? (p.Zona.Pista ?? "Fíjate en esta pieza y compárala con lo que pide el encargo: algo no cuadra.")
+                                      : "Mírala bien antes de cambiar nada: que parezca rara no quiere decir que esté mal.",
+                    EsLeccion = p.EsReal && !string.IsNullOrEmpty(p.Zona.Pista)
+                });
+                string carta;
+                ganadora.TryGetValue(p.Id, out carta);
+                if (p.EsReal) {
+                    var c = PuntosDelDiagrama.Carta(def, carta);
+                    pasos.Add(new PasoGuiado {
+                        Accion = AccionGuiada.JugarCarta, Objetivo = carta,
+                        Texto = $"Juega la carta «{PuntosDelDiagrama.NombreDeCarta(def, carta)}».",
+                        Porque = (c != null && !string.IsNullOrEmpty(c.Descripcion) ? c.Descripcion + " " : "") + p.Zona.Explicacion,
+                        EsLeccion = true
+                    });
+                } else {
+                    pasos.Add(new PasoGuiado {
+                        Accion = AccionGuiada.JugarCarta, Objetivo = PuntosDelDiagrama.EstaBien,
+                        Texto = "Juega «Está bien así»: aquí no se cambia nada.",
+                        Porque = p.Senuelo.RazonNoEsDefecto + " Cambiar lo que funciona también cuenta en contra.", EsLeccion = true
+                    });
+                }
+            }
+            pasos.Add(new PasoGuiado {
+                Accion = AccionGuiada.Entregar, Texto = "Cada punto tiene su carta. Pulsa «Verificar».",
+                Porque = "Revisar bien es arreglar lo que falla sin tocar lo que funciona."
             });
             return pasos;
         }
@@ -292,6 +344,16 @@ namespace Nexus.Core.Minijuegos {
                     return RepartirEvaluador.Evaluar(def, horas);
                 }
                 default: {
+                    if (PuntosDelDiagrama.Aplica(def)) {
+                        var tablero = new CorregirState(def.Cartas.Select(c => c.Id));
+                        var segundo = 0;
+                        foreach (var p in pasos) {
+                            if (p.Accion == AccionGuiada.ElegirPunto) tablero.PuntoElegido = p.Objetivo;
+                            string devuelta;
+                            if (p.Accion == AccionGuiada.JugarCarta) tablero.Jugar(p.Objetivo, segundo++, out devuelta);
+                        }
+                        return CorregirEvaluador.Evaluar(def, tablero);
+                    }
                     var estado = new DetectarState(def.Presentacion.SegundosReloj);
                     var t = 0;
                     foreach (var p in pasos) {

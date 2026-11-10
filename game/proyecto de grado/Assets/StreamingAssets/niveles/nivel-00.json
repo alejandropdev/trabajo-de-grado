@@ -909,6 +909,39 @@
         "entorno": "pruebas",
         "trampa": true,
         "porque": "Los avisos irían a un buzón que nadie lee: ningún anfitrión se entera de que llegó su visita."
+      },
+      {
+        "id": "copia-de-ayer",
+        "nombre": "Copia de ayer de la base de datos",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Los datos de hoy no estarían: se guardaría en una copia que mañana se borra."
+      },
+      {
+        "id": "replica-lectura",
+        "nombre": "Réplica de solo lectura",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Solo se puede leer de ahí: lo que se intente guardar se pierde."
+      },
+      {
+        "id": "buzon-personal",
+        "nombre": "Buzón personal de un compañero",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Los avisos le llegarían a una sola persona, que quizá hoy no esté."
+      },
+      {
+        "id": "entorno-de-ensayo",
+        "nombre": "Entorno de ensayo",
+        "entorno": "pruebas"
+      },
+      {
+        "id": "produccion-directa",
+        "nombre": "Producción directa",
+        "entorno": "produccion",
+        "trampa": true,
+        "porque": "Soltarlo sin ensayar es jugársela delante del cliente: el ensayo existe para fallar sin que nadie lo vea."
       }
     ],
     "modulos": {
@@ -917,6 +950,7 @@
           "id": "pantalla",
           "nombre": "Dónde se abre",
           "toma": "equipo-recepcion",
+          "alternativa": "tu-computador",
           "porque": "La pantalla tiene que abrirse en el único equipo con navegador que hay en la recepción."
         }
       ],
@@ -925,13 +959,22 @@
           "id": "datos",
           "nombre": "Dónde guarda",
           "toma": "bd-produccion",
+          "alternativa": "copia-de-ayer",
           "porque": "Las visitas de verdad van a la base de datos de producción."
         },
         {
           "id": "clave",
           "nombre": "Su clave de acceso",
           "toma": "caja-de-secretos",
+          "alternativa": "clave-a-la-vista",
           "porque": "Las claves se guardan en la caja de secretos, nunca escritas en el código."
+        },
+        {
+          "id": "ensayo",
+          "nombre": "Dónde se ensaya antes de soltar",
+          "toma": "entorno-de-ensayo",
+          "alternativa": "produccion-directa",
+          "porque": "Antes de soltar algo al cliente se ensaya en un entorno aparte: ahí se puede fallar sin que nadie se entere."
         }
       ],
       "aviso": [
@@ -939,6 +982,7 @@
           "id": "correo",
           "nombre": "Por dónde avisa",
           "toma": "correo-nexus",
+          "alternativa": "buzon-personal",
           "porque": "El aviso tiene que llegar al correo real del anfitrión."
         },
         {
@@ -953,6 +997,7 @@
           "id": "datos",
           "nombre": "De dónde lee",
           "toma": "bd-produccion",
+          "alternativa": "replica-lectura",
           "porque": "La lista de quién sigue dentro sale de las visitas reales."
         },
         {

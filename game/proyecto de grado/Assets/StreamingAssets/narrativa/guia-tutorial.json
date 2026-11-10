@@ -545,8 +545,8 @@
       "disparador": "despliegue.tuberia",
       "orden": 432,
       "titulo": "Arma la tubería",
-      "texto": "Arrastra cada tramo a su hueco, en orden. No todos convienen.",
-      "mas": "Arrastra un tramo a cada hueco, de izquierda a derecha, en el orden en que debe pasar. Pulsa un tramo para leer qué hace. Ojo: no todos los tramos convienen, y lo que no pongas no ocurre. Piensa en una fila de puertas: primero se comprueba que el programa arranca, después que no tiene errores, después se ensaya en un sitio de pruebas, y solo entonces llega al cliente. Y al final, alguien se queda mirando que siga funcionando."
+      "texto": "Pon cada etapa en su cuadro y pruébala. Hay atajos.",
+      "mas": "Pulsa una carta (o arrástrala) para ponerla en un cuadro, de izquierda a derecha, en el orden en que debe pasar. Pasa el ratón por una carta para leer qué hace. Ojo: no todas convienen, y lo que no pongas no ocurre. Piensa en una fila de puertas: primero se comprueba que el programa arranca, después que no tiene errores, después se ensaya en un sitio de pruebas, y solo entonces llega al cliente. Y al final, alguien se queda mirando que siga funcionando. Cuando creas que está lista, pruébala: una luz recorre la tubería y se detiene en la primera etapa que falla, aunque las siguientes estén bien. No pasarás a los cuartos hasta que la luz llegue entera al cliente."
     },
     {
       "id": "DESP-3",
@@ -554,8 +554,8 @@
       "disparador": "despliegue.modulos",
       "orden": 433,
       "titulo": "Enchufa cada módulo",
-      "texto": "Cada cable va a su toma. PRODUCCIÓN es lo real; PRUEBAS, no.",
-      "mas": "Cada módulo necesita cosas para funcionar: dónde guardar, por dónde avisar, su clave. Arrastra cada cable a su toma. Fíjate en la etiqueta de cada toma: PRODUCCIÓN es lo de verdad; PRUEBAS, no. Un programa que en tu computador hablaba con una base de datos de mentira tiene que hablar ahora con la de verdad. Si se queda apuntando a la de pruebas, funciona… pero los datos van al sitio equivocado. Y las claves nunca se escriben a la vista."
+      "texto": "Con la linterna, elige la toma real y baja la palanca.",
+      "mas": "Cada módulo necesita cosas para funcionar: dónde guardar, por dónde avisar, su clave. Cada cosa es un cuarto a oscuras: con la linterna, ilumina las dos tomas y lee su etiqueta, elige una y baja la palanca DESPLEGAR. PRODUCCIÓN es lo de verdad; PRUEBAS, no. Pero lee bien el cable: a veces lo correcto es PRUEBAS, como al ensayar antes de soltar. Si se queda apuntando a la de pruebas, salta una chispa, el cuarto se queda a oscuras y sigues al siguiente. Y las claves nunca se escriben a la vista. Si un módulo necesita a otro, un candado te dice si ese ya está encendido."
     },
     {
       "id": "DESP-4",
@@ -564,7 +564,7 @@
       "orden": 434,
       "titulo": "Cómo salió el despliegue",
       "texto": "Esto salió bien y esto faltó, y lo que supone al lanzamiento.",
-      "mas": "Renglón a renglón, qué estuvo bien y qué faltó, con su porqué. A la derecha, lo que le hace al proyecto: lo que notó el cliente hoy y lo que se suma al riesgo y a los errores del lanzamiento."
+      "mas": "Una luz por cada etapa de la tubería y una lámpara por cada módulo: pasa el ratón por una para leer qué pasó y por qué. Las barras dicen lo que le hace al proyecto hoy y lo que se suma al riesgo y a los errores del lanzamiento. Abajo, lo que notó el cliente."
     },
     {
       "id": "LANZ-1",

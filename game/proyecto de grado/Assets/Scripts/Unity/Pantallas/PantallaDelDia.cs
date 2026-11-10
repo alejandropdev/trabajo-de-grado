@@ -744,7 +744,11 @@ namespace Nexus.Unity.Pantallas {
                     App.Router.Apilar<PantallaRepartir>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
                 default:
-                    App.Router.Apilar<PantallaDetectar>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
+                    // Los diagramas se juegan con cartas de solucion (2026-11-09); el grafo y la secuencia, marcando.
+                    if (Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.Aplica(def))
+                        App.Router.Apilar<PantallaCorregirDiagrama>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
+                    else
+                        App.Router.Apilar<PantallaDetectar>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
             }
         }

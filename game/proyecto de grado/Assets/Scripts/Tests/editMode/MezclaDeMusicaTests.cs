@@ -18,6 +18,7 @@ namespace Nexus.Tests {
         }
 
         [TestCase("PantallaDetectar")]
+        [TestCase("PantallaCorregirDiagrama")]
         [TestCase("PantallaOrdenar")]
         [TestCase("PantallaRepartir")]
         public void En_los_minijuegos_no_suena_nada_ni_con_apremio(string pantalla) {

@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama del panel desde el que Facilities ve los ascensores y las reservas del día.",
   "presentacion": {
     "titulo": "Práctica: el diagrama del panel de Facilities",
-    "comoSeJuega": "El diagrama de el panel de Facilities. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,10 @@
       ],
       "defecto": "acoplamiento_indebido",
       "explicacion": "El panel escribe directo en las tablas de reservas, saltándose el módulo que comprueba los choques de horario. Cualquier cambio de la tabla rompe el panel.",
-      "pista": "Mira por dónde cambia el panel una reserva. ¿Pasa por la puerta del módulo de reservas?"
+      "pista": "Mira por dónde cambia el panel una reserva. ¿Pasa por la puerta del módulo de reservas?",
+      "soluciones": [
+        "fachada"
+      ]
     },
     {
       "id": "Z2",
@@ -118,7 +121,10 @@
       ],
       "defecto": "elemento_sin_especificar",
       "explicacion": "No dice cada cuánto se actualiza el estado ni qué se muestra si el ascensor no contesta. Sin eso, el panel puede enseñar un estado viejo como si fuera de ahora.",
-      "pista": "¿Qué pieza no explica qué hace cuando el aparato del fabricante no responde?"
+      "pista": "¿Qué pieza no explica qué hace cuando el aparato del fabricante no responde?",
+      "soluciones": [
+        "especificar"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -140,35 +146,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "elemento_sin_especificar",
-        "requisito_incompleto"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "elemento_sin_especificar",
-        "falla_de_seguridad",
-        "requisito_incompleto"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "falla_de_seguridad"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -215,5 +205,47 @@
   },
   "cierre": {
     "texto": "Una pantalla pide las cosas al módulo que sabe hacerlas; no las hace ella por su cuenta en la base de datos."
-  }
+  },
+  "cartas": [
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    },
+    {
+      "id": "fachada",
+      "nombre": "Fachada: la puerta del módulo",
+      "descripcion": "Los demás piden los datos al módulo por su puerta; nadie entra en sus tablas.",
+      "icono": "puerta",
+      "tipo": "patron",
+      "porQueNo": "nadie se está metiendo en las tripas de otro módulo."
+    },
+    {
+      "id": "mas-servidores",
+      "nombre": "Más servidores",
+      "descripcion": "Escalar el sistema poniendo más máquinas.",
+      "icono": "servidores",
+      "tipo": "practica",
+      "porQueNo": "no es un problema de carga."
+    },
+    {
+      "id": "especificar",
+      "nombre": "Especificar la pieza",
+      "descripcion": "Escribir qué hace, con qué regla y qué pasa cuando falla.",
+      "icono": "plano",
+      "tipo": "practica",
+      "porQueNo": "la pieza ya dice qué hace: el fallo es otro."
+    },
+    {
+      "id": "singleton",
+      "nombre": "Singleton",
+      "descripcion": "Que solo exista una instancia de la pieza en todo el sistema.",
+      "icono": "uno",
+      "tipo": "patron",
+      "porQueNo": "tener una sola instancia no cambia quién habla con quién ni qué hace cada pieza."
+    }
+  ]
 }

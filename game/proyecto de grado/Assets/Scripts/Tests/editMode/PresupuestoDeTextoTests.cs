@@ -138,7 +138,7 @@ namespace Nexus.Tests {
         private const int TechoGuia = 611;   // 2026-11-03: botones movidos a «Más» y «?» (la guia los nombra donde estan ahora)
         private const int TechoAdmision = 220;   // H4: 750 → 220 (frase + etiquetas; el instrumento original queda a un boton)
         private const int TechoEventosTutorial = 71;   // H3: 244 → 71 (aviso + frase + etiquetas)
-        private const int TechoRetosF0 = 651;   // H3: 791 → 676; 2026-11-03: 676 → 651 (comoSeJuega y enElProyecto, más cortos)
+        private const int TechoRetosF0 = 693;   // H3: 791 → 676; 2026-11-03: 676 → 651; 2026-11-09: 651 → 693 (las cartas de solucion del diagrama: sustituyen a la paleta de etiquetas y a la leyenda, que estaban en el codigo y no contaban)
         private const int TechoCeremonias = 127;
 
         [Test]
@@ -153,7 +153,7 @@ namespace Nexus.Tests {
 
         // La meta del plan era 1.500-2.000 palabras obligatorias en todo el N0. Lo medido aqui no incluye el expediente de
         // la Fase 1 ni el Dashboard, asi que el techo del total es lo conseguido hoy; ver C4-reduccion-de-texto.md.
-        private const int TechoDelTotalMedido = 2160;   // 2026-11-03: 2180 → 2154 medido
+        private const int TechoDelTotalMedido = 2202;   // 2026-11-03: 2180 → 2154 medido; 2026-11-09: +42 de las cartas de los retos MJ-F0
 
         [Test]
         public void El_total_medido_del_nivel_0_no_supera_su_techo() {

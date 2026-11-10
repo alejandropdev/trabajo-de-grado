@@ -554,9 +554,16 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(frente, rol, EstiloTexto.Pequeno, Tema.cyan, TextAlignmentOptions.Center);
             if (ficha != null) EstadoDeHoy(frente, ficha);
             if (ficha != null) BarrasDeAtributos(frente, ficha);
-            var reverso = Ui.Columna(t, "Reverso", Tema.Espacio(3));
+            // El reverso va en un visor que ocupa TODO el hueco entre el borde de arriba y los botones, y su ficha se encoge
+            // (EscaladorAlCaber) lo justo para caber: antes, con una descripcion larga, empujaba «Frente» e «Interactuar»
+            // fuera de la carta (2026-11-09).
+            var visor = Ui.Nodo(t, "Visor del reverso");
+            UiKit.Tamano(visor, flexAncho: 1, flexAlto: 100);
+            var reverso = Ui.Columna(visor, "Reverso", Tema.Espacio(2));
             ReversoDePersona(reverso, nombre, rol, dorso, ficha);
-            reverso.gameObject.SetActive(false);
+            var escalador = visor.gameObject.AddComponent<EscaladorAlCaber>();
+            escalador.Interior = reverso;
+            visor.gameObject.SetActive(false);
             UiKit.Tamano(Ui.Nodo(t, "Hueco"), flexAlto: 1);
             // Las acciones, una debajo de otra y a todo el ancho: en fila, «Interactuar» se salia de la carta.
             var acciones = Ui.Columna(t, "Acciones", Tema.Espacio(2));
@@ -565,7 +572,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(girar, flexAncho: 1);
             var giro = t.gameObject.AddComponent<GiroDeCarta>();
             giro.Frente = frente.gameObject;
-            giro.Reverso = reverso.gameObject;
+            giro.Reverso = visor.gameObject;
             girar.onClick.AddListener(giro.Girar);
             // La etiqueta dice a que cara se va: «Descripción» desde el frente, «Frente» desde el reverso.
             var etiqueta = girar.GetComponentInChildren<TMP_Text>();
@@ -658,7 +665,7 @@ namespace Nexus.Unity.Pantallas {
         private void Cifra(RectTransform padre, string numero, string que, Color color) {
             var c = Ui.PanelColumna(padre, "Cifra " + que, Tema.Espacio(2), 0, Tema.bg900);
             UiKit.Tamano(c, flexAncho: 1);
-            Ui.Texto(c, numero, EstiloTexto.Titulo, color, TextAlignmentOptions.Center);
+            Ui.Texto(c, numero, EstiloTexto.Subtitulo, color, TextAlignmentOptions.Center);   // mas bajo: el reverso tiene que caber
             Ui.Texto(c, que, EstiloTexto.Leyenda, Tema.inkMuted, TextAlignmentOptions.Center);
         }
 
