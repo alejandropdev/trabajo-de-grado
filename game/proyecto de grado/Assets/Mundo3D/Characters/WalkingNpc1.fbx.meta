@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: abdeb812397afde4691af6ad2dc91d27
+guid: 70beedb886b424f45be101f7114e0f39
 ModelImporter:
   serializedVersion: 24000
   internalIDToNameTable: []
@@ -32,18 +32,18 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Neutral idle
+      name: caminaNpcI
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 263
+      lastFrame: 31
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
