@@ -39,8 +39,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         public IReadOnlyList<PasoGuiado> Pasos { get { return _pasos; } }
         public bool Terminado { get { return _indice >= _pasos.Count; } }
 
+        /// <summary>
+        /// 'flotante' (estilo cristal, 2026-11-09): el panel no entra en el layout de 'padre'; flota arriba en el centro,
+        /// con un ancho fijo y el alto que pida su texto, como un globo que no le quita sitio a nada.
+        /// </summary>
         public GuiaDelMinijuego(AppRoot app, Transform padre, int indiceEnPadre,
-                                Func<PasoGuiado, RectTransform> piezaDe, Action<PasoGuiado> alCambiar) {
+                                Func<PasoGuiado, RectTransform> piezaDe, Action<PasoGuiado> alCambiar, bool flotante = false) {
             _app = app;
             _piezaDe = piezaDe;
             _alCambiar = alCambiar;
@@ -48,7 +52,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var tema = ui.Tema;
 
             _panel = ui.PanelColumna(padre, "Marisol te guia", tema.margen * 0.75f, 4, tema.surfaceRaised);
-            _panel.SetSiblingIndex(indiceEnPadre);
+            if (flotante) {
+                _panel.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+                _panel.anchorMin = _panel.anchorMax = _panel.pivot = new Vector2(0.5f, 1f);
+                _panel.sizeDelta = new Vector2(760, 10);
+                _panel.anchoredPosition = new Vector2(0, -150);   // bajo la cabecera del reto, entre los globos de los lados
+                var ajuste = _panel.gameObject.AddComponent<ContentSizeFitter>();
+                ajuste.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                ajuste.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            } else {
+                _panel.SetSiblingIndex(indiceEnPadre);
+            }
             UiKit.ColorDeBorde(_panel, tema.warning);   // el mismo amarillo con el que la guia señala las piezas
             var cabecera = ui.Fila(_panel);
             _progreso = ui.Texto(cabecera, "", EstiloTexto.Leyenda, tema.warning);

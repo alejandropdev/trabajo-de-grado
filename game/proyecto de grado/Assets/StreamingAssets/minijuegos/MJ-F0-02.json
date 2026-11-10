@@ -8,7 +8,7 @@
   "enElProyecto": "«Quién sigue dentro», el diagrama de Mateo.",
   "presentacion": {
     "titulo": "El diagrama de Mateo",
-    "comoSeJuega": "Pincha lo que falle. Si todo está bien, apruébalo.",
+    "comoSeJuega": "Juega en cada punto la carta que lo arregla, o «Está bien así».",
     "quienEspera": "Mateo",
     "textoPresion": "Mateo empieza a programarlo a las 11:00",
     "segundosReloj": 90
@@ -125,33 +125,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "requisito_incompleto",
-        "acoplamiento_indebido"
-      ],
       "contadorRestantes": false
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "requisito_incompleto",
-        "acoplamiento_indebido",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": false
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "acoplamiento_indebido"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -207,5 +193,19 @@
   "cierre": {
     "texto": "Mateo guarda el diagrama con tu visto bueno y se pone a programar."
   },
-  "sinDefectos": true
+  "sinDefectos": true,
+  "cartas": [
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia para ir más rápido.",
+      "icono": "rayo"
+    },
+    {
+      "id": "singleton",
+      "nombre": "Singleton",
+      "descripcion": "Una sola instancia de la pieza.",
+      "icono": "uno"
+    }
+  ]
 }

@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de cómo viaja una visita desde el formulario de recepción hasta la lista «Quién sigue dentro», la que consulta el vigilante al cerrar.",
   "presentacion": {
     "titulo": "Práctica: el diagrama del registro de visitas",
-    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza del sistema y cada flecha dice quién le habla a quién. Busca la flecha que no debería estar ahí, púlsala y elige a la derecha qué problema tiene. Como es práctica, si no te sale puedes intentarlo otra vez.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 90
@@ -108,7 +108,10 @@
       ],
       "defecto": "acoplamiento_indebido",
       "explicacion": "La pantalla del vigilante lee directamente del formulario, a medio escribir y sin validar. Si cambia el formulario, se rompe la pantalla: están pegadas. Lo correcto es que lea de «Quién sigue dentro», como ya hace.",
-      "pista": "Sigue las flechas que llegan a la pantalla del vigilante. ¿De dónde debería sacar los datos: de las visitas ya guardadas o de un formulario a medio escribir?"
+      "pista": "Sigue las flechas que llegan a la pantalla del vigilante. ¿De dónde debería sacar los datos: de las visitas ya guardadas o de un formulario a medio escribir?",
+      "soluciones": [
+        "fachada"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -129,33 +132,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "requisito_incompleto"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "requisito_incompleto",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "elemento_sin_especificar"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -202,5 +191,39 @@
   },
   "cierre": {
     "texto": "Una pieza solo debería hablar con otra por su puerta de entrada. Si se mete en sus tripas, quedan pegadas: cambiar una rompe la otra."
-  }
+  },
+  "cartas": [
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    },
+    {
+      "id": "fachada",
+      "nombre": "Fachada: la puerta del módulo",
+      "descripcion": "Los demás piden los datos al módulo por su puerta; nadie entra en sus tablas.",
+      "icono": "puerta",
+      "tipo": "patron",
+      "porQueNo": "nadie se está metiendo en las tripas de otro módulo."
+    },
+    {
+      "id": "reintentos",
+      "nombre": "Reintentar si falla",
+      "descripcion": "Si una llamada falla, repetirla unas cuantas veces.",
+      "icono": "reintento",
+      "tipo": "practica",
+      "porQueNo": "reintentar algo mal diseñado solo repite el fallo."
+    },
+    {
+      "id": "comentar-codigo",
+      "nombre": "Comentar el código",
+      "descripcion": "Explicar con comentarios lo que hace cada función.",
+      "icono": "comentario",
+      "tipo": "practica",
+      "porQueNo": "los comentarios llegan tarde: el fallo está en el diseño, antes del código."
+    }
+  ]
 }

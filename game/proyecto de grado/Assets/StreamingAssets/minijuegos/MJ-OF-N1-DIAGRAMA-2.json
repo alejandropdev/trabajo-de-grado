@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de la lectura de matrículas en la garita: cómo se decide si la barrera se abre.",
   "presentacion": {
     "titulo": "Práctica: el diagrama del lector de matrículas",
-    "comoSeJuega": "El diagrama de la lectura de matrículas en la garita. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,10 @@
       ],
       "defecto": "falla_de_seguridad",
       "explicacion": "La cámara abre la barrera sola cada vez que ve un vehículo, sin preguntar si está autorizado. Es el mismo agujero que se usó para colarse en los patios.",
-      "pista": "Busca todos los caminos que llegan a la barrera. ¿Alguno se salta la comprobación de autorizados?"
+      "pista": "Busca todos los caminos que llegan a la barrera. ¿Alguno se salta la comprobación de autorizados?",
+      "soluciones": [
+        "autorizar-antes"
+      ]
     },
     {
       "id": "Z2",
@@ -118,7 +121,10 @@
       ],
       "defecto": "elemento_sin_especificar",
       "explicacion": "El lector no dice qué hace si no consigue leer la matrícula (barro, lluvia, una placa doblada). Cada uno lo programaría a su manera.",
-      "pista": "¿Qué pasa cuando la foto no se lee bien? Busca la pieza que tendría que decirlo."
+      "pista": "¿Qué pasa cuando la foto no se lee bien? Busca la pieza que tendría que decirlo.",
+      "soluciones": [
+        "especificar"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -140,35 +146,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "falla_de_seguridad",
-        "elemento_sin_especificar",
-        "acoplamiento_indebido"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "falla_de_seguridad",
-        "elemento_sin_especificar",
-        "acoplamiento_indebido",
-        "requisito_ambiguo"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "requisito_ambiguo"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -215,5 +205,47 @@
   },
   "cierre": {
     "texto": "En seguridad no basta con que el camino bueno funcione: no puede haber otro que lo esquive."
-  }
+  },
+  "cartas": [
+    {
+      "id": "reintentos",
+      "nombre": "Reintentar si falla",
+      "descripcion": "Si una llamada falla, repetirla unas cuantas veces.",
+      "icono": "reintento",
+      "tipo": "practica",
+      "porQueNo": "reintentar algo mal diseñado solo repite el fallo."
+    },
+    {
+      "id": "autorizar-antes",
+      "nombre": "Comprobar el permiso antes de actuar",
+      "descripcion": "Antes de abrir o dar paso, se pregunta a quien decide si está autorizado.",
+      "icono": "escudo",
+      "tipo": "practica",
+      "porQueNo": "aquí nadie actúa sin preguntar."
+    },
+    {
+      "id": "cifrar-bd",
+      "nombre": "Cifrar la base de datos",
+      "descripcion": "Guardar los datos cifrados en el disco.",
+      "icono": "llave",
+      "tipo": "practica",
+      "porQueNo": "protege el disco, pero no lo que se enseña ni quién da las órdenes."
+    },
+    {
+      "id": "especificar",
+      "nombre": "Especificar la pieza",
+      "descripcion": "Escribir qué hace, con qué regla y qué pasa cuando falla.",
+      "icono": "plano",
+      "tipo": "practica",
+      "porQueNo": "la pieza ya dice qué hace: el fallo es otro."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    }
+  ]
 }

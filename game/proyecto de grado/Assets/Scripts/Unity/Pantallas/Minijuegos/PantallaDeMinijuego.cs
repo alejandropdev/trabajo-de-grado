@@ -50,6 +50,12 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private bool _briefingPlegado;
         protected ResultadoMinijuego Resultado { get; private set; }
 
+        /// <summary>
+        /// La estetica de la Fase 1 (2026-11-09): sin la columna de papel del briefing ni la ventana de metal; lo de antes
+        /// de empezar va en un cristal neon. Cada minijuego la enciende cuando se rediseña (el diagrama con cartas, el primero).
+        /// </summary>
+        protected virtual bool EstiloCristal { get { return false; } }
+
         public override bool PuedeVolver { get { return false; } }
 
         protected float Segundo { get { return _relojInicial - _restante; } }
@@ -100,7 +106,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var area = Ui.Fila(marco, "Area", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
             _area = area;
             UiKit.Tamano(area, flexAncho: 1, flexAlto: 1);
-            ConstruirBriefing(area);
+            if (!EstiloCristal) ConstruirBriefing(area);
             _cuerpo = Ui.Fila(area, "Cuerpo", Tema.espacio * 1.5f, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(_cuerpo, flexAncho: 1, flexAlto: 1);
             GuiaView.Registrar("mj.tablero", _cuerpo);
@@ -108,9 +114,20 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             // El panel de Marisol va entre la cabecera y el tablero: se ve a la vez que la pieza que señala.
             if (Pendiente != null && Pendiente.Guiado) ActivarGuia();
 
+            // Estilo cristal (ronda 3): sin ventana de espera ni receta de pantalla completa. El reto empieza en el primer
+            // fotograma y su tutorial son globos que flotan encima (MostrarTutorial).
+            if (EstiloCristal) return;
+
             // Detras de la receta: quien espera el trabajo y, por si alguien la cierra sin empezar, volver a verla.
-            var espera = Ui.Ventana(_cuerpo, "Espera");
+            var espera = EstiloCristal ? Ui.Dialogo(_cuerpo, "Espera") : Ui.Ventana(_cuerpo, "Espera");
             UiKit.Tamano(espera, flexAncho: 1, flexAlto: 1);
+            if (EstiloCristal) {
+                // Sin briefing de papel: el titulo, donde estamos y que se hace, aqui.
+                Ui.Texto(espera, Def.Presentacion.Titulo ?? Def.Id, EstiloTexto.Titulo, Tema.ink);
+                var donde = DondeEstamos();
+                if (donde != null) Ui.Texto(espera, donde, EstiloTexto.Cuerpo, Tema.inkMuted);
+                if (!string.IsNullOrEmpty(Def.Presentacion.ComoSeJuega)) Ui.Texto(espera, Def.Presentacion.ComoSeJuega, EstiloTexto.Cuerpo, Tema.ink);
+            }
             var personaje = Def.Presentacion.QuienEspera;
             if (!string.IsNullOrEmpty(personaje) && personaje != "Tú mismo")
                 Ui.Ilustracion(espera, Nexus.Unity.Tema.MaterialesNexus.IdDePersonaje(personaje), personaje, alto: 420);
@@ -146,6 +163,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         private void PlegarBriefing(bool plegado) {
+            if (_anchoDelBriefing == null) return;   // estilo cristal: no hay briefing
             _briefingPlegado = plegado;
             _contenidoDelBriefing.SetActive(!plegado);
             _anchoDelBriefing.minWidth = _anchoDelBriefing.preferredWidth = plegado ? AnchoDelBriefingPlegado : AnchoDelBriefing;
@@ -174,13 +192,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private void ActivarGuia() {
             if (Guia != null || _fase != Fase.Receta || Pendiente == null) return;
             Pendiente.Guiado = true;
-            Guia = new GuiaDelMinijuego(App, _marco, _area.GetSiblingIndex(), PiezaGuiada, _ => Repintar());
+            // En estilo cristal el panel de Marisol flota (un globo sobre el tablero) en vez de quitarle alto.
+            Guia = new GuiaDelMinijuego(App, EstiloCristal ? (Transform)Raiz : _marco, _area.GetSiblingIndex(), PiezaGuiada, _ => Repintar(), EstiloCristal);
             _reloj.gameObject.SetActive(false);   // guiado = sin prisa: el reloj no corre
         }
 
         /// <summary>Lo que hay tras el «?»: la receta, repetir el tutorial guiado y la guia de Marisol.</summary>
         private List<OpcionDeMenu> OpcionesDeAyuda() {
-            var lista = new List<OpcionDeMenu> { new OpcionDeMenu("Ver la receta", () => AbrirReceta(false)) };
+            var lista = new List<OpcionDeMenu> {
+                EstiloCristal ? new OpcionDeMenu("Ver el tutorial", () => MostrarTutorial(false))
+                              : new OpcionDeMenu("Ver la receta", () => AbrirReceta(false))
+            };
             // Las ayudas ganadas con los compañeros se gastan antes de empezar, en la receta de inicio.
             var ayudas = _fase == Fase.Receta ? AyudasUtiles().Count : 0;
             if (ayudas > 0) lista.Add(new OpcionDeMenu($"Usar la ayuda de un compañero ({ayudas})", () => AbrirReceta(true)));
@@ -191,6 +213,18 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             lista.AddRange(GuiaView.OpcionesDeAyuda(App));
             return lista;
         }
+
+        /// <summary>
+        /// Estilo cristal: el tutorial del reto como globos que flotan encima (sin pantalla aparte). Lo abre el reto cuando
+        /// ya esta dibujado ('primeraVez': nunca habia visto esta mecanica) y lo repite el «?». Por defecto, nada.
+        /// </summary>
+        protected virtual void MostrarTutorial(bool primeraVez) { }
+
+        /// <summary>Con un globo de tutorial abierto, el reloj espera (como con la receta).</summary>
+        protected bool TutorialAbierto { get; set; }
+
+        /// <summary>Hay que enseñar el tutorial en cuanto el reto pueda: lo consulta el reto al terminar su entrada.</summary>
+        protected bool TutorialPendiente { get; set; }
 
         private void AbrirReceta(bool inicio) {
             if (_recetaAbierta) return;
@@ -291,7 +325,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// sin abrirla por el (eso seria repetir el tutorial que ya se quito). Con Marisol guiando no hace falta.
         /// </summary>
         private void VigilarSiEstaQuieto(UnityEngine.InputSystem.Keyboard teclado) {
-            if (_empujado || Guia != null || _empujon == null) return;
+            if (_empujado || Guia != null || _empujon == null || EstiloCristal) return;   // en cristal, nada que empuje el layout
             var raton = UnityEngine.InputSystem.Mouse.current;
             var hizoAlgo = (raton != null && (raton.leftButton.wasPressedThisFrame || raton.rightButton.wasPressedThisFrame)) ||
                            (teclado != null && teclado.anyKey.wasPressedThisFrame);
@@ -313,6 +347,14 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 // La receta se apila encima en cuanto la pantalla existe (en Construir el router aun no la tiene).
                 // Solo la primera vez de cada mecanica, o si se juega guiado: despues ya se sabe y queda tras el «?».
                 _recetaInicialPendiente = false;
+                // Estilo cristal: empieza ya. Solo si hay ayudas de companeros por gastar se abre la receta (ahi se gastan).
+                if (EstiloCristal && AyudasUtiles().Count == 0) {
+                    TutorialPendiente = !App.YaVioLaReceta(Def.Verbo);
+                    App.AnotarRecetaVista(Def.Verbo);
+                    Empezar();
+                    GuiaView.Avisar(App, "minijuego.presentacion");
+                    return;
+                }
                 if (Guia != null || !App.YaVioLaReceta(Def.Verbo)) AbrirReceta(true);
                 GuiaView.Avisar(App, "minijuego.presentacion");
                 return;
@@ -322,7 +364,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 if (teclado != null) TeclasDelJuego(teclado);
                 VigilarSiEstaQuieto(teclado);
             }
-            if (_fase != Fase.Jugando || _recetaAbierta || GuiaView.PausaActiva || PantallaDePausa.Abierta || Guia != null) return;
+            if (_fase != Fase.Jugando || _recetaAbierta || TutorialAbierto || GuiaView.PausaActiva || PantallaDePausa.Abierta || Guia != null) return;
             _restante -= Time.unscaledDeltaTime;
             var f = Mathf.Max(0, _restante) / Math.Max(10f, _total);
             _reloj.Mostrar(Reloj(Mathf.Max(0, _restante)), f < 0.15f ? Tono.Peligro : f < 0.3f ? Tono.Aviso : Tono.Cyan);
@@ -356,6 +398,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private void PintarCierre() {
             UiKit.Vaciar(_cuerpo);
+            if (PintarCierrePropio(_cuerpo)) { GuiaView.Avisar(App, "minijuego.cierre"); return; }
 
             var visual = Ui.Columna(_cuerpo, "Solucion", Tema.espacio);
             UiKit.Tamano(visual, flexAncho: 1, flexAlto: 1);
@@ -407,6 +450,31 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 Ui.Boton(lado, "Intentarlo otra vez", Reintentar);
             Ui.Boton(lado, "Volver a la jornada", () => AlTerminar?.Invoke(Resultado), VarianteBoton.Primario);
             GuiaView.Avisar(App, "minijuego.cierre");
+        }
+
+        /// <summary>
+        /// Un minijuego con estilo cristal puede pintar el cierre entero a su manera (true); si no, el de siempre: el
+        /// lienzo resuelto a la izquierda y la hoja de explicaciones a la derecha.
+        /// </summary>
+        protected virtual bool PintarCierrePropio(RectTransform cuerpo) { return false; }
+
+        /// <summary>«Volver a la jornada»: entrega el resultado al motor.</summary>
+        protected void VolverALaJornada() { AlTerminar?.Invoke(Resultado); }
+
+        /// <summary>Una practica que no salio se puede repetir una vez (no guiada).</summary>
+        protected bool PuedeReintentar {
+            get { return Practica && Guia == null && !_reintentado && Resultado != null && Resultado.Resultado != ResultadosDeMinijuego.Todos; }
+        }
+
+        protected void ReintentarPractica() { Reintentar(); }
+
+        /// <summary>«Qué significa para el cliente», en una frase (null si el nivel no tiene proyecto).</summary>
+        protected string QueSignificaParaElCliente() {
+            var modulo = Proyecto == null ? null : Proyecto.Modulo(Def.Modulo);
+            if (modulo == null || Resultado == null) return null;
+            return Resultado.Resultado == ResultadosDeMinijuego.Todos
+                ? $"«{modulo.Nombre}» sigue adelante sin sorpresas para {Proyecto.Cliente.Nombre}."
+                : $"Lo que se escapó lo acabará notando {Proyecto.Cliente.Nombre} en «{modulo.Nombre}».";
         }
 
         private static string Minuscula(string s) {

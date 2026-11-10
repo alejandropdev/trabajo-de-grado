@@ -8,7 +8,7 @@
   "enElProyecto": "Tu propuesta: del formulario al registro, con aviso al anfitrión.",
   "presentacion": {
     "titulo": "La revisión de tu propuesta",
-    "comoSeJuega": "Pincha lo que falle y di qué problema es. Lo que está bien, déjalo.",
+    "comoSeJuega": "Juega en cada punto la carta que lo arregla, o «Está bien así».",
     "quienEspera": "Marisol Andrade",
     "textoPresion": "Marisol recoge las propuestas revisadas a las 12:00",
     "segundosReloj": 90
@@ -101,7 +101,10 @@
       ],
       "defecto": "requisito_incompleto",
       "explicacion": "Solo registra a quien trae cita. ¿Y los visitantes sin cita? Alguien lo preguntó en los comentarios del ticket y nadie contestó: el requisito está incompleto.",
-      "pista": "Vuelve al encargo: la recepcionista contó que la mitad de los visitantes llega SIN cita. ¿Este registro sabe qué hacer con ellos?"
+      "pista": "Vuelve al encargo: la recepcionista contó que la mitad de los visitantes llega SIN cita. ¿Este registro sabe qué hacer con ellos?",
+      "soluciones": [
+        "cubrir-caso"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -122,33 +125,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "requisito_incompleto",
-        "acoplamiento_indebido"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "requisito_incompleto",
-        "acoplamiento_indebido",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "acoplamiento_indebido"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -203,5 +192,25 @@
   },
   "cierre": {
     "texto": "Marisol recoge tu hoja sin mirarla. La mirará el jurado."
-  }
+  },
+  "cartas": [
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia para ir más rápido.",
+      "icono": "rayo"
+    },
+    {
+      "id": "cubrir-caso",
+      "nombre": "Añadir el caso que falta",
+      "descripcion": "Decir qué pasa en el caso olvidado.",
+      "icono": "lista"
+    },
+    {
+      "id": "mas-servidores",
+      "nombre": "Más servidores",
+      "descripcion": "Poner más máquinas.",
+      "icono": "servidores"
+    }
+  ]
 }

@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama del registro de visitas con la nueva pantalla de bienvenida del vestíbulo.",
   "presentacion": {
     "titulo": "Práctica: el diagrama de la pantalla del vestíbulo",
-    "comoSeJuega": "Un diagrama de componentes del registro de visitas: cada caja es una pieza y cada flecha dice quién le habla a quién. Busca lo que no está bien (hay uno), púlsalo y elige a la derecha qué problema tiene. Es práctica: si no te sale, inténtalo otra vez.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -101,7 +101,10 @@
       ],
       "defecto": "falla_de_seguridad",
       "explicacion": "La pantalla del vestíbulo está a la vista de cualquiera y muestra el número de documento de cada visitante. Para dar la bienvenida basta el nombre.",
-      "pista": "Piensa en quién ve cada pantalla. ¿Qué dato no debería ver cualquiera que pase por la entrada?"
+      "pista": "Piensa en quién ve cada pantalla. ¿Qué dato no debería ver cualquiera que pase por la entrada?",
+      "soluciones": [
+        "minimos-datos"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -122,33 +125,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "falla_de_seguridad",
-        "acoplamiento_indebido"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "falla_de_seguridad",
-        "acoplamiento_indebido",
-        "requisito_incompleto"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "requisito_incompleto"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -195,5 +184,39 @@
   },
   "cierre": {
     "texto": "Cada pantalla enseña lo mínimo que necesita quien la mira. Lo demás se queda guardado."
-  }
+  },
+  "cartas": [
+    {
+      "id": "cifrar-bd",
+      "nombre": "Cifrar la base de datos",
+      "descripcion": "Guardar los datos cifrados en el disco.",
+      "icono": "llave",
+      "tipo": "practica",
+      "porQueNo": "protege el disco, pero no lo que se enseña ni quién da las órdenes."
+    },
+    {
+      "id": "minimos-datos",
+      "nombre": "Mostrar solo lo necesario",
+      "descripcion": "Ningún dato personal que la pantalla no necesite para su trabajo.",
+      "icono": "ojo",
+      "tipo": "practica",
+      "porQueNo": "aquí no se enseña ningún dato de más."
+    },
+    {
+      "id": "autenticar",
+      "nombre": "Autenticar las órdenes",
+      "descripcion": "Solo se obedece una orden firmada por quien puede darla.",
+      "icono": "candado",
+      "tipo": "practica",
+      "porQueNo": "nadie está dando órdenes sin permiso."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    }
+  ]
 }

@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama del módulo de reservas: cómo se pide un ascensor de carga, cómo se decide quién va primero y cómo se bloquea el ascensor a su hora.",
   "presentacion": {
     "titulo": "Práctica: el diagrama de las reservas",
-    "comoSeJuega": "El diagrama del módulo de reservas. Encuentra las piezas o flechas con problemas (hay dos) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,10 @@
       ],
       "defecto": "elemento_sin_especificar",
       "explicacion": "El calendario de turnos decide quién va primero, pero nadie escribió con qué regla. Una pieza que decide algo sin regla escrita es una pieza sin especificar.",
-      "pista": "Esta pieza decide quién va primero en el ascensor. ¿Dice en algún sitio con qué regla lo decide?"
+      "pista": "Esta pieza decide quién va primero en el ascensor. ¿Dice en algún sitio con qué regla lo decide?",
+      "soluciones": [
+        "especificar"
+      ]
     },
     {
       "id": "Z2",
@@ -118,7 +121,10 @@
       ],
       "defecto": "acoplamiento_indebido",
       "explicacion": "El controlador del fabricante escribe directo en nuestras tablas. Si cambiamos una tabla, rompemos el ascensor; si el fabricante cambia algo, rompe las reservas.",
-      "pista": "Mira hacia dónde escribe el controlador del fabricante. ¿Entra por la puerta del módulo de reservas o directo a sus tablas?"
+      "pista": "Mira hacia dónde escribe el controlador del fabricante. ¿Entra por la puerta del módulo de reservas o directo a sus tablas?",
+      "soluciones": [
+        "adaptador"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -140,35 +146,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "elemento_sin_especificar",
-        "requisito_ambiguo"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "acoplamiento_indebido",
-        "elemento_sin_especificar",
-        "requisito_ambiguo",
-        "falla_de_seguridad"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "falla_de_seguridad"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -215,5 +205,47 @@
   },
   "cierre": {
     "texto": "Una pieza sin regla escrita y una pieza metida en las tripas de otra: dos formas de que el sistema haga algo que nadie decidió."
-  }
+  },
+  "cartas": [
+    {
+      "id": "estrategia",
+      "nombre": "Estrategia: regla intercambiable",
+      "descripcion": "Poder cambiar la forma de decidir sin tocar el resto.",
+      "icono": "bifurcacion",
+      "tipo": "patron",
+      "porQueNo": "deja cambiar la regla, pero nadie ha dicho todavía cuál es."
+    },
+    {
+      "id": "especificar",
+      "nombre": "Especificar la pieza",
+      "descripcion": "Escribir qué hace, con qué regla y qué pasa cuando falla.",
+      "icono": "plano",
+      "tipo": "practica",
+      "porQueNo": "la pieza ya dice qué hace: el fallo es otro."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    },
+    {
+      "id": "adaptador",
+      "nombre": "Adaptador para lo de fuera",
+      "descripcion": "Una pieza nuestra traduce al sistema externo; él nunca toca nuestras tablas.",
+      "icono": "adaptador",
+      "tipo": "patron",
+      "porQueNo": "aquí no hay un sistema de fuera que traducir."
+    },
+    {
+      "id": "microservicios",
+      "nombre": "Partir en microservicios",
+      "descripcion": "Separar cada módulo en un servicio con su propio despliegue.",
+      "icono": "cubos",
+      "tipo": "practica",
+      "porQueNo": "partirlo lo complica todo, y el problema viaja con él."
+    }
+  ]
 }

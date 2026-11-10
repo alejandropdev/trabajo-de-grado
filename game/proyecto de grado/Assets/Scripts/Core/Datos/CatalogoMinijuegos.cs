@@ -102,6 +102,40 @@ namespace Nexus.Core.Datos
                 if (def.Zonas.Any(z => z.Commits.Intersect(s.Commits).Any()))
                     e.Add($"El senuelo '{s.Id}' se solapa con una zona real. Seria injusto.");
             }
+            if (def.Lienzo == "diagrama") ValidarCartas(def, e);
+        }
+
+        /// <summary>Maximo de cartas en la mano del diagrama: con mas, el abanico no cabe en 1920 de ancho.</summary>
+        public const int MaximoDeCartas = 7;
+
+        /// <summary>
+        /// Lienzo diagrama (2026-11-09): se juega con cartas de solucion unicas. Tiene que poder ganarse sin repetir
+        /// carta, y tiene que haber algo que descartar (una carta que no arregla nada).
+        /// </summary>
+        private static void ValidarCartas(MinijuegoDef def, List<string> e)
+        {
+            if (def.Cartas.Count == 0) { e.Add("Un diagrama necesita 'cartas' de solucion: se juega poniendo una en cada punto."); return; }
+            if (def.Cartas.Count > MaximoDeCartas) e.Add($"Hay {def.Cartas.Count} cartas; como mucho {MaximoDeCartas}, o el abanico no cabe.");
+            var ids = new HashSet<string>();
+            foreach (var c in def.Cartas)
+            {
+                if (string.IsNullOrEmpty(c.Id) || !ids.Add(c.Id) || c.Id == Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.EstaBien)
+                    e.Add($"Hay una carta sin id, repetida o con un id reservado ('{c.Id}').");
+                if (string.IsNullOrEmpty(c.Nombre) || string.IsNullOrEmpty(c.Descripcion))
+                    e.Add($"La carta '{c.Id}' necesita nombre y descripcion: es lo unico que el jugador lee de ella.");
+            }
+            foreach (var z in def.Zonas)
+            {
+                if (z.Soluciones.Count == 0) e.Add($"La zona '{z.Id}' no dice que carta la arregla ('soluciones').");
+                foreach (var s in z.Soluciones)
+                    if (!ids.Contains(s)) e.Add($"La zona '{z.Id}' se arregla con la carta '{s}', que no esta en 'cartas'.");
+            }
+            var arreglan = new HashSet<string>(def.Zonas.SelectMany(z => z.Soluciones));
+            if (def.Cartas.All(c => arreglan.Contains(c.Id))) e.Add("Todas las cartas arreglan algo: sin una que descartar, elegir no ensena nada.");
+            var piezas = Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.De(def).Select(p => p.Pieza).ToList();
+            if (piezas.Distinct().Count() != piezas.Count) e.Add("Dos puntos del diagrama caen en la misma pieza: sus marcadores se taparian.");
+            if (Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.SolucionGanadora(def) == null)
+                e.Add("No hay manera de arreglar todas las zonas sin repetir carta: el reto es imposible.");
         }
 
         /// <summary>V3 · ordenar con restricciones. Las dependencias tienen que existir y no pueden formar un ciclo.</summary>
