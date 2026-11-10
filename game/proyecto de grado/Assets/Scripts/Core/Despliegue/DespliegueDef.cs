@@ -26,6 +26,35 @@ namespace Nexus.Core.Despliegue {
         /// <summary>Los cables de cada modulo, por id de modulo. Un modulo sin entrada no necesita enchufar nada.</summary>
         public Dictionary<string, List<CableDef>> Modulos = new Dictionary<string, List<CableDef>>(StringComparer.Ordinal);
 
+        /// <summary>
+        /// Las dos tomas entre las que se elige para un cable (los cuartos a oscuras de la Fase 3): la correcta y un señuelo,
+        /// en un orden que no cambia entre partidas pero varia de un cable a otro (para que la buena no sea siempre la de la
+        /// izquierda). Un cable que es una dependencia no se elige: devuelve una lista vacia.
+        /// El señuelo es CableDef.Alternativa; si falta o no vale, la primera toma trampa distinta de la correcta y, si no hay,
+        /// cualquier otra.
+        /// </summary>
+        public List<string> OpcionesDeCable(string modulo, CableDef cable) {
+            var opciones = new List<string>();
+            if (cable == null || cable.EsDependencia) return opciones;
+            var correcta = cable.Toma;
+            var senuelo = cable.Alternativa;
+            if (string.IsNullOrEmpty(senuelo) || senuelo == correcta || Toma(senuelo) == null || senuelo.StartsWith(CableDef.PrefijoDeModulo, StringComparison.Ordinal))
+                senuelo = (Tomas.FirstOrDefault(t => t.Trampa && t.Id != correcta) ?? Tomas.FirstOrDefault(t => t.Id != correcta) ?? new TomaDef()).Id;
+            var correctaPrimero = (Hash((modulo ?? "") + "|" + cable.Id) & 1) == 0;
+            opciones.Add(correctaPrimero ? correcta : senuelo);
+            opciones.Add(correctaPrimero ? senuelo : correcta);
+            return opciones;
+        }
+
+        /// <summary>FNV-1a: estable entre ejecuciones y plataformas (string.GetHashCode no lo es).</summary>
+        private static uint Hash(string s) {
+            unchecked {
+                var h = 2166136261u;
+                foreach (var c in s ?? "") { h ^= c; h *= 16777619u; }
+                return h;
+            }
+        }
+
         public TramoDef Tramo(string id) { return Tuberia.Tramos.FirstOrDefault(t => t.Id == id); }
         public TomaDef Toma(string id) { return Tomas.FirstOrDefault(t => t.Id == id); }
 
@@ -88,6 +117,11 @@ namespace Nexus.Core.Despliegue {
         public string Nombre;
         /// <summary>La toma correcta. O "modulo:&lt;id&gt;" si lo que necesita es otro modulo ya desplegado.</summary>
         public string Toma;
+        /// <summary>
+        /// El señuelo con el que se confunde en los cuartos a oscuras: otra toma (casi siempre la de pruebas del mismo
+        /// sitio). Opcional; ver DespliegueDef.OpcionesDeCable.
+        /// </summary>
+        public string Alternativa;
         public string Porque;
 
         public const string PrefijoDeModulo = "modulo:";
