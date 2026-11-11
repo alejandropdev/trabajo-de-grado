@@ -755,7 +755,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, c.EsBug ? "ERROR" : PiezasDelMuro.NombreDeTipo(c.Tipo).ToUpperInvariant(), EstiloTexto.Leyenda, color).characterSpacing = 4;
             Ui.Texto(titulos, c.Titulo, EstiloTexto.Titulo, Tema.ink);
-            Ui.Boton(cabecera, "Cerrar", () => _fichaAbierta = null, VarianteBoton.Fantasma);
+            Ui.Boton(cabecera, "Cerrar", () => _fichaAbierta = null, VarianteBoton.Salida);
 
             // ---- tres cifras como en los indicadores: puntos, avance, quien
             var cifras = Ui.Fila(hoja, "Cifras", Tema.espacio, 0, TextAnchor.UpperLeft);

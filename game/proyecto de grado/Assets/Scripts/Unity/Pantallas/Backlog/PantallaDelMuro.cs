@@ -75,7 +75,7 @@ namespace Nexus.Unity.Pantallas {
             cabecera.pivot = new Vector2(0.5f, 1);
             cabecera.offsetMin = new Vector2(28, -92);
             cabecera.offsetMax = new Vector2(-28, -14);
-            Ui.Boton(cabecera, "Volver (Esc)", () => App.Router.Volver(), VarianteBoton.Fantasma);
+            Ui.Boton(cabecera, "Volver (Esc)", () => App.Router.Volver(), VarianteBoton.Salida);
             var titulos = Ui.Columna(cabecera, "Titulos", 0);
             if (!string.IsNullOrEmpty(Etiqueta)) {
                 var e = Ui.Texto(titulos, Etiqueta.ToUpperInvariant(), EstiloTexto.Leyenda, Tema.cyan);
