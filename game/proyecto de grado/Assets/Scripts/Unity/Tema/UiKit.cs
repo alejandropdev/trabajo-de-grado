@@ -37,6 +37,11 @@ namespace Nexus.Unity.Tema {
         Peligro,
         /// <summary>Solo texto: «volver», «cancelar».</summary>
         Fantasma,
+        /// <summary>
+        /// Salir de una pantalla («Volver (Esc)», «Cerrar»): cristal OPACO con borde cian y texto claro. Sobre los fondos
+        /// semitransparentes el fantasma se perdia; este siempre se ve.
+        /// </summary>
+        Salida,
         /// <summary>Opcion de menu: ancho completo, icono a la izquierda en cyan, se marca con Resaltar.</summary>
         Menu
     }

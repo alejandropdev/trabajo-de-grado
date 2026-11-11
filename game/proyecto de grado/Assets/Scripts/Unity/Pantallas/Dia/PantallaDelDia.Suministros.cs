@@ -148,7 +148,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(titulos, flexAncho: 1);
             Ui.Texto(titulos, $"{o.Nombre.ToUpperInvariant()} · {o.Suministro.MinutosDeUso} MIN", EstiloTexto.Leyenda, color).characterSpacing = 3;
             Ui.Texto(titulos, "¿A quién se lo das?", EstiloTexto.Titulo, Tema.ink);
-            Ui.Boton(cabecera, "Cerrar", () => _suministroAbierto = null, VarianteBoton.Fantasma);
+            Ui.Boton(cabecera, "Cerrar", () => _suministroAbierto = null, VarianteBoton.Salida);
 
             var gente = RejillaDeBotones(hoja, 3, new Vector2(280, 112), "Gente");
             foreach (var ficha in S.FichasDelEquipo()) {

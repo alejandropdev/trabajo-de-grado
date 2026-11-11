@@ -520,17 +520,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             switch (Verbos.Normalizar(verbo)) {
                 case Verbos.Ordenar:
                     switch (resultado) {
-                        case ResultadosDeMinijuego.Todos: return "Buen orden";
-                        case ResultadosDeMinijuego.Parcial: return "Quedó fuera algo valioso";
-                        case ResultadosDeMinijuego.FalsoPositivo: return "Algo va antes de lo que necesita";
-                        default: return "No entregaste el orden";
+                        case ResultadosDeMinijuego.Todos: return "Puente completo";
+                        case ResultadosDeMinijuego.Parcial: return "Puente con grietas";
+                        case ResultadosDeMinijuego.FalsoPositivo: return "Se cayó un pilar";
+                        default: return "No se verificó el puente";
                     }
                 case Verbos.Repartir:
                     switch (resultado) {
-                        case ResultadosDeMinijuego.Todos: return "Buen reparto";
-                        case ResultadosDeMinijuego.Parcial: return "Se escaparon errores";
-                        case ResultadosDeMinijuego.FalsoPositivo: return "Horas de más en un tipo, cero en otro";
-                        default: return "No repartiste nada";
+                        case ResultadosDeMinijuego.Todos: return "Edificio a salvo";
+                        case ResultadosDeMinijuego.Parcial: return "Se coló algo";
+                        case ResultadosDeMinijuego.FalsoPositivo: return "Todo en un piso, y el resto sin defensa";
+                        default: return "El edificio quedó sin defensas";
                     }
                 default:
                     switch (resultado) {

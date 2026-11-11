@@ -31,7 +31,9 @@ namespace Nexus.Core.Datos
 
             switch (Verbos.Normalizar(def.Verbo))
             {
-                case Verbos.Ordenar: ValidarOrdenar(def, e); break;
+                case Verbos.Ordenar:
+                    if (Nexus.Core.Minijuegos.Puente.PuenteDelBacklog.Aplica(def)) ValidarPuente(def, e); else ValidarOrdenar(def, e);
+                    break;
                 case Verbos.Repartir: ValidarRepartir(def, e); break;
                 default: ValidarDetectar(def, e); break;
             }
@@ -136,6 +138,41 @@ namespace Nexus.Core.Datos
             if (piezas.Distinct().Count() != piezas.Count) e.Add("Dos puntos del diagrama caen en la misma pieza: sus marcadores se taparian.");
             if (Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.SolucionGanadora(def) == null)
                 e.Add("No hay manera de arreglar todas las zonas sin repetir carta: el reto es imposible.");
+        }
+
+        /// <summary>
+        /// V3 · el puente del backlog (lienzo "puente", 2026-11-10). Cada pilar es un modulo con sus historias; las
+        /// dependencias son del mismo pilar, existen y no forman un ciclo; y ordenar tiene que importar de verdad.
+        /// </summary>
+        private static void ValidarPuente(MinijuegoDef def, List<string> e)
+        {
+            var p = def.Puente;
+            if (p == null) { e.Add("Un puente necesita el bloque 'puente'."); return; }
+            if (p.Vidas < 1 || p.Vidas > 3) e.Add("'puente.vidas' tiene que estar entre 1 y 3.");
+            if (p.Pilares.Count < 2 || p.Pilares.Count > 4) e.Add("Un puente lleva de dos a cuatro pilares (modulos).");
+
+            var pilares = new HashSet<string>();
+            var historias = new HashSet<string>();
+            foreach (var pilar in p.Pilares)
+            {
+                if (string.IsNullOrEmpty(pilar.Id) || !pilares.Add(pilar.Id)) e.Add($"Hay un pilar sin id o repetido ('{pilar.Id}').");
+                if (string.IsNullOrEmpty(pilar.Nombre)) e.Add($"El pilar '{pilar.Id}' no tiene nombre.");
+                if (pilar.Historias.Count < 3 || pilar.Historias.Count > 5) e.Add($"El pilar '{pilar.Id}' lleva de tres a cinco historias.");
+                var propios = new HashSet<string>(pilar.Historias.Select(h => h.Id));
+                foreach (var h in pilar.Historias)
+                {
+                    if (string.IsNullOrEmpty(h.Id) || !historias.Add(h.Id)) e.Add($"Hay una historia sin id o repetida en el puente ('{h.Id}').");
+                    if (string.IsNullOrEmpty(h.Titulo)) e.Add($"La historia '{h.Id}' no tiene titulo.");
+                    foreach (var d in h.DependeDe)
+                        if (!propios.Contains(d)) e.Add($"La historia '{h.Id}' depende de '{d}', que no esta en su pilar '{pilar.Id}'.");
+                }
+                if (pilar.Historias.All(h => h.DependeDe.Count == 0))
+                    e.Add($"Ninguna historia del pilar '{pilar.Id}' depende de otra: ordenarlo no ensena nada.");
+                if (!pilar.Historias.Any(h => h.DependeDe.Any(d => pilar.Historias.Any(x => x.Id == d && x.DependeDe.Count > 0))))
+                    e.Add($"El pilar '{pilar.Id}' necesita al menos una cadena de tres historias (A, B que necesita A, C que necesita B).");
+                if (Nexus.Core.Minijuegos.Puente.PuenteEvaluador.HayCiclo(pilar))
+                    e.Add($"Las dependencias del pilar '{pilar.Id}' forman un ciclo: no existe ningun orden valido.");
+            }
         }
 
         /// <summary>V3 · ordenar con restricciones. Las dependencias tienen que existir y no pueden formar un ciclo.</summary>

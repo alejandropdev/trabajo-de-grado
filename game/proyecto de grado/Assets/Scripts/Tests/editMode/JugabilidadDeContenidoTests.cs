@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Nexus.Core.Datos;
 using Nexus.Core.Minijuegos;
-using Nexus.Core.Minijuegos.Ordenar;
+using Nexus.Core.Minijuegos.Puente;
 using Nexus.Core.Minijuegos.Repartir;
 using NUnit.Framework;
 
@@ -111,100 +111,68 @@ namespace Nexus.Tests {
             Assert.IsTrue(r.Detalle.Any(d => d.Contains("no las suficientes") && d.Contains("unitarias")));
         }
 
-        // ================================================================ V3 · ordenar
+        // ================================================================ V3 · el puente del backlog (2026-11-10)
+
+        private static IEnumerable<MinijuegoDef> Puentes() { return Escenas(Verbos.Ordenar).Where(PuenteDelBacklog.Aplica); }
 
         [Test]
-        public void Cada_backlog_se_puede_ganar_con_su_mejor_orden_y_negociando() {
-            foreach (var def in Escenas(Verbos.Ordenar)) {
-                var mejor = OrdenarEvaluador.MejorOrden(def.Ordenar);
-                var orden = mejor.Concat(def.Ordenar.Tarjetas.Select(t => t.Id).Where(id => !mejor.Contains(id))).ToList();
-                var r = OrdenarEvaluador.Evaluar(def, orden, "negociar");
+        public void Todos_los_backlog_del_contenido_son_puentes() {
+            var ordenar = Escenas(Verbos.Ordenar).ToList();
+            Assert.AreEqual(13, ordenar.Count);
+            foreach (var def in ordenar) Assert.IsTrue(PuenteDelBacklog.Aplica(def), def.Id + ": sigue siendo un backlog de lista plana");
+        }
+
+        [Test]
+        public void Cada_puente_se_puede_ganar_sin_perder_una_vida() {
+            foreach (var def in Puentes()) {
+                var estado = new EstadoDelPuente(def.Puente);
+                for (var i = 0; i < def.Puente.Pilares.Count; i++) {
+                    var solucion = PuenteEvaluador.Solucion(def.Puente.Pilares[i]);
+                    for (var k = 0; k < solucion.Count; k++) estado.Mover(i, solucion[k], k);
+                }
+                var ronda = estado.Verificar();
+                Assert.IsTrue(ronda.Completo, def.Id);
+                var r = PuenteEvaluador.Evaluar(def, estado);
                 Assert.AreEqual(ResultadosDeMinijuego.Todos, r.Resultado, def.Id + ": " + string.Join(" | ", r.Detalle));
             }
         }
 
         [Test]
-        public void El_backlog_no_empieza_ya_resuelto_y_siempre_empieza_igual() {
-            // El JSON trae las tarjetas en el orden bueno: quien no tocaba nada ganaba, y quien ordenaba «por valor»
-            // lo rompia. El tablero empieza barajado, en un orden que no gana tal cual.
-            foreach (var def in Escenas(Verbos.Ordenar)) {
-                var cfg = def.Ordenar;
-                var porId = cfg.Tarjetas.ToDictionary(t => t.Id);
-                for (var semilla = 0; semilla < 12; semilla++) {
-                    var orden = OrdenarEvaluador.OrdenInicial(cfg, semilla);
-                    CollectionAssert.AreEquivalent(cfg.Tarjetas.Select(t => t.Id), orden, def.Id + ": se pierde o se repite una tarjeta");
-                    CollectionAssert.AreEqual(orden, OrdenarEvaluador.OrdenInicial(cfg, semilla), def.Id + ": no es determinista");
-                    var capturado = OrdenarEvaluador.Entran(cfg, orden).Sum(id => porId[id].Valor);
-                    var gana = OrdenarEvaluador.Rotas(cfg, orden).Count == 0 &&
-                               capturado >= cfg.UmbralDeValor * OrdenarEvaluador.MejorValorPosible(cfg);
-                    Assert.IsFalse(gana, $"{def.Id} (semilla {semilla}): el tablero empieza ya resuelto");
-                }
+        public void Ningun_puente_empieza_ya_resuelto_y_siempre_empieza_igual() {
+            foreach (var def in Puentes())
+                foreach (var pilar in def.Puente.Pilares)
+                    for (var semilla = 0; semilla < 12; semilla++) {
+                        var orden = PuenteEvaluador.OrdenInicial(pilar, semilla);
+                        CollectionAssert.AreEquivalent(pilar.Historias.Select(h => h.Id), orden, def.Id + ": se pierde o se repite una historia");
+                        CollectionAssert.AreEqual(orden, PuenteEvaluador.OrdenInicial(pilar, semilla), def.Id + ": no es determinista");
+                        Assert.IsFalse(PuenteEvaluador.RevisarPilar(pilar, orden).Correcto, $"{def.Id}/{pilar.Id} (semilla {semilla}): empieza ya resuelto");
+                    }
+        }
+
+        [Test]
+        public void Dos_errores_en_el_mismo_pilar_pierden_el_puente_y_los_pilares_buenos_se_quedan_hechos() {
+            foreach (var def in Puentes()) {
+                var estado = new EstadoDelPuente(def.Puente);
+                // Pilar 0 bien; el resto, como empieza (mal).
+                var solucion = PuenteEvaluador.Solucion(def.Puente.Pilares[0]);
+                for (var k = 0; k < solucion.Count; k++) estado.Mover(0, solucion[k], k);
+                var uno = estado.Verificar();
+                Assert.IsTrue(estado.Hecho[0], def.Id);
+                Assert.IsFalse(estado.Perdido, def.Id + ": un error no pierde");
+                Assert.IsFalse(uno.Revisiones.First(x => x.Pilar != def.Puente.Pilares[0].Id).Correcto, def.Id);
+                var dos = estado.Verificar();
+                Assert.IsFalse(dos.Pilares.Contains(0), def.Id + ": un pilar hecho no se vuelve a revisar");
+                Assert.IsTrue(estado.Perdido, def.Id + ": el segundo error pierde");
+                Assert.AreEqual(ResultadosDeMinijuego.FalsoPositivo, PuenteEvaluador.Evaluar(def, estado).Resultado, def.Id);
             }
         }
 
         [Test]
-        public void Las_dependencias_rotas_que_se_avisan_son_las_que_luego_se_castigan() {
-            foreach (var def in Escenas(Verbos.Ordenar)) {
-                var mejor = OrdenarEvaluador.MejorOrden(def.Ordenar);
-                var orden = mejor.Concat(def.Ordenar.Tarjetas.Select(t => t.Id).Where(id => !mejor.Contains(id))).ToList();
-                CollectionAssert.IsEmpty(OrdenarEvaluador.Rotas(def.Ordenar, orden), def.Id + ": el mejor orden no avisa de nada");
-
-                var conDependencia = def.Ordenar.Tarjetas.First(t => t.DependeDe.Count > 0 && mejor.Contains(t.Id));
-                orden.Remove(conDependencia.Id);
-                orden.Insert(0, conDependencia.Id);   // arriba del todo: antes de lo que necesita
-                Assert.IsTrue(OrdenarEvaluador.Rotas(def.Ordenar, orden).Any(p => p.Key == conDependencia.Id), def.Id);
-                Assert.AreEqual(ResultadosDeMinijuego.FalsoPositivo, OrdenarEvaluador.Evaluar(def, orden, "rechazar").Resultado, def.Id);
-            }
-        }
-
-        [Test]
-        public void Cada_backlog_dice_que_tarjeta_pide_el_cliente_y_que_le_pasa() {
-            foreach (var def in Escenas(Verbos.Ordenar)) {
-                Assert.IsNotNull(def.Ordenar.TarjetaPedida, def.Id);
-                foreach (var kv in def.Ordenar.Respuestas)
-                    Assert.IsFalse(string.IsNullOrEmpty(kv.Value.Replica), $"{def.Id}/{kv.Key}: sin réplica no se ve el efecto de contestar");
-            }
-        }
-
-        [Test]
-        public void Obedecer_sube_la_tarjeta_del_cliente_al_tablero_y_no_puede_salir_todos() {
-            var def = Escena("MJ-OF-N0-BACKLOG");
-            var mejor = OrdenarEvaluador.MejorOrden(def.Ordenar);
-            var orden = mejor.Concat(def.Ordenar.Tarjetas.Select(t => t.Id).Where(id => !mejor.Contains(id))).ToList();
-
-            var tras = OrdenarEvaluador.AplicarRespuesta(def.Ordenar, orden, def.Ordenar.Respuestas["obedecer"]);
-            Assert.AreEqual(def.Ordenar.TarjetaPedida, tras[0], "la pedida sube arriba del todo");
-            Assert.IsFalse(OrdenarEvaluador.Entran(def.Ordenar, orden).SetEquals(OrdenarEvaluador.Entran(def.Ordenar, tras)),
-                           "lo que entra cambia: se ve el efecto");
-
-            var r = OrdenarEvaluador.Evaluar(def, orden, "obedecer");
-            Assert.AreNotEqual(ResultadosDeMinijuego.Todos, r.Resultado, "decir que sí a todo nunca es el mejor resultado");
-        }
-
-        [Test]
-        public void Negociar_en_el_graduado_mete_la_tarjeta_pedida_a_cambio_de_otra() {
+        public void El_evento_del_cliente_que_entiende_sale_de_un_puente_perfecto_del_graduado() {
             var def = Escena("MJ-F1-08");
-            var mejor = OrdenarEvaluador.MejorOrden(def.Ordenar);
-            var orden = mejor.Concat(def.Ordenar.Tarjetas.Select(t => t.Id).Where(id => !mejor.Contains(id))).ToList();
-            Assert.IsFalse(OrdenarEvaluador.Entran(def.Ordenar, orden).Contains(def.Ordenar.TarjetaPedida));
-
-            var tras = OrdenarEvaluador.AplicarRespuesta(def.Ordenar, orden, def.Ordenar.Respuestas["negociar"]);
-            var entran = OrdenarEvaluador.Entran(def.Ordenar, tras);
-            Assert.IsTrue(entran.Contains(def.Ordenar.TarjetaPedida), "lo pedido entra");
-            Assert.AreEqual(orden.Count, tras.Count, "no se pierde ni se duplica ninguna tarjeta");
-            Assert.AreEqual(ResultadosDeMinijuego.Todos, OrdenarEvaluador.Evaluar(def, orden, "negociar").Resultado,
-                            "y el orden sigue siendo construible");
-        }
-
-        [Test]
-        public void El_mejor_orden_respeta_las_dependencias() {
-            foreach (var def in Escenas(Verbos.Ordenar)) {
-                var mejor = OrdenarEvaluador.MejorOrden(def.Ordenar);
-                var porId = def.Ordenar.Tarjetas.ToDictionary(t => t.Id);
-                for (var i = 0; i < mejor.Count; i++)
-                    foreach (var dep in porId[mejor[i]].DependeDe)
-                        Assert.Less(mejor.IndexOf(dep), i, $"{def.Id}: {mejor[i]} va antes que {dep}");
-            }
+            Assert.IsTrue(def.Consecuencias["todos"].EfectosDiferidos.Any(e => e.EventoForzado == "EV-BUE-02"));
+            foreach (var clave in new[] { "parcial", "falsoPositivo", "omitido" })
+                Assert.IsFalse(def.Consecuencias[clave].EfectosDiferidos.Any(e => e.EventoForzado == "EV-BUE-02"), clave);
         }
     }
 }

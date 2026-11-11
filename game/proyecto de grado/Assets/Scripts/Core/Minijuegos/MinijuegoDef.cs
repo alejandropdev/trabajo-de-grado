@@ -58,6 +58,9 @@ namespace Nexus.Core.Minijuegos
         /// <summary>Solo verbo V3 (ordenar con restricciones): el backlog.</summary>
         public OrdenarCfg Ordenar;
 
+        /// <summary>Solo verbo V3, lienzo "puente" (2026-11-10): el backlog como pilares de un puente, uno por modulo.</summary>
+        public PuenteCfg Puente;
+
         /// <summary>Solo verbo V2 (repartir un presupuesto escaso): las horas de pruebas.</summary>
         public RepartirCfg Repartir;
     }
@@ -116,6 +119,38 @@ namespace Nexus.Core.Minijuegos
         public string Grupo;
         /// <summary>Diagrama de componentes: "pide" (por defecto), "lee" o "escribe". Solo cambia el trazo de la flecha.</summary>
         public string Tipo;
+    }
+
+    /// <summary>
+    /// El puente del backlog: cada modulo es un pilar y sus historias van apiladas. Se ordenan de ABAJO hacia ARRIBA: abajo,
+    /// lo que no necesita nada; arriba, lo que necesita lo de debajo.
+    /// </summary>
+    public sealed class PuenteCfg
+    {
+        /// <summary>Vidas de cada pilar. Con 2, el segundo error en el mismo pilar pierde el reto.</summary>
+        public int Vidas = 2;
+        public List<PilarDef> Pilares = new List<PilarDef>();
+    }
+
+    public sealed class PilarDef
+    {
+        /// <summary>El modulo del proyecto que sostiene este pilar.</summary>
+        public string Id;
+        public string Nombre;
+        public List<HistoriaDePilar> Historias = new List<HistoriaDePilar>();
+    }
+
+    public sealed class HistoriaDePilar
+    {
+        /// <summary>Unico en todo el puente (no solo en su pilar).</summary>
+        public string Id;
+        public string Titulo;
+        /// <summary>«Quiero…» de la historia, para el tooltip (opcional).</summary>
+        public string Quiero;
+        /// <summary>Historias del MISMO pilar que tienen que estar mas abajo.</summary>
+        public List<string> DependeDe = new List<string>();
+        /// <summary>Por que necesita lo que necesita (se dice al fallar y en el modo guiado).</summary>
+        public string Porque;
     }
 
     /// <summary>El backlog del verbo V3: tarjetas, capacidad y la peticion del cliente.</summary>

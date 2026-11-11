@@ -5,12 +5,12 @@
   "temaPrincipal": "PTP",
   "objetivoAprendizaje": "OA-TEST-01",
   "modulo": "acceso",
-  "enElProyecto": "Es el plan de pruebas del control de acceso: lo que decide si la barrera se abre. Camila ya lo trae repartido y te pide que lo revises antes de empezar.",
+  "enElProyecto": "Es el plan de pruebas del control de acceso: lo que decide si la barrera se abre. Javier ya lo trae repartido y te pide que lo revises antes de empezar.",
   "presentacion": {
-    "titulo": "El plan de pruebas de Camila",
-    "comoSeJuega": "Camila ya repartió las horas de pruebas del control de acceso y te pide que lo revises. Las pilas empiezan como ella las dejó. Mira cada tarjeta: cuántos errores suele haber y cuánto cuesta atrapar cada uno. Si su reparto cubre el riesgo, entrégalo tal cual; si ves un hueco, corrígelo con + y −. Ganas si se escapa como mucho 1 error, y ninguno de la pila marcada en rojo. Revisar no siempre es encontrar algo mal.",
-    "quienEspera": "Camila",
-    "textoPresion": "Camila empieza a probar a las 14:00",
+    "titulo": "El plan de pruebas de Javier",
+    "comoSeJuega": "Javier ya repartió las horas de pruebas del control de acceso y te pide que lo revises. Las pilas empiezan como ella las dejó. Mira cada tarjeta: cuántos errores suele haber y cuánto cuesta atrapar cada uno. Si su reparto cubre el riesgo, entrégalo tal cual; si ves un hueco, corrígelo con + y −. Ganas si se escapa como mucho 1 error, y ninguno de la pila marcada en rojo. Revisar no siempre es encontrar algo mal.",
+    "quienEspera": "Javier",
+    "textoPresion": "Javier empieza a probar a las 14:00",
     "segundosReloj": 120
   },
   "repartir": {
@@ -18,7 +18,7 @@
     "paso": 2,
     "unidad": "horas",
     "toleranciaDeEscapes": 1,
-    "quienPropone": "Camila",
+    "quienPropone": "Javier",
     "propuesta": {
       "unitarias": 8,
       "integracion": 4,
@@ -80,7 +80,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-TEST-01",
-        "razon": "El reparto de Camila cubría el riesgo, incluido el camino que no podía fallar, y lo diste por bueno. Revisar bien también es saber cuándo algo está bien y no tocarlo."
+        "razon": "El reparto de Javier cubría el riesgo, incluido el camino que no podía fallar, y lo diste por bueno. Revisar bien también es saber cuándo algo está bien y no tocarlo."
       }
     },
     "parcial": {
@@ -100,7 +100,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-TEST-01",
-        "razon": "El reparto de Camila ganaba tal cual. Al moverlo quedó un hueco por el que se escaparon errores: cambiar algo que estaba bien también es un error de revisión."
+        "razon": "El reparto de Javier ganaba tal cual. Al moverlo quedó un hueco por el que se escaparon errores: cambiar algo que estaba bien también es un error de revisión."
       }
     },
     "falsoPositivo": {
@@ -120,7 +120,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-TEST-01",
-        "razon": "Cargaste horas de sobra en un tipo y dejaste otro sin nada. El reparto que traía Camila ya estaba equilibrado."
+        "razon": "Cargaste horas de sobra en un tipo y dejaste otro sin nada. El reparto que traía Javier ya estaba equilibrado."
       }
     },
     "omitido": {
@@ -133,11 +133,11 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-TEST-01",
-        "razon": "Dejaste las pilas en cero: el plan que traía Camila se perdió y todo lo que había lo encontrará el cliente."
+        "razon": "Dejaste las pilas en cero: el plan que traía Javier se perdió y todo lo que había lo encontrará el cliente."
       }
     }
   },
   "cierre": {
-    "texto": "Camila apunta en su cuaderno: «revisado y aprobado sin cambios». No todas las revisiones acaban con una corrección."
+    "texto": "Javier apunta en su cuaderno: «revisado y aprobado sin cambios». No todas las revisiones acaban con una corrección."
   }
 }

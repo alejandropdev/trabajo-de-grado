@@ -136,9 +136,10 @@ namespace Nexus.Unity.Pantallas {
             fondo.raycastTarget = false;
             ui.Borde(raiz, NexusTheme.Alfa(_t.cyan, 0.45f), NexusTheme.RadioLg, 1.5f);
 
-            // 85 % arriba: la pizarra (recorta lo que salga). 15 % abajo: pestañas + pie.
+            // 70 % arriba: la pizarra (recorta lo que salga). 30 % abajo: el pie de la fase (hasta tres lineas, ya no se
+            // corta con «…») y, debajo, las pestañas.
             _tabla = ui.Nodo(raiz, "Pizarra");
-            _tabla.anchorMin = new Vector2(0, 0.17f); _tabla.anchorMax = Vector2.one;
+            _tabla.anchorMin = new Vector2(0, 0.30f); _tabla.anchorMax = Vector2.one;
             _tabla.offsetMin = new Vector2(12, 4); _tabla.offsetMax = new Vector2(-12, -10);
             _tabla.gameObject.AddComponent<RectMask2D>();
             var capa = ui.Nodo(_tabla, "Capa");
@@ -149,20 +150,33 @@ namespace Nexus.Unity.Pantallas {
             _lamina.Dibujo.Tiza = true;
 
             var banda = ui.Nodo(raiz, "Banda");
-            banda.anchorMin = Vector2.zero; banda.anchorMax = new Vector2(1, 0.17f);
-            banda.offsetMin = new Vector2(14, 8); banda.offsetMax = new Vector2(-14, -2);
-            var fila = ui.Fila(banda, "Fila", 10, 0, TextAnchor.MiddleLeft);
-            UiKit.Rellenar(fila);
-            fila.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
+            banda.anchorMin = Vector2.zero; banda.anchorMax = new Vector2(1, 0.30f);
+            banda.offsetMin = new Vector2(14, 6); banda.offsetMax = new Vector2(-14, -2);
 
-            if (fases.Count > 1)
+            // Las pestañas, abajo (si hay mas de una fase).
+            var zonaPestanas = ui.Nodo(banda, "Pestanas");
+            zonaPestanas.anchorMin = Vector2.zero; zonaPestanas.anchorMax = new Vector2(1, fases.Count > 1 ? 0.40f : 0f);
+            zonaPestanas.offsetMin = zonaPestanas.offsetMax = Vector2.zero;
+            if (fases.Count > 1) {
+                var fila = ui.Fila(zonaPestanas, "Fila", 10, 0, TextAnchor.MiddleLeft);
+                UiKit.Rellenar(fila);
+                fila.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
                 for (var i = 0; i < fases.Count; i++) Pestana(fila, i);
-            _pie = ui.Texto(fila, "", EstiloTexto.Cuerpo, _t.ink, TextAlignmentOptions.MidlineLeft);
-            ActoresDeEscena.QueCabe(_pie, _t.Px(15));
+            }
+
+            // El pie, encima de las pestañas: se ajusta, pero puede ocupar hasta tres lineas.
+            var zonaPie = ui.Nodo(banda, "Pie");
+            zonaPie.anchorMin = new Vector2(0, fases.Count > 1 ? 0.44f : 0f); zonaPie.anchorMax = Vector2.one;
+            zonaPie.offsetMin = zonaPie.offsetMax = Vector2.zero;
+            _pie = ui.Texto(zonaPie, "", EstiloTexto.Cuerpo, _t.ink, TextAlignmentOptions.TopLeft);
             var alto = _pie.GetComponent<AltoDeTexto>();
             if (alto != null) DestroyImmediate(alto);   // el alto lo da la banda; el texto se ajusta a ella
-            var le = UiKit.Tamano(_pie, flexAncho: 1, flexAlto: 1);
-            le.minHeight = 0; le.preferredHeight = 0;
+            UiKit.Rellenar(_pie.rectTransform);
+            _pie.enableAutoSizing = true;
+            _pie.fontSizeMax = _t.Px(16);
+            _pie.fontSizeMin = _t.Px(10);
+            _pie.textWrappingMode = TextWrappingModes.Normal;
+            _pie.overflowMode = TextOverflowModes.Overflow;
 
             Ir(0);
         }

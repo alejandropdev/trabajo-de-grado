@@ -82,7 +82,7 @@ namespace Nexus.Tests {
         public void Hay_un_reto_en_que_el_reparto_que_trae_el_equipo_esta_bien_y_se_entrega_tal_cual() {
             var def = Minijuego("MJ-F2-09");
             var cfg = def.Repartir;
-            Assert.IsNotNull(cfg.Propuesta, "el reto empieza con el reparto de Camila ya puesto");
+            Assert.IsNotNull(cfg.Propuesta, "el reto empieza con el reparto propuesto (el de Javier) ya puesto");
             Assert.IsFalse(string.IsNullOrEmpty(cfg.QuienPropone));
             Assert.LessOrEqual(cfg.Propuesta.Values.Sum(), cfg.Presupuesto);
             Assert.AreEqual(ResultadosDeMinijuego.Todos, RepartirEvaluador.Evaluar(def, cfg.Propuesta).Resultado, "aceptarlo sin tocar es lo correcto");

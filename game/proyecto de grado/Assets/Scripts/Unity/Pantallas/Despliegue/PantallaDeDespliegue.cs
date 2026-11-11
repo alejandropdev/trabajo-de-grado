@@ -217,27 +217,7 @@ namespace Nexus.Unity.Pantallas {
         /// izquierda, y hacia abajo) si 'arribaIzquierda'; si no, en las del padre centrado.
         /// </summary>
         private void Chispas(Transform padre, Vector2 centro, Color color, int n, float alcance, bool arribaIzquierda) {
-            for (var i = 0; i < n; i++) {
-                var p = Ui.Nodo(padre, "Chispa");
-                if (arribaIzquierda) { p.anchorMin = p.anchorMax = new Vector2(0, 1); } else { p.anchorMin = p.anchorMax = new Vector2(0.5f, 0.5f); }
-                p.pivot = new Vector2(0.5f, 0.5f);
-                p.sizeDelta = new Vector2(8 + (i % 3) * 3, 8 + (i % 3) * 3);
-                var img = p.gameObject.AddComponent<Image>();
-                img.sprite = Ui.SpriteCircular();
-                img.raycastTarget = false;
-                var ang = (i / (float)n) * Mathf.PI * 2 + (i % 2) * 0.4f;
-                var dir = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
-                var lejos = alcance * (0.55f + (i % 4) * 0.18f);
-                var origen = arribaIzquierda ? new Vector2(centro.x, -centro.y) : centro;
-                p.anchoredPosition = origen;
-                _anim.Lanzar(0.75f, t => {
-                    if (p == null) return;
-                    var e = Curvas.SalidaCubica(t);
-                    p.anchoredPosition = origen + dir * lejos * e + new Vector2(0, -50f * t * t);
-                    img.color = NexusTheme.Alfa(color, 1 - t);
-                    p.localScale = Vector3.one * (1 - 0.6f * t);
-                }, () => { if (p != null) Destroy(p.gameObject); }, 0.02f * (i % 5), p.gameObject);
-            }
+            EfectosUI.Chispas(Ui, _anim, padre, centro, color, n, alcance, arribaIzquierda);
         }
 
         // ==================================================================== de un paso al siguiente

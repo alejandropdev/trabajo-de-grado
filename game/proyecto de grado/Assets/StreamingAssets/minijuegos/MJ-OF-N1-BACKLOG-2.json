@@ -1,129 +1,124 @@
 {
   "id": "MJ-OF-N1-BACKLOG-2",
   "verbo": "V3_ORDENAR",
-  "lienzo": "backlog",
+  "lienzo": "puente",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
   "modulo": "lectura",
   "enElProyecto": "Es el backlog de la lectura de matrículas en la garita.",
   "presentacion": {
     "titulo": "Práctica: el backlog de la lectura de matrículas",
-    "comoSeJuega": "Ordena el backlog: arrastra las tarjetas (o usa ▲▼), lo más valioso arriba. Solo entra lo que cabe sobre la línea, que es el tiempo que hay. Algunas tarjetas necesitan otra antes. Al final, contesta a Facilities y mira qué cambia en el tablero.",
+    "comoSeJuega": "Cada pilar es un módulo y cada bloque, una historia. Ordénalas de abajo arriba: abajo, lo que no necesita nada; arriba, lo que necesita lo de debajo. Pulsa «Verificar»: la luz sube por cada pilar y se detiene en lo que falla. Cada pilar tiene dos vidas.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 120
   },
-  "ordenar": {
-    "capacidad": 12,
-    "umbralDeValor": 0.8,
-    "peticion": "Facilities pregunta si se puede ver en el panel la foto de cada vehículo que entra.",
-    "tarjetaPedida": "t5",
-    "tarjetas": [
+  "puente": {
+    "vidas": 2,
+    "pilares": [
       {
-        "id": "t1",
-        "titulo": "Leer la matrícula",
-        "valor": 8,
-        "esfuerzo": 3
-      },
-      {
-        "id": "t2",
-        "titulo": "Lista de vehículos autorizados",
-        "valor": 7,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t1"
+        "id": "lectura",
+        "nombre": "Lectura de matrículas",
+        "historias": [
+          {
+            "id": "lec-b1",
+            "titulo": "Calibrar la cámara"
+          },
+          {
+            "id": "lec-b2",
+            "titulo": "Detectar la placa",
+            "dependeDe": [
+              "lec-b1"
+            ],
+            "porque": "Con la cámara mal enfocada no se distingue la placa."
+          },
+          {
+            "id": "lec-b3",
+            "titulo": "Leer los caracteres",
+            "dependeDe": [
+              "lec-b2"
+            ],
+            "porque": "Se leen las letras de una placa ya detectada."
+          },
+          {
+            "id": "lec-b4",
+            "titulo": "Probar con lluvia",
+            "dependeDe": [
+              "lec-b3"
+            ],
+            "porque": "Probar con lluvia es probar la lectura entera."
+          }
         ]
       },
       {
-        "id": "t3",
-        "titulo": "Abrir la barrera solo a los autorizados",
-        "valor": 8,
-        "esfuerzo": 3,
-        "dependeDe": [
-          "t2"
+        "id": "acceso",
+        "nombre": "Control de acceso",
+        "historias": [
+          {
+            "id": "acc-b1",
+            "titulo": "Clave del controlador"
+          },
+          {
+            "id": "acc-b2",
+            "titulo": "Orden de abrir",
+            "dependeDe": [
+              "acc-b1"
+            ],
+            "porque": "Sin clave, el controlador no obedece."
+          },
+          {
+            "id": "acc-b3",
+            "titulo": "Abrir solo a autorizados",
+            "dependeDe": [
+              "acc-b2"
+            ],
+            "porque": "Primero tiene que funcionar la orden."
+          },
+          {
+            "id": "acc-b4",
+            "titulo": "Cerrar tras pasar",
+            "dependeDe": [
+              "acc-b3"
+            ],
+            "porque": "Se cierra lo que se abrió."
+          }
         ]
       },
       {
-        "id": "t4",
-        "titulo": "Registro de entradas",
-        "valor": 5,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t1"
-        ]
-      },
-      {
-        "id": "t5",
-        "titulo": "Foto del vehículo en el panel",
-        "valor": 2,
-        "esfuerzo": 3,
-        "dependeDe": [
-          "t1"
-        ]
-      },
-      {
-        "id": "t6",
-        "titulo": "Avisar al guardia si no se lee",
-        "valor": 4,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t1"
+        "id": "panel",
+        "nombre": "Pantalla del guardia",
+        "historias": [
+          {
+            "id": "pan-a1",
+            "titulo": "Datos de la garita"
+          },
+          {
+            "id": "pan-a2",
+            "titulo": "Pantalla del guardia",
+            "dependeDe": [
+              "pan-a1"
+            ],
+            "porque": "La pantalla muestra los datos de la garita."
+          },
+          {
+            "id": "pan-a3",
+            "titulo": "Actualizar en vivo",
+            "dependeDe": [
+              "pan-a2"
+            ],
+            "porque": "Solo se actualiza una pantalla que ya existe."
+          },
+          {
+            "id": "pan-a4",
+            "titulo": "Aviso sonoro",
+            "dependeDe": [
+              "pan-a3"
+            ],
+            "porque": "El sonido salta cuando algo cambia en vivo."
+          }
         ]
       }
-    ],
-    "respuestas": {
-      "obedecer": {
-        "texto": "Le dices que sí, que cabe todo.",
-        "replica": "¡Perfecto! Entonces ponlo lo primero, que es lo que más se va a notar.",
-        "efectoEnBacklog": "forzar-arriba",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "Cansancio": 3
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "incorrecta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Decir que cabe lo que no cabe no lo hace caber: «Foto del vehículo en el panel» subió arriba y empujó fuera algo que valía mucho más."
-          }
-        }
-      },
-      "rechazar": {
-        "texto": "Le dices que no, sin más.",
-        "replica": "Bueno… no entiendo bien por qué, pero vale.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "SatisfaccionCliente": -2
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "aceptable",
-            "oa": "OA-SCRUM-01",
-            "razon": "Proteges el tiempo, pero sin explicar por qué. Un «no» sin razones cansa la confianza."
-          }
-        }
-      },
-      "negociar": {
-        "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
-        "replica": "Visto así, mejor dejamos «Foto del vehículo en el panel» para más adelante. Gracias por explicármelo.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "SatisfaccionCliente": 2
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "correcta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Enseñar lo que cuesta y dejar elegir es negociar: la decisión de dejarlo fuera la tomó quien lo pedía."
-          }
-        }
-      }
-    }
+    ]
   },
   "consecuencias": {
     "todos": {
@@ -133,7 +128,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-SCRUM-01",
-        "razon": "Lo que cierra el agujero de la barrera, primero: leer, comprobar y abrir solo a quien toca."
+        "razon": "Cada historia quedó después de lo que necesita y no hubo tropiezos: así se construye de abajo arriba sin quedarse bloqueado."
       }
     },
     "parcial": {
@@ -143,7 +138,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-SCRUM-01",
-        "razon": "Entró poco de lo que más valía, o la respuesta al cliente empujó fuera algo importante. Mira el «valor»: lo que más vale va arriba."
+        "razon": "El puente se completó, pero con errores o a medias: algo se puso antes de lo que necesitaba. Antes de colocar una historia, pregúntate de qué depende."
       }
     },
     "falsoPositivo": {
@@ -153,7 +148,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir. Primero los cimientos, luego lo de encima."
+        "razon": "Un pilar se quedó sin vidas: se puso una historia antes de lo que necesita, dos veces. Un equipo que empieza por ahí se bloquea a mitad de sprint."
       }
     },
     "omitido": {
@@ -163,11 +158,11 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "No se ordenó nada."
+        "razon": "No se terminó ningún pilar a tiempo. Sin un orden que respete las dependencias, el equipo empieza por lo que llegó primero."
       }
     }
   },
   "cierre": {
-    "texto": "El valor de un sprint es lo que resuelve el problema que dio origen al proyecto."
+    "texto": "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse: lo que otras historias necesitan va primero."
   }
 }

@@ -757,9 +757,10 @@ namespace Nexus.Unity.Pantallas {
             var oficina = Mosaico(rejilla, "Práctica", "Retos de práctica", disponibles > 0 ? disponibles.ToString() : null, AbrirEscritorio, disponibles > 0);
             GuiaView.Registrar("dia.oficina", oficina);
 
-            var arq = S.Perfil.Fase1 == null ? null : S.Perfil.Fase1.Arquitecturas.FirstOrDefault(a => a.Id == S.ArquitecturaElegida);
-            Mosaico(rejilla, "El plano", arq != null ? arq.Nombre : "Arquitectura", null,
-                    () => { if (arq != null) PantallaDelProducto.AbrirPlano(App, arq.Id, true); }, false);
+            // «El producto» (2026-11-11): lo que hay construido hoy, parte a parte (antes, aqui salia el plano de la arquitectura).
+            var producto = S.Producto();
+            var funcionan = producto.Count(x => x.Etapa == Nexus.Core.Proyecto.EtapasDelProducto.Mvp || x.Etapa == Nexus.Core.Proyecto.EtapasDelProducto.Desplegado);
+            Mosaico(rejilla, "El producto", $"{funcionan} de {producto.Count} partes funcionan", null, () => ProductoVivo.Abrir(App), false);
 
             var probar = S.PorQueNoSePuedeProbar();
             // La insignia dice cuantas rondas quedan hoy: «1» si se puede, nada si ya se hizo (antes salia un cuadrito).

@@ -60,7 +60,7 @@ namespace Nexus.Unity.Pantallas {
             ManoDeAcciones();
 
             // «Volver», arriba a la izquierda y fuera del layout: siempre en el mismo sitio, nada lo tapa.
-            var volver = Ui.Boton(_capaInteraccion, "Volver (Esc)", CerrarInteraccion, VarianteBoton.Secundario);
+            var volver = Ui.Boton(_capaInteraccion, "Volver (Esc)", CerrarInteraccion, VarianteBoton.Salida);
             var rv = (RectTransform)volver.transform;
             var le = volver.GetComponent<LayoutElement>();
             if (le == null) le = volver.gameObject.AddComponent<LayoutElement>();

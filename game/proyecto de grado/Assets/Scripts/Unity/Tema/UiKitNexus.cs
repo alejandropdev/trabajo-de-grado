@@ -241,6 +241,7 @@ namespace Nexus.Unity.Tema {
         ///   Menu       como Secundario, con el texto a la izquierda y un poco mas alto
         ///   Peligro    como Secundario, en rojo
         ///   Fantasma   solo texto; al pasar, un fondo cian suave
+        ///   Salida     «Volver (Esc)» / «Cerrar»: cristal opaco con borde cian (se ve sobre cualquier velo)
         ///
         /// En el kit clasico (receta, pizarrones) es el mismo boton: la etiqueta se pone en la letra del design system.
         /// Sustituye a las chapas con textura (boton_mostaza, boton_oscuro).
@@ -326,6 +327,11 @@ namespace Nexus.Unity.Tema {
                     v.Normal = Estado(cristal, NexusTheme.Alfa(Tema.danger, 0.6f), Tema.danger);
                     v.Encima = Estado(NexusTheme.Alfa(Tema.dangerSoft, 0.95f), Tema.danger, Color.Lerp(Tema.danger, Color.white, 0.25f), true);
                     v.ElegidoEstado = v.Encima;
+                    break;
+                case VarianteBoton.Salida:
+                    v.Normal = Estado(Tema.bg900, NexusTheme.Alfa(Tema.cyan, 0.7f), Tema.ink);
+                    v.Encima = Estado(Color.Lerp(Tema.bg900, Tema.cyanSoft, 0.7f), Tema.cyan, Color.white, true);
+                    v.ElegidoEstado = Estado(Tema.cyanSoft, Tema.cyan, Tema.ink, true);
                     break;
                 case VarianteBoton.Fantasma:
                     v.Normal = Estado(Color.clear, Color.clear, Tema.inkMuted);

@@ -4,6 +4,7 @@ using System.Linq;
 using Nexus.Core.Minijuegos.Corregir;
 using Nexus.Core.Minijuegos.Detectar;
 using Nexus.Core.Minijuegos.Ordenar;
+using Nexus.Core.Minijuegos.Puente;
 using Nexus.Core.Minijuegos.Repartir;
 
 namespace Nexus.Core.Minijuegos {
@@ -56,7 +57,7 @@ namespace Nexus.Core.Minijuegos {
             if (def == null) throw new ArgumentNullException(nameof(def));
             List<PasoGuiado> pasos;
             switch (Verbos.Normalizar(def.Verbo)) {
-                case Verbos.Ordenar: pasos = Ordenar(def); break;
+                case Verbos.Ordenar: pasos = PuenteDelBacklog.Aplica(def) ? Puente(def) : Ordenar(def); break;
                 case Verbos.Repartir: pasos = Repartir(def); break;
                 default: pasos = PuntosDelDiagrama.Aplica(def) ? Corregir(def) : Detectar(def); break;
             }
@@ -201,6 +202,52 @@ namespace Nexus.Core.Minijuegos {
             return "«" + pieza + "»";
         }
 
+        // ==================================================================== V3 · el puente del backlog
+
+        private static List<PasoGuiado> Puente(MinijuegoDef def) {
+            var cfg = def.Puente;
+            var pasos = new List<PasoGuiado> {
+                new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Antes de mover nada: cómo se construye un pilar.",
+                    Porque = "Un pilar se levanta de abajo arriba: lo que no necesita nada va ABAJO, y cada historia necesita que lo que le hace " +
+                             "falta ya esté más abajo. Si una está antes de lo que necesita, al verificar se pone roja y ese pilar pierde una vida; " +
+                             "con dos errores en el mismo pilar, el puente se cae.",
+                    EsLeccion = true
+                },
+                new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Así se mueve una historia.",
+                    Porque = "Arrastra el bloque dentro de su pilar, o pulsa uno y súbelo o bájalo con ▲ y ▼. Cada pilar empieza desordenado " +
+                             "a propósito: ordenarlo es el reto."
+                }
+            };
+            foreach (var pilar in cfg.Pilares) {
+                var porId = pilar.Historias.ToDictionary(h => h.Id);
+                var solucion = PuenteEvaluador.Solucion(pilar);
+                for (var i = 0; i < solucion.Count; i++) {
+                    var h = porId[solucion[i]];
+                    string porque;
+                    if (!string.IsNullOrEmpty(h.Porque)) porque = h.Porque;
+                    else if (h.DependeDe.Count > 0)
+                        porque = "Necesita " + string.Join(" y ", h.DependeDe.Select(d => "«" + porId[d].Titulo + "»")) + ", que ya está más abajo.";
+                    else porque = "No necesita ninguna otra historia: puede ir en la base.";
+                    pasos.Add(new PasoGuiado {
+                        Accion = AccionGuiada.Mover, Objetivo = h.Id, Valor = i,
+                        Texto = "En «" + pilar.Nombre + "», pon «" + h.Titulo + "» en el puesto " + (i + 1) + " (contando desde abajo).",
+                        Porque = porque, EsLeccion = i == 0
+                    });
+                }
+            }
+            pasos.Add(new PasoGuiado {
+                Accion = AccionGuiada.Listo, Texto = "Los pilares están listos. Pulsa «Verificar el puente».",
+                Porque = "Verificar ilumina cada pilar de abajo arriba. Lo que está bien se queda en verde; si algo falla, se pone rojo y cuesta una vida."
+            });
+            pasos.Add(new PasoGuiado {
+                Accion = AccionGuiada.Entregar, Texto = "El puente está completo: se entrega solo.",
+                Porque = "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse."
+            });
+            return pasos;
+        }
+
         // ==================================================================== V3 · ordenar
 
         private static List<PasoGuiado> Ordenar(MinijuegoDef def) {
@@ -326,6 +373,14 @@ namespace Nexus.Core.Minijuegos {
         public static ResultadoMinijuego Aplicar(MinijuegoDef def, IList<PasoGuiado> pasos) {
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar: {
+                    if (PuenteDelBacklog.Aplica(def)) {
+                        var puente = new EstadoDelPuente(def.Puente);
+                        foreach (var p in pasos) {
+                            if (p.Accion == AccionGuiada.Mover) puente.Mover(puente.PilarDe(p.Objetivo), p.Objetivo, p.Valor);
+                            if (p.Accion == AccionGuiada.Listo) puente.Verificar();
+                        }
+                        return PuenteEvaluador.Evaluar(def, puente);
+                    }
                     // Desde el tablero barajado, que es como lo encuentra el jugador (tambien en el modo guiado).
                     var orden = OrdenarEvaluador.OrdenInicial(def.Ordenar, 0);
                     string respuesta = null;

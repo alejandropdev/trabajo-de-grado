@@ -8,6 +8,7 @@ using Nexus.Core.Minijuegos;
 using Nexus.Core.Minijuegos.Ordenar;
 using Nexus.Core.Narrativa;
 using Nexus.Core.Sesion;
+using Nexus.Core.Minijuegos.Puente;
 using NUnit.Framework;
 
 namespace Nexus.Tests {
@@ -313,6 +314,19 @@ namespace Nexus.Tests {
                                    .Where(d => Verbos.Normalizar(d.Verbo) == Verbos.Ordenar).ToList();
             Assert.IsNotEmpty(escenas);
             foreach (var def in escenas) {
+                if (PuenteDelBacklog.Aplica(def)) {
+                    // El puente: cada pilar empieza desordenado, y seguir a Marisol mueve bloques de verdad.
+                    var puente = new EstadoDelPuente(def.Puente);
+                    var movidasPuente = 0;
+                    foreach (var paso in RecorridoGuiado.Para(def).Where(p => p.Accion == AccionGuiada.Mover)) {
+                        var pilar = puente.PilarDe(paso.Objetivo);
+                        if (puente.Ordenes[pilar].IndexOf(paso.Objetivo) != paso.Valor) movidasPuente++;
+                        puente.Mover(pilar, paso.Objetivo, paso.Valor);
+                    }
+                    Assert.Greater(movidasPuente, 0, def.Id + ": el recorrido guiado no mueve ningun bloque");
+                    Assert.AreEqual(ResultadosDeMinijuego.Todos, RecorridoGuiado.Aplicar(def, RecorridoGuiado.Para(def)).Resultado, def.Id);
+                    continue;
+                }
                 var orden = OrdenarEvaluador.OrdenInicial(def.Ordenar, 0);
                 var movidas = 0;
                 foreach (var paso in RecorridoGuiado.Para(def).Where(p => p.Accion == AccionGuiada.Mover)) {
