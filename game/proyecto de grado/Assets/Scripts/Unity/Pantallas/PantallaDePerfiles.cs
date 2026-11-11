@@ -28,11 +28,6 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(titulos, "¿Quién juega?", EstiloTexto.Titulo);
             Ui.Texto(titulos, "Cada estudiante tiene su perfil: ahí se guardan sus partidas, su entrevista de admisión y todo lo que encuentre.",
                      EstiloTexto.Pequeno);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            // Herramientas del equipo de desarrollo: en la build que juegan estudiantes y jurado no existen.
-            Ui.Boton(cabecera, "Prueba del motor", () => App.Router.Apilar<PantallaDeDiagnostico>(), VarianteBoton.Fantasma);
-            Ui.Boton(cabecera, "Ver el tema", () => App.Router.Apilar<PantallaDelTema>(), VarianteBoton.Fantasma);
-#endif
 
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);

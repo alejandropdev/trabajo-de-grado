@@ -33,7 +33,7 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Tamano(titulos, flexAncho: 1);
             if (!string.IsNullOrEmpty(Etiqueta)) Ui.Texto(titulos, Etiqueta.ToUpperInvariant(), EstiloTexto.Leyenda, Tema.cyan);
             Ui.Texto(titulos, Titulo ?? "", EstiloTexto.Subtitulo, Tema.ink);
-            Ui.Boton(cabecera, "Cerrar", () => App.Router.Volver(), VarianteBoton.Fantasma);
+            Ui.Boton(cabecera, "Cerrar (Esc)", () => App.Router.Volver(), VarianteBoton.Salida);
             Hoja.Separador();
 
             _cuerpo = new Hoja(Ui, Ui.Columna(Hoja.Raiz, "Cuerpo", Tema.espacio));

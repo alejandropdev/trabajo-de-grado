@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de todo el sistema de los patios: la garita, el control de acceso, las reservas y los informes. Javier va a programar el control de acceso encima de él.",
   "presentacion": {
     "titulo": "La revisión del diagrama",
-    "comoSeJuega": "Revisa el diseño antes de que Javier empiece a programar sobre él. Pincha cada caja o flecha con un problema y ponle nombre a la derecha (ambigüedad, acoplamiento, seguridad…). Hay tres problemas reales y algunas cosas raras que están bien: marcar lo que está bien también cuenta en contra.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Javier",
     "textoPresion": "Javier empieza a programar sobre este diagrama a las 11:00",
     "segundosReloj": 120
@@ -165,7 +165,10 @@
       ],
       "defecto": "requisito_ambiguo",
       "explicacion": "«Gana la prioritaria», pero nadie ha dicho qué es la prioridad. Facilities salió de su primera reunión con tres ideas distintas: el diagrama lo copió sin resolverlo, y alguien lo va a interpretar a su manera.",
-      "pista": "«Gana la prioritaria»… ¿Alguien dijo qué significa «prioritaria»? Recuerda que Facilities salió con tres ideas distintas."
+      "pista": "«Gana la prioritaria»… ¿Alguien dijo qué significa «prioritaria»? Recuerda que Facilities salió con tres ideas distintas.",
+      "soluciones": [
+        "acordar-regla"
+      ]
     },
     {
       "id": "Z2",
@@ -175,7 +178,10 @@
       ],
       "defecto": "acoplamiento_indebido",
       "explicacion": "El módulo de informes lee las tablas internas del de reservas sin pasar por él. El día que reservas cambie una tabla, los informes se rompen sin que nadie sepa por qué.",
-      "pista": "Sigue la flecha del módulo de informes. ¿Le pide los datos al módulo de reservas o se mete en sus tablas por detrás?"
+      "pista": "Sigue la flecha del módulo de informes. ¿Le pide los datos al módulo de reservas o se mete en sus tablas por detrás?",
+      "soluciones": [
+        "fachada"
+      ]
     },
     {
       "id": "Z3",
@@ -185,7 +191,10 @@
       ],
       "defecto": "falla_de_seguridad",
       "explicacion": "El controlador obedece cualquier orden, venga de donde venga. Es exactamente como la abrieron la primera vez: con el mando genérico del fabricante.",
-      "pista": "¿Quién puede dar órdenes a este controlador? Piensa en cómo abrieron la barrera la primera vez."
+      "pista": "¿Quién puede dar órdenes a este controlador? Piensa en cómo abrieron la barrera la primera vez.",
+      "soluciones": [
+        "autenticar"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -215,36 +224,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "requisito_ambiguo",
-        "acoplamiento_indebido",
-        "falla_de_seguridad"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "requisito_ambiguo",
-        "acoplamiento_indebido",
-        "falla_de_seguridad",
-        "dependencia_circular"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "dependencia_circular",
-        "elemento_sin_especificar"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -313,5 +305,55 @@
   },
   "cierre": {
     "texto": "El diagrama se queda como lo dejes. Lo que no marques, alguien lo construirá tal cual."
-  }
+  },
+  "cartas": [
+    {
+      "id": "estrategia",
+      "nombre": "Estrategia: regla intercambiable",
+      "descripcion": "Poder cambiar la forma de decidir sin tocar el resto.",
+      "icono": "bifurcacion",
+      "tipo": "patron",
+      "porQueNo": "deja cambiar la regla, pero nadie ha dicho todavía cuál es."
+    },
+    {
+      "id": "fachada",
+      "nombre": "Fachada: la puerta del módulo",
+      "descripcion": "Los demás piden los datos al módulo por su puerta; nadie entra en sus tablas.",
+      "icono": "puerta",
+      "tipo": "patron",
+      "porQueNo": "nadie se está metiendo en las tripas de otro módulo."
+    },
+    {
+      "id": "cifrar-bd",
+      "nombre": "Cifrar la base de datos",
+      "descripcion": "Guardar los datos cifrados en el disco.",
+      "icono": "llave",
+      "tipo": "practica",
+      "porQueNo": "protege el disco, pero no lo que se enseña ni quién da las órdenes."
+    },
+    {
+      "id": "acordar-regla",
+      "nombre": "Acordar la regla con el cliente",
+      "descripcion": "Escribir con el cliente cómo se decide, con un ejemplo de cada caso.",
+      "icono": "acuerdo",
+      "tipo": "practica",
+      "porQueNo": "aquí no falta una decisión del cliente: el fallo está en el diseño."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    },
+    {
+      "id": "autenticar",
+      "nombre": "Autenticar las órdenes",
+      "descripcion": "Solo se obedece una orden firmada por quien puede darla.",
+      "icono": "candado",
+      "tipo": "practica",
+      "porQueNo": "nadie está dando órdenes sin permiso."
+    }
+  ]
 }

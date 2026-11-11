@@ -98,7 +98,7 @@ namespace Nexus.Unity.Pantallas {
                 boton.interactable = opcion.Activa;
             }
             Hoja.Espacio();
-            Ui.Boton(Hoja.Fila(), "Cerrar", () => App.Router.Volver(), VarianteBoton.Fantasma);
+            Ui.Boton(Hoja.Fila(), "Cerrar (Esc)", () => App.Router.Volver(), VarianteBoton.Salida);
         }
     }
 
@@ -115,7 +115,7 @@ namespace Nexus.Unity.Pantallas {
             Hoja.Espacio();
             var fila = Hoja.Fila();
             Ui.Boton(fila, TextoSi, () => { App.Router.Volver(); AlConfirmar?.Invoke(); }, VarianteBoton.Peligro);
-            Ui.Boton(fila, "Cancelar", () => App.Router.Volver(), VarianteBoton.Fantasma);
+            Ui.Boton(fila, "Cancelar (Esc)", () => App.Router.Volver(), VarianteBoton.Salida);
         }
     }
 

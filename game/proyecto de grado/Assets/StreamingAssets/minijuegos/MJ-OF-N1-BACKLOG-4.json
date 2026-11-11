@@ -1,126 +1,124 @@
 {
   "id": "MJ-OF-N1-BACKLOG-4",
   "verbo": "V3_ORDENAR",
-  "lienzo": "backlog",
+  "lienzo": "puente",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
   "modulo": "turnos",
   "enElProyecto": "Es el backlog de los turnos de mantenimiento de los ascensores de carga.",
   "presentacion": {
     "titulo": "Práctica: el backlog de los turnos de mantenimiento",
-    "comoSeJuega": "Ordena el backlog: arrastra las tarjetas (o usa ▲▼), lo más valioso arriba. Solo entra lo que cabe sobre la línea, que es el tiempo que hay. Algunas tarjetas necesitan otra antes. Al final, contesta a Facilities y mira qué cambia en el tablero.",
+    "comoSeJuega": "Cada pilar es un módulo y cada bloque, una historia. Ordénalas de abajo arriba: abajo, lo que no necesita nada; arriba, lo que necesita lo de debajo. Pulsa «Verificar»: la luz sube por cada pilar y se detiene en lo que falla. Cada pilar tiene dos vidas.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 120
   },
-  "ordenar": {
-    "capacidad": 11,
-    "umbralDeValor": 0.8,
-    "peticion": "Facilities pregunta si se pueden exportar los turnos a PDF para colgarlos en el tablón.",
-    "tarjetaPedida": "t5",
-    "tarjetas": [
+  "puente": {
+    "vidas": 2,
+    "pilares": [
       {
-        "id": "t1",
-        "titulo": "Calendario de mantenimiento",
-        "valor": 7,
-        "esfuerzo": 3
-      },
-      {
-        "id": "t2",
-        "titulo": "Asignar técnico al turno",
-        "valor": 6,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t1"
+        "id": "turnos",
+        "nombre": "Prioridades y turnos",
+        "historias": [
+          {
+            "id": "tur-b1",
+            "titulo": "Turnos de mantenimiento"
+          },
+          {
+            "id": "tur-b2",
+            "titulo": "Asignar un turno",
+            "dependeDe": [
+              "tur-b1"
+            ],
+            "porque": "Se asigna uno de los turnos que existen."
+          },
+          {
+            "id": "tur-b3",
+            "titulo": "Turno de urgencia",
+            "dependeDe": [
+              "tur-b2"
+            ],
+            "porque": "Una urgencia se cuela en turnos ya asignados."
+          },
+          {
+            "id": "tur-b4",
+            "titulo": "Historial de turnos",
+            "dependeDe": [
+              "tur-b2"
+            ],
+            "porque": "El historial guarda lo que se asignó."
+          }
         ]
       },
       {
-        "id": "t3",
-        "titulo": "Bloquear el ascensor en mantenimiento",
-        "valor": 8,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t1"
+        "id": "reservas",
+        "nombre": "Reservas de ascensores",
+        "historias": [
+          {
+            "id": "res-a1",
+            "titulo": "Calendario de ascensores"
+          },
+          {
+            "id": "res-a2",
+            "titulo": "Reservar un ascensor",
+            "dependeDe": [
+              "res-a1"
+            ],
+            "porque": "No se reserva lo que no está en el calendario."
+          },
+          {
+            "id": "res-a3",
+            "titulo": "Bloquear a su hora",
+            "dependeDe": [
+              "res-a2"
+            ],
+            "porque": "Bloquear necesita una reserva con hora."
+          },
+          {
+            "id": "res-a4",
+            "titulo": "Avisar por correo",
+            "dependeDe": [
+              "res-a2"
+            ],
+            "porque": "El aviso confirma una reserva ya hecha."
+          }
         ]
       },
       {
-        "id": "t4",
-        "titulo": "Cambiar un turno",
-        "valor": 4,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t2"
-        ]
-      },
-      {
-        "id": "t5",
-        "titulo": "Exportar los turnos a PDF",
-        "valor": 1,
-        "esfuerzo": 3
-      },
-      {
-        "id": "t6",
-        "titulo": "Aviso al técnico la víspera",
-        "valor": 3,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t2"
+        "id": "panel",
+        "nombre": "Pantalla del guardia",
+        "historias": [
+          {
+            "id": "pan-b1",
+            "titulo": "Recibir las entradas"
+          },
+          {
+            "id": "pan-b2",
+            "titulo": "Mostrar el estado",
+            "dependeDe": [
+              "pan-b1"
+            ],
+            "porque": "Se muestra lo que se recibió."
+          },
+          {
+            "id": "pan-b3",
+            "titulo": "Colores de alerta",
+            "dependeDe": [
+              "pan-b2"
+            ],
+            "porque": "Los colores se aplican sobre el estado mostrado."
+          },
+          {
+            "id": "pan-b4",
+            "titulo": "Modo noche",
+            "dependeDe": [
+              "pan-b3"
+            ],
+            "porque": "El modo noche reajusta colores que ya existen."
+          }
         ]
       }
-    ],
-    "respuestas": {
-      "obedecer": {
-        "texto": "Le dices que sí, que cabe todo.",
-        "replica": "¡Perfecto! Entonces ponlo lo primero, que es lo que más se va a notar.",
-        "efectoEnBacklog": "forzar-arriba",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "Cansancio": 3
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "incorrecta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Decir que cabe lo que no cabe no lo hace caber: «Exportar los turnos a PDF» subió arriba y empujó fuera algo que valía mucho más."
-          }
-        }
-      },
-      "rechazar": {
-        "texto": "Le dices que no, sin más.",
-        "replica": "Bueno… no entiendo bien por qué, pero vale.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "SatisfaccionCliente": -2
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "aceptable",
-            "oa": "OA-SCRUM-01",
-            "razon": "Proteges el tiempo, pero sin explicar por qué. Un «no» sin razones cansa la confianza."
-          }
-        }
-      },
-      "negociar": {
-        "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
-        "replica": "Visto así, mejor dejamos «Exportar los turnos a PDF» para más adelante. Gracias por explicármelo.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "SatisfaccionCliente": 2
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "correcta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Enseñar lo que cuesta y dejar elegir es negociar: la decisión de dejarlo fuera la tomó quien lo pedía."
-          }
-        }
-      }
-    }
+    ]
   },
   "consecuencias": {
     "todos": {
@@ -130,7 +128,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-SCRUM-01",
-        "razon": "Que nadie use un ascensor en revisión va antes que cualquier comodidad: es seguridad."
+        "razon": "Cada historia quedó después de lo que necesita y no hubo tropiezos: así se construye de abajo arriba sin quedarse bloqueado."
       }
     },
     "parcial": {
@@ -140,7 +138,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-SCRUM-01",
-        "razon": "Entró poco de lo que más valía, o la respuesta al cliente empujó fuera algo importante. Mira el «valor»: lo que más vale va arriba."
+        "razon": "El puente se completó, pero con errores o a medias: algo se puso antes de lo que necesitaba. Antes de colocar una historia, pregúntate de qué depende."
       }
     },
     "falsoPositivo": {
@@ -150,7 +148,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir. Primero los cimientos, luego lo de encima."
+        "razon": "Un pilar se quedó sin vidas: se puso una historia antes de lo que necesita, dos veces. Un equipo que empieza por ahí se bloquea a mitad de sprint."
       }
     },
     "omitido": {
@@ -160,11 +158,11 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "No se ordenó nada."
+        "razon": "No se terminó ningún pilar a tiempo. Sin un orden que respete las dependencias, el equipo empieza por lo que llegó primero."
       }
     }
   },
   "cierre": {
-    "texto": "Cuando una tarjeta evita un accidente, su valor no se discute."
+    "texto": "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse: lo que otras historias necesitan va primero."
   }
 }

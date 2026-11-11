@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de cómo se cancela una reserva de un ascensor de carga.",
   "presentacion": {
     "titulo": "Práctica: el diagrama de las cancelaciones",
-    "comoSeJuega": "El diagrama de las cancelaciones de reservas. Encuentra las piezas o flechas con problemas (hay uno) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,10 @@
       ],
       "defecto": "requisito_incompleto",
       "explicacion": "Cancelar borra la reserva, pero nadie le dice al ascensor que ya no hace falta: seguirá bloqueado a esa hora, vacío.",
-      "pista": "Compara lo que pasa al reservar con lo que pasa al cancelar. ¿Falta deshacer algo?"
+      "pista": "Compara lo que pasa al reservar con lo que pasa al cancelar. ¿Falta deshacer algo?",
+      "soluciones": [
+        "cubrir-caso"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -130,35 +133,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "requisito_incompleto",
-        "acoplamiento_indebido",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "requisito_incompleto",
-        "acoplamiento_indebido",
-        "elemento_sin_especificar",
-        "dependencia_circular"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "dependencia_circular"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -205,5 +192,39 @@
   },
   "cierre": {
     "texto": "Un requisito incompleto no se ve en lo que está: se ve en lo que falta. Compara siempre una operación con su contraria."
-  }
+  },
+  "cartas": [
+    {
+      "id": "reintentos",
+      "nombre": "Reintentar si falla",
+      "descripcion": "Si una llamada falla, repetirla unas cuantas veces.",
+      "icono": "reintento",
+      "tipo": "practica",
+      "porQueNo": "reintentar algo mal diseñado solo repite el fallo."
+    },
+    {
+      "id": "cubrir-caso",
+      "nombre": "Añadir el caso que falta",
+      "descripcion": "Escribir qué pasa en el caso olvidado y quién lo atiende.",
+      "icono": "lista",
+      "tipo": "practica",
+      "porQueNo": "no se ha olvidado ningún caso: el fallo es otro."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    },
+    {
+      "id": "comentar-codigo",
+      "nombre": "Comentar el código",
+      "descripcion": "Explicar con comentarios lo que hace cada función.",
+      "icono": "comentario",
+      "tipo": "practica",
+      "porQueNo": "los comentarios llegan tarde: el fallo está en el diseño, antes del código."
+    }
+  ]
 }

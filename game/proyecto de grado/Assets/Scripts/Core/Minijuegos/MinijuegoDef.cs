@@ -29,6 +29,12 @@ namespace Nexus.Core.Minijuegos
         public List<string> PaletaEtiquetas = new List<string>();
 
         /// <summary>
+        /// Solo lienzo "diagrama" (2026-11-09): las cartas de solucion que se reparten. Cada punto del diagrama (una zona
+        /// o un señuelo) se resuelve jugando una carta, o «Está bien así»; una carta en uso no se puede jugar en otro.
+        /// </summary>
+        public List<CartaDeSolucion> Cartas = new List<CartaDeSolucion>();
+
+        /// <summary>
         /// Solo verbo V1: cuantos señuelos se pueden marcar sin que el resultado sea «falsoPositivo». Con 0 (lo de
         /// siempre) un solo señuelo manda sobre haber acertado todo; con 1, quien lo encontro todo y acuso una pieza
         /// sana se queda en «parcial».
@@ -51,6 +57,9 @@ namespace Nexus.Core.Minijuegos
 
         /// <summary>Solo verbo V3 (ordenar con restricciones): el backlog.</summary>
         public OrdenarCfg Ordenar;
+
+        /// <summary>Solo verbo V3, lienzo "puente" (2026-11-10): el backlog como pilares de un puente, uno por modulo.</summary>
+        public PuenteCfg Puente;
 
         /// <summary>Solo verbo V2 (repartir un presupuesto escaso): las horas de pruebas.</summary>
         public RepartirCfg Repartir;
@@ -110,6 +119,38 @@ namespace Nexus.Core.Minijuegos
         public string Grupo;
         /// <summary>Diagrama de componentes: "pide" (por defecto), "lee" o "escribe". Solo cambia el trazo de la flecha.</summary>
         public string Tipo;
+    }
+
+    /// <summary>
+    /// El puente del backlog: cada modulo es un pilar y sus historias van apiladas. Se ordenan de ABAJO hacia ARRIBA: abajo,
+    /// lo que no necesita nada; arriba, lo que necesita lo de debajo.
+    /// </summary>
+    public sealed class PuenteCfg
+    {
+        /// <summary>Vidas de cada pilar. Con 2, el segundo error en el mismo pilar pierde el reto.</summary>
+        public int Vidas = 2;
+        public List<PilarDef> Pilares = new List<PilarDef>();
+    }
+
+    public sealed class PilarDef
+    {
+        /// <summary>El modulo del proyecto que sostiene este pilar.</summary>
+        public string Id;
+        public string Nombre;
+        public List<HistoriaDePilar> Historias = new List<HistoriaDePilar>();
+    }
+
+    public sealed class HistoriaDePilar
+    {
+        /// <summary>Unico en todo el puente (no solo en su pilar).</summary>
+        public string Id;
+        public string Titulo;
+        /// <summary>«Quiero…» de la historia, para el tooltip (opcional).</summary>
+        public string Quiero;
+        /// <summary>Historias del MISMO pilar que tienen que estar mas abajo.</summary>
+        public List<string> DependeDe = new List<string>();
+        /// <summary>Por que necesita lo que necesita (se dice al fallar y en el modo guiado).</summary>
+        public string Porque;
     }
 
     /// <summary>El backlog del verbo V3: tarjetas, capacidad y la peticion del cliente.</summary>
@@ -247,6 +288,23 @@ namespace Nexus.Core.Minijuegos
         public string Explicacion;
         /// <summary>Lo que hay que preguntarse para encontrarla, sin decir la respuesta. Lo usa el modo guiado.</summary>
         public string Pista;
+        /// <summary>Lienzo "diagrama": los ids de las cartas que arreglan esta zona (al menos una).</summary>
+        public List<string> Soluciones = new List<string>();
+    }
+
+    /// <summary>Una carta de solucion del lienzo "diagrama": un patron o una practica.</summary>
+    public sealed class CartaDeSolucion
+    {
+        public string Id;
+        public string Nombre;
+        /// <summary>Una linea: para que sirve.</summary>
+        public string Descripcion;
+        /// <summary>La clave del dibujo de la carta (DibujosDeSoluciones).</summary>
+        public string Icono;
+        /// <summary>"patron" | "practica": solo cambia el rotulo de la carta.</summary>
+        public string Tipo;
+        /// <summary>Por que no arregla lo que se le pidio, para el cierre cuando se juega donde no toca.</summary>
+        public string PorQueNo;
     }
 
     public sealed class Senuelo

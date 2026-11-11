@@ -26,6 +26,11 @@ namespace Nexus.Core.Despliegue {
         public Dictionary<string, Dictionary<string, string>> Enchufes = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
         public double SegundosUsados;
         public bool SeAcaboElTiempo;
+        /// <summary>
+        /// Cuantas veces se probo la tuberia y fallo (2026-11-09: no se pasa a los modulos hasta que esta perfecta, asi que
+        /// el error se paga en intentos). Cada uno suma riesgo, con un tope.
+        /// </summary>
+        public int IntentosFallidosDeTuberia;
     }
 
     public static class EstadosDeDespliegue {
@@ -69,6 +74,8 @@ namespace Nexus.Core.Despliegue {
         /// <summary>Lo que noto el cliente, en una frase.</summary>
         public string ParaElCliente;
         public bool SeAcaboElTiempo;
+        /// <summary>Pruebas fallidas de la tuberia (los «tropiezos»): ya sumadas al riesgo.</summary>
+        public int IntentosFallidos;
     }
 
     /// <summary>
@@ -83,6 +90,8 @@ namespace Nexus.Core.Despliegue {
         // Lo que pesa cada cosa. Estan juntos para poder afinarlos jugando.
         public const double RiesgoPorTramoQueFalta = 6, RiesgoPorTrampa = 7, RiesgoPorOrden = 3, RiesgoPorModuloCaido = 5,
                             RiesgoPorTomaTrampa = 4, AlivioPorTodoBien = -8;
+        /// <summary>Cada prueba fallida de la tuberia suma esto al riesgo, hasta TopeDeRiesgoPorIntentos.</summary>
+        public const double RiesgoPorIntentoFallido = 2, TopeDeRiesgoPorIntentos = 10;
 
         /// <summary>Que modulos salen hoy. En el ultimo despliegue, todos los que tengan algo hecho; antes, los que llegan al umbral.</summary>
         public static PlanDeDespliegue Planear(DespliegueDef def, FichaDelProyecto ficha, double avance, double alcance,
@@ -167,6 +176,9 @@ namespace Nexus.Core.Despliegue {
 
             res.Riesgo = faltan * RiesgoPorTramoQueFalta + trampas * RiesgoPorTrampa + desordenados * RiesgoPorOrden +
                          caidos * RiesgoPorModuloCaido + tomasTrampa * RiesgoPorTomaTrampa + (perfecto ? AlivioPorTodoBien : 0);
+            // Los tropiezos de la tuberia: no cambian el «nivel» (eso sale de como quedo), pero cuestan.
+            res.IntentosFallidos = Math.Max(0, r.IntentosFallidosDeTuberia);
+            res.Riesgo += Math.Min(res.IntentosFallidos * RiesgoPorIntentoFallido, TopeDeRiesgoPorIntentos);
             // Sin las etapas que atrapan errores, lo que tenian que atrapar llega al cliente. Y una toma de pruebas en
             // produccion es un error seguro.
             res.Defectos = sinRed + tomasTrampa + (trampas > 0 ? 1 : 0);

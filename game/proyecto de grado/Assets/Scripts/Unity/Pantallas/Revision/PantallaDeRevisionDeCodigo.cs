@@ -315,7 +315,7 @@ namespace Nexus.Unity.Pantallas {
             _grupoCapa.alpha = 0;
             var t = _capa.transform;
             _x.Texto(t, "TU REVISIÓN", EstiloTexto.Leyenda, Tema.cyan, -ancho / 2 + 120, AltoCapa / 2 - 24, 200, 22, TextAlignmentOptions.Left).characterSpacing = 3;
-            var cerrar = Ui.Boton(t, "Cerrar sin decidir (Esc)", Cerrar, VarianteBoton.Fantasma);
+            var cerrar = Ui.Boton(t, "Cerrar sin decidir (Esc)", Cerrar, VarianteBoton.Salida);
             var rc = (RectTransform)cerrar.transform;
             UiKit.Tamano(cerrar).ignoreLayout = true;
             rc.anchorMin = rc.anchorMax = rc.pivot = new Vector2(0.5f, 0.5f);

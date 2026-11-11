@@ -8,7 +8,7 @@
   "enElProyecto": "Es el diagrama de cómo se reparten los turnos de mantenimiento de los ascensores de carga.",
   "presentacion": {
     "titulo": "Práctica: el diagrama de los turnos de mantenimiento",
-    "comoSeJuega": "El diagrama de los turnos de mantenimiento. Encuentra las piezas o flechas con problemas (hay uno) y ponles nombre a la derecha. No todo lo raro está mal: una pieza que hace su trabajo no es un problema.",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 100
@@ -108,7 +108,11 @@
       ],
       "defecto": "dependencia_circular",
       "explicacion": "Turnos pregunta al calendario, el calendario a reservas y reservas vuelve a preguntar a turnos: un círculo. Ninguna de las tres se puede cambiar sin las otras dos.",
-      "pista": "Sigue las flechas desde «Asignación de turnos». ¿Puedes volver a ella sin dar marcha atrás?"
+      "pista": "Sigue las flechas desde «Asignación de turnos». ¿Puedes volver a ella sin dar marcha atrás?",
+      "soluciones": [
+        "romper-ciclo",
+        "observador"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -130,35 +134,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "dependencia_circular",
-        "acoplamiento_indebido",
-        "elemento_sin_especificar"
-      ],
       "contadorRestantes": true
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "dependencia_circular",
-        "acoplamiento_indebido",
-        "elemento_sin_especificar",
-        "requisito_ambiguo"
-      ],
       "contadorRestantes": true
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "requisito_ambiguo"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -205,5 +193,47 @@
   },
   "cierre": {
     "texto": "Un círculo de dependencias se rompe haciendo que una de las piezas pregunte a los datos en lugar de a otra pieza."
-  }
+  },
+  "cartas": [
+    {
+      "id": "cola",
+      "nombre": "Cola de mensajes",
+      "descripcion": "Los mensajes esperan en una cola y se procesan en orden.",
+      "icono": "cola",
+      "tipo": "patron",
+      "porQueNo": "encolar lo mismo que antes no arregla nada."
+    },
+    {
+      "id": "romper-ciclo",
+      "nombre": "Romper el ciclo",
+      "descripcion": "Una de las dos piezas deja de preguntar a la otra y lee el dato de donde se guarda.",
+      "icono": "ciclo",
+      "tipo": "patron",
+      "porQueNo": "aquí no hay ningún círculo de llamadas."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero el problema sigue ahí."
+    },
+    {
+      "id": "observador",
+      "nombre": "Observador: avisar con eventos",
+      "descripcion": "La pieza publica «ha pasado esto» y quien lo necesite se suscribe: nadie espera a nadie.",
+      "icono": "antena",
+      "tipo": "patron",
+      "porQueNo": "avisar con eventos no cambia lo que está mal aquí."
+    },
+    {
+      "id": "reintentos",
+      "nombre": "Reintentar si falla",
+      "descripcion": "Si una llamada falla, repetirla unas cuantas veces.",
+      "icono": "reintento",
+      "tipo": "practica",
+      "porQueNo": "reintentar algo mal diseñado solo repite el fallo."
+    }
+  ]
 }

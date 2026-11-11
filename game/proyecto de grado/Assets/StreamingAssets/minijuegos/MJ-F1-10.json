@@ -5,12 +5,12 @@
   "temaPrincipal": "SSD / SDD",
   "objetivoAprendizaje": "OA-DOC-01",
   "modulo": "turnos",
-  "enElProyecto": "Es el diagrama de «Prioridades y turnos»: quién usa primero el ascensor de carga cuando dos reservas chocan. Lo dibujó Andrés.",
+  "enElProyecto": "Es el diagrama de «Prioridades y turnos»: quién usa primero el ascensor de carga cuando dos reservas chocan. Lo dibujó Óscar.",
   "presentacion": {
-    "titulo": "El diagrama de Andrés",
-    "comoSeJuega": "Andrés dibujó cómo se deciden los turnos del ascensor y te pide una revisión antes de programarlo. Mira cada caja y cada flecha: ¿cada pieza habla con las demás por su sitio? ¿falta algo de lo que pidió Facilities? Si encuentras un problema, pínchalo y di cuál es. Si lo miras todo y no falla nada, pulsa «Está bien: lo apruebo». No todo lo que llega a revisión está mal.",
-    "quienEspera": "Andrés",
-    "textoPresion": "Andrés empieza a programarlo mañana",
+    "titulo": "El diagrama de Óscar",
+    "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
+    "quienEspera": "Óscar",
+    "textoPresion": "Óscar empieza a programarlo mañana",
     "segundosReloj": 120
   },
   "artefacto": {
@@ -134,36 +134,19 @@
   "andamiaje": {
     "3": {
       "resaltarZonasCandidatas": true,
-      "etiquetas": [
-        "requisito_ambiguo",
-        "acoplamiento_indebido",
-        "falla_de_seguridad"
-      ],
       "contadorRestantes": false
     },
     "2": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [
-        "requisito_ambiguo",
-        "acoplamiento_indebido",
-        "falla_de_seguridad",
-        "dependencia_circular"
-      ],
       "contadorRestantes": false
     },
     "1": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
       "contadorRestantes": false
     },
     "0": {
       "resaltarZonasCandidatas": false,
-      "etiquetas": [],
-      "contadorRestantes": false,
-      "etiquetasTrampa": [
-        "dependencia_circular",
-        "elemento_sin_especificar"
-      ]
+      "contadorRestantes": false
     }
   },
   "consecuencias": {
@@ -189,7 +172,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-DOC-01",
-        "razon": "Marcaste una pieza que estaba bien. Andrés va a rehacer algo que ya funcionaba."
+        "razon": "Marcaste una pieza que estaba bien. Óscar va a rehacer algo que ya funcionaba."
       }
     },
     "falsoPositivo": {
@@ -217,7 +200,33 @@
     }
   },
   "cierre": {
-    "texto": "Andrés asiente: «Entonces lo dejo así». Y lo deja así."
+    "texto": "Óscar asiente: «Entonces lo dejo así». Y lo deja así."
   },
-  "sinDefectos": true
+  "sinDefectos": true,
+  "cartas": [
+    {
+      "id": "estrategia",
+      "nombre": "Estrategia: regla intercambiable",
+      "descripcion": "Poder cambiar la forma de decidir sin tocar el resto.",
+      "icono": "bifurcacion",
+      "tipo": "patron",
+      "porQueNo": "deja cambiar la regla, pero nadie ha dicho todavía cuál es."
+    },
+    {
+      "id": "adaptador",
+      "nombre": "Adaptador para lo de fuera",
+      "descripcion": "Una pieza nuestra traduce al sistema externo; él nunca toca nuestras tablas.",
+      "icono": "adaptador",
+      "tipo": "patron",
+      "porQueNo": "aquí no hay un sistema de fuera que traducir."
+    },
+    {
+      "id": "fachada",
+      "nombre": "Fachada: la puerta del módulo",
+      "descripcion": "Los demás piden los datos al módulo por su puerta; nadie entra en sus tablas.",
+      "icono": "puerta",
+      "tipo": "patron",
+      "porQueNo": "nadie se está metiendo en las tripas de otro módulo."
+    }
+  ]
 }

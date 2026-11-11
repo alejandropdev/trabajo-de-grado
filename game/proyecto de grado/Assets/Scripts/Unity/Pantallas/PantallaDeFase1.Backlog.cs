@@ -13,9 +13,8 @@ using A = Nexus.Unity.Pantallas.ActoresDeEscena;
 namespace Nexus.Unity.Pantallas {
     /// <summary>
     /// El product backlog de la Fase 1 en DOS partes (2026-11-08), con el lenguaje de cristal neon de las demas y sin scroll:
-    ///   0 · Lo que pide el cliente   quien lo va a usar (caras; al pasar el raton, lo que necesita), una animacion generica
-    ///                                de tres escenas (historias · el orden · lo que nadie pidio) y las cifras del paso.
-    ///                                Las escenas NO enseñan las historias reales: eso es lo que se decide en la parte 2.
+    ///   0 · Lo que pide el cliente   quien lo va a usar (caras; al pasar el raton, lo que necesita) y las cifras del paso.
+    ///                                (La animacion generica de tres escenas y los globos de la guia se quitaron el 2026-11-11.)
     ///   1 · Arma tu backlog          las candidatas por parte del sistema (fichas compactas) y, a la derecha, tu backlog
     ///                                numerado, con el anillo «N de M». Se arrastra o se pulsa.
     /// Si el proyecto ya estaba en marcha («heredado»), hay una sola parte: las partes del sistema con su avance.
@@ -70,7 +69,7 @@ namespace Nexus.Unity.Pantallas {
 
             // ---- quien lo va a usar: caras y, al pasar el raton, lo que necesita
             var usan = Ui.Columna(cuerpo, "Usuarios", Tema.Espacio(2), 0, TextAnchor.UpperLeft);
-            UiKit.Tamano(usan, ancho: Tema.Px(260), flexAlto: 1);
+            UiKit.Tamano(usan, flexAncho: 1, flexAlto: 1);
             PiezasDeProyecto.Cristal(Ui, usan, NexusTheme.Alfa(Tema.warning, 0.5f));
             usan.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(12, 12, 12, 12);
             usan.gameObject.AddComponent<ListaDeElementos>();
@@ -92,12 +91,6 @@ namespace Nexus.Unity.Pantallas {
                 r.Entra = () => Tooltip().Mostrar(persona.Nombre, "Necesita: " + persona.QueNecesita, Tema.warning);
                 r.Sale = () => Tooltip().Ocultar();
             }
-
-            // ---- la escena: historias · el orden · lo que nadie pidio (genericas: no destapan las reales)
-            var escena = Ui.Nodo(cuerpo, "Escena del backlog");
-            UiKit.Tamano(escena, flexAncho: 1, flexAlto: 1);
-            var animacion = EscenaDeMetodologia.Crear(Ui, escena, EscenasDelBacklog.Fases(), "El backlog en escenas");
-            UiKit.Rellenar((RectTransform)animacion.transform);
 
             // ---- las cifras del paso
             var datos = Ui.Fila(hoja.Raiz, "Datos", Tema.Espacio(3), 0, TextAnchor.MiddleCenter);

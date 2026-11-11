@@ -34,7 +34,11 @@ namespace Nexus.Unity.Pantallas {
             Ui.Texto(titulos, "NEXUS PROTOCOL", EstiloTexto.Hero);   // el logotipo: una sola vez por pantalla
             Ui.Texto(titulos, "Hola, " + App.PerfilActivo.nombreEstudiante, EstiloTexto.Titulo);
             // Lo que no es jugar (opciones, diario, guia, borrar) espera en un solo menu: la pantalla es para elegir partida.
-            PantallaDeMenu.Boton(App, cabecera, "Más ▾", "Más", OpcionesDeLaCabecera, VarianteBoton.Secundario);
+            // Es una red de nodos (como la pausa): un nodo por cosa, unido al nucleo «Más».
+            Ui.Boton(cabecera, "Más", () => App.Router.Apilar<PantallaDeRedDeMenu>(m => {
+                m.Titulo = "Más";
+                m.Opciones = OpcionesDeLaCabecera();
+            }), VarianteBoton.Secundario);
 
             var cuerpo = Ui.Fila(marco, "Cuerpo", Tema.margen, alineacion: TextAnchor.UpperLeft);
             UiKit.Tamano(cuerpo, flexAncho: 1, flexAlto: 1);

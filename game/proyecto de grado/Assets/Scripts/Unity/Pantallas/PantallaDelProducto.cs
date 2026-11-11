@@ -31,8 +31,8 @@ namespace Nexus.Unity.Pantallas {
         private bool _acabaDePulsar;
 
         public static void Abrir(AppRoot app) {
-            if (app.Sesion == null || app.Sesion.Perfil.Proyecto == null) return;
-            app.Router.Apilar<PantallaDelProducto>();
+            // «El producto» tiene desde 2026-11-11 su propia pantalla, con el lenguaje de los indicadores (ProductoVivo).
+            ProductoVivo.Abrir(app);
         }
 
         /// <summary>

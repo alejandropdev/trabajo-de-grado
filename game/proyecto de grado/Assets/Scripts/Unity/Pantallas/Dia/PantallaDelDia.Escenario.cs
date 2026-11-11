@@ -263,7 +263,7 @@ namespace Nexus.Unity.Pantallas {
 
             var cabecera = Ui.Fila(_bandeja, "Cabecera", Tema.Espacio(2));
             UiKit.Tamano(Ui.Texto(cabecera, "TU BUZÓN", EstiloTexto.Leyenda, Tema.cyan), flexAncho: 1);
-            Ui.Boton(cabecera, "Cerrar", AlternarBandeja, VarianteBoton.Fantasma);
+            Ui.Boton(cabecera, "Cerrar (Esc)", AlternarBandeja, VarianteBoton.Salida);
             RectTransform contenido;
             var scroll = Ui.Desplazable(_bandeja, out contenido);
             UiKit.Tamano(scroll, flexAncho: 1, flexAlto: 1);

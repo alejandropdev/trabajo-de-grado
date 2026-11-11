@@ -18,7 +18,10 @@ namespace Nexus.Tests {
         }
 
         [TestCase("PantallaDetectar")]
+        [TestCase("PantallaCorregirDiagrama")]
         [TestCase("PantallaOrdenar")]
+        [TestCase("PantallaEdificio")]
+        [TestCase("PantallaPuente")]
         [TestCase("PantallaRepartir")]
         public void En_los_minijuegos_no_suena_nada_ni_con_apremio(string pantalla) {
             var m = MezclaDeMusica.Para(pantalla, apremio: true);

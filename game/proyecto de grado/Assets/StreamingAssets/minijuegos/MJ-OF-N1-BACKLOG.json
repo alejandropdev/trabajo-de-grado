@@ -1,78 +1,124 @@
 {
   "id": "MJ-OF-N1-BACKLOG",
   "verbo": "V3_ORDENAR",
-  "lienzo": "backlog",
+  "lienzo": "puente",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
   "modulo": "reservas",
   "enElProyecto": "Es el backlog del módulo de reservas de los ascensores de carga.",
   "presentacion": {
     "titulo": "Práctica: el backlog de las reservas",
-    "comoSeJuega": "Ordena el backlog del sprint: arrastra las tarjetas, lo más valioso arriba. Entra lo que cabe sobre la línea (la capacidad). Algunas dependen de otras. Después, Facilities te pedirá algo más: tu respuesta mueve el tablero.",
+    "comoSeJuega": "Cada pilar es un módulo y cada bloque, una historia. Ordénalas de abajo arriba: abajo, lo que no necesita nada; arriba, lo que necesita lo de debajo. Pulsa «Verificar»: la luz sube por cada pilar y se detiene en lo que falla. Cada pilar tiene dos vidas.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 120
   },
-  "ordenar": {
-    "capacidad": 12,
-    "umbralDeValor": 0.8,
-    "peticion": "Facilities pregunta si pueden tener también las estadísticas de uso de los ascensores esta semana.",
-    "tarjetaPedida": "t5",
-    "tarjetas": [
-      { "id": "t1", "titulo": "Crear una reserva", "valor": 8, "esfuerzo": 3 },
-      { "id": "t2", "titulo": "Cancelar una reserva", "valor": 5, "esfuerzo": 2, "dependeDe": ["t1"] },
-      { "id": "t3", "titulo": "Detectar choques de horario", "valor": 7, "esfuerzo": 3, "dependeDe": ["t1"] },
-      { "id": "t4", "titulo": "Bloquear el ascensor a su hora", "valor": 6, "esfuerzo": 4, "dependeDe": ["t1"] },
-      { "id": "t5", "titulo": "Estadísticas de uso", "valor": 2, "esfuerzo": 3, "dependeDe": ["t4"] },
-      { "id": "t6", "titulo": "Recordatorio por correo", "valor": 2, "esfuerzo": 2, "dependeDe": ["t1"] }
-    ],
-    "respuestas": {
-      "obedecer": {
-        "texto": "Dices que sí a las estadísticas.",
-        "replica": "¡Bien! Pónmelas arriba, que el lunes tengo comité.",
-        "efectoEnBacklog": "forzar-arriba",
-        "consecuencia": {
-          "efectosInmediatos": { "Cansancio": 4 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "incorrecta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Aceptar lo que no cabe lo paga el equipo: las estadísticas subieron sin el bloqueo del ascensor que necesitan."
+  "puente": {
+    "vidas": 2,
+    "pilares": [
+      {
+        "id": "reservas",
+        "nombre": "Reservas de ascensores",
+        "historias": [
+          {
+            "id": "res-a1",
+            "titulo": "Calendario de ascensores"
+          },
+          {
+            "id": "res-a2",
+            "titulo": "Reservar un ascensor",
+            "dependeDe": [
+              "res-a1"
+            ],
+            "porque": "No se reserva lo que no está en el calendario."
+          },
+          {
+            "id": "res-a3",
+            "titulo": "Bloquear a su hora",
+            "dependeDe": [
+              "res-a2"
+            ],
+            "porque": "Bloquear necesita una reserva con hora."
+          },
+          {
+            "id": "res-a4",
+            "titulo": "Avisar por correo",
+            "dependeDe": [
+              "res-a2"
+            ],
+            "porque": "El aviso confirma una reserva ya hecha."
           }
-        }
+        ]
       },
-      "rechazar": {
-        "texto": "Dices que no, sin explicar.",
-        "replica": "Vaya. Entonces iré al comité sin nada que enseñar.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": { "SatisfaccionCliente": -3 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "aceptable",
-            "oa": "OA-SCRUM-01",
-            "razon": "Proteges al equipo, pero el cliente no puede elegir."
+      {
+        "id": "lectura",
+        "nombre": "Lectura de matrículas",
+        "historias": [
+          {
+            "id": "lec-a1",
+            "titulo": "Cámara de la garita"
+          },
+          {
+            "id": "lec-a2",
+            "titulo": "Leer la matrícula",
+            "dependeDe": [
+              "lec-a1"
+            ],
+            "porque": "Sin imagen no hay nada que leer."
+          },
+          {
+            "id": "lec-a3",
+            "titulo": "Corregir lecturas dudosas",
+            "dependeDe": [
+              "lec-a2"
+            ],
+            "porque": "Solo se corrige lo que ya se leyó."
+          },
+          {
+            "id": "lec-a4",
+            "titulo": "Guardar la foto",
+            "dependeDe": [
+              "lec-a1"
+            ],
+            "porque": "La foto sale de la misma cámara."
           }
-        }
+        ]
       },
-      "negociar": {
-        "texto": "Explicas qué cabe y le pides que elija qué sale.",
-        "replica": "Entendido: sin el bloqueo del ascensor las estadísticas no sirven. Las dejamos para el próximo sprint.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": { "SatisfaccionCliente": 2 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "correcta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Negociar es enseñar el coste y dejar elegir. Facilities entendió la dependencia y movió la petición al siguiente sprint."
+      {
+        "id": "acceso",
+        "nombre": "Control de acceso",
+        "historias": [
+          {
+            "id": "acc-a1",
+            "titulo": "Lista de autorizados"
+          },
+          {
+            "id": "acc-a2",
+            "titulo": "Comparar con la matrícula",
+            "dependeDe": [
+              "acc-a1"
+            ],
+            "porque": "Se compara contra la lista: tiene que existir."
+          },
+          {
+            "id": "acc-a3",
+            "titulo": "Abrir la barrera",
+            "dependeDe": [
+              "acc-a2"
+            ],
+            "porque": "Se abre solo si la comparación dijo que sí."
+          },
+          {
+            "id": "acc-a4",
+            "titulo": "Registrar entrada y salida",
+            "dependeDe": [
+              "acc-a3"
+            ],
+            "porque": "Se registra el paso que de verdad ocurrió."
           }
-        }
+        ]
       }
-    }
+    ]
   },
   "consecuencias": {
     "todos": {
@@ -82,7 +128,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-SCRUM-01",
-        "razon": "Lo que más valía entró, en un orden que se puede construir."
+        "razon": "Cada historia quedó después de lo que necesita y no hubo tropiezos: así se construye de abajo arriba sin quedarse bloqueado."
       }
     },
     "parcial": {
@@ -92,7 +138,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-SCRUM-01",
-        "razon": "Quedó fuera valor que cabía, o la respuesta al cliente lo desordenó."
+        "razon": "El puente se completó, pero con errores o a medias: algo se puso antes de lo que necesitaba. Antes de colocar una historia, pregúntate de qué depende."
       }
     },
     "falsoPositivo": {
@@ -102,7 +148,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "Algo quedó antes de lo que necesita: el equipo se bloquearía a mitad de sprint."
+        "razon": "Un pilar se quedó sin vidas: se puso una historia antes de lo que necesita, dos veces. Un equipo que empieza por ahí se bloquea a mitad de sprint."
       }
     },
     "omitido": {
@@ -112,11 +158,11 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "No se ordenó nada."
+        "razon": "No se terminó ningún pilar a tiempo. Sin un orden que respete las dependencias, el equipo empieza por lo que llegó primero."
       }
     }
   },
   "cierre": {
-    "texto": "Lo que quedó debajo de la línea espera al siguiente sprint."
+    "texto": "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse: lo que otras historias necesitan va primero."
   }
 }

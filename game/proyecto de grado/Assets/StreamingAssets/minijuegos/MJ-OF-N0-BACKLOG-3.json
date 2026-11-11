@@ -1,117 +1,125 @@
 {
   "id": "MJ-OF-N0-BACKLOG-3",
   "verbo": "V3_ORDENAR",
-  "lienzo": "backlog",
+  "lienzo": "puente",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
   "modulo": "aviso",
   "enElProyecto": "Es el backlog del aviso: lo necesario para que el anfitrión sepa que su visita ha llegado.",
   "presentacion": {
     "titulo": "Práctica: ¿qué hacemos primero en el aviso al anfitrión?",
-    "comoSeJuega": "Ordena el backlog: arrastra las tarjetas (o usa ▲▼), lo más valioso arriba. Solo entra lo que cabe sobre la línea, que es el tiempo que hay. Algunas tarjetas necesitan otra antes. Al final, contesta a Marisol y mira qué cambia en el tablero. Es práctica: si no te sale, puedes intentarlo otra vez.",
+    "comoSeJuega": "Cada pilar es un módulo y cada bloque, una historia. Ordénalas de abajo arriba: abajo, lo que no necesita nada; arriba, lo que necesita lo de debajo. Pulsa «Verificar»: la luz sube por cada pilar y se detiene en lo que falla. Cada pilar tiene dos vidas.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 120
   },
-  "ordenar": {
-    "capacidad": 7,
-    "umbralDeValor": 0.75,
-    "peticion": "Marisol pregunta si el aviso puede tener un sonido personalizado para cada anfitrión.",
-    "tarjetaPedida": "t4",
-    "tarjetas": [
+  "puente": {
+    "vidas": 2,
+    "pilares": [
       {
-        "id": "t1",
-        "titulo": "Elegir a quién se avisa",
-        "valor": 6,
-        "esfuerzo": 2
-      },
-      {
-        "id": "t2",
-        "titulo": "Aviso por correo",
-        "valor": 5,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t1"
+        "id": "aviso",
+        "nombre": "Aviso al anfitrión",
+        "historias": [
+          {
+            "id": "avi-b1",
+            "titulo": "Datos del anfitrión"
+          },
+          {
+            "id": "avi-b2",
+            "titulo": "Plantilla del mensaje",
+            "dependeDe": [
+              "avi-b1"
+            ],
+            "porque": "La plantilla usa el nombre y el correo del anfitrión."
+          },
+          {
+            "id": "avi-b3",
+            "titulo": "Avisar al anfitrión",
+            "dependeDe": [
+              "avi-b2"
+            ],
+            "porque": "Se avisa con el mensaje ya armado."
+          },
+          {
+            "id": "avi-b4",
+            "titulo": "Confirmar que lo leyó",
+            "dependeDe": [
+              "avi-b3"
+            ],
+            "porque": "No se puede confirmar lo que todavía no se mandó."
+          }
         ]
       },
       {
-        "id": "t3",
-        "titulo": "Reintentar si no contesta",
-        "valor": 3,
-        "esfuerzo": 2,
-        "dependeDe": [
-          "t2"
+        "id": "recepcion",
+        "nombre": "Pantalla de recepción",
+        "historias": [
+          {
+            "id": "rec-b1",
+            "titulo": "Pantalla de inicio"
+          },
+          {
+            "id": "rec-b2",
+            "titulo": "Teclado en pantalla",
+            "dependeDe": [
+              "rec-b1"
+            ],
+            "porque": "El teclado vive dentro de la pantalla de inicio."
+          },
+          {
+            "id": "rec-b3",
+            "titulo": "Leer el carné con la cámara",
+            "dependeDe": [
+              "rec-b1"
+            ],
+            "porque": "La cámara también se enciende desde la pantalla de inicio."
+          },
+          {
+            "id": "rec-b4",
+            "titulo": "Confirmar los datos",
+            "dependeDe": [
+              "rec-b2",
+              "rec-b3"
+            ],
+            "porque": "Para confirmar hay que tener lo escrito y lo leído."
+          }
         ]
       },
       {
-        "id": "t4",
-        "titulo": "Sonido personalizado del aviso",
-        "valor": 1,
-        "esfuerzo": 2
-      },
-      {
-        "id": "t5",
-        "titulo": "Aviso por SMS",
-        "valor": 3,
-        "esfuerzo": 3,
-        "dependeDe": [
-          "t1"
+        "id": "registro",
+        "nombre": "Registro de visitas",
+        "historias": [
+          {
+            "id": "reg-a1",
+            "titulo": "Formulario de visita"
+          },
+          {
+            "id": "reg-a2",
+            "titulo": "Guardar las visitas",
+            "dependeDe": [
+              "reg-a1"
+            ],
+            "porque": "No se puede guardar una visita sin el formulario que la recoge."
+          },
+          {
+            "id": "reg-a3",
+            "titulo": "Marcar la salida",
+            "dependeDe": [
+              "reg-a2"
+            ],
+            "porque": "Solo se marca la salida de una visita que ya está guardada."
+          },
+          {
+            "id": "reg-a4",
+            "titulo": "Exportar a hoja de cálculo",
+            "dependeDe": [
+              "reg-a2"
+            ],
+            "porque": "Exportar es sacar lo que ya está guardado."
+          }
         ]
       }
-    ],
-    "respuestas": {
-      "obedecer": {
-        "texto": "Le dices que sí, que cabe todo.",
-        "replica": "¡Perfecto! Entonces ponlo lo primero, que es lo que más se va a notar.",
-        "efectoEnBacklog": "forzar-arriba",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "Cansancio": 3
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "incorrecta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Decir que cabe lo que no cabe no lo hace caber: «Sonido personalizado del aviso» subió arriba y empujó fuera algo que valía mucho más."
-          }
-        }
-      },
-      "rechazar": {
-        "texto": "Le dices que no, sin más.",
-        "replica": "Bueno… no entiendo bien por qué, pero vale.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "SatisfaccionCliente": -2
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "aceptable",
-            "oa": "OA-SCRUM-01",
-            "razon": "Proteges el tiempo, pero sin explicar por qué. Un «no» sin razones cansa la confianza."
-          }
-        }
-      },
-      "negociar": {
-        "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
-        "replica": "Visto así, mejor dejamos «Sonido personalizado del aviso» para más adelante. Gracias por explicármelo.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": {
-            "SatisfaccionCliente": 2
-          },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "correcta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Enseñar lo que cuesta y dejar elegir es negociar: la decisión de dejarlo fuera la tomó quien lo pedía."
-          }
-        }
-      }
-    }
+    ]
   },
   "consecuencias": {
     "todos": {
@@ -121,7 +129,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-SCRUM-01",
-        "razon": "Primero que el aviso llegue: elegir a quién y mandarlo. Los adornos del aviso no valen si el aviso no existe."
+        "razon": "Cada historia quedó después de lo que necesita y no hubo tropiezos: así se construye de abajo arriba sin quedarse bloqueado."
       }
     },
     "parcial": {
@@ -131,7 +139,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-SCRUM-01",
-        "razon": "Entró poco de lo que más valía, o la respuesta al cliente empujó fuera algo importante. Mira el «valor»: lo que más vale va arriba."
+        "razon": "El puente se completó, pero con errores o a medias: algo se puso antes de lo que necesitaba. Antes de colocar una historia, pregúntate de qué depende."
       }
     },
     "falsoPositivo": {
@@ -141,7 +149,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir. Primero los cimientos, luego lo de encima."
+        "razon": "Un pilar se quedó sin vidas: se puso una historia antes de lo que necesita, dos veces. Un equipo que empieza por ahí se bloquea a mitad de sprint."
       }
     },
     "omitido": {
@@ -151,11 +159,11 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "No se ordenó nada."
+        "razon": "No se terminó ningún pilar a tiempo. Sin un orden que respete las dependencias, el equipo empieza por lo que llegó primero."
       }
     }
   },
   "cierre": {
-    "texto": "Una función a medias no vale nada: primero lo mínimo que funciona de principio a fin."
+    "texto": "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse: lo que otras historias necesitan va primero."
   }
 }

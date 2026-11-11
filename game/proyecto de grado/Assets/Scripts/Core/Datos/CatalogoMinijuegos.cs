@@ -31,7 +31,9 @@ namespace Nexus.Core.Datos
 
             switch (Verbos.Normalizar(def.Verbo))
             {
-                case Verbos.Ordenar: ValidarOrdenar(def, e); break;
+                case Verbos.Ordenar:
+                    if (Nexus.Core.Minijuegos.Puente.PuenteDelBacklog.Aplica(def)) ValidarPuente(def, e); else ValidarOrdenar(def, e);
+                    break;
                 case Verbos.Repartir: ValidarRepartir(def, e); break;
                 default: ValidarDetectar(def, e); break;
             }
@@ -101,6 +103,75 @@ namespace Nexus.Core.Datos
                     e.Add($"El senuelo '{s.Id}' no dice por que no es un defecto.");
                 if (def.Zonas.Any(z => z.Commits.Intersect(s.Commits).Any()))
                     e.Add($"El senuelo '{s.Id}' se solapa con una zona real. Seria injusto.");
+            }
+            if (def.Lienzo == "diagrama") ValidarCartas(def, e);
+        }
+
+        /// <summary>Maximo de cartas en la mano del diagrama: con mas, el abanico no cabe en 1920 de ancho.</summary>
+        public const int MaximoDeCartas = 7;
+
+        /// <summary>
+        /// Lienzo diagrama (2026-11-09): se juega con cartas de solucion unicas. Tiene que poder ganarse sin repetir
+        /// carta, y tiene que haber algo que descartar (una carta que no arregla nada).
+        /// </summary>
+        private static void ValidarCartas(MinijuegoDef def, List<string> e)
+        {
+            if (def.Cartas.Count == 0) { e.Add("Un diagrama necesita 'cartas' de solucion: se juega poniendo una en cada punto."); return; }
+            if (def.Cartas.Count > MaximoDeCartas) e.Add($"Hay {def.Cartas.Count} cartas; como mucho {MaximoDeCartas}, o el abanico no cabe.");
+            var ids = new HashSet<string>();
+            foreach (var c in def.Cartas)
+            {
+                if (string.IsNullOrEmpty(c.Id) || !ids.Add(c.Id) || c.Id == Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.EstaBien)
+                    e.Add($"Hay una carta sin id, repetida o con un id reservado ('{c.Id}').");
+                if (string.IsNullOrEmpty(c.Nombre) || string.IsNullOrEmpty(c.Descripcion))
+                    e.Add($"La carta '{c.Id}' necesita nombre y descripcion: es lo unico que el jugador lee de ella.");
+            }
+            foreach (var z in def.Zonas)
+            {
+                if (z.Soluciones.Count == 0) e.Add($"La zona '{z.Id}' no dice que carta la arregla ('soluciones').");
+                foreach (var s in z.Soluciones)
+                    if (!ids.Contains(s)) e.Add($"La zona '{z.Id}' se arregla con la carta '{s}', que no esta en 'cartas'.");
+            }
+            var arreglan = new HashSet<string>(def.Zonas.SelectMany(z => z.Soluciones));
+            if (def.Cartas.All(c => arreglan.Contains(c.Id))) e.Add("Todas las cartas arreglan algo: sin una que descartar, elegir no ensena nada.");
+            var piezas = Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.De(def).Select(p => p.Pieza).ToList();
+            if (piezas.Distinct().Count() != piezas.Count) e.Add("Dos puntos del diagrama caen en la misma pieza: sus marcadores se taparian.");
+            if (Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.SolucionGanadora(def) == null)
+                e.Add("No hay manera de arreglar todas las zonas sin repetir carta: el reto es imposible.");
+        }
+
+        /// <summary>
+        /// V3 · el puente del backlog (lienzo "puente", 2026-11-10). Cada pilar es un modulo con sus historias; las
+        /// dependencias son del mismo pilar, existen y no forman un ciclo; y ordenar tiene que importar de verdad.
+        /// </summary>
+        private static void ValidarPuente(MinijuegoDef def, List<string> e)
+        {
+            var p = def.Puente;
+            if (p == null) { e.Add("Un puente necesita el bloque 'puente'."); return; }
+            if (p.Vidas < 1 || p.Vidas > 3) e.Add("'puente.vidas' tiene que estar entre 1 y 3.");
+            if (p.Pilares.Count < 2 || p.Pilares.Count > 4) e.Add("Un puente lleva de dos a cuatro pilares (modulos).");
+
+            var pilares = new HashSet<string>();
+            var historias = new HashSet<string>();
+            foreach (var pilar in p.Pilares)
+            {
+                if (string.IsNullOrEmpty(pilar.Id) || !pilares.Add(pilar.Id)) e.Add($"Hay un pilar sin id o repetido ('{pilar.Id}').");
+                if (string.IsNullOrEmpty(pilar.Nombre)) e.Add($"El pilar '{pilar.Id}' no tiene nombre.");
+                if (pilar.Historias.Count < 3 || pilar.Historias.Count > 5) e.Add($"El pilar '{pilar.Id}' lleva de tres a cinco historias.");
+                var propios = new HashSet<string>(pilar.Historias.Select(h => h.Id));
+                foreach (var h in pilar.Historias)
+                {
+                    if (string.IsNullOrEmpty(h.Id) || !historias.Add(h.Id)) e.Add($"Hay una historia sin id o repetida en el puente ('{h.Id}').");
+                    if (string.IsNullOrEmpty(h.Titulo)) e.Add($"La historia '{h.Id}' no tiene titulo.");
+                    foreach (var d in h.DependeDe)
+                        if (!propios.Contains(d)) e.Add($"La historia '{h.Id}' depende de '{d}', que no esta en su pilar '{pilar.Id}'.");
+                }
+                if (pilar.Historias.All(h => h.DependeDe.Count == 0))
+                    e.Add($"Ninguna historia del pilar '{pilar.Id}' depende de otra: ordenarlo no ensena nada.");
+                if (!pilar.Historias.Any(h => h.DependeDe.Any(d => pilar.Historias.Any(x => x.Id == d && x.DependeDe.Count > 0))))
+                    e.Add($"El pilar '{pilar.Id}' necesita al menos una cadena de tres historias (A, B que necesita A, C que necesita B).");
+                if (Nexus.Core.Minijuegos.Puente.PuenteEvaluador.HayCiclo(pilar))
+                    e.Add($"Las dependencias del pilar '{pilar.Id}' forman un ciclo: no existe ningun orden valido.");
             }
         }
 

@@ -44,12 +44,9 @@ namespace Nexus.Unity.Pantallas {
             app.Router.Apilar<PantallaDeFicha>(p => { p.Titulo = titulo; p.Pintar = pintar; });
         }
 
+        /// <summary>El ticket del cliente, con el aspecto de las pantallas de indicadores (ver TicketDelCliente).</summary>
         public static void Ticket(AppRoot app, LevelProfile perfil) {
-            Abrir(app, "El ticket original", h => {
-                h.Nota("Así llegó el encargo, con las palabras del cliente.");
-                PantallaDeGlosario.Palabras(app, h.Raiz, "Si alguna palabra no te suena:", "ticket", "cliente", "requisito");
-                if (perfil.Briefing != null) foreach (var linea in perfil.Briefing) h.Parrafo(linea);
-            });
+            TicketDelCliente.Abrir(app, perfil);
         }
 
         public static void Vocabulario(AppRoot app, FichaDelProyecto ficha) {
@@ -73,11 +70,7 @@ namespace Nexus.Unity.Pantallas {
 
         /// <summary>El encargo y lo averiguado en el recorrido, para releerlos antes de elegir la arquitectura.</summary>
         public static void Encargo(AppRoot app, LevelProfile perfil, IEnumerable<string> pistas) {
-            Abrir(app, "El encargo, otra vez", h => {
-                if (perfil.Briefing != null) foreach (var linea in perfil.Briefing) h.Parrafo("· " + linea);
-                if (pistas == null) return;
-                foreach (var p in pistas) h.Parrafo("· " + p, app.Ui.Tema.cyan);
-            });
+            TicketDelCliente.Abrir(app, perfil, pistas ?? new string[0], "El encargo, otra vez");
         }
     }
 }

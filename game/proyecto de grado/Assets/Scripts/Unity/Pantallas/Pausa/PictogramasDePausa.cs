@@ -12,7 +12,7 @@ namespace Nexus.Unity.Pantallas {
     /// juego). Se pueden repintar con otro color: el nodo enfocado los pone en cian.
     /// </summary>
     public static class PictogramasDePausa {
-        public enum Tipo { Ayuda, Apuntes, Diario, Opciones, Guardar }
+        public enum Tipo { Ayuda, Apuntes, Diario, Opciones, Guardar, Borrar }
 
         public const float Lado = 64f;
 
@@ -54,6 +54,15 @@ namespace Nexus.Unity.Pantallas {
                     gancho.Add(new Vector2(32, 44));
                     d.Polilinea(gancho, c, g);
                     d.Circulo(32, 55, 3.5f, c, 2, c);
+                    break;
+
+                case Tipo.Borrar:   // una papelera: tapa, asa, cubo y tres rayas
+                    d.Linea(12, 18, 52, 18, c, g);
+                    d.Rect(26, 8, 12, 10, c, f, null, false, 2);
+                    d.Rect(18, 22, 28, 34, c, g, null, false, 3);
+                    d.Linea(26, 30, 26, 48, c, f);
+                    d.Linea(32, 30, 32, 48, c, f);
+                    d.Linea(38, 30, 38, 48, c, f);
                     break;
 
                 case Tipo.Apuntes:   // una hoja con la esquina doblada y renglones

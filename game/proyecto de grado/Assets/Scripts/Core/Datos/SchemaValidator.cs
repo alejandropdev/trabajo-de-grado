@@ -299,6 +299,13 @@ namespace Nexus.Core.Datos {
                     var toma = d.Toma(c.Toma);
                     if (toma == null) e.Add($"{donde}: el cable '{c.Id}' de '{kv.Key}' va a la toma '{c.Toma}', que no existe.");
                     else if (toma.Trampa) e.Add($"{donde}: la toma correcta del cable '{c.Id}' de '{kv.Key}' es una trampa.");
+                    // El señuelo de los cuartos a oscuras: una toma que existe, distinta de la correcta.
+                    if (!string.IsNullOrEmpty(c.Alternativa)) {
+                        if (c.Alternativa == c.Toma) e.Add($"{donde}: la alternativa del cable '{c.Id}' de '{kv.Key}' es la misma toma correcta.");
+                        else if (c.Alternativa.StartsWith(Nexus.Core.Despliegue.CableDef.PrefijoDeModulo, StringComparison.Ordinal))
+                            e.Add($"{donde}: la alternativa del cable '{c.Id}' de '{kv.Key}' no puede ser un modulo.");
+                        else if (d.Toma(c.Alternativa) == null) e.Add($"{donde}: la alternativa '{c.Alternativa}' del cable '{c.Id}' de '{kv.Key}' no existe.");
+                    }
                 }
             }
         }

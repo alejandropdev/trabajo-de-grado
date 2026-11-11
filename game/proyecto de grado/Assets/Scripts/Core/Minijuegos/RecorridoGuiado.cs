@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nexus.Core.Minijuegos.Corregir;
 using Nexus.Core.Minijuegos.Detectar;
 using Nexus.Core.Minijuegos.Ordenar;
+using Nexus.Core.Minijuegos.Puente;
 using Nexus.Core.Minijuegos.Repartir;
 
 namespace Nexus.Core.Minijuegos {
@@ -23,7 +25,11 @@ namespace Nexus.Core.Minijuegos {
         /// <summary>Repartir: dejar el deposito 'Objetivo' con 'Valor' horas.</summary>
         Asignar,
         /// <summary>Pulsar «Entregar».</summary>
-        Entregar
+        Entregar,
+        /// <summary>Diagrama con cartas: pinchar el punto 'Objetivo' (id del punto).</summary>
+        ElegirPunto,
+        /// <summary>Diagrama con cartas: jugar la carta 'Objetivo' en el punto elegido («esta_bien» = Está bien así).</summary>
+        JugarCarta
     }
 
     public sealed class PasoGuiado {
@@ -51,9 +57,9 @@ namespace Nexus.Core.Minijuegos {
             if (def == null) throw new ArgumentNullException(nameof(def));
             List<PasoGuiado> pasos;
             switch (Verbos.Normalizar(def.Verbo)) {
-                case Verbos.Ordenar: pasos = Ordenar(def); break;
+                case Verbos.Ordenar: pasos = PuenteDelBacklog.Aplica(def) ? Puente(def) : Ordenar(def); break;
                 case Verbos.Repartir: pasos = Repartir(def); break;
-                default: pasos = Detectar(def); break;
+                default: pasos = PuntosDelDiagrama.Aplica(def) ? Corregir(def) : Detectar(def); break;
             }
             // Lo primero: en que parte del proyecto estamos. Sin eso, las piezas son nombres sueltos.
             if (!string.IsNullOrEmpty(def.EnElProyecto))
@@ -139,6 +145,53 @@ namespace Nexus.Core.Minijuegos {
             return pasos;
         }
 
+        // ==================================================================== V1 · el diagrama con cartas
+
+        private static List<PasoGuiado> Corregir(MinijuegoDef def) {
+            var pasos = new List<PasoGuiado> {
+                new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Antes de jugar ninguna carta: qué se busca aquí.",
+                    Porque = "Cada punto marcado del diagrama es una sospecha: unas son problemas de verdad y otras parecen raras y están bien. " +
+                             "Te preguntas tres cosas: ¿hace TODO lo que pide el encargo? ¿cada pieza habla con otra solo por su puerta? " +
+                             "¿alguna decide algo sin que nadie haya dicho cómo? Cada carta solo se puede usar una vez.",
+                    EsLeccion = true
+                }
+            };
+            var ganadora = PuntosDelDiagrama.SolucionGanadora(def) ?? new Dictionary<string, string>();
+            foreach (var p in PuntosDelDiagrama.De(def)) {
+                var pieza = Nombre(def, p.Pieza);
+                pasos.Add(new PasoGuiado {
+                    Accion = AccionGuiada.ElegirPunto, Objetivo = p.Id,
+                    Texto = $"Pincha el punto #{p.Numero}, sobre {pieza}.",
+                    Porque = p.EsReal ? (p.Zona.Pista ?? "Fíjate en esta pieza y compárala con lo que pide el encargo: algo no cuadra.")
+                                      : "Mírala bien antes de cambiar nada: que parezca rara no quiere decir que esté mal.",
+                    EsLeccion = p.EsReal && !string.IsNullOrEmpty(p.Zona.Pista)
+                });
+                string carta;
+                ganadora.TryGetValue(p.Id, out carta);
+                if (p.EsReal) {
+                    var c = PuntosDelDiagrama.Carta(def, carta);
+                    pasos.Add(new PasoGuiado {
+                        Accion = AccionGuiada.JugarCarta, Objetivo = carta,
+                        Texto = $"Juega la carta «{PuntosDelDiagrama.NombreDeCarta(def, carta)}».",
+                        Porque = (c != null && !string.IsNullOrEmpty(c.Descripcion) ? c.Descripcion + " " : "") + p.Zona.Explicacion,
+                        EsLeccion = true
+                    });
+                } else {
+                    pasos.Add(new PasoGuiado {
+                        Accion = AccionGuiada.JugarCarta, Objetivo = PuntosDelDiagrama.EstaBien,
+                        Texto = "Juega «Está bien así»: aquí no se cambia nada.",
+                        Porque = p.Senuelo.RazonNoEsDefecto + " Cambiar lo que funciona también cuenta en contra.", EsLeccion = true
+                    });
+                }
+            }
+            pasos.Add(new PasoGuiado {
+                Accion = AccionGuiada.Entregar, Texto = "Cada punto tiene su carta. Pulsa «Verificar».",
+                Porque = "Revisar bien es arreglar lo que falla sin tocar lo que funciona."
+            });
+            return pasos;
+        }
+
         private static string Nombre(MinijuegoDef def, string pieza) {
             var e = def.Artefacto.Elementos.FirstOrDefault(x => x.Id == pieza);
             if (e != null) return "«" + e.Texto + "»";
@@ -147,6 +200,52 @@ namespace Nexus.Core.Minijuegos {
             var k = def.Artefacto.Commits.FirstOrDefault(x => x.Id == pieza);
             if (k != null) return "el commit " + k.Id + " («" + k.Mensaje + "»)";
             return "«" + pieza + "»";
+        }
+
+        // ==================================================================== V3 · el puente del backlog
+
+        private static List<PasoGuiado> Puente(MinijuegoDef def) {
+            var cfg = def.Puente;
+            var pasos = new List<PasoGuiado> {
+                new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Antes de mover nada: cómo se construye un pilar.",
+                    Porque = "Un pilar se levanta de abajo arriba: lo que no necesita nada va ABAJO, y cada historia necesita que lo que le hace " +
+                             "falta ya esté más abajo. Si una está antes de lo que necesita, al verificar se pone roja y ese pilar pierde una vida; " +
+                             "con dos errores en el mismo pilar, el puente se cae.",
+                    EsLeccion = true
+                },
+                new PasoGuiado {
+                    Accion = AccionGuiada.Leer, Texto = "Así se mueve una historia.",
+                    Porque = "Arrastra el bloque dentro de su pilar, o pulsa uno y súbelo o bájalo con ▲ y ▼. Cada pilar empieza desordenado " +
+                             "a propósito: ordenarlo es el reto."
+                }
+            };
+            foreach (var pilar in cfg.Pilares) {
+                var porId = pilar.Historias.ToDictionary(h => h.Id);
+                var solucion = PuenteEvaluador.Solucion(pilar);
+                for (var i = 0; i < solucion.Count; i++) {
+                    var h = porId[solucion[i]];
+                    string porque;
+                    if (!string.IsNullOrEmpty(h.Porque)) porque = h.Porque;
+                    else if (h.DependeDe.Count > 0)
+                        porque = "Necesita " + string.Join(" y ", h.DependeDe.Select(d => "«" + porId[d].Titulo + "»")) + ", que ya está más abajo.";
+                    else porque = "No necesita ninguna otra historia: puede ir en la base.";
+                    pasos.Add(new PasoGuiado {
+                        Accion = AccionGuiada.Mover, Objetivo = h.Id, Valor = i,
+                        Texto = "En «" + pilar.Nombre + "», pon «" + h.Titulo + "» en el puesto " + (i + 1) + " (contando desde abajo).",
+                        Porque = porque, EsLeccion = i == 0
+                    });
+                }
+            }
+            pasos.Add(new PasoGuiado {
+                Accion = AccionGuiada.Listo, Texto = "Los pilares están listos. Pulsa «Verificar el puente».",
+                Porque = "Verificar ilumina cada pilar de abajo arriba. Lo que está bien se queda en verde; si algo falla, se pone rojo y cuesta una vida."
+            });
+            pasos.Add(new PasoGuiado {
+                Accion = AccionGuiada.Entregar, Texto = "El puente está completo: se entrega solo.",
+                Porque = "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse."
+            });
+            return pasos;
         }
 
         // ==================================================================== V3 · ordenar
@@ -274,6 +373,14 @@ namespace Nexus.Core.Minijuegos {
         public static ResultadoMinijuego Aplicar(MinijuegoDef def, IList<PasoGuiado> pasos) {
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar: {
+                    if (PuenteDelBacklog.Aplica(def)) {
+                        var puente = new EstadoDelPuente(def.Puente);
+                        foreach (var p in pasos) {
+                            if (p.Accion == AccionGuiada.Mover) puente.Mover(puente.PilarDe(p.Objetivo), p.Objetivo, p.Valor);
+                            if (p.Accion == AccionGuiada.Listo) puente.Verificar();
+                        }
+                        return PuenteEvaluador.Evaluar(def, puente);
+                    }
                     // Desde el tablero barajado, que es como lo encuentra el jugador (tambien en el modo guiado).
                     var orden = OrdenarEvaluador.OrdenInicial(def.Ordenar, 0);
                     string respuesta = null;
@@ -292,6 +399,16 @@ namespace Nexus.Core.Minijuegos {
                     return RepartirEvaluador.Evaluar(def, horas);
                 }
                 default: {
+                    if (PuntosDelDiagrama.Aplica(def)) {
+                        var tablero = new CorregirState(def.Cartas.Select(c => c.Id));
+                        var segundo = 0;
+                        foreach (var p in pasos) {
+                            if (p.Accion == AccionGuiada.ElegirPunto) tablero.PuntoElegido = p.Objetivo;
+                            string devuelta;
+                            if (p.Accion == AccionGuiada.JugarCarta) tablero.Jugar(p.Objetivo, segundo++, out devuelta);
+                        }
+                        return CorregirEvaluador.Evaluar(def, tablero);
+                    }
                     var estado = new DetectarState(def.Presentacion.SegundosReloj);
                     var t = 0;
                     foreach (var p in pasos) {
