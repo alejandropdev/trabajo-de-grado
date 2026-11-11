@@ -11,14 +11,14 @@ namespace Nexus.Unity.Pantallas {
     ///   · Quien es:     su edificio y las personas, con su nombre.
     ///   · Que le duele: la fila que crece, el reloj y la cara de disgusto.
     ///   · Como trabaja: el papel que pasa de mano en mano por el mostrador.
-    /// El pie de cada una es UNA frase (la primera de lo que dice la ficha); el resto, en el tooltip de las tarjetas.
+    /// El pie de cada una es la frase de la ficha, entera (la pizarra le da hasta tres lineas).
     /// </summary>
     internal static class EscenasDelCliente {
         public static List<FaseDeEscena> Fases(FichaDelProyecto f) {
             var usuarios = Mathf.Clamp(f.Usuarios.Count, 2, 4);
             return new List<FaseDeEscena> {
                 new FaseDeEscena {
-                    Pestana = "Quién es", Duracion = 5f, Pie = PiezasDeProyecto.PrimeraFrase(f.Cliente.QueHace, 110),
+                    Pestana = "Quién es", Duracion = 5f, Pie = PiezasDeProyecto.PrimeraFrase(f.Cliente.QueHace, 260),
                     Preparar = (p, a) => {
                         p.Edificio(70, 50, 190, 200, Tizador.Cian);
                         for (var i = 0; i < usuarios; i++) p.Figura(340 + i * 64, 175, i == 0 ? Tizador.Mostaza : Tizador.Tiza);
@@ -33,7 +33,7 @@ namespace Nexus.Unity.Pantallas {
                     }
                 },
                 new FaseDeEscena {
-                    Pestana = "Qué le duele", Duracion = 5f, Pie = PiezasDeProyecto.PrimeraFrase(f.Cliente.QueLeDuele, 110),
+                    Pestana = "Qué le duele", Duracion = 5f, Pie = PiezasDeProyecto.PrimeraFrase(f.Cliente.QueLeDuele, 260),
                     Preparar = (p, a) => {
                         p.Caja(40, 120, 110, 80, null, Tizador.Gris);
                         p.Reloj(520, 70);
@@ -55,7 +55,7 @@ namespace Nexus.Unity.Pantallas {
                     }
                 },
                 new FaseDeEscena {
-                    Pestana = "Cómo trabaja", Duracion = 5f, Pie = PiezasDeProyecto.PrimeraFrase(f.Sector.ComoTrabaja, 110),
+                    Pestana = "Cómo trabaja", Duracion = 5f, Pie = PiezasDeProyecto.PrimeraFrase(f.Sector.ComoTrabaja, 260),
                     Preparar = (p, a) => {
                         p.Figura(70, 140, Tizador.Tiza);
                         p.Caja(220, 100, 160, 110, null, Tizador.Cian);
