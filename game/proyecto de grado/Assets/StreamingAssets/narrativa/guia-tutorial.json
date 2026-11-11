@@ -190,26 +190,6 @@
       "mas": "Relee el encargo (tienes el botón arriba): ¿cuántas personas lo van a usar? ¿Hay alguien que sepa de sistemas? ¿Se puede instalar algo? La respuesta está ahí. Cuando elijas una opción, a su derecha salen SUS razones: elige la que de verdad la justifica."
     },
     {
-      "id": "F1-BL-1",
-      "nivel": "nivel-00",
-      "disparador": "fase1.backlog",
-      "orden": 132,
-      "titulo": "El product backlog",
-      "texto": "El backlog es la lista de lo que hay que construir.",
-      "mas": "El product backlog es la lista de todo lo que hay que construir, ordenada por importancia. Este proyecto empieza de cero, así que la lista la armas tú. Cada renglón es una historia: dice quién necesita qué, y para qué. Una historia se escribe así: «Como recepcionista, quiero registrar una visita con tres datos, para que la fila no se alargue». No dice cómo se programa: dice qué necesita alguien.",
-      "resaltar": "fase1.historias"
-    },
-    {
-      "id": "F1-BL-2",
-      "nivel": "nivel-00",
-      "disparador": "fase1.backlog",
-      "orden": 134,
-      "titulo": "No todo debe entrar",
-      "texto": "Descarta lo que nadie pidió y ordena: arriba, lo más valioso.",
-      "resaltar": "fase1.mibacklog",
-      "mas": "Entre las candidatas hay cosas que nadie pidió, una que dice lo mismo que otra y una que es una tarea de programación, no una historia. Mira a la derecha quién necesita qué: lo que no le sirve a ninguno de ellos, sobra. Después ordena: arriba, lo que más le vale al cliente."
-    },
-    {
       "id": "F1-RES-1",
       "nivel": "nivel-00",
       "disparador": "fase1.resumen",
