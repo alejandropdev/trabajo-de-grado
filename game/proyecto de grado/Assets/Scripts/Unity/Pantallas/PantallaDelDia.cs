@@ -738,10 +738,15 @@ namespace Nexus.Unity.Pantallas {
             };
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar:
-                    App.Router.Apilar<PantallaOrdenar>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
+                    // El backlog se juega como un puente de pilares (2026-11-10); la lista plana queda para los retos antiguos.
+                    if (Nexus.Core.Minijuegos.Puente.PuenteDelBacklog.Aplica(def))
+                        App.Router.Apilar<PantallaPuente>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
+                    else
+                        App.Router.Apilar<PantallaOrdenar>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
                 case Verbos.Repartir:
-                    App.Router.Apilar<PantallaRepartir>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
+                    // Las pruebas se estiman como un edificio que defiende al cliente (2026-11-11).
+                    App.Router.Apilar<PantallaEdificio>(p => { p.Def = def; p.Pendiente = pendiente; p.Practica = practica; p.AlTerminar = alTerminar; });
                     break;
                 default:
                     // Los diagramas se juegan con cartas de solucion (2026-11-09); el grafo y la secuencia, marcando.
