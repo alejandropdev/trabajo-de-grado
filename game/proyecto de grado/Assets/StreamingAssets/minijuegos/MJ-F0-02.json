@@ -5,12 +5,12 @@
   "temaPrincipal": "SRS",
   "objetivoAprendizaje": "OA-DOC-01",
   "modulo": "dentro",
-  "enElProyecto": "«Quién sigue dentro», el diagrama de Mateo.",
+  "enElProyecto": "«Quién sigue dentro», el diagrama de Iván.",
   "presentacion": {
-    "titulo": "El diagrama de Mateo",
+    "titulo": "El diagrama de Iván",
     "comoSeJuega": "Juega en cada punto la carta que lo arregla, o «Está bien así».",
-    "quienEspera": "Mateo",
-    "textoPresion": "Mateo empieza a programarlo a las 11:00",
+    "quienEspera": "Iván Cárdenas",
+    "textoPresion": "Iván empieza a programarlo a las 11:00",
     "segundosReloj": 90
   },
   "artefacto": {
@@ -163,7 +163,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-DOC-01",
-        "razon": "Marcaste una pieza que estaba bien. Mateo va a gastar la mañana revisando algo que funcionaba."
+        "razon": "Marcaste una pieza que estaba bien. Iván va a gastar la mañana revisando algo que funcionaba."
       }
     },
     "falsoPositivo": {
@@ -191,7 +191,7 @@
     }
   },
   "cierre": {
-    "texto": "Mateo guarda el diagrama con tu visto bueno y se pone a programar."
+    "texto": "Iván guarda el diagrama con tu visto bueno y se pone a programar."
   },
   "sinDefectos": true,
   "cartas": [

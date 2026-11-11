@@ -37,7 +37,7 @@
         "id": "m01",
         "rama": "main",
         "fecha": "2026-04-17T09:30",
-        "autor": "JM",
+        "autor": "OR",
         "mensaje": "Inicializa servicio de reportes",
         "padres": [],
         "diff": "d_m01"
@@ -46,7 +46,7 @@
         "id": "r01",
         "rama": "feature/reportes",
         "fecha": "2026-04-17T10:01",
-        "autor": "JM",
+        "autor": "OR",
         "mensaje": "Crea modulo de reportes",
         "padres": [
           "m01"
@@ -57,7 +57,7 @@
         "id": "r02",
         "rama": "feature/reportes",
         "fecha": "2026-04-17T11:52",
-        "autor": "AP",
+        "autor": "SL",
         "mensaje": "UI: tabla de reportes",
         "padres": [
           "r01"
@@ -68,7 +68,7 @@
         "id": "r03",
         "rama": "feature/reportes",
         "fecha": "2026-04-17T14:05",
-        "autor": "AP",
+        "autor": "SL",
         "mensaje": "Agrega filtros por rango de fechas",
         "padres": [
           "r02"
@@ -79,7 +79,7 @@
         "id": "r04",
         "rama": "feature/reportes",
         "fecha": "2026-04-17T15:21",
-        "autor": "LC",
+        "autor": "JW",
         "mensaje": "Implementa exportacion CSV",
         "padres": [
           "r03"
@@ -90,7 +90,7 @@
         "id": "r05",
         "rama": "feature/reportes",
         "fecha": "2026-04-17T16:38",
-        "autor": "LC",
+        "autor": "JW",
         "mensaje": "Ajustes de rendimiento",
         "padres": [
           "r04"
@@ -149,7 +149,7 @@
         "id": "s01",
         "rama": "spike/cache",
         "fecha": "2026-04-17T13:10",
-        "autor": "JM",
+        "autor": "OR",
         "mensaje": "Prueba de cache en memoria (spike)",
         "padres": [
           "r01"
@@ -172,7 +172,7 @@
         "id": "m02",
         "rama": "main",
         "fecha": "2026-04-18T09:14",
-        "autor": "JM",
+        "autor": "OR",
         "mensaje": "Agrega reporte de uso",
         "padres": [
           "mrg"
@@ -182,7 +182,7 @@
     ],
     "diffs": {
       "d_r04": {
-        "titulo": "17 ABR 15:21  ·  LC",
+        "titulo": "17 ABR 15:21  ·  JW",
         "lineas": [
           {
             "tipo": "ctx",
@@ -240,7 +240,7 @@
         ]
       },
       "d_m01": {
-        "titulo": "17 ABR 09:30  ·  JM",
+        "titulo": "17 ABR 09:30  ·  OR",
         "lineas": [
           {
             "tipo": "add",
@@ -249,7 +249,7 @@
         ]
       },
       "d_r01": {
-        "titulo": "17 ABR 10:01  ·  JM",
+        "titulo": "17 ABR 10:01  ·  OR",
         "lineas": [
           {
             "tipo": "add",
@@ -266,7 +266,7 @@
         ]
       },
       "d_r02": {
-        "titulo": "17 ABR 11:52  ·  AP",
+        "titulo": "17 ABR 11:52  ·  SL",
         "lineas": [
           {
             "tipo": "add",
@@ -275,7 +275,7 @@
         ]
       },
       "d_r03": {
-        "titulo": "17 ABR 14:05  ·  AP",
+        "titulo": "17 ABR 14:05  ·  SL",
         "lineas": [
           {
             "tipo": "add",
@@ -284,7 +284,7 @@
         ]
       },
       "d_r05": {
-        "titulo": "17 ABR 16:38  ·  LC",
+        "titulo": "17 ABR 16:38  ·  JW",
         "lineas": [
           {
             "tipo": "add",
@@ -320,7 +320,7 @@
         ]
       },
       "d_s01": {
-        "titulo": "17 ABR 13:10  ·  JM",
+        "titulo": "17 ABR 13:10  ·  OR",
         "lineas": [
           {
             "tipo": "add",
@@ -338,7 +338,7 @@
         ]
       },
       "d_m02": {
-        "titulo": "18 ABR 09:14  ·  JM",
+        "titulo": "18 ABR 09:14  ·  OR",
         "lineas": [
           {
             "tipo": "add",
@@ -369,7 +369,7 @@
         "x04"
       ],
       "defecto": "autoria_perdida",
-      "explicacion": "El contenido de x04 es idéntico al de r04, firmado por LC. Tras la reescritura, ese trabajo aparece firmado por DH: la autoría se perdió.",
+      "explicacion": "El contenido de x04 es idéntico al de r04, firmado por JW. Tras la reescritura, ese trabajo aparece firmado por DH: la autoría se perdió.",
       "pista": "Mira quién firma este commit y compáralo con el original del que es copia. ¿Es la misma persona?"
     }
   ],

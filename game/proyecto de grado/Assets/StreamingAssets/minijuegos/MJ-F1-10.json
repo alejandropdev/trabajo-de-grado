@@ -5,12 +5,12 @@
   "temaPrincipal": "SSD / SDD",
   "objetivoAprendizaje": "OA-DOC-01",
   "modulo": "turnos",
-  "enElProyecto": "Es el diagrama de «Prioridades y turnos»: quién usa primero el ascensor de carga cuando dos reservas chocan. Lo dibujó Andrés.",
+  "enElProyecto": "Es el diagrama de «Prioridades y turnos»: quién usa primero el ascensor de carga cuando dos reservas chocan. Lo dibujó Óscar.",
   "presentacion": {
-    "titulo": "El diagrama de Andrés",
+    "titulo": "El diagrama de Óscar",
     "comoSeJuega": "Los puntos marcados del diagrama son sospechas: unas son problemas de verdad y otras parecen raras y están bien. Elige un punto y juega la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
-    "quienEspera": "Andrés",
-    "textoPresion": "Andrés empieza a programarlo mañana",
+    "quienEspera": "Óscar",
+    "textoPresion": "Óscar empieza a programarlo mañana",
     "segundosReloj": 120
   },
   "artefacto": {
@@ -172,7 +172,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-DOC-01",
-        "razon": "Marcaste una pieza que estaba bien. Andrés va a rehacer algo que ya funcionaba."
+        "razon": "Marcaste una pieza que estaba bien. Óscar va a rehacer algo que ya funcionaba."
       }
     },
     "falsoPositivo": {
@@ -200,7 +200,7 @@
     }
   },
   "cierre": {
-    "texto": "Andrés asiente: «Entonces lo dejo así». Y lo deja así."
+    "texto": "Óscar asiente: «Entonces lo dejo así». Y lo deja así."
   },
   "sinDefectos": true,
   "cartas": [
