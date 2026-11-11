@@ -1,94 +1,184 @@
 {
   "id": "MJ-F1-08",
   "verbo": "V3_ORDENAR",
-  "lienzo": "backlog",
+  "lienzo": "puente",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
   "modulo": "acceso",
   "enElProyecto": "Es el backlog del primer sprint del sistema de los patios: leer matrículas, abrir la barrera solo a los autorizados y las reservas de los ascensores.",
   "presentacion": {
     "titulo": "El orden del backlog",
-    "comoSeJuega": "El backlog es la lista de trabajo pendiente; ordenarlo es decidir qué se hace en este sprint. Arrastra las tarjetas: arriba lo más valioso. Solo entran las que caben sobre la línea (la capacidad del equipo). Algunas necesitan otra antes, y eso no se ve hasta que chocas con ello. Al final, contesta a Facilities: verás en el tablero qué cambia con tu respuesta.",
+    "comoSeJuega": "Cada pilar es un módulo y cada bloque, una historia. Ordénalas de abajo arriba: abajo, lo que no necesita nada; arriba, lo que necesita lo de debajo. Pulsa «Verificar»: la luz sube por cada pilar y se detiene en lo que falla. Cada pilar tiene dos vidas.",
     "quienEspera": "Facilities",
     "textoPresion": "Facilities espera respuesta antes de la reunión de las 12:00",
     "segundosReloj": 150
   },
-  "ordenar": {
-    "capacidad": 16,
-    "umbralDeValor": 0.8,
-    "peticion": "Facilities quiere todo para el día 10, incluido el informe mensual de uso de los patios.",
-    "tarjetaPedida": "t6",
-    "tarjetas": [
-      { "id": "t1", "titulo": "Leer matrículas en la garita", "valor": 8, "esfuerzo": 5 },
-      { "id": "t2", "titulo": "Abrir la barrera solo a autorizados", "valor": 9, "esfuerzo": 3, "dependeDe": ["t1"] },
-      { "id": "t3", "titulo": "Registrar entradas y salidas", "valor": 6, "esfuerzo": 3, "dependeDe": ["t1"] },
-      { "id": "t4", "titulo": "Reservar ascensores de carga", "valor": 7, "esfuerzo": 5 },
-      { "id": "t5", "titulo": "Prioridades entre reservas", "valor": 4, "esfuerzo": 3, "dependeDe": ["t4"] },
-      { "id": "t6", "titulo": "Informe mensual de uso de los patios", "valor": 3, "esfuerzo": 4, "dependeDe": ["t3"] },
-      { "id": "t7", "titulo": "Avisos de reserva por correo", "valor": 2, "esfuerzo": 2, "dependeDe": ["t4"] },
-      { "id": "t8", "titulo": "Panel de la garita en tiempo real", "valor": 5, "esfuerzo": 4, "dependeDe": ["t3"] }
-    ],
-    "respuestas": {
-      "obedecer": {
-        "texto": "Aceptas el plazo con todo dentro.",
-        "replica": "¡Perfecto! Entonces el informe va primero, que es lo que me pide la gerencia.",
-        "efectoEnBacklog": "forzar-arriba",
-        "consecuencia": {
-          "efectosInmediatos": { "Cansancio": 8, "DeudaTecnica": 6 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": { "veredicto": "incorrecta", "oa": "OA-SCRUM-01", "razon": "Aceptar un alcance que no cabe no lo hace caber: el informe se coló arriba sin lo que necesita y lo paga el equipo, en horas y en atajos." }
-        }
+  "puente": {
+    "vidas": 2,
+    "pilares": [
+      {
+        "id": "acceso",
+        "nombre": "Control de acceso",
+        "historias": [
+          {
+            "id": "acc-a1",
+            "titulo": "Lista de autorizados"
+          },
+          {
+            "id": "acc-a2",
+            "titulo": "Comparar con la matrícula",
+            "dependeDe": [
+              "acc-a1"
+            ],
+            "porque": "Se compara contra la lista: tiene que existir."
+          },
+          {
+            "id": "acc-a3",
+            "titulo": "Abrir la barrera",
+            "dependeDe": [
+              "acc-a2"
+            ],
+            "porque": "Se abre solo si la comparación dijo que sí."
+          },
+          {
+            "id": "acc-a4",
+            "titulo": "Registrar entrada y salida",
+            "dependeDe": [
+              "acc-a3"
+            ],
+            "porque": "Se registra el paso que de verdad ocurrió."
+          }
+        ]
       },
-      "rechazar": {
-        "texto": "Dices que no: se hace lo que cabe, y punto.",
-        "replica": "Ajá. Pues tendré que explicarle a la gerencia por qué no hay informe. No me deja muy bien parada.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": { "SatisfaccionCliente": -6 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": { "veredicto": "aceptable", "oa": "OA-SCRUM-01", "razon": "Proteges al equipo, pero el cliente se entera de lo que no tendrá sin haber podido elegir qué prefería." }
-        }
+      {
+        "id": "lectura",
+        "nombre": "Lectura de matrículas",
+        "historias": [
+          {
+            "id": "lec-a1",
+            "titulo": "Cámara de la garita"
+          },
+          {
+            "id": "lec-a2",
+            "titulo": "Leer la matrícula",
+            "dependeDe": [
+              "lec-a1"
+            ],
+            "porque": "Sin imagen no hay nada que leer."
+          },
+          {
+            "id": "lec-a3",
+            "titulo": "Corregir lecturas dudosas",
+            "dependeDe": [
+              "lec-a2"
+            ],
+            "porque": "Solo se corrige lo que ya se leyó."
+          },
+          {
+            "id": "lec-a4",
+            "titulo": "Guardar la foto",
+            "dependeDe": [
+              "lec-a1"
+            ],
+            "porque": "La foto sale de la misma cámara."
+          }
+        ]
       },
-      "negociar": {
-        "texto": "Le explicas qué cabe, qué no y por qué, y le pides que elija.",
-        "replica": "Ya veo… Si algo tiene que salir, que sea lo de menos valor para mí. El informe sí lo necesito este mes.",
-        "efectoEnBacklog": "intercambiar",
-        "consecuencia": {
-          "efectosInmediatos": { "SatisfaccionCliente": 2 },
-          "efectosDiferidos": [ { "enDias": 4, "efectos": {}, "eventoForzado": "EV-BUE-02" } ],
-          "hallazgos": [],
-          "rubrica": { "veredicto": "correcta", "oa": "OA-SCRUM-01", "razon": "Negociar es enseñarle al cliente el coste de lo que pide y dejarle elegir qué sale. El informe entró, a cambio de algo que él valoraba menos." }
-        }
+      {
+        "id": "reservas",
+        "nombre": "Reservas de ascensores",
+        "historias": [
+          {
+            "id": "res-a1",
+            "titulo": "Calendario de ascensores"
+          },
+          {
+            "id": "res-a2",
+            "titulo": "Reservar un ascensor",
+            "dependeDe": [
+              "res-a1"
+            ],
+            "porque": "No se reserva lo que no está en el calendario."
+          },
+          {
+            "id": "res-a3",
+            "titulo": "Bloquear a su hora",
+            "dependeDe": [
+              "res-a2"
+            ],
+            "porque": "Bloquear necesita una reserva con hora."
+          },
+          {
+            "id": "res-a4",
+            "titulo": "Avisar por correo",
+            "dependeDe": [
+              "res-a2"
+            ],
+            "porque": "El aviso confirma una reserva ya hecha."
+          }
+        ]
       }
-    }
+    ]
   },
   "consecuencias": {
     "todos": {
-      "efectosInmediatos": { "Documentacion": 3 },
-      "efectosDiferidos": [],
+      "efectosInmediatos": {
+        "Documentacion": 3
+      },
+      "efectosDiferidos": [
+        {
+          "enDias": 4,
+          "efectos": {},
+          "eventoForzado": "EV-BUE-02"
+        }
+      ],
       "hallazgos": [],
-      "rubrica": { "veredicto": "correcta", "oa": "OA-SCRUM-01", "razon": "El orden respeta lo que depende de qué y deja dentro casi todo el valor que cabía. Priorizar es decidir qué se queda fuera, no ordenar por lo que se pidió primero." }
+      "rubrica": {
+        "veredicto": "correcta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Cada historia quedó después de lo que necesita y no hubo tropiezos: así se construye de abajo arriba sin quedarse bloqueado."
+      }
     },
     "parcial": {
-      "efectosInmediatos": { "DeudaTecnica": 2 },
+      "efectosInmediatos": {
+        "DeudaTecnica": 2
+      },
       "efectosDiferidos": [],
       "hallazgos": [],
-      "rubrica": { "veredicto": "aceptable", "oa": "OA-SCRUM-01", "razon": "El orden funciona, pero dejaste fuera trabajo que valía más que lo que entró, o la respuesta al cliente lo estropeó. Mira valor y esfuerzo a la vez: una tarjeta pequeña y valiosa casi siempre va antes." }
+      "rubrica": {
+        "veredicto": "aceptable",
+        "oa": "OA-SCRUM-01",
+        "razon": "El puente se completó, pero con errores o a medias: algo se puso antes de lo que necesitaba. Antes de colocar una historia, pregúntate de qué depende."
+      }
     },
     "falsoPositivo": {
-      "efectosInmediatos": { "DeudaTecnica": 5, "MoralEquipo": -3 },
+      "efectosInmediatos": {
+        "DeudaTecnica": 5,
+        "MoralEquipo": -3
+      },
       "efectosDiferidos": [],
       "hallazgos": [],
-      "rubrica": { "veredicto": "incorrecta", "oa": "OA-SCRUM-01", "razon": "Una tarea quedó antes que otra de la que depende. El equipo la va a empezar y se va a quedar bloqueado a mitad de sprint." }
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "Un pilar se quedó sin vidas: se puso una historia antes de lo que necesita, dos veces. Un equipo que empieza por ahí se bloquea a mitad de sprint."
+      }
     },
     "omitido": {
-      "efectosInmediatos": { "SatisfaccionCliente": -5, "DeudaTecnica": 4 },
+      "efectosInmediatos": {
+        "SatisfaccionCliente": -5,
+        "DeudaTecnica": 4
+      },
       "efectosDiferidos": [],
       "hallazgos": [],
-      "rubrica": { "veredicto": "incorrecta", "oa": "OA-SCRUM-01", "razon": "Nadie ordenó el backlog. El equipo va a trabajar en lo que llegó primero, que casi nunca es lo que más vale." }
+      "rubrica": {
+        "veredicto": "incorrecta",
+        "oa": "OA-SCRUM-01",
+        "razon": "No se terminó ningún pilar a tiempo. Sin un orden que respete las dependencias, el equipo empieza por lo que llegó primero."
+      }
     }
   },
-  "cierre": { "texto": "Lo que quedó debajo de la línea no desaparece: espera al siguiente sprint." }
+  "cierre": {
+    "texto": "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse: lo que otras historias necesitan va primero."
+  }
 }

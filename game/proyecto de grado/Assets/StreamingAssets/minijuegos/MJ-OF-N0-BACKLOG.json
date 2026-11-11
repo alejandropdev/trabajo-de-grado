@@ -1,77 +1,124 @@
 {
   "id": "MJ-OF-N0-BACKLOG",
   "verbo": "V3_ORDENAR",
-  "lienzo": "backlog",
+  "lienzo": "puente",
   "temaPrincipal": "Scrum",
   "objetivoAprendizaje": "OA-SCRUM-01",
   "modulo": "registro",
   "enElProyecto": "Es el backlog del registro de visitas: lo que hay que construir para que la recepcionista deje el cuaderno.",
   "presentacion": {
     "titulo": "Práctica: ¿qué hacemos primero en el registro de visitas?",
-    "comoSeJuega": "Un backlog es la lista de cosas por hacer, ordenada de lo más importante a lo menos. Arrastra las tarjetas (o usa ▲▼): arriba las de más «valor». Solo entra lo que cabe sobre la línea, que es el tiempo de hoy. Ojo: algunas tarjetas necesitan otra antes (no se puede guardar una visita sin el formulario). Al final, contesta a Marisol y mira qué cambia en el tablero.",
+    "comoSeJuega": "Cada pilar es un módulo y cada bloque, una historia. Ordénalas de abajo arriba: abajo, lo que no necesita nada; arriba, lo que necesita lo de debajo. Pulsa «Verificar»: la luz sube por cada pilar y se detiene en lo que falla. Cada pilar tiene dos vidas.",
     "quienEspera": "Tú mismo",
     "textoPresion": "Práctica en tu escritorio: no cuenta para tu evaluación",
     "segundosReloj": 120
   },
-  "ordenar": {
-    "capacidad": 8,
-    "umbralDeValor": 0.75,
-    "peticion": "Marisol pregunta si también te da tiempo a poner el logo y los colores de Nexus en la pantalla de recepción.",
-    "tarjetaPedida": "t4",
-    "tarjetas": [
-      { "id": "t1", "titulo": "Formulario de visita", "valor": 5, "esfuerzo": 3 },
-      { "id": "t2", "titulo": "Guardar las visitas", "valor": 6, "esfuerzo": 2, "dependeDe": ["t1"] },
-      { "id": "t3", "titulo": "Avisar al anfitrión", "valor": 4, "esfuerzo": 3, "dependeDe": ["t2"] },
-      { "id": "t4", "titulo": "Logo y colores de Nexus", "valor": 1, "esfuerzo": 2 },
-      { "id": "t5", "titulo": "Exportar las visitas a hoja de cálculo", "valor": 2, "esfuerzo": 2, "dependeDe": ["t2"] }
-    ],
-    "respuestas": {
-      "obedecer": {
-        "texto": "Le dices que sí, que cabe todo.",
-        "replica": "¡Genial! Entonces pon el logo primero, que es lo que se ve.",
-        "efectoEnBacklog": "forzar-arriba",
-        "consecuencia": {
-          "efectosInmediatos": { "Cansancio": 3 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "incorrecta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Decir que cabe lo que no cabe no lo hace caber: el logo subió arriba y empujó fuera el aviso al anfitrión, que valía mucho más."
+  "puente": {
+    "vidas": 2,
+    "pilares": [
+      {
+        "id": "registro",
+        "nombre": "Registro de visitas",
+        "historias": [
+          {
+            "id": "reg-a1",
+            "titulo": "Formulario de visita"
+          },
+          {
+            "id": "reg-a2",
+            "titulo": "Guardar las visitas",
+            "dependeDe": [
+              "reg-a1"
+            ],
+            "porque": "No se puede guardar una visita sin el formulario que la recoge."
+          },
+          {
+            "id": "reg-a3",
+            "titulo": "Marcar la salida",
+            "dependeDe": [
+              "reg-a2"
+            ],
+            "porque": "Solo se marca la salida de una visita que ya está guardada."
+          },
+          {
+            "id": "reg-a4",
+            "titulo": "Exportar a hoja de cálculo",
+            "dependeDe": [
+              "reg-a2"
+            ],
+            "porque": "Exportar es sacar lo que ya está guardado."
           }
-        }
+        ]
       },
-      "rechazar": {
-        "texto": "Le dices que no, sin más.",
-        "replica": "Ah… vale. No entiendo bien por qué, pero vale.",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": { "SatisfaccionCliente": -2 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "aceptable",
-            "oa": "OA-SCRUM-01",
-            "razon": "Proteges el tiempo, pero ella no sabe por qué. Un «no» sin explicación cansa la confianza."
+      {
+        "id": "aviso",
+        "nombre": "Aviso al anfitrión",
+        "historias": [
+          {
+            "id": "avi-a1",
+            "titulo": "Lista de anfitriones"
+          },
+          {
+            "id": "avi-a2",
+            "titulo": "Escribir el aviso",
+            "dependeDe": [
+              "avi-a1"
+            ],
+            "porque": "El aviso lleva el nombre del anfitrión: tiene que estar en la lista."
+          },
+          {
+            "id": "avi-a3",
+            "titulo": "Enviar el correo",
+            "dependeDe": [
+              "avi-a2"
+            ],
+            "porque": "No se envía un correo que todavía no está escrito."
+          },
+          {
+            "id": "avi-a4",
+            "titulo": "Reintentar si falla",
+            "dependeDe": [
+              "avi-a3"
+            ],
+            "porque": "Reintentar es repetir un envío que ya existe."
           }
-        }
+        ]
       },
-      "negociar": {
-        "texto": "Le explicas qué cabe y le preguntas qué prefiere dejar fuera.",
-        "replica": "Uy, si el logo deja fuera el aviso al anfitrión, mejor mañana. ¡Gracias por explicármelo!",
-        "efectoEnBacklog": "ninguno",
-        "consecuencia": {
-          "efectosInmediatos": { "SatisfaccionCliente": 2 },
-          "efectosDiferidos": [],
-          "hallazgos": [],
-          "rubrica": {
-            "veredicto": "correcta",
-            "oa": "OA-SCRUM-01",
-            "razon": "Enseñar lo que cuesta y dejar elegir es negociar. Marisol eligió ella misma dejar el logo para después."
+      {
+        "id": "dentro",
+        "nombre": "Quién sigue dentro",
+        "historias": [
+          {
+            "id": "den-a1",
+            "titulo": "Registrar la salida"
+          },
+          {
+            "id": "den-a2",
+            "titulo": "Contar quién sigue dentro",
+            "dependeDe": [
+              "den-a1"
+            ],
+            "porque": "Para contar los que quedan hay que saber quién ya salió."
+          },
+          {
+            "id": "den-a3",
+            "titulo": "Lista en pantalla",
+            "dependeDe": [
+              "den-a2"
+            ],
+            "porque": "La lista muestra lo que se contó."
+          },
+          {
+            "id": "den-a4",
+            "titulo": "Alerta de fin de jornada",
+            "dependeDe": [
+              "den-a3"
+            ],
+            "porque": "La alerta avisa si la lista no está vacía."
           }
-        }
+        ]
       }
-    }
+    ]
   },
   "consecuencias": {
     "todos": {
@@ -81,7 +128,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-SCRUM-01",
-        "razon": "Lo importante primero, y cada cosa después de lo que necesita: formulario → guardar la visita → avisar al anfitrión."
+        "razon": "Cada historia quedó después de lo que necesita y no hubo tropiezos: así se construye de abajo arriba sin quedarse bloqueado."
       }
     },
     "parcial": {
@@ -91,7 +138,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-SCRUM-01",
-        "razon": "Entró poco de lo que más valía, o la respuesta a Marisol empujó fuera algo importante. Mira la pastilla «valor»: lo que más vale va arriba."
+        "razon": "El puente se completó, pero con errores o a medias: algo se puso antes de lo que necesitaba. Antes de colocar una historia, pregúntate de qué depende."
       }
     },
     "falsoPositivo": {
@@ -101,7 +148,7 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "Pusiste algo antes de lo que necesitaba: así no se puede construir. Primero los cimientos, luego lo de encima."
+        "razon": "Un pilar se quedó sin vidas: se puso una historia antes de lo que necesita, dos veces. Un equipo que empieza por ahí se bloquea a mitad de sprint."
       }
     },
     "omitido": {
@@ -111,11 +158,11 @@
       "rubrica": {
         "veredicto": "incorrecta",
         "oa": "OA-SCRUM-01",
-        "razon": "No se ordenó nada."
+        "razon": "No se terminó ningún pilar a tiempo. Sin un orden que respete las dependencias, el equipo empieza por lo que llegó primero."
       }
     }
   },
   "cierre": {
-    "texto": "Priorizar es decidir qué se queda fuera hoy. Lo que quedó bajo la línea no se pierde: espera al siguiente turno."
+    "texto": "Un backlog bien ordenado se puede construir de abajo arriba sin bloquearse: lo que otras historias necesitan va primero."
   }
 }

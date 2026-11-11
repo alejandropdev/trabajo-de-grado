@@ -10,6 +10,7 @@ using Nexus.Core.Minijuegos.Ordenar;
 using Nexus.Core.Minijuegos.Repartir;
 using Nexus.Core.Narrativa;
 using Nexus.Core.Sesion;
+using Nexus.Core.Minijuegos.Puente;
 using NUnit.Framework;
 
 namespace Nexus.Tests {
@@ -70,6 +71,15 @@ namespace Nexus.Tests {
             var def = Escena(archivo);
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar: {
+                    if (PuenteDelBacklog.Aplica(def)) {
+                        var puente = new EstadoDelPuente(def.Puente);
+                        for (var i = 0; i < def.Puente.Pilares.Count; i++) {
+                            var solucion = PuenteEvaluador.Solucion(def.Puente.Pilares[i]);
+                            for (var k = 0; k < solucion.Count; k++) puente.Mover(i, solucion[k], k);
+                        }
+                        puente.Verificar();
+                        return PuenteEvaluador.Evaluar(def, puente);
+                    }
                     var mejor = OrdenarEvaluador.MejorOrden(def.Ordenar);
                     var orden = mejor.Concat(def.Ordenar.Tarjetas.Select(t => t.Id).Where(id => !mejor.Contains(id))).ToList();
                     return OrdenarEvaluador.Evaluar(def, orden, "negociar");
@@ -92,7 +102,9 @@ namespace Nexus.Tests {
         private static ResultadoMinijuego JugarMal(string archivo) {
             var def = Escena(archivo);
             switch (Verbos.Normalizar(def.Verbo)) {
-                case Verbos.Ordenar: return OrdenarEvaluador.Evaluar(def, new List<string>(), null);
+                case Verbos.Ordenar:
+                    if (PuenteDelBacklog.Aplica(def)) return PuenteEvaluador.Evaluar(def, new EstadoDelPuente(def.Puente));   // no verificar nada: omitido
+                    return OrdenarEvaluador.Evaluar(def, new List<string>(), null);
                 case Verbos.Repartir: return RepartirEvaluador.Evaluar(def, new Dictionary<string, int>());
                 default: return DetectarEvaluador.Evaluar(def, new DetectarState(def.Presentacion.SegundosReloj));
             }

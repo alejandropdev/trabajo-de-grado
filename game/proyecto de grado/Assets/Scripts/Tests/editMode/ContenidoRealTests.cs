@@ -10,6 +10,7 @@ using Nexus.Core.Minijuegos.Ordenar;
 using Nexus.Core.Minijuegos.Repartir;
 using Nexus.Core.Narrativa;
 using Nexus.Core.Sesion;
+using Nexus.Core.Minijuegos.Puente;
 using NUnit.Framework;
 
 namespace Nexus.Tests {
@@ -88,6 +89,26 @@ namespace Nexus.Tests {
             var def = CatalogoMinijuegos.Parsear(File.ReadAllText(Path.Combine(Raiz(), pendiente.Archivo)));
             switch (Verbos.Normalizar(def.Verbo)) {
                 case Verbos.Ordenar: {
+                    if (PuenteDelBacklog.Aplica(def)) {
+                        // Cada pilar lo sabe (dos de cada tres veces) o lo baraja al azar; verifica hasta completar el puente,
+                        // perderlo o cansarse. Asi salen los cuatro resultados, y el perfecto con frecuencia.
+                        var puente = new EstadoDelPuente(def.Puente);
+                        var sabe = def.Puente.Pilares.Select(_ => azar.Next(3) != 0).ToList();
+                        for (var intento = 0; intento < 4 && !puente.Completo && !puente.Perdido; intento++) {
+                            for (var i = 0; i < def.Puente.Pilares.Count; i++) {
+                                if (!puente.SePuedeMover(i)) continue;
+                                if (sabe[i] && intento == 0) {
+                                    var solucion = PuenteEvaluador.Solucion(def.Puente.Pilares[i]);
+                                    for (var k = 0; k < solucion.Count; k++) puente.Mover(i, solucion[k], k);
+                                    continue;
+                                }
+                                foreach (var id in def.Puente.Pilares[i].Historias.Select(h => h.Id).OrderBy(_ => azar.Next()).ToList())
+                                    puente.Mover(i, id, azar.Next(0, def.Puente.Pilares[i].Historias.Count));
+                            }
+                            puente.Verificar();
+                        }
+                        return PuenteEvaluador.Evaluar(def, puente);
+                    }
                     var orden = def.Ordenar.Tarjetas.Select(t => t.Id).OrderBy(_ => azar.Next()).ToList();
                     var respuestas = new[] { "obedecer", "rechazar", "negociar" };
                     return OrdenarEvaluador.Evaluar(def, orden, respuestas[azar.Next(3)]);
@@ -488,11 +509,11 @@ namespace Nexus.Tests {
                     Assert.AreEqual(ids.Count, ids.Distinct().Count(), donde + ": ningun evento sale dos veces");
                     Assert.IsFalse(ids.Any(id => id.StartsWith("EV-TUT")), donde + ": un evento del concurso salio en N1");
                     var fallaDiagrama = p.Minijuegos.Any(m => m.StartsWith("MJ-F1-07:parcial") || m.StartsWith("MJ-F1-07:omitido"));
-                    var negocio = p.Minijuegos.Any(m => m.StartsWith("MJ-F1-08:") && m.Contains("respuesta:negociar"));
+                    var negocio = p.Minijuegos.Any(m => m.StartsWith("MJ-F1-08:todos"));
                     Assert.AreEqual(fallaDiagrama, ids.Contains("EV-ALC-01"),
                                     donde + ": «Ah, y también…» sale si y solo si se falló la revisión del diagrama");
                     Assert.AreEqual(negocio, ids.Contains("EV-BUE-02"),
-                                    donde + ": «El cliente que entiende» sale si y solo si se negoció el backlog " + string.Join(",", p.Minijuegos) + " / " + string.Join(",", p.Decisiones) + " / exp " + string.Join(",", p.Expiradas));
+                                    donde + ": «El cliente que entiende» sale si y solo si el puente del backlog salió perfecto " + string.Join(",", p.Minijuegos) + " / " + string.Join(",", p.Decisiones) + " / exp " + string.Join(",", p.Expiradas));
                     if (fallaDiagrama) alcances++;
                     if (negocio) clientes++;
                     minijuegos += p.Minijuegos.Count;
