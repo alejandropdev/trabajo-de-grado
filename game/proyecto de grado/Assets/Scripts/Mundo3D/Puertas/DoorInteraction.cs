@@ -131,8 +131,8 @@ namespace Mundo3D.Puertas {
                 return;
 
             promptText.text = doorController.IsOpen
-                ? "F · CERRAR PUERTA"
-                : "F · ABRIR PUERTA";
+                ? "CERRAR PUERTA"
+                : "ABRIR PUERTA";
         }
 
         private void SetPromptVisible(bool visible) {
