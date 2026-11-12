@@ -182,6 +182,7 @@ namespace Nexus.Mundo3D {
             foreach (var raiz in escena.GetRootGameObjects()) AjustesDelRecorrido.AjustarSalto(raiz);
             AjustesDelRecorrido.PonerRedDeSeguridad(escena);
             AjustesDelRecorrido.Ambientar(escena);
+            SpawnerDeNpcs.Poblar(escena);   // los NPC repartidos por las zonas (Npc7 se queda en el Escondite)
             _volumenDelJuego = AudioListener.volume;
             AplicarVolumen(MenuDePausa3D.Volumen);
             MigrarSensibilidadVieja();
