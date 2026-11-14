@@ -71,8 +71,9 @@ namespace Nexus.Unity.Pantallas {
             _progreso.text = $"{Mathf.Min(_linea + 1, Lineas.Count)} / {Lineas.Count}";
 
             UiKit.Vaciar(_acciones);
+            // Avanzar va abajo a la derecha, donde se busca el «siguiente» en cualquier juego.
             if (!EnLaUltima) {
-                Ui.Boton(Ui.Fila(_acciones), "Siguiente  ►", Avanzar, VarianteBoton.Primario);
+                Ui.Boton(Ui.Fila(_acciones, alineacion: TextAnchor.MiddleRight), "Siguiente  ►", Avanzar, VarianteBoton.Primario);
             } else if (TieneOpciones) {
                 // La eleccion del guion, como mano de cartas (2026-11-05).
                 var opciones = Ui.Fila(_acciones, "Opciones", Tema.espacio, alineacion: TextAnchor.MiddleCenter);
@@ -83,7 +84,7 @@ namespace Nexus.Unity.Pantallas {
                 }
                 ManoDeCartas.Crear(Ui, opciones, cartas, new ManoDeCartas.Ajustes { Sello = "DECIDIDO", AnchoDeCarta = 320 });
             } else {
-                Ui.Boton(Ui.Fila(_acciones), "Continuar  ►", Terminar, VarianteBoton.Primario);
+                Ui.Boton(Ui.Fila(_acciones, alineacion: TextAnchor.MiddleRight), "Continuar  ►", Terminar, VarianteBoton.Primario);
             }
             Canvas.ForceUpdateCanvases();
             _scroll.verticalNormalizedPosition = 0;   // la ultima viñeta, abajo, siempre a la vista
