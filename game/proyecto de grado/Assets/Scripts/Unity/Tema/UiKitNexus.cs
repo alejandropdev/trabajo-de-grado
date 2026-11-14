@@ -550,6 +550,7 @@ namespace Nexus.Unity.Tema {
             campo.onSelect.AddListener(_ => { marcador.alpha = 0; borde.color = Tema.cyan; halo.gameObject.SetActive(true); });
             campo.onDeselect.AddListener(_ => { marcador.alpha = 1; borde.color = Tema.lineStrong; halo.gameObject.SetActive(false); });
             campo.text = valor ?? "";
+            ReactivarCampo(campo);
             return campo;
         }
 
