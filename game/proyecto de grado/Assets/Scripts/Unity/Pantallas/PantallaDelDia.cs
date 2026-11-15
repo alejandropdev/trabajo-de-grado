@@ -149,7 +149,7 @@ namespace Nexus.Unity.Pantallas {
             var clave = $"{paso}|{S.R.DiaActual}|{S.ZonaActual}|{string.Join(",", AlertasSonando().Select(a => a.Id))}|" +
                         $"{_compromiso}|{string.Join(",", _alSprint)}|{Runner.PuedeMoverse}|" +
                         string.Join(",", S.TareasDeOficina.Select(t => S.PorQueNoSePuedeHacer(t.Id) == null ? "1" : "0")) +
-                        $"|{S.R.CeremoniasHechasHoy.Count}|{S.PrPendiente != null}";
+                        $"|{S.R.CeremoniasHechasHoy.Count}|{PuedoRevisar}";
             if (clave != _claveAhora) {
                 _claveAhora = clave;
                 PintarAhora(paso);
@@ -538,7 +538,7 @@ namespace Nexus.Unity.Pantallas {
                 var n = Ui.Notificacion(_ahora.Raiz, "Hoy puedes asistir a: " + string.Join(" · ", pendientes.Select(c => $"{c.Nombre} ({c.DuracionMinutos} min)")), Tono.Cyan);
                 Ui.Boton(n, "Ir", () => AbrirCeremonias(0), VarianteBoton.Fantasma);
             }
-            if (S.PrPendiente != null) {
+            if (PuedoRevisar) {
                 var n = Ui.Notificacion(_ahora.Raiz, Solo("Un compañero ha dejado un cambio de código para que lo revises.", "Tienes un cambio tuyo sin revisar: míralo con ojos frescos antes de integrarlo."), Tono.Cyan);
                 Ui.Boton(n, "Revisar", AbrirRevision, VarianteBoton.Fantasma);
             }
