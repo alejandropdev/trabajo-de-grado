@@ -83,7 +83,7 @@ namespace Nexus.Tests {
                 foreach (var a in nivel.Fase1.Arquitecturas) Assert.IsTrue(hay(a.Id), "falta en el glosario: " + a.Id);
             }
             foreach (var m in c.Metodologias.Keys) Assert.IsTrue(hay(m), "falta en el glosario: " + m);
-            foreach (var t in new[] { "sprint", "wip", "deuda-tecnica", "cobertura", "riesgo", "satisfaccion", "srs", "ptp", "git", "devops", "estimacion", "patron-de-diseno" })
+            foreach (var t in new[] { "sprint", "wip", "deuda-tecnica", "cobertura", "riesgo", "satisfaccion", "srs", "ptp", "git", "devops", "estimacion" })
                 Assert.IsTrue(hay(t), "falta en el glosario: " + t);
         }
 
@@ -153,6 +153,8 @@ namespace Nexus.Tests {
             foreach (var nivel in Catalogo().Niveles.Values)
                 foreach (var t in nivel.Proyecto.Vocabulario) { usadas.Add(t.Dibujo); usadas.Add(t.DibujoDonde); }
             usadas.Add("of-quien-lo-usa");   // la pone el pizarron de las palabras del oficio, en «Dónde lo verás»
+            // La entrevista (prueba de admision) dibuja una escena por pregunta en su pizarra.
+            if (Catalogo().Admision != null) foreach (var p in Catalogo().Admision.Preguntas) usadas.Add(p.Escena);
             foreach (var escena in EscenasDePizarra.Todas) Assert.IsTrue(usadas.Contains(escena), "nadie usa la escena " + escena);
         }
 
@@ -211,12 +213,12 @@ namespace Nexus.Tests {
                 Assert.IsNotNull(Glosario.Buscar(Catalogo().Glosario, id), "falta en el glosario: " + id);
         }
 
+        // 2026-11-15: salen las entradas que ninguna pantalla abria (scrum-master, roles, reunion-diaria, diagramas, dependencia…).
         private static readonly string[] LoQueAntesSeDabaPorSabido = {
             "mvp",
-            "ticket", "cliente", "interesados", "scrum-master", "desarrollador", "tester", "rol-interfaz", "rol-datos", "rol-servidor",
-            "historia-de-usuario", "columnas-del-tablero", "revision-de-codigo", "burndown", "flujo-acumulado", "curva-s", "velocidad",
-            "reunion-diaria", "planificacion-de-sprint",
-            "diagrama-de-componentes", "diagrama-de-secuencia", "traza", "log", "defecto", "dependencia", "presupuesto", "incidencia"
+            "ticket", "cliente", "desarrollador", "tester", "historia-de-usuario", "columnas-del-tablero", "revision-de-codigo", "burndown", "flujo-acumulado", "curva-s", "velocidad",
+            "planificacion-de-sprint",
+            "traza", "log", "defecto", "presupuesto", "incidencia"
         };
 
         // ================================================================ arquitecturas con sus propias razones

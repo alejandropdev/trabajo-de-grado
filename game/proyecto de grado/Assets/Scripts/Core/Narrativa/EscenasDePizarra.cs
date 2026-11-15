@@ -23,16 +23,16 @@ namespace Nexus.Core.Narrativa {
             "ca-cuando", "ca-resumen",
             // Escenas.Despliegue.cs
             "d-despliegue", "d-despliegue-partes", "d-entorno", "d-entorno-mezcla", "d-secretos", "d-secretos-a-la-vista",
-            "d-vuelta-atras", "d-vuelta-sin-paquete", "j-tuberia", "j-enchufes", "j-cuenta-atras",
+            "j-tuberia", "j-enchufes", "j-cuenta-atras",
             // Escenas.Documentos.cs
             "doc-srs-que", "doc-srs-secciones", "doc-srs-porque", "doc-srs-cuando-no", "doc-sad-que", "doc-sad-secciones",
             "doc-sad-porque", "doc-sad-cuando-no", "doc-ptp-que", "doc-ptp-secciones", "doc-ptp-porque",
             "doc-ptp-cuando-no", "doc-pmp-que", "doc-pmp-secciones", "doc-pmp-porque", "doc-pmp-cuando-no",
             // Escenas.Equipo.cs
-            "g-ticket", "g-ticket-vida", "g-cliente", "g-interesados", "g-scrum-master", "g-desarrollador", "g-tester",
-            "g-rol-interfaz", "g-rol-datos", "g-rol-servidor", "g-historia", "g-columnas", "g-pr", "g-burndown", "g-cfd",
-            "g-curva-s", "g-velocidad", "g-daily", "g-planning", "g-componentes", "g-secuencia", "g-traza", "g-log",
-            "g-defecto", "g-dependencia", "g-presupuesto", "g-incidencia",
+            "g-ticket", "g-ticket-vida", "g-cliente", "g-desarrollador", "g-tester",
+            "g-historia", "g-columnas", "g-pr", "g-burndown", "g-cfd",
+            "g-curva-s", "g-velocidad", "g-planning", "g-componentes", "g-traza", "g-log",
+            "g-defecto", "g-presupuesto", "g-incidencia",
             // Escenas.Juego.cs
             "j-barras", "j-horas-extra", "j-lanzamiento", "j-cliente-pide", "j-tablero", "j-decision", "j-incidencia",
             "j-oficina", "j-reto-pruebas", "j-irse-a-casa", "j-charla", "j-reunion", "j-pronostico", "j-apuntes",

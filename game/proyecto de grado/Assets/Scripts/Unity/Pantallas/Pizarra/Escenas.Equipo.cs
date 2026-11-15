@@ -30,22 +30,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Moneda(490, 66, 26, Tizador.Mostaza); p.Texto(490, 120, "paga por resolverlo", 15, Tizador.Mostaza, true); p.Flecha(340, 80, 450, 70, Tizador.Mostaza);
                 p.Si(300, 220, null, 18); p.Texto(300, 266, "y decide si lo entregado le sirve", 16, Tizador.Cian, true);
             };
-            d["g-interesados"] = p => {
-                p.Caja(230, 110, 140, 70, "el proyecto", Tizador.Cian, false, 18);
-                var quien = new[] { "cliente", "usuarios", "tu jefe", "el equipo", "quien lo mantiene" };
-                var x = new[] { 90f, 300, 510, 150, 450 }; var y = new[] { 60f, 30, 60, 230, 230 };
-                for (var i = 0; i < 5; i++) {
-                    p.Figura(x[i], y[i], Tizador.Mostaza); p.Texto(x[i], y[i] + 58, quien[i], 14, Tizador.Mostaza, true);
-                    p.Linea(x[i] + (x[i] < 300 ? 30 : x[i] > 300 ? -30 : 0), y[i] + (y[i] < 100 ? 34 : -14), 300 + (x[i] - 300) * 0.3f, y[i] < 100 ? 108 : 182, Tizador.Gris, 2, true);
-                }
-            };
-            d["g-scrum-master"] = p => {
-                p.Circulo(380, 150, 110, Tizador.Gris, true); for (var i = 0; i < 3; i++) p.Figura(330 + i * 50, 130 + (i % 2) * 30, Tizador.Tiza);
-                p.Texto(380, 230, "el equipo, concentrado", 14, Tizador.Tiza, true);
-                p.Figura(220, 130, Tizador.Cian, "Scrum Master"); p.Escudo(220, 60, 14, Tizador.Cian);
-                for (var i = 0; i < 3; i++) { p.Flecha(30, 70 + i * 70, 170, 110 + i * 26, Tizador.Roja); }
-                p.Texto(70, 40, "interrupciones", 14, Tizador.Roja, true); p.No(190, 140, null, 12);
-            };
             d["g-desarrollador"] = p => {
                 p.Figura(110, 130, Tizador.Cian, "desarrollador"); p.Navegador(210, 40, 330, 210, Tizador.Tiza);
                 var ancho = new[] { 120f, 200, 160, 220, 90, 180 };
@@ -58,21 +42,6 @@ namespace Nexus.Unity.Pantallas {
                 var caso = new[] { "con cita", "sin cita", "nombre vacío" };
                 for (var i = 0; i < 3; i++) { p.Texto(440, 90 + i * 44, caso[i], 16, Tizador.Tiza); if (i == 1) p.No(570, 84 + i * 44, null, 8); else p.Si(570, 84 + i * 44, null, 9); }
                 p.Texto(300, 270, "busca los fallos antes de que los encuentre el cliente", 15, Tizador.Tiza, true);
-            };
-            d["g-rol-interfaz"] = p => {
-                p.Navegador(150, 20, 300, 220, Tizador.Cian); p.Caja(176, 70, 248, 40, null, Tizador.Mostaza); p.Caja(176, 124, 116, 40, null, Tizador.Mostaza); p.Caja(308, 124, 116, 40, "Guardar", Tizador.Mostaza, false, 16);
-                p.Mano(370, 150); p.Texto(300, 276, "lo que se ve y se toca", 18, Tizador.Mostaza, true);
-            };
-            d["g-rol-datos"] = p => {
-                p.Cilindro(60, 60, 150, 170, Tizador.Cian); p.Caja(290, 50, 270, 190, null, Tizador.Tiza); p.Linea(290, 90, 560, 90, Tizador.Tiza, 2); p.Linea(380, 50, 380, 240, Tizador.Gris, 2); p.Linea(470, 50, 470, 240, Tizador.Gris, 2);
-                p.Texto(335, 78, "visita", 14, Tizador.Mostaza, true); p.Texto(425, 78, "entra", 14, Tizador.Mostaza, true); p.Texto(515, 78, "sale", 14, Tizador.Mostaza, true);
-                for (var i = 0; i < 3; i++) p.Linea(290, 140 + i * 50, 560, 140 + i * 50, Tizador.Gris, 2);
-                p.Flecha(220, 145, 282, 145, Tizador.Cian); p.Texto(300, 276, "lo que se guarda, y con qué forma", 17, Tizador.Cian, true);
-            };
-            d["g-rol-servidor"] = p => {
-                p.Servidor(60, 40, 120, 200, Tizador.Tiza); p.Engranaje(300, 110, 36, Tizador.Mostaza); p.Engranaje(366, 160, 24, Tizador.Mostaza);
-                p.Caja(440, 60, 140, 44, "¿tiene cita?", Tizador.Cian, false, 15); p.Caja(440, 120, 140, 44, "avisar", Tizador.Cian, false, 15); p.Caja(440, 180, 140, 44, "guardar", Tizador.Cian, false, 15);
-                p.Flecha(190, 140, 250, 130, Tizador.Tiza); p.Texto(300, 276, "las reglas: lo que el sistema decide", 17, Tizador.Mostaza, true);
             };
 
             // ------------------------------------------------------------ el tablero y sus graficas
@@ -122,11 +91,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Texto(500, 80, "promedio:", 16, Tizador.Mostaza, true); p.Texto(500, 110, "9,5 puntos", 20, Tizador.Mostaza, true); p.Texto(500, 150, "por sprint", 16, Tizador.Mostaza, true);
                 p.Texto(300, 284, "sirve para saber cuánto cabe en el siguiente", 15, Tizador.Tiza, true);
             };
-            d["g-daily"] = p => {
-                var dice = new[] { "«ayer hice…»", "«hoy haré…»", "«me bloquea…»" }; var c = new[] { Tizador.Tiza, Tizador.Cian, Tizador.Roja };
-                for (var i = 0; i < 3; i++) { p.Figura(100 + i * 200, 150, c[i]); p.Bocadillo(30 + i * 200, 50, 150, 50, dice[i], c[i], 16); }
-                p.Esfera(300, 250, 24, Tizador.Mostaza); p.Texto(430, 258, "15 minutos, de pie", 16, Tizador.Mostaza, true);
-            };
             d["g-planning"] = p => {
                 for (var i = 0; i < 5; i++) p.Tarjeta(30, 30 + i * 50, 150, 40, i < 3 ? Tizador.Cian : Tizador.Gris);
                 p.Texto(105, 290, "lo más importante, arriba", 14, Tizador.Tiza, true); p.Flecha(190, 90, 280, 120, Tizador.Cian);
@@ -140,14 +104,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Caja(40, 40, 150, 70, "Recepción", Tizador.Cian, false, 16); p.Caja(240, 40, 150, 70, "Registro", Tizador.Cian, false, 16); p.Caja(240, 180, 150, 70, "Aviso", Tizador.Cian, false, 16); p.Cilindro(450, 40, 110, 80, Tizador.Tiza);
                 p.Flecha(194, 75, 236, 75, Tizador.Mostaza); p.Flecha(394, 75, 446, 75, Tizador.Mostaza); p.Flecha(315, 114, 315, 176, Tizador.Mostaza);
                 p.Texto(215, 60, "usa", 13, Tizador.Mostaza, true); p.Texto(110, 200, "cajas: las piezas", 16, Tizador.Cian, true); p.Texto(110, 226, "flechas: quién usa a quién", 14, Tizador.Mostaza, true);
-            };
-            d["g-secuencia"] = p => {
-                var quien = new[] { "Recepción", "Registro", "Aviso" };
-                for (var i = 0; i < 3; i++) { p.Caja(50 + i * 200, 10, 110, 40, quien[i], Tizador.Cian, false, 15); p.Linea(105 + i * 200, 50, 105 + i * 200, 250, Tizador.Gris, 2, true); }
-                p.Flecha(105, 90, 300, 90, Tizador.Tiza); p.Texto(203, 80, "1. guardar visita", 14, Tizador.Tiza, true);
-                p.Flecha(305, 140, 500, 140, Tizador.Tiza); p.Texto(403, 130, "2. avisar", 14, Tizador.Tiza, true);
-                p.Flecha(305, 200, 110, 200, Tizador.Mostaza); p.Texto(207, 190, "3. listo", 14, Tizador.Mostaza, true);
-                p.Flecha(560, 60, 560, 240, Tizador.Gris); p.Texto(560, 266, "el tiempo", 13, Tizador.Gris, true); p.Texto(280, 284, "quién le dice qué a quién, y en qué orden", 15, Tizador.Tiza, true);
             };
             d["g-traza"] = p => {
                 var paso = new[] { "garita", "lectura", "permiso", "barrera" };
@@ -167,12 +123,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Caja(40, 60, 220, 110, null, Tizador.Cian); p.Texto(150, 96, "lo esperado", 16, Tizador.Cian, true); p.Texto(150, 144, "aforo: 40", 26, Tizador.Cian, true);
                 p.Caja(340, 60, 220, 110, null, Tizador.Roja); p.Texto(450, 96, "lo que pasó", 16, Tizador.Roja, true); p.Texto(450, 144, "aforo: 4", 26, Tizador.Roja, true);
                 p.Texto(300, 124, "≠", 44, Tizador.Mostaza, true); p.Bicho(300, 210, Tizador.Roja); p.Texto(300, 264, "esa diferencia es el defecto", 17, Tizador.Tiza, true);
-            };
-            d["g-dependencia"] = p => {
-                p.Caja(40, 100, 140, 70, "guardar", Tizador.Cian, false, 18); p.Caja(230, 100, 140, 70, "avisar", Tizador.Tiza, false, 18); p.Caja(420, 100, 140, 70, "informe", Tizador.Tiza, false, 18);
-                p.Flecha(226, 135, 186, 135, Tizador.Mostaza); p.Flecha(416, 135, 376, 135, Tizador.Mostaza); p.Texto(206, 86, "necesita", 13, Tizador.Mostaza, true); p.Texto(396, 86, "necesita", 13, Tizador.Mostaza, true);
-                p.Texto(110, 210, "1.º", 22, Tizador.Cian, true); p.Texto(300, 210, "2.º", 22, Tizador.Tiza, true); p.Texto(490, 210, "3.º", 22, Tizador.Tiza, true);
-                p.Texto(300, 268, "lo que otros necesitan se hace antes", 16, Tizador.Tiza, true);
             };
             d["g-presupuesto"] = p => {
                 p.Circulo(110, 130, 70, Tizador.Mostaza); p.Texto(110, 146, "$", 70, Tizador.Mostaza, true);

@@ -56,18 +56,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Hoja(60, 30, 220, 240, Tizador.Gris, "el código"); p.Bloque(80, 130, 180, 30, Tizador.Roja); p.Texto(170, 152, "clave = 1234", 16, Tizador.Pizarra, true);
                 p.Figura(400, 110, Tizador.Roja); p.Lupa(350, 150, 18, Tizador.Roja); p.Texto(470, 200, "cualquiera que vea", 15, Tizador.Roja, true); p.Texto(470, 222, "el código la lee", 15, Tizador.Roja, true);
             };
-            d["d-vuelta-atras"] = p => {
-                p.Caja(60, 100, 130, 80, "versión 1", Tizador.Cian, false, 18); p.Si(125, 210, null, 12); p.Texto(125, 244, "funcionaba", 15, Tizador.Cian, true);
-                p.Flecha(200, 140, 300, 140, Tizador.Tiza);
-                p.Caja(310, 100, 130, 80, "versión 2", Tizador.Roja, false, 18); p.Bicho(375, 214, Tizador.Roja); p.Texto(375, 250, "falla", 15, Tizador.Roja, true);
-                p.Curva(375, 96, 250, 20, 125, 96, Tizador.Mostaza); p.Texto(250, 30, "vuelta atrás", 18, Tizador.Mostaza, true);
-                p.Texto(520, 140, "en minutos,", 15, Tizador.Tiza, true); p.Texto(520, 162, "no en horas", 15, Tizador.Tiza, true);
-            };
-            d["d-vuelta-sin-paquete"] = p => {
-                p.Caja(70, 80, 150, 100, null, Tizador.Gris, true); p.Texto(145, 140, "?", 50, Tizador.Roja, true); p.Texto(145, 214, "¿cuál era la anterior?", 15, Tizador.Roja, true);
-                p.Figura(360, 110, Tizador.Tiza); p.Texto(360, 60, "?", 34, Tizador.Roja, true);
-                p.Texto(480, 130, "sin versiones", 15, Tizador.Tiza, true); p.Texto(480, 152, "guardadas, no hay", 15, Tizador.Tiza, true); p.Texto(480, 174, "a dónde volver", 15, Tizador.Tiza, true);
-            };
 
             // ------------------------------------------------------------ como se ve en el juego
             d["j-tuberia"] = p => {
