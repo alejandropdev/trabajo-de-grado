@@ -287,6 +287,21 @@ namespace Nexus.Tests {
         }
 
         [Test]
+        public void El_ultimo_dia_se_reconoce_y_al_cierre_pasa_al_despliegue() {
+            var s = Empezar("nivel-01", "scrum");
+            var total = s.Perfil.DiasTotales;
+            JugarHasta(s, total - 1, Perfecta);
+            Assert.IsFalse(s.EsUltimoDia);
+            EmpezarDia(s);
+            Assert.AreEqual(total, s.R.DiaActual);
+            Assert.IsTrue(s.EsUltimoDia);
+            LlegarAlCierre(s);
+            s.TerminarDia();   // lo que hace «Irse» al llegar el cierre del ultimo dia
+            Assert.IsFalse(s.JornadaProrrogada);
+            Assert.AreEqual(3, s.R.Fase, "al cerrar el último día se pasa al despliegue");
+        }
+
+        [Test]
         public void Las_seis_de_la_tarde_sin_decidir_no_es_un_dia_cerrado_ni_despues_de_recargar() {
             var s = Empezar("nivel-01", "scrum");
             EmpezarDia(s);

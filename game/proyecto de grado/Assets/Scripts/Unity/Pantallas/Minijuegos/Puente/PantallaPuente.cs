@@ -280,6 +280,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         public override void Repintar() {
             if (_st == null || Resultado != null || _verificar == null) return;
+            SaltarMovimientosYaHechos();
             var hechos = _st.Hecho.Count(h => h);
             var vidas = _st.Vidas.Sum();
             _contador.text = $"{hechos} de {_st.Cfg.Pilares.Count} pilares listos · {vidas} " + (vidas == 1 ? "vida" : "vidas");
@@ -291,6 +292,32 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             }
             PintarEleccion();
             PintarResalteGuiado();
+        }
+
+        private bool _saltandoPasos;
+
+        /// <summary>
+        /// Guiado: si el bloque que pide el paso ya esta en su puesto (desde el principio, o porque otro movimiento lo dejo
+        /// ahi), el paso se da por hecho y se sigue con el siguiente. No hay que arrastrarlo al mismo sitio en que ya esta.
+        /// Es seguro porque los pasos van de abajo arriba: colocar uno mas arriba no mueve los de debajo.
+        /// </summary>
+        private void SaltarMovimientosYaHechos() {
+            if (!Guiado || Guia == null || _saltandoPasos || _pilares == null) return;
+            _saltandoPasos = true;
+            try {
+                string saltado = null;
+                for (var n = 0; n < 64; n++) {
+                    var paso = Guia.Actual;
+                    if (paso == null || paso.Accion != AccionGuiada.Mover) break;
+                    var pv = PilarDeBloque(paso.Objetivo);
+                    if (pv == null || pv.Visual.IndexOf(paso.Objetivo) != paso.Valor) break;
+                    saltado = paso.Objetivo;
+                    Guia.Hecho(AccionGuiada.Mover, paso.Objetivo);
+                }
+                if (saltado != null && PuedeJugar) Decir("«" + Titulo(saltado) + "» ya estaba en su puesto: sigue con el siguiente.");
+            } finally {
+                _saltandoPasos = false;
+            }
         }
 
         private void LateUpdate() {

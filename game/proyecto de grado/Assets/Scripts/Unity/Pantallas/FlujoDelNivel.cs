@@ -72,6 +72,8 @@ namespace Nexus.Unity.Pantallas {
             }
             pasos.Add(_ => {
                 app.Sesion.R.IntroVista = true;
+                // Ya en disco: si el juego se cierra ahora, al volver no se repiten la entrevista ni las escenas.
+                app.Guardar(AutoGuardado.Motivos.IntroVista);
                 app.Router.IrA<PantallaDeFase1>();
             });
             Ejecutar(app, pasos);

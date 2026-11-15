@@ -36,7 +36,7 @@ namespace Nexus.Unity.Pantallas {
     /// <summary>
     /// El expediente del proyecto en pantalla (FichaDelProyecto): el diagrama de contexto dibujado con tiza, los
     /// pizarrones de las palabras del oficio, lo que cambia respecto al nivel anterior y las paginas para los
-    /// Apuntes. Lo usan la Fase 1 (paso «El proyecto»), la receta de los minijuegos y los Apuntes.
+    /// Apuntes. Lo usan la Fase 1 (paso «El proyecto») y la receta de los minijuegos.
     /// </summary>
     public static class ExpedienteView {
         // ==================================================================== el diagrama de contexto
@@ -150,41 +150,6 @@ namespace Nexus.Unity.Pantallas {
             if (perfil.Proyecto != null && perfil.Proyecto.TemasDelNivel.Count > 0)
                 lineas.Add("Lo que practicas aquí: " + string.Join(", ", perfil.Proyecto.TemasDelNivel) + ".");
             return lineas;
-        }
-
-        // ==================================================================== paginas para los apuntes
-
-        /// <summary>
-        /// Las paginas del expediente para un pizarron (Apuntes): el proyecto, el sistema en una imagen, sus partes y
-        /// cuanto llevan, las palabras del oficio, que cambia y los documentos. 'dibujos' recibe el dibujo de la
-        /// pagina del diagrama.
-        /// </summary>
-        public static List<PaginaDePizarra> Paginas(AppRoot app, LevelProfile perfil, WorldState w,
-                                                    Dictionary<PaginaDePizarra, Action<Tizador, float>> dibujos,
-                                                    Action<List<PaginaDePizarra>, string, string> anadir) {
-            var paginas = new List<PaginaDePizarra>();
-            var f = perfil.Proyecto;
-            if (f == null) return paginas;
-
-            anadir(paginas, "El proyecto: " + f.Nombre,
-                   $"Cliente: {f.Cliente.Nombre}. {f.Cliente.QueHace}\nQué le duele: {f.Cliente.QueLeDuele}\n" +
-                   $"Sector: {f.Sector.Nombre}. {f.Sector.ComoTrabaja}\nEn una frase: {f.EnUnaFrase}");
-
-            var diagrama = new PaginaDePizarra {
-                Titulo = "El sistema en una imagen",
-                Texto = "Fuera, quién usa el sistema; dentro, sus partes. Las flechas dicen quién le pide qué a quién."
-            };
-            paginas.Add(diagrama);
-            dibujos[diagrama] = (t, y) => DibujarContexto(t, f, 60, y + 20, MarcoDePizarra.W - 120, MarcoDePizarra.H - y - 140);
-
-            var avance = w == null ? null : AvanceDeModulos.Calcular(f, w.Avance, w.Alcance);
-            anadir(paginas, "Las partes del sistema",
-                   string.Join("\n", f.Modulos.Select((m, i) => $"· {m.Nombre}" + (avance != null ? $" ({avance[i].Value:0} % hecho)" : "") + $": {m.QueHace}")));
-            anadir(paginas, "Palabras del oficio", string.Join("\n", f.Vocabulario.Select(v => $"· {v.Termino}: {v.Definicion}")));
-            anadir(paginas, "Qué tiene de distinto este proyecto", string.Join("\n", QueCambia(app, perfil).Select(l => "· " + l)));
-            if (f.Artefactos.Count > 0)
-                anadir(paginas, "Los documentos que importan aquí", string.Join("\n", f.Artefactos.Select(a => $"· {a.Id}: {a.ParaQueAqui}")));
-            return paginas;
         }
     }
 }

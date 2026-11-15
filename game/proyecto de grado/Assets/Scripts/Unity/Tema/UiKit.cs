@@ -413,7 +413,20 @@ namespace Nexus.Unity.Tema {
             campo.onSelect.AddListener(_ => { marcador.alpha = 0; borde.enabled = true; });
             campo.onDeselect.AddListener(_ => { marcador.alpha = 1; borde.enabled = false; });
             campo.text = valor ?? "";
+            ReactivarCampo(campo);
             return campo;
+        }
+
+        /// <summary>
+        /// El TMP_InputField se añade antes de tener su texto y su visor, y en ese OnEnable no crea el cursor ni se
+        /// engancha al texto: el palito no salia hasta escribir algo. Apagarlo y encenderlo ya cableado lo deja listo.
+        /// Al enfocar, el cursor queda al final del texto (sin seleccionarlo todo) para que se vea que ya se escribe ahi.
+        /// </summary>
+        public static void ReactivarCampo(TMP_InputField campo) {
+            campo.onFocusSelectAll = false;
+            campo.resetOnDeActivation = true;
+            campo.enabled = false;
+            campo.enabled = true;
         }
 
         /// <summary>Una etiqueta pequeña con fondo de color: el estado de algo (aquí estás, cerrada, 3 h).</summary>

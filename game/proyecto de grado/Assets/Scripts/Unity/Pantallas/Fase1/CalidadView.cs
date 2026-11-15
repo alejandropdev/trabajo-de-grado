@@ -73,7 +73,7 @@ namespace Nexus.Unity.Pantallas {
             var barra = _ui.Fila(_padre, "BarraDeCalidad", _t.espacio, 0, TextAnchor.MiddleLeft);
             var rotulo = _ui.Columna(barra, "Rotulo", 2);
             UiKit.Tamano(rotulo, flexAncho: 1);
-            _ui.Texto(rotulo, "Atributos de calidad", EstiloTexto.Subtitulo);
+            _ui.Texto(rotulo, "Atributos de calidad ISO 25010", EstiloTexto.Subtitulo);
             _ui.Texto(rotulo, "Reparte con + y −. Las fichas sin usar no se guardan.", EstiloTexto.Pequeno);
 
             var cuenta = _ui.Columna(barra, "Cuenta", 0, 0, TextAnchor.MiddleCenter);

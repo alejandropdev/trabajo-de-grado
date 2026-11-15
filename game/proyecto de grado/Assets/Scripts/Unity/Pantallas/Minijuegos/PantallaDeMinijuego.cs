@@ -88,9 +88,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var quien = Practica ? "PRÁCTICA EN TU ESCRITORIO · NO CUENTA PARA TU EVALUACIÓN"
                                  : $"TICKET · {(Def.Presentacion.QuienEspera ?? "").ToUpperInvariant()} · {Def.Presentacion.TextoPresion}";
             UiKit.Tamano(Ui.Texto(cabecera, quien, EstiloTexto.Leyenda, Practica ? Tema.cyan : Tema.warning), flexAncho: 1);
-            // Quien te echa una mano en este reto (un compañero fuerte en esto, o alguien que confia en ti): se ve.
-            if (Pendiente != null && !string.IsNullOrEmpty(Pendiente.AyudaDe))
-                Ui.Chip(cabecera, "Te echa una mano: " + Pendiente.AyudaDe, Tema.successSoft, Tema.success);
+            // Quien te echa una mano en este reto (un compañero fuerte en esto, o alguien que confia en ti): se ve, con su
+            // cara y su nombre en grande (2026-11-14: un chip pequeño no se percibia).
+            if (Pendiente != null && !string.IsNullOrEmpty(Pendiente.AyudaDe)) TarjetaDeAyudante(cabecera, Pendiente.AyudaDe);
             PantallaDeMenu.Boton(App, cabecera, "?", "Ayuda", OpcionesDeAyuda, VarianteBoton.Secundario);
             Ui.Boton(cabecera, "Menú", AbrirPausa, VarianteBoton.Fantasma);
 
@@ -134,6 +134,27 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var fila = Ui.Fila(espera);
             Ui.Boton(fila, "Ver la receta", () => AbrirReceta(true));
             Ui.Boton(fila, "¡A jugar!", Empezar, VarianteBoton.Primario);
+        }
+
+        /// <summary>
+        /// La tarjeta de quien te ayuda: su retrato, «TE ECHA UNA MANO» y su nombre, con borde verde, un halo y un latido
+        /// al entrar para que se note que esta ahi.
+        /// </summary>
+        private void TarjetaDeAyudante(Transform padre, string quien) {
+            var tarjeta = Ui.Fila(padre, "Ayudante", Tema.Espacio(3), Tema.Espacio(2), TextAnchor.MiddleLeft);
+            var fondo = tarjeta.gameObject.AddComponent<UnityEngine.UI.Image>();
+            Ui.Fondo(fondo, NexusTheme.Alfa(Tema.bg950, 0.92f), NexusTheme.RadioLg);
+            Ui.Halo(tarjeta, NexusTheme.Alfa(Tema.success, 0.45f), NexusTheme.RadioLg);
+            Ui.Borde(tarjeta, Tema.success, NexusTheme.RadioLg, 2);
+            RostroDePersonaje.Crear(Ui, tarjeta, MaterialesNexus.IdDePersonaje(quien), quien, 72, Tema.success);
+            var textos = Ui.Columna(tarjeta, "Textos", 2, 0, TextAnchor.MiddleLeft);
+            var rotulo = Ui.Texto(textos, "TE ECHA UNA MANO", EstiloTexto.Leyenda, Tema.success);
+            rotulo.characterSpacing = 3;
+            var nombre = Ui.Texto(textos, quien, EstiloTexto.Subtitulo, Tema.ink);
+            nombre.fontSize = 24;
+            nombre.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+            tarjeta.gameObject.AddComponent<EntradaDePieza>().Retraso = 0.2f;
+            tarjeta.gameObject.AddComponent<LatidoDeLlegada>();
         }
 
         /// <summary>
@@ -610,6 +631,19 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (_le == null) _le = UiKit.Tamano(transform);
             _le.minWidth = _le.preferredWidth = Ancho * k;
             _le.minHeight = _le.preferredHeight = Alto * k;
+        }
+    }
+
+    /// <summary>Al llegar, tres latidos en los primeros segundos: para que la tarjeta de quien ayuda se vea. Luego, quieta.</summary>
+    public sealed class LatidoDeLlegada : MonoBehaviour {
+        private float _t;
+
+        private void Update() {
+            if (_t > 3f) return;
+            _t += Time.unscaledDeltaTime;
+            var fase = Mathf.Clamp01((_t - 0.6f) / 2.4f);
+            transform.localScale = Vector3.one * (1f + 0.06f * Mathf.Abs(Mathf.Sin(fase * Mathf.PI * 3f)) * (1f - fase));
+            if (_t > 3f) transform.localScale = Vector3.one;
         }
     }
 }

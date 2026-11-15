@@ -64,7 +64,7 @@ namespace Nexus.Unity.Pantallas {
         private string ClaveDelMuro() {
             var t = S.Tablero;
             if (t == null) return "";
-            return S.MinutoDelDia + "|" + S.R.LimiteWip + "|" + (S.PrPendiente != null) + "|" + AlertasSonando().Count + "|" +
+            return S.MinutoDelDia + "|" + S.R.LimiteWip + "|" + PuedoRevisar + "|" + AlertasSonando().Count + "|" +
                    _fichaAbierta + "|" + _asignarTarjeta + _asignarA + "|" + _filtroDelMuro + "|" + _hechoAbierto + "|" + _ayudaDelMuro + "|" + t.SprintActual + "|" +
                    string.Join(",", t.Tarjetas.Select(c => c.Id + c.Columna + c.Asignado + c.Orden + c.Sprint));
         }
@@ -173,7 +173,7 @@ namespace Nexus.Unity.Pantallas {
                     }
                 }
             }
-            if (S.PrPendiente != null) Ui.Boton(h, "Revisar código", AbrirRevision, VarianteBoton.Primario);
+            if (PuedoRevisar) Ui.Boton(h, "Revisar código", AbrirRevision, VarianteBoton.Primario);
             Ui.Boton(h, _ayudaDelMuro ? "Ocultar palabras" : "?", () => { _ayudaDelMuro = !_ayudaDelMuro; }, VarianteBoton.Fantasma);
         }
 

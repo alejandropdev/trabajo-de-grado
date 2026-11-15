@@ -10,7 +10,8 @@ using NUnit.Framework;
 namespace Nexus.Tests {
     /// <summary>
     /// El diagrama con cartas de solucion (2026-11-09): los puntos se ven, a cada uno se le juega una carta, y una carta
-    /// en uso no se puede repetir. «Está bien así» no se gasta. Se evalua con las claves de siempre.
+    /// en uso no se puede repetir, tampoco «Está bien así» (2026-11-14), y cada reto tiene como mucho un punto que esta
+    /// bien. Se evalua con las claves de siempre.
     /// </summary>
     public class CorregirDiagramaTests {
         private static string Carpeta() {
@@ -83,12 +84,33 @@ namespace Nexus.Tests {
         }
 
         [Test]
-        public void Esta_bien_asi_no_se_gasta() {
+        public void Esta_bien_asi_se_gasta_como_las_demas_cartas() {
             var def = Cargar("MJ-F1-07");
             var st = Tablero(def);
-            Assert.AreEqual(Jugada.Puesta, Jugar(st, Senuelo(def, 0).Id, PuntosDelDiagrama.EstaBien));
-            Assert.AreEqual(Jugada.Puesta, Jugar(st, Senuelo(def, 1).Id, PuntosDelDiagrama.EstaBien));
+            var s = Senuelo(def);
+            Assert.AreEqual(Jugada.Puesta, Jugar(st, s.Id, PuntosDelDiagrama.EstaBien));
+            Assert.IsTrue(st.EnUso(PuntosDelDiagrama.EstaBien));
+            Assert.AreEqual(s.Id, st.PuntoDe(PuntosDelDiagrama.EstaBien));
+            Assert.AreEqual(Jugada.EnUso, Jugar(st, Real(def).Id, PuntosDelDiagrama.EstaBien), "no se repite");
+
+            // Cambiarla por otra carta la devuelve a la mano, y ya se puede jugar en otro punto.
+            st.PuntoElegido = s.Id;
+            string devuelta;
+            Assert.AreEqual(Jugada.Puesta, st.Jugar(Distractor(def), 2, out devuelta));
+            Assert.AreEqual(PuntosDelDiagrama.EstaBien, devuelta);
             Assert.IsFalse(st.EnUso(PuntosDelDiagrama.EstaBien));
+            Assert.AreEqual(Jugada.Puesta, Jugar(st, Real(def).Id, PuntosDelDiagrama.EstaBien));
+            Assert.AreEqual(PuntosDelDiagrama.EstaBien, st.Quitar(Real(def).Id));
+            Assert.IsFalse(st.EnUso(PuntosDelDiagrama.EstaBien));
+        }
+
+        [Test]
+        public void Cada_diagrama_tiene_algun_problema_y_como_mucho_un_punto_que_esta_bien() {
+            foreach (var def in Diagramas()) {
+                Assert.IsFalse(def.SinDefectos, def.Id);
+                Assert.GreaterOrEqual(def.Zonas.Count, 1, def.Id + ": sin problemas las cartas sobran");
+                Assert.LessOrEqual(def.Senuelos.Count, 1, def.Id + ": «Está bien así» se usa una sola vez");
+            }
         }
 
         [Test]
@@ -135,7 +157,10 @@ namespace Nexus.Tests {
         public void Dar_por_bueno_un_problema_no_gana() {
             var def = Cargar("MJ-F1-07");
             var st = Tablero(def);
-            foreach (var p in PuntosDelDiagrama.De(def)) Jugar(st, p.Id, PuntosDelDiagrama.EstaBien);
+            var ganadora = PuntosDelDiagrama.SolucionGanadora(def);
+            foreach (var kv in ganadora) if (kv.Value != PuntosDelDiagrama.EstaBien) Jugar(st, kv.Key, kv.Value);
+            st.Quitar(Real(def).Id);
+            Jugar(st, Real(def).Id, PuntosDelDiagrama.EstaBien);
             var r = CorregirEvaluador.Evaluar(def, st);
             Assert.AreEqual(ResultadosDeMinijuego.Parcial, r.Resultado);
             Assert.IsTrue(r.Detalle.Any(d => d.Contains("lo diste por bueno")));
@@ -143,7 +168,7 @@ namespace Nexus.Tests {
 
         [Test]
         public void Cambiar_lo_que_estaba_bien_cuenta_en_contra_segun_la_tolerancia() {
-            var def = Cargar("MJ-F1-07");   // tolerancia 1, dos señuelos
+            var def = Cargar("MJ-F1-07");   // tolerancia 1, un señuelo
             var ganadora = PuntosDelDiagrama.SolucionGanadora(def);
             var st = Tablero(def);
             foreach (var kv in ganadora) Jugar(st, kv.Key, kv.Value);
@@ -152,22 +177,18 @@ namespace Nexus.Tests {
             var r = CorregirEvaluador.Evaluar(def, st);
             Assert.AreEqual(ResultadosDeMinijuego.Parcial, r.Resultado, "uno dentro de la tolerancia: nunca «todos»");
             Assert.IsTrue(r.Detalle.Any(d => d.Contains("a algo que estaba bien")));
-            Jugar(st, Senuelo(def, 1).Id, libres[1]);
-            Assert.AreEqual(ResultadosDeMinijuego.FalsoPositivo, CorregirEvaluador.Evaluar(def, st).Resultado);
         }
 
         [Test]
-        public void Un_diagrama_sin_defectos_se_gana_dandolo_todo_por_bueno() {
+        public void El_diagrama_de_Ivan_tiene_un_caso_olvidado_y_la_cache_y_el_singleton_no_lo_arreglan() {
             var def = Cargar("MJ-F0-02");
-            Assert.IsTrue(def.SinDefectos);
             var st = Tablero(def);
-            var puntos = PuntosDelDiagrama.De(def);
-            Jugar(st, puntos[0].Id, PuntosDelDiagrama.EstaBien);
-            Assert.AreEqual(ResultadosDeMinijuego.Parcial, CorregirEvaluador.Evaluar(def, st).Resultado, "sin revisarlo entero");
-            foreach (var p in puntos) Jugar(st, p.Id, PuntosDelDiagrama.EstaBien);
+            var zona = Real(def);
+            Assert.AreEqual(Jugada.Puesta, Jugar(st, zona.Id, "cache"));
+            Assert.AreEqual(Jugada.Puesta, Jugar(st, Senuelo(def).Id, PuntosDelDiagrama.EstaBien));
+            Assert.AreNotEqual(ResultadosDeMinijuego.Todos, CorregirEvaluador.Evaluar(def, st).Resultado);
+            Jugar(st, zona.Id, "cubrir-caso");
             Assert.AreEqual(ResultadosDeMinijuego.Todos, CorregirEvaluador.Evaluar(def, st).Resultado);
-            Jugar(st, puntos[1].Id, def.Cartas[0].Id);
-            Assert.AreEqual(ResultadosDeMinijuego.FalsoPositivo, CorregirEvaluador.Evaluar(def, st).Resultado);
         }
 
         [Test]
@@ -252,6 +273,10 @@ namespace Nexus.Tests {
             var otro = Cargar("MJ-F0-01");
             otro.Cartas = otro.Cartas.Where(c => otro.Zonas.Any(z => z.Soluciones.Contains(c.Id))).ToList();
             Assert.IsTrue(CatalogoMinijuegos.Validar(otro).Any(e => e.Contains("descartar")));
+
+            var dosBien = Cargar("MJ-F0-01");
+            dosBien.Senuelos.Add(new Senuelo { Id = "S9", Commits = new List<string> { dosBien.Artefacto.Elementos.Last().Id }, RazonNoEsDefecto = "x" });
+            Assert.IsTrue(CatalogoMinijuegos.Validar(dosBien).Any(e => e.Contains("como mucho uno")));
 
             var sinCartas = Cargar("MJ-F0-01");
             sinCartas.Cartas.Clear();

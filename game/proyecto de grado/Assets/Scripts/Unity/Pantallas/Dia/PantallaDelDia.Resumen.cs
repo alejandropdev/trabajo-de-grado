@@ -230,32 +230,50 @@ namespace Nexus.Unity.Pantallas {
             var caja = Caja(padre, titulo, subieron.Count > 0 ? Tema.success : Tema.cyan, 1, retraso);
             UiKit.Tamano(caja, flexAlto: 1);
 
-            var maxFilas = hayDemo ? 2 : 3;
+            // Lo minimo y en grande (2026-11-14): como mucho dos filas cortas, sin citas ni parrafos. Cada fila es el
+            // nombre de la parte y su etapa (o su barra); si hay mas, un «+N». Asi nada se recorta ni se aprieta.
+            var lista = Ui.Columna(caja, "Lista", 10, 0, TextAnchor.UpperLeft);
+            UiKit.Tamano(lista, flexAncho: 1, flexAlto: 1);
+            const int maxFilas = 2;
+
             if (subieron.Count > 0) {
-                foreach (var m in subieron.Take(maxFilas)) {
-                    var fila = Ui.Fila(caja, "Etapa", 10, 0, TextAnchor.MiddleLeft);
-                    Ui.Punto(fila, Tema.success, 10);
-                    var nombre = Ui.Texto(fila, m.Modulo.Nombre, EstiloTexto.Cuerpo, Tema.ink);
-                    nombre.maxVisibleLines = 1;
-                    nombre.overflowMode = TextOverflowModes.Ellipsis;
+                var mostradas = subieron.Take(maxFilas).ToList();
+                for (var k = 0; k < mostradas.Count; k++) {
+                    var m = mostradas[k];
+                    var fila = Ui.Fila(lista, "Etapa", 12, 0, TextAnchor.MiddleLeft);
+                    UiKit.Tamano(fila, flexAncho: 1, alto: 40);
+                    var nombre = Ui.Texto(fila, m.Modulo.Nombre, EstiloTexto.Encabezado, Tema.ink);
+                    UnaLinea(nombre, 20);
                     UiKit.Tamano(nombre, flexAncho: 1);
-                    Ui.Chip(fila, Nexus.Core.Proyecto.EtapasDelProducto.Nombre(m.Etapa), Tema.successSoft, Tema.success);
-                    fila.gameObject.AddComponent<EntradaDeResumen>().Retraso = retraso + 0.2f;
+                    Ui.Texto(fila, "→", EstiloTexto.Encabezado, Tema.success);
+                    var etapa = Ui.Chip(fila, Nexus.Core.Proyecto.EtapasDelProducto.Nombre(m.Etapa).ToUpperInvariant(), Tema.successSoft, Tema.success);
+                    UiKit.Tamano(etapa, alto: 34);
+                    if (k == mostradas.Count - 1 && subieron.Count > maxFilas)
+                        Ui.Chip(fila, "+" + (subieron.Count - maxFilas), NexusTheme.Alfa(Tema.inkMuted, 0.2f), Tema.inkMuted);
+                    fila.gameObject.AddComponent<EntradaDeResumen>().Retraso = retraso + 0.2f + k * 0.08f;
                 }
-                if (subieron.Count > maxFilas) Ui.Texto(caja, $"y {subieron.Count - maxFilas} más", EstiloTexto.Pequeno, Tema.inkMuted);
-            } else if (f != null && f.Modulos.Count > 0 && !hayDemo) {
+            } else if (hayDemo) {
+                // La demo: la cara de quien la vio y una sola linea.
+                var v = voces[0];
+                var fila = Ui.Fila(lista, "Demo", 12, 0, TextAnchor.MiddleLeft);
+                UiKit.Tamano(fila, flexAncho: 1);
+                RostroDePersonaje.Crear(Ui, fila, MaterialesNexus.IdDePersonaje(v.Quien), v.Quien, 56, Tema.cyan);
+                var linea = Ui.Texto(fila, v.Quien + " probó la demo", EstiloTexto.Encabezado, Tema.ink);
+                UnaLinea(linea, 20);
+                UiKit.Tamano(linea, flexAncho: 1);
+                fila.gameObject.AddComponent<EntradaDeResumen>().Retraso = retraso + 0.2f;
+            } else if (f != null && f.Modulos.Count > 0) {
                 var deAntes = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, antes, w.Alcance);
                 var deAhora = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, w.Avance, w.Alcance);
                 var cambios = Enumerable.Range(0, deAhora.Count).Where(i => deAhora[i].Value - deAntes[i].Value >= 0.5)
                     .OrderByDescending(i => deAhora[i].Value - deAntes[i].Value).Take(maxFilas).ToList();
-                if (cambios.Count == 0)
-                    Ui.Texto(caja, "Hoy no avanzó ninguna parte del sistema.", EstiloTexto.Cuerpo, Tema.inkMuted);
+                if (cambios.Count == 0) UnaLinea(Ui.Texto(lista, "Hoy no avanzó ninguna parte.", EstiloTexto.Encabezado, Tema.inkMuted), 18);
                 foreach (var i in cambios) {
-                    var fila = Ui.Fila(caja, "Parte", 10, 0, TextAnchor.MiddleLeft);
-                    var nombre = Ui.Texto(fila, deAhora[i].Key.Nombre, EstiloTexto.Pequeno, Tema.ink);
-                    nombre.maxVisibleLines = 1;
-                    nombre.overflowMode = TextOverflowModes.Ellipsis;
-                    UiKit.Tamano(nombre, ancho: 220);
+                    var fila = Ui.Fila(lista, "Parte", 12, 0, TextAnchor.MiddleLeft);
+                    UiKit.Tamano(fila, flexAncho: 1, alto: 36);
+                    var nombre = Ui.Texto(fila, deAhora[i].Key.Nombre, EstiloTexto.Encabezado, Tema.ink);
+                    UnaLinea(nombre, 18);
+                    UiKit.Tamano(nombre, ancho: 200);
                     var desde = (float)(deAntes[i].Value / 100);
                     var barra = Ui.Barra(fila, desde, Tema.cyan);
                     UiKit.Tamano(barra, flexAncho: 1);
@@ -268,19 +286,22 @@ namespace Nexus.Unity.Pantallas {
                 }
             }
 
-            // Una voz (o dos, si fue la demo): lo que dicen quienes van a usarlo.
-            var queDicen = hayDemo ? voces.Take(2).ToList()
-                : voces.Where(v => subieron.Any(m => m.Modulo.Id == v.ModuloId)).Take(1).ToList();
-            foreach (var v in queDicen) {
-                var cita = Ui.Texto(caja, $"{v.Quien}: «{v.Frase}»", EstiloTexto.Dialogo, Tema.cyan);
-                cita.maxVisibleLines = 2;
-                cita.overflowMode = TextOverflowModes.Ellipsis;
-                cita.gameObject.AddComponent<EntradaDeResumen>().Retraso = retraso + 0.5f;
-            }
             if (subieron.Count > 0 || hayDemo) {
-                UiKit.Tamano(Ui.Nodo(caja, "Hueco"), flexAlto: 1);
-                Ui.Boton(Ui.Fila(caja), "Ver el producto", () => PantallaDelProducto.Abrir(App), VarianteBoton.Fantasma);
+                // Grande y a lo ancho, con el texto entero: es la invitacion a mirar lo que se acaba de construir.
+                var ver = Ui.Boton(caja, "Ver el producto  ►", () => PantallaDelProducto.Abrir(App), VarianteBoton.Secundario);
+                UiKit.Tamano(ver, alto: 54, flexAncho: 1);
+                var texto = ver.GetComponentInChildren<TMP_Text>();
+                if (texto != null) { texto.enableAutoSizing = true; texto.fontSizeMin = 14; texto.fontSizeMax = 22; texto.textWrappingMode = TextWrappingModes.NoWrap; }
             }
+        }
+
+        /// <summary>Una linea, a un tamaño legible fijo, con puntos suspensivos si no cabe.</summary>
+        private static void UnaLinea(TMP_Text t, float tamano) {
+            var alto = t.GetComponent<AltoDeTexto>();
+            if (alto != null) Destroy(alto);
+            t.fontSize = tamano;
+            t.textWrappingMode = TextWrappingModes.NoWrap;
+            t.overflowMode = TextOverflowModes.Ellipsis;
         }
 
         /// <summary>Abajo a la derecha: las notas cortas (decisiones, guardado, despliegue, arquitectura) y el boton de seguir.</summary>

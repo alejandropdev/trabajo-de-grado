@@ -112,7 +112,8 @@ namespace Nexus.Core.Datos
 
         /// <summary>
         /// Lienzo diagrama (2026-11-09): se juega con cartas de solucion unicas. Tiene que poder ganarse sin repetir
-        /// carta, y tiene que haber algo que descartar (una carta que no arregla nada).
+        /// carta, tiene que haber algo que descartar (una carta que no arregla nada), al menos un problema de verdad y
+        /// como mucho un punto que esta bien (2026-11-14: «Está bien así» tambien se gasta).
         /// </summary>
         private static void ValidarCartas(MinijuegoDef def, List<string> e)
         {
@@ -134,6 +135,10 @@ namespace Nexus.Core.Datos
             }
             var arreglan = new HashSet<string>(def.Zonas.SelectMany(z => z.Soluciones));
             if (def.Cartas.All(c => arreglan.Contains(c.Id))) e.Add("Todas las cartas arreglan algo: sin una que descartar, elegir no ensena nada.");
+            // «Está bien así» se usa una sola vez: con dos puntos que estan bien el reto se volveria imposible, y con
+            // muchos, confuso (si al final todo estaba bien, ¿para que estaban las demas cartas?).
+            if (def.Senuelos.Count > 1) e.Add($"Hay {def.Senuelos.Count} puntos que están bien; con cartas, como mucho uno: «Está bien así» se usa una sola vez.");
+            if (def.Zonas.Count == 0) e.Add("Un diagrama con cartas necesita al menos un problema de verdad: si todo está bien, las cartas sobran.");
             var piezas = Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.De(def).Select(p => p.Pieza).ToList();
             if (piezas.Distinct().Count() != piezas.Count) e.Add("Dos puntos del diagrama caen en la misma pieza: sus marcadores se taparian.");
             if (Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.SolucionGanadora(def) == null)

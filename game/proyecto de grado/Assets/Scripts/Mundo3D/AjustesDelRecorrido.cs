@@ -90,9 +90,16 @@ namespace Nexus.Mundo3D {
         // ================================================================== ambientacion
 
         /// <summary>
+        /// El color de la luz principal de la escena de recoleccion (#160059: R 22, G 0, B 89). Se escribe en sRGB, tal como
+        /// sale del selector de color; Unity lo convierte solo en el espacio lineal.
+        /// </summary>
+        public static readonly Color ColorDeLaLuz = new Color(22f / 255f, 0f, 89f / 255f, 1f);
+
+        /// <summary>
         /// Luz de oficina por la tarde: ambiente en tres tonos (techo claro, paredes calidas, suelo oscuro), una niebla
-        /// apenas perceptible que da profundidad a los pasillos, la luz principal calida y con sombras suaves, y un
-        /// volumen de postproceso discreto. Nada de esto cambia lo que se puede ver o recoger.
+        /// apenas perceptible que da profundidad a los pasillos, la luz principal con el color de la escena (#160059; antes
+        /// se le ponia uno calido y se sobreponia) y sombras suaves, y un volumen de postproceso discreto. Solo toca la
+        /// escena que se le pasa. Nada de esto cambia lo que se puede ver o recoger.
         /// </summary>
         public static void Ambientar(Scene escena) {
             RenderSettings.ambientMode = AmbientMode.Trilight;
@@ -108,7 +115,7 @@ namespace Nexus.Mundo3D {
             foreach (var raiz in escena.GetRootGameObjects())
                 foreach (var luz in raiz.GetComponentsInChildren<Light>(true)) {
                     if (luz.type != LightType.Directional) continue;
-                    luz.color = new Color(1f, 0.93f, 0.82f);
+                    luz.color = ColorDeLaLuz;
                     luz.intensity = Mathf.Max(luz.intensity, 1.1f);
                     luz.shadows = LightShadows.Soft;
                     luz.shadowStrength = 0.75f;

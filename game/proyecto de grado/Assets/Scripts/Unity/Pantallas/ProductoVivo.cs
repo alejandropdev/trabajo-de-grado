@@ -13,9 +13,9 @@ namespace Nexus.Unity.Pantallas {
     ///
     ///   · arriba, una franja de tres indicadores: en que etapa esta el producto hoy, cuantas partes ya funcionan y el
     ///     avance medio (con cifras que cuentan y una barra que crece);
-    ///   · una tarjeta por parte del sistema: su avance en grande, la etapa (boceto → mockup → prototipo → MVP) como una
-    ///     barra por fases y, al pulsarla, lo que hace esa parte (un prototipo responde pero no guarda; en un MVP lo que
-    ///     haces aparece en las partes que dependen de el);
+    ///   · una tarjeta por parte del sistema: su avance, la etapa (boceto → mockup → prototipo → MVP) como una barra por
+    ///     fases y su pantallita (MaquetaDelModulo, 2026-11-14) dibujada como esta hoy. En un prototipo su boton responde
+    ///     pero no guarda; en un MVP se usa de verdad: lo que creas se queda y aparece en las demas partes que funcionan;
     ///   · abajo, un globo con lo que acaba de pasar o con lo que dice de su parte quien la va a usar, con su cara.
     /// Las tarjetas entran escalonadas y no hay scroll. No cambia nada del proyecto; el reloj espera mientras esta abierta.
     /// </summary>
@@ -23,6 +23,10 @@ namespace Nexus.Unity.Pantallas {
         private sealed class Estado {
             public string Elegido, Mensaje;
             public int Registros;
+            /// <summary>Registros creados en cada parte que funciona (por id de modulo).</summary>
+            public readonly System.Collections.Generic.Dictionary<string, int> Propios = new System.Collections.Generic.Dictionary<string, int>();
+            /// <summary>Se acaba de crear un registro: la fila nueva entra animada en el siguiente pintado.</summary>
+            public bool Recien;
             public bool PausadoAntes;
         }
 
@@ -91,6 +95,7 @@ namespace Nexus.Unity.Pantallas {
                 fila.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
                 for (var k = i; k < System.Math.Min(n, i + cols); k++) Tarjeta(app, m, ui, tema, fila, modulos[k], est, animar, 3 + k);
             }
+            est.Recien = false;
 
             // ---- abajo: lo que acaba de pasar, o lo que dice quien la va a usar
             var voz = s.VocesDelProducto().FirstOrDefault(v => v.ModuloId == est.Elegido) ?? s.VocesDelProducto().FirstOrDefault();
@@ -122,7 +127,7 @@ namespace Nexus.Unity.Pantallas {
             // El avance en grande y la etapa.
             var cima = ui.Fila(tarjeta, "Cima", tema.espacio, 0, TextAnchor.MiddleLeft);
             UiKit.Tamano(cima, flexAncho: 1);
-            PiezasDelMuro.Cifra(ui, cima, e.Porcentaje, "0", " %", color, 44, animar ? 0.2f + indice * 0.05f : -1f);
+            PiezasDelMuro.Cifra(ui, cima, e.Porcentaje, "0", " %", color, 34, animar ? 0.2f + indice * 0.05f : -1f);
             var etapa = ui.Chip(cima, EtapasDelProducto.Nombre(e.Etapa), NexusTheme.Alfa(color, 0.18f), color);
             UiKit.Tamano(etapa, flexAncho: 0);
 
@@ -136,6 +141,12 @@ namespace Nexus.Unity.Pantallas {
                 var t = ui.Texto(nombres, fases[i], EstiloTexto.Leyenda, i == orden ? color : NexusTheme.Alfa(tema.inkMuted, i < orden ? 0.8f : 0.45f), i == 0 ? TextAlignmentOptions.Left : i == fases.Length - 1 ? TextAlignmentOptions.Right : TextAlignmentOptions.Center);
                 UiKit.Tamano(t, flexAncho: 1);
             }
+
+            // Su pantallita, como esta hoy; en un prototipo o un MVP, con su boton.
+            int propios;
+            est.Propios.TryGetValue(e.Modulo.Id, out propios);
+            var recibidos = est.Propios.Where(kv => kv.Key != e.Modulo.Id).Sum(kv => kv.Value);
+            MaquetaDelModulo.Crear(ui, tarjeta, e, propios, recibidos, est.Recien, () => { Usar(app, e, est); m.Repintar(); });
 
             // Pulsar la parte: hace lo suyo (y se dice abajo).
             var viva = tarjeta.gameObject.AddComponent<PiezaViva>();
@@ -161,6 +172,10 @@ namespace Nexus.Unity.Pantallas {
                     : nombre + " muestra lo que pasa en el sistema. Prueba «" + conAccion.Modulo.Accion + "» en «" + conAccion.Modulo.Nombre + "» y vuelve a mirar aquí.";
             } else {
                 est.Registros++;
+                int antes;
+                est.Propios.TryGetValue(e.Modulo.Id, out antes);
+                est.Propios[e.Modulo.Id] = antes + 1;
+                est.Recien = true;
                 var seEnteran = todos.Where(x => x.Modulo.Id != e.Modulo.Id && Funciona(x)).Select(x => "«" + x.Modulo.Nombre + "»").ToList();
                 var sinEnterarse = todos.Where(x => x.Modulo.Id != e.Modulo.Id && !Funciona(x)).Select(x => "«" + x.Modulo.Nombre + "»").ToList();
                 est.Mensaje = "«" + e.Modulo.Accion + "»: hecho, y guardado. " +

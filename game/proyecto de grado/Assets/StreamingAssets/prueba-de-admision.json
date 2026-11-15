@@ -364,7 +364,7 @@
       "escena": "g-componentes",
       "oa": "OA-TEST-01",
       "enunciado": "¿Qué diferencia a una prueba unitaria de una prueba de integración?",
-      "frase": "¿Qué diferencia hay entre unaPrueba unitaria frente a prueba de integración?",
+      "frase": "¿Qué diferencia hay entre una Prueba unitaria frente a prueba de integración?",
       "opciones": [
         {
           "id": "A",

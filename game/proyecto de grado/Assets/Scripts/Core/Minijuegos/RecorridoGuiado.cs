@@ -153,7 +153,7 @@ namespace Nexus.Core.Minijuegos {
                     Accion = AccionGuiada.Leer, Texto = "Antes de jugar ninguna carta: qué se busca aquí.",
                     Porque = "Cada punto marcado del diagrama es una sospecha: unas son problemas de verdad y otras parecen raras y están bien. " +
                              "Te preguntas tres cosas: ¿hace TODO lo que pide el encargo? ¿cada pieza habla con otra solo por su puerta? " +
-                             "¿alguna decide algo sin que nadie haya dicho cómo? Cada carta solo se puede usar una vez.",
+                             "¿alguna decide algo sin que nadie haya dicho cómo? Cada carta solo se puede usar una vez, también «Está bien así».",
                     EsLeccion = true
                 }
             };
