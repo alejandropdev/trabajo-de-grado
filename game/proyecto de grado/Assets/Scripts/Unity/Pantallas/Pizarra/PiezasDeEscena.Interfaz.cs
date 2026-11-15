@@ -108,5 +108,99 @@ namespace Nexus.Unity.Pantallas {
                     v.Latido(v.Forma(arco, A(Coral, 0.85f - k * 0.25f)), 0.3f, 1, 0.8f, k * 0.25f);
                 }
         }
+
+        // ---------------------------------------------------------------- piezas de sistema, papel y paso
+
+        /// <summary>Una pieza de un sistema (modulo, servicio): panel con su nombre del color que toque.</summary>
+        private static void Pieza(Tizador v, float x, float y, float w, float h, string texto, Color c, float tam = 15) {
+            v.Forma(L.Redondeado(x - 1.5f, y - 1.5f, w + 3, h + 3, 9), A(c, 0.85f));
+            v.Forma(L.Redondeado(x, y, w, h, 8), Color.Lerp(SuperficieAlta, c, 0.12f), Superficie);
+            if (!string.IsNullOrEmpty(texto)) v.Rotulo(x + w / 2, y + h / 2, texto, tam, c, 0, true);
+        }
+
+        /// <summary>Papel impreso con su titulo y renglones (documento, cuaderno, codigo).</summary>
+        private static void Papel(Tizador v, float x, float y, float w, float h, string titulo = null, Color? tinta = null, float giro = 0) {
+            var t = tinta ?? H(0x1E2A2A);
+            List<Vector2> R(List<Vector2> p) { return giro == 0 ? p : Tizador.Rotar(p, x + w / 2, y + h / 2, giro); }
+            v.Forma(R(L.Redondeado(x + 5, y + 6, w, h, 4)), A(Silueta, 0.45f));
+            v.Forma(R(L.Redondeado(x, y, w, h, 4)), H(0xEDE7D6), H(0xCFC7B0));
+            var y0 = y + 16;
+            if (titulo != null) { v.Rotulo(x + w / 2, y + 18, titulo, 13, t, 0, true); y0 = y + 36; }
+            for (var ry = y0; ry < y + h - 10; ry += 14) v.Forma(R(Caja(x + 12, ry, (ry / 14) % 2 < 1 ? w - 24 : w - 40, 3)), A(t, 0.4f));
+        }
+
+        /// <summary>Calendario de pared: hoja con su cabecera y los dias.</summary>
+        private static void Calendario(Tizador v, float x, float y, float w, float h, Color c) {
+            v.Forma(L.Redondeado(x + 5, y + 6, w, h, 5), A(Silueta, 0.45f));
+            v.Forma(L.Redondeado(x, y, w, h, 5), H(0xEDE7D6), H(0xCFC7B0));
+            v.Forma(L.Redondeado(x, y, w, h * 0.24f, 5), c);
+            for (var f = 0; f < 3; f++) for (var k = 0; k < 5; k++) v.Forma(Caja(x + 10 + k * (w - 20) / 5, y + h * 0.34f + f * (h * 0.2f), (w - 20) / 5 - 5, h * 0.12f), A(H(0x1E2A2A), 0.25f));
+        }
+
+        /// <summary>Reloj de arena con su armazon: 'resto' de 0 a 1 es la arena que queda arriba.</summary>
+        private static void RelojDeArena(Tizador v, float cx, float y, float h, Color c, float resto = 0.4f) {
+            var w = h * 0.55f;
+            v.Forma(L.Redondeado(cx - w / 2 - 6, y - 6, w + 12, 8, 3), Cromo, CromoOscuro);
+            v.Forma(L.Redondeado(cx - w / 2 - 6, y + h - 2, w + 12, 8, 3), Cromo, CromoOscuro);
+            v.FormaDeLuz(Pts(cx - w / 2, y + 2, cx + w / 2, y + 2, cx + 3, y + h / 2, cx + w / 2, y + h - 2, cx - w / 2, y + h - 2, cx - 3, y + h / 2), A(NucleoClaro, 0.12f));
+            var a = (1 - resto) * (h / 2 - 6);
+            v.Forma(Pts(cx - (w / 2) * resto, y + 4 + a, cx + (w / 2) * resto, y + 4 + a, cx, y + h / 2), Color.Lerp(c, Color.white, 0.2f), c);
+            v.Forma(Pts(cx, y + h - 4 - (1 - resto) * (h / 2 - 8), cx + w / 2 - 4, y + h - 4, cx - w / 2 + 4, y + h - 4), Color.Lerp(c, Color.white, 0.2f), c);
+            v.Forma(Caja(cx - 0.8f, y + h / 2, 1.6f, h / 2 - 8), A(c, 0.8f));
+        }
+
+        /// <summary>Barrera de paso sobre la via: poste y brazo con franjas; 'abierta' lo levanta.</summary>
+        private static void Barrera(Tizador v, float x, float yRiel, bool abierta, Color luz) {
+            v.Forma(L.Redondeado(x - 6, yRiel - 70, 12, 70, 3), H(0x46555A), H(0x1A2428));
+            var brazo = L.Redondeado(x - 4, yRiel - 66, 110, 8, 4);
+            var giro = abierta ? -62 : 0;
+            v.Forma(Tizador.Rotar(brazo, x, yRiel - 62, giro), Tinta, H(0xBDB59E));
+            for (var i = 0; i < 4; i++) v.Forma(Tizador.Rotar(Caja(x + 10 + i * 26, yRiel - 66, 12, 8), x, yRiel - 62, giro), abierta ? Menta : Coral);
+            v.Halo(x, yRiel - 76, 14, A(luz, 0.7f));
+            v.Forma(L.Elipse(x, yRiel - 76, 5, 5, 12), Color.Lerp(luz, Color.white, 0.4f));
+        }
+
+        /// <summary>Rele de red: la caja por la que pasan los mensajes entre servicios (con su antena).</summary>
+        private static void Rele(Tizador v, float cx, float cy, Color c) {
+            v.Cable(Pts(cx + 8, cy - 18, cx + 14, cy - 40), 1.6f, 1.2f, Cromo);
+            v.Halo(cx + 14, cy - 42, 8, A(c, 0.7f));
+            v.Forma(L.Redondeado(cx - 22, cy - 18, 44, 36, 6), H(0x2B3335), H(0x101416));
+            for (var i = 0; i < 3; i++) v.Forma(Caja(cx - 14, cy - 8 + i * 7, 20, 2), A(TintaSuave, 0.5f));
+            v.Forma(L.Elipse(cx + 12, cy, 3.5f, 3.5f, 10), Color.Lerp(c, Color.white, 0.3f));
+        }
+
+        private static void NeonCheck(Tizador v, float cx, float cy, float s, Color? c = null) {
+            v.Halo(cx, cy, s * 1.6f, A(c ?? Menta, 0.3f));
+            v.Neon(Pts(cx - s * 0.6f, cy, cx - s * 0.15f, cy + s * 0.45f, cx + s * 0.7f, cy - s * 0.55f), Mathf.Max(1.2f, s * 0.07f), c ?? Menta);
+        }
+
+        private static void NeonX(Tizador v, float cx, float cy, float s, Color? c = null) {
+            v.Halo(cx, cy, s * 1.6f, A(c ?? Coral, 0.3f));
+            v.Neon(Pts(cx - s * 0.5f, cy - s * 0.5f, cx + s * 0.5f, cy + s * 0.5f), Mathf.Max(1.2f, s * 0.07f), c ?? Coral);
+            v.Neon(Pts(cx + s * 0.5f, cy - s * 0.5f, cx - s * 0.5f, cy + s * 0.5f), Mathf.Max(1.2f, s * 0.07f), c ?? Coral);
+        }
+
+        /// <summary>
+        /// Contorno cerrado lado a lado (un tubo cerrado en un solo poligono se triangularia como forma rellena).
+        /// 'neon' lo pinta como tubo de neon; si no, como linea del color.
+        /// </summary>
+        private static void Contorno(Tizador v, List<Vector2> puntos, float g, Color c, bool neon = false) {
+            for (var i = 0; i < puntos.Count; i++) {
+                Vector2 a = puntos[i], b = puntos[(i + 1) % puntos.Count];
+                if (neon) v.Neon(new List<Vector2> { a, b }, g, c);
+                else v.Forma(L.Tubo(new List<Vector2> { a, b }, g, g), c);
+            }
+        }
+
+        /// <summary>Maraña de cables entre (x, y, w, h): todo toca todo.</summary>
+        private static void Maraña(Tizador v, float x, float y, float w, float h, Color c, int semilla) {
+            var az = new System.Random(semilla);
+            for (var i = 0; i < 6; i++) {
+                Vector2 a = new Vector2(x + (float)az.NextDouble() * w, y + (float)az.NextDouble() * h);
+                Vector2 b = new Vector2(x + (float)az.NextDouble() * w, y + (float)az.NextDouble() * h);
+                Vector2 m = new Vector2(x + (float)az.NextDouble() * w, y + (float)az.NextDouble() * h);
+                v.Neon(Tizador.Bezier(a, m, b, 20), 0.9f, c);
+            }
+        }
     }
 }
