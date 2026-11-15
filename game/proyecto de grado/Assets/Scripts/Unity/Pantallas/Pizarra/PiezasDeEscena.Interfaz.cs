@@ -202,5 +202,76 @@ namespace Nexus.Unity.Pantallas {
                 v.Neon(Tizador.Bezier(a, m, b, 20), 0.9f, c);
             }
         }
+
+        // ---------------------------------------------------------------- plataformas: ventana, telefono, app, antena, pasos
+
+        /// <summary>Ventana de navegador de la interfaz: barra con sus tres luces y la direccion; devuelve la y del contenido.</summary>
+        private static float Ventana(Tizador v, float x, float y, float w, float h, string url = null, Color? c = null) {
+            var col = c ?? Nucleo;
+            v.Forma(L.Redondeado(x - 1.5f, y - 1.5f, w + 3, h + 3, 11), A(col, 0.8f));
+            v.Forma(L.Redondeado(x, y, w, h, 10), SuperficieAlta, Superficie);
+            v.Forma(L.Redondeado(x, y, w, 26, 10), H(0x1D3F4A));
+            var cs = new[] { Coral, Aviso, Menta };
+            for (var i = 0; i < 3; i++) v.Forma(L.Elipse(x + 14 + i * 13, y + 13, 4, 4, 10), cs[i]);
+            if (url != null) {
+                v.Forma(L.Redondeado(x + 58, y + 6, w - 72, 15, 7), Pozo);
+                v.Rotulo(x + 66, y + 13.5f, url, 11, TintaSuave, -1);
+            }
+            return y + 26;
+        }
+
+        /// <summary>Telefono de mano de cromo: cuerpo, pantalla que brilla, altavoz y boton. Devuelve el rect de la pantalla.</summary>
+        private static Rect Movil(Tizador v, float x, float y, float w, float h, Color? brillo = null) {
+            v.Forma(L.Redondeado(x + 4, y + 6, w, h, w * 0.16f), A(Silueta, 0.5f));
+            v.Forma(L.Redondeado(x, y, w, h, w * 0.16f), Cromo, CromoOscuro);
+            var p = new Rect(x + w * 0.08f, y + h * 0.1f, w * 0.84f, h * 0.76f);
+            v.Forma(L.Redondeado(p.x, p.y, p.width, p.height, 8), H(0x0E3340), H(0x05161B));
+            v.Halo(p.center.x, p.center.y, p.width * 0.6f, p.height * 0.5f, A(brillo ?? Nucleo, 0.14f));
+            v.Forma(L.Redondeado(x + w / 2 - w * 0.12f, y + h * 0.045f, w * 0.24f, 4, 2), H(0x2B3335));
+            v.Forma(L.Elipse(x + w / 2, y + h * 0.93f, w * 0.07f, w * 0.07f, 14), H(0x46555A), H(0x1A2428));
+            return p;
+        }
+
+        /// <summary>Icono de app: azulejo redondeado que brilla si es la tuya.</summary>
+        private static void AppIcono(Tizador v, float x, float y, float s, Color c, bool tuya = false) {
+            if (tuya) v.Halo(x + s / 2, y + s / 2, s, A(c, 0.45f));
+            v.Forma(L.Redondeado(x, y, s, s, s * 0.26f), Color.Lerp(c, Color.white, tuya ? 0.25f : 0.05f), Color.Lerp(c, Silueta, tuya ? 0.25f : 0.55f));
+            v.Forma(L.Elipse(x + s / 2, y + s / 2, s * 0.2f, s * 0.2f, 14), A(Color.white, tuya ? 0.7f : 0.25f));
+        }
+
+        /// <summary>Antena de radio: internet, la red por la que viajan las peticiones.</summary>
+        private static void Antena(Tizador v, float cx, float suelo, float alto, Color c) {
+            var top = suelo - alto;
+            v.Forma(Pts(cx - 3, top + 10, cx + 3, top + 10, cx + 20, suelo, cx - 20, suelo), H(0x46555A), H(0x1A2428));
+            for (var i = 1; i < 4; i++) { var y = top + 10 + i * (alto - 10) / 4; var w = 3 + 17 * i / 4f; v.Forma(Caja(cx - w, y, w * 2, 2), Cromo); }
+            v.Latido(v.Halo(cx, top + 6, 22, A(c, 0.6f)), 0.4f, 1, 1.4f);
+            v.Forma(L.Elipse(cx, top + 6, 5, 5, 12), Color.Lerp(c, Color.white, 0.4f));
+            for (var k = 0; k < 2; k++) {
+                v.Forma(L.Arco(cx, top + 6, 14 + k * 10, 14 + k * 10, 2, 200, 250, 10), A(c, 0.8f - k * 0.25f));
+                v.Forma(L.Arco(cx, top + 6, 14 + k * 10, 14 + k * 10, 2, 290, 340, 10), A(c, 0.8f - k * 0.25f));
+            }
+        }
+
+        /// <summary>Pasos numerados en una linea de neon; cada paso «linea uno|linea dos» con su rotulo debajo.</summary>
+        private static void PasosLuz(Tizador v, Color c, params string[] pasos) {
+            FondoInterior(v, 300, 120, c, 0.5f, pasos.Length * 7);
+            // Los rotulos se alternan arriba y abajo de la linea para que no se pisen entre vecinos.
+            var n = pasos.Length; var paso = 470f / (n - 1);
+            v.Neon(Pts(50, 140, 550, 140), 1.2f, c);
+            for (var i = 0; i < n; i++) {
+                var x = 65 + i * paso;
+                v.Halo(x, 140, 26, A(c, 0.4f));
+                v.Forma(L.Elipse(x, 140, 18, 18, 24), SuperficieAlta, Superficie);
+                Anillo(v, x, 140, 18, 2.4f, c);
+                v.Rotulo(x, 140, (i + 1).ToString(), 16, c, 0, false, true);
+                var t = pasos[i].Split('|');
+                var abajo = i % 2 == 0;
+                for (var k = 0; k < t.Length; k++) {
+                    var y = abajo ? 186 + k * 22 : 94 - (t.Length - 1 - k) * 22;
+                    v.Rotulo(x, y, t[k], 15, k == 0 ? Tinta : TintaSuave);
+                }
+                v.Forma(Caja(x - 0.6f, abajo ? 160 : 104, 1.2f, abajo ? 12 : 14), A(c, 0.5f));
+            }
+        }
     }
 }
