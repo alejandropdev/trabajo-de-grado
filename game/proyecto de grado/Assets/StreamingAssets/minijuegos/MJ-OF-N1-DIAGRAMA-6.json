@@ -22,7 +22,7 @@
         "tipo": "componente",
         "fila": 0,
         "columna": 0,
-        "detalle": "Lanza el informe cada mañana."
+        "detalle": "Lanza el informe cada mañana. Nadie ha escrito qué hace si falla."
       },
       {
         "id": "informes",
@@ -40,7 +40,7 @@
         "tipo": "componente",
         "fila": 0,
         "columna": 2,
-        "detalle": "Desde aquí se puede pedir un informe a mano."
+        "detalle": "Desde aquí Facilities ve un informe cuando lo necesita."
       },
       {
         "id": "correo",
@@ -85,14 +85,41 @@
       },
       {
         "id": "i4",
-        "tipo": "pide",
+        "tipo": "lee",
         "desde": "panel",
-        "hasta": "informes",
-        "texto": "pide un informe a mano"
+        "hasta": "bd",
+        "texto": "lee las tablas de reservas para armar su propio informe"
       }
     ]
   },
-  "zonas": [],
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "planificador"
+      ],
+      "defecto": "elemento_sin_especificar",
+      "explicacion": "La tarea de las 7:00 lanza el informe, pero nadie escribió qué pasa si falla: ¿lo reintenta, avisa a alguien, lo deja sin enviar? Una pieza sin ese «y si falla» es una pieza sin especificar.",
+      "pista": "Esta pieza lanza el informe cada mañana. ¿Dice en algún sitio qué hace si algo sale mal?",
+      "soluciones": [
+        "especificar"
+      ]
+    },
+    {
+      "id": "Z2",
+      "tipo": "commit",
+      "commits": [
+        "i4"
+      ],
+      "defecto": "acoplamiento_indebido",
+      "explicacion": "El panel se salta el generador y lee las tablas de reservas por su cuenta. Ahora hay dos sitios que calculan el informe, y el día que cambie una tabla se rompen los dos de forma distinta.",
+      "pista": "Sigue la flecha que sale del panel. ¿Le pide el informe al generador o entra directo a las tablas?",
+      "soluciones": [
+        "fachada"
+      ]
+    }
+  ],
   "toleranciaDeSenuelos": 0,
   "senuelos": [
     {
@@ -101,20 +128,6 @@
         "i2"
       ],
       "razonNoEsDefecto": "Leer de la base de datos lo que pasó ayer es justo lo que tiene que hacer un informe."
-    },
-    {
-      "id": "S2",
-      "commits": [
-        "i3"
-      ],
-      "razonNoEsDefecto": "Enviar el informe por el servidor de correo de Nexus está bien: es un servicio externo usado por su puerta."
-    },
-    {
-      "id": "S3",
-      "commits": [
-        "planificador"
-      ],
-      "razonNoEsDefecto": "Una tarea programada a una hora fija es la forma normal de lanzar un informe diario."
     }
   ],
   "paletaEtiquetas": [
@@ -149,7 +162,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-DIS-01",
-        "razon": "Lo revisaste entero y estaba bien, y lo aprobaste. Saber cuándo un diseño no necesita cambios también es revisar."
+        "razon": "Viste la tarea que no dice qué hacer si falla y el panel que se salta el generador, y dejaste en paz la lectura de lo que pasó ayer."
       }
     },
     "parcial": {
@@ -159,7 +172,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-DIS-01",
-        "razon": "Marcaste una pieza que estaba bien, o no viste todo lo que fallaba."
+        "razon": "Encontraste una parte, o marcaste algo que estaba bien."
       }
     },
     "falsoPositivo": {
@@ -184,10 +197,25 @@
     }
   },
   "cierre": {
-    "texto": "Revisar no es encontrar algo a la fuerza. Un diseño limpio se aprueba."
+    "texto": "Una pieza sin «y si falla» y una pantalla que se salta la puerta: dos formas de que el informe diga cosas distintas según quién lo mire."
   },
-  "sinDefectos": true,
   "cartas": [
+    {
+      "id": "especificar",
+      "nombre": "Especificar la pieza",
+      "descripcion": "Escribir qué hace, con qué regla y qué pasa cuando falla.",
+      "icono": "plano",
+      "tipo": "practica",
+      "porQueNo": "la pieza ya dice qué hace: el fallo es otro."
+    },
+    {
+      "id": "fachada",
+      "nombre": "Fachada: la puerta del módulo",
+      "descripcion": "Los demás piden los datos al módulo por su puerta; nadie entra en sus tablas.",
+      "icono": "puerta",
+      "tipo": "patron",
+      "porQueNo": "nadie se está metiendo en las tripas de otro módulo."
+    },
     {
       "id": "cola",
       "nombre": "Cola de mensajes",

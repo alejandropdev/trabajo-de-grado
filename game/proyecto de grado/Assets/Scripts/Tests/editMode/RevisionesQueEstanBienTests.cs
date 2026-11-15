@@ -14,8 +14,9 @@ using NUnit.Framework;
 namespace Nexus.Tests {
     /// <summary>
     /// No todo lo que se revisa esta mal (ronda 6: «quiero que haya algun caso donde si pueda aceptarlo y este bien»).
-    /// Hay diagramas sin ningun defecto, documentos de etapa correctos y decisiones en las que lo bueno es dar por
-    /// bueno el trabajo de un compañero.
+    /// Cada diagrama tiene un punto que parece raro y esta bien, hay documentos de etapa correctos y decisiones en las
+    /// que lo bueno es dar por bueno el trabajo de un compañero. (Los diagramas enteramente limpios se quitaron el
+    /// 2026-11-14: con «Está bien así» de un solo uso, cada diagrama trae al menos un problema de verdad.)
     /// </summary>
     public class RevisionesQueEstanBienTests {
         private static Catalogo _catalogo;
@@ -35,64 +36,11 @@ namespace Nexus.Tests {
 
         // ---------------------------------------------------------------- diagramas
 
-        [TestCase("MJ-F0-02")]
-        [TestCase("MJ-F1-10")]
-        public void Un_diagrama_limpio_se_gana_aprobandolo_sin_marcar_nada(string id) {
-            var def = Minijuego(id);
-            Assert.IsTrue(def.SinDefectos);
-            Assert.IsEmpty(def.Zonas);
-            Assert.GreaterOrEqual(def.Senuelos.Count, 2, "tiene que haber cosas que parezcan raras");
-
-            var aprobado = new DetectarState(def.Presentacion.SegundosReloj) { Aprobado = true };
-            var r = DetectarEvaluador.Evaluar(def, aprobado);
-            Assert.AreEqual(DetectarEvaluador.TODOS, r.Resultado);
-            Assert.AreEqual(def.Senuelos.Count, r.Detalle.Count, "explica por qué cada cosa rara estaba bien");
-
-            // Dejar correr el reloj sin decidir no es aprobar.
-            Assert.AreEqual(DetectarEvaluador.OMITIDO, DetectarEvaluador.Evaluar(def, new DetectarState(def.Presentacion.SegundosReloj)).Resultado);
-        }
-
-        [TestCase("MJ-F0-02")]
-        [TestCase("MJ-F1-10")]
-        public void En_un_diagrama_limpio_cualquier_marca_acusa_a_algo_que_estaba_bien(string id) {
-            var def = Minijuego(id);
-            var conSenuelo = new DetectarState(def.Presentacion.SegundosReloj);
-            conSenuelo.Alternar(def.Senuelos[0].Commits[0]);
-            conSenuelo.Marcar(def.PaletaEtiquetas[0], 1);
-            Assert.AreEqual(DetectarEvaluador.FALSO_POSITIVO, DetectarEvaluador.Evaluar(def, conSenuelo).Resultado);
-
-            var sana = def.Artefacto.Elementos.Select(e => e.Id).First(e => def.Senuelos.All(s => !s.Commits.Contains(e)));
-            var conOtra = new DetectarState(def.Presentacion.SegundosReloj);
-            conOtra.Alternar(sana);
-            conOtra.Marcar(def.PaletaEtiquetas[0], 1);
-            Assert.AreNotEqual(DetectarEvaluador.TODOS, DetectarEvaluador.Evaluar(def, conOtra).Resultado, "marcar una pieza sana nunca gana");
-        }
-
         [Test]
         public void Aprobar_un_diagrama_que_si_tenia_defectos_los_deja_escapar() {
             var def = Minijuego("MJ-F0-01");
             var r = DetectarEvaluador.Evaluar(def, new DetectarState(def.Presentacion.SegundosReloj) { Aprobado = true });
             Assert.AreEqual(DetectarEvaluador.PARCIAL, r.Resultado);
-        }
-
-        [TestCase("MJ-F0-02")]
-        [TestCase("MJ-F1-10")]
-        public void El_recorrido_guiado_de_un_diagrama_limpio_acaba_aprobandolo(string id) {
-            var def = Minijuego(id);
-            var pasos = RecorridoGuiado.Para(def);
-            Assert.AreEqual(AccionGuiada.Entregar, pasos.Last().Accion);
-            Assert.IsFalse(pasos.Any(p => p.Accion == AccionGuiada.Seleccionar || p.Accion == AccionGuiada.Etiquetar), "no se marca nada");
-            Assert.AreEqual(DetectarEvaluador.TODOS, RecorridoGuiado.Aplicar(def, pasos).Resultado);
-        }
-
-        [Test]
-        public void Los_diagramas_limpios_estan_en_el_indice_de_su_nivel() {
-            var indice = Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(Path.Combine(Raiz(), "minijuegos", "indice.json")));
-            foreach (var par in new[] { new[] { "MJ-F0-02", "nivel-00" }, new[] { "MJ-F1-10", "nivel-01" } }) {
-                var entrada = indice["minijuegos"].FirstOrDefault(m => (string)m["id"] == par[0]);
-                Assert.IsNotNull(entrada, par[0]);
-                CollectionAssert.Contains(entrada["soloNiveles"].Values<string>().ToList(), par[1]);
-            }
         }
 
         // ---------------------------------------------------------------- documentos de etapa

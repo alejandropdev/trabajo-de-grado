@@ -24,7 +24,7 @@ namespace Nexus.Core.Minijuegos.Corregir
     /// </summary>
     public static class PuntosDelDiagrama
     {
-        /// <summary>Lo que se juega en vez de una carta cuando el punto esta bien. No se gasta.</summary>
+        /// <summary>Lo que se juega en vez de una carta cuando el punto esta bien. Se gasta como cualquier carta.</summary>
         public const string EstaBien = "esta_bien";
 
         /// <summary>El reto se juega con cartas (lienzo diagrama con cartas): si no, es el Detectar de siempre.</summary>

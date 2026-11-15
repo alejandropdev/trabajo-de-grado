@@ -16,7 +16,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos.Corregir {
         public string Icono;
         /// <summary>"patron" | "practica" | null.</summary>
         public string Tipo;
-        /// <summary>«Está bien así»: va aparte, no se gasta.</summary>
+        /// <summary>«Está bien así»: va aparte y, como las demas, se gasta al jugarla.</summary>
         public bool EsEstaBien;
     }
 
@@ -254,7 +254,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos.Corregir {
             var rotulo = Texto(ui, tecla, o.EsEstaBien ? "0" : (indice + 1).ToString(), 17, acento, TextAlignmentOptions.Center);
             UiKit.Rellenar(rotulo.rectTransform);
             if (!string.IsNullOrEmpty(o.Tipo) || o.EsEstaBien) {
-                var tipo = Texto(ui, rt, o.EsEstaBien ? "NO SE GASTA" : o.Tipo == "patron" ? "PATRÓN" : "PRÁCTICA", 13,
+                var tipo = Texto(ui, rt, o.EsEstaBien ? "UNA VEZ" : o.Tipo == "patron" ? "PATRÓN" : "PRÁCTICA", 13,
                                  NexusTheme.Alfa(acento, 0.85f), TextAlignmentOptions.MidlineRight);
                 tipo.characterSpacing = 3;
                 Lamina.Colocar(tipo.rectTransform, 52, relleno, ancho - 52 - relleno, 30);
@@ -377,7 +377,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos.Corregir {
         public void Sacudir() { _sacudida = 1f; }
 
         public void MarcarEnUso(int numero) {
-            EnUso = Opcion.EsEstaBien ? 0 : numero;
+            EnUso = numero;
             _chapa.gameObject.SetActive(EnUso > 0);
             if (EnUso > 0) _textoChapa.text = "EN #" + EnUso;
             _borde.color = EnUso > 0 ? NexusTheme.Alfa(_tema.warning, 0.8f)

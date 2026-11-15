@@ -354,13 +354,13 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 pie = "ELIGE UN PUNTO, JUÉGALE LA CARTA QUE LO ARREGLA Y VERIFICA ANTES DE QUE ACABE EL RELOJ.";
                 t.Texto(60, yL, "EL TRUCO", 26, Tizador.Cian);
                 t.Texto(60, yL + 50, "Cada carta sirve una sola vez: si la pones en un punto, ya no está para otro.", 26);
-                t.Texto(60, yL + 96, "Algunos puntos están bien: para esos, «Está bien así». Arreglar lo que funciona también cuenta en contra.", 26, Tizador.Mostaza);
+                t.Texto(60, yL + 96, "Como mucho un punto está bien: para ese, «Está bien así». Arreglar lo que funciona también cuenta en contra.", 26, Tizador.Mostaza);
                 var mano = t.En(300, yL + 160);
                 for (var i = 0; i < 4; i++) mano.Caja(i * 120, i == 1 ? 50 : 0, 100, 140, i == 1 ? "EN #1" : null, i == 1 ? Tizador.Gris : Tizador.Tiza);
                 mano.Texto(230, 190, "una carta jugada se queda hundida: no se repite", 22, Tizador.Mostaza, true);
                 var bien = t.En(1000, yL + 160);
                 bien.Caja(0, 0, 120, 140, null, Tizador.Cian, true); bien.Check(60, 70);
-                bien.Texto(60, 190, "«Está bien así» no se gasta", 22, Tizador.Cian, true);
+                bien.Texto(60, 190, "«Está bien así»: también una sola vez", 22, Tizador.Cian, true);
             } else {
                 pie = "PINCHA LO QUE ESTÁ MAL, DILE QUÉ LE PASA Y ENTREGA ANTES DE QUE ACABE EL RELOJ.";
                 t.Texto(60, yL, "¿CUÁNDO ES CADA COSA?  (ejemplos de otra tienda, no de tu reto)", 26, Tizador.Cian);
