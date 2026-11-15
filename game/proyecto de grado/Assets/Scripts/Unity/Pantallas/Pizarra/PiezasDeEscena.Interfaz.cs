@@ -192,6 +192,13 @@ namespace Nexus.Unity.Pantallas {
             }
         }
 
+        /// <summary>Una X maciza de sello, para encima de papel (el neon aditivo se lava sobre lo claro).</summary>
+        private static void Sello(Tizador v, float cx, float cy, float s, Color? c = null) {
+            var col = c ?? Coral;
+            v.Forma(L.Tubo(Pts(cx - s * 0.5f, cy - s * 0.5f, cx + s * 0.5f, cy + s * 0.5f), s * 0.2f, s * 0.2f), col);
+            v.Forma(L.Tubo(Pts(cx + s * 0.5f, cy - s * 0.5f, cx - s * 0.5f, cy + s * 0.5f), s * 0.2f, s * 0.2f), col);
+        }
+
         /// <summary>Maraña de cables entre (x, y, w, h): todo toca todo.</summary>
         private static void Maraña(Tizador v, float x, float y, float w, float h, Color c, int semilla) {
             var az = new System.Random(semilla);
