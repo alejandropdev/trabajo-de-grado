@@ -68,6 +68,11 @@ namespace Nexus.Unity.Aplicacion {
                 var trozo = escenas.Skip(i).Take(9).ToList();
                 paginas.Add(Par("pizarra_" + (i / 9 + 1).ToString("00"), r => Pizarras(r, trozo)));
             }
+            // El pizarron de verdad, con paginas del glosario (NEXUS_GALERIA=pizarron).
+            foreach (var (termino, pagina) in new[] { ("avance", 0), ("avance", 2), ("avance", 4), ("avance", 5), ("cansancio", 1), ("cansancio", 3) }) {
+                var t = termino; var n = pagina;
+                paginas.Add(Par("pizarron_" + t + "_" + (n + 1), r => Pizarron(r, t, n)));
+            }
             paginas.Add(Par("atardecer", Atardecer));
             paginas.Add(Par("despliegue", Despliegue));
             paginas.Add(Par("edificio", Edificio));
@@ -93,6 +98,7 @@ namespace Nexus.Unity.Aplicacion {
                 yield return new WaitForSecondsRealtime(3.5f);
                 yield return Capturar(p.Key);
                 if (ok) Anotar("ok " + p.Key);
+                if (_despues != null) { _despues(); _despues = null; yield return null; }
                 capa.gameObject.SetActive(false);
                 Destroy(capa.gameObject);
                 yield return null;
