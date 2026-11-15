@@ -46,6 +46,10 @@ namespace Nexus.Unity.Pantallas {
             public AmbienteDeLosCuartos Ambiente;
             public Paleta Paleta;
             public Vector2 Puerto, BaseDeLaPalanca;   // el puerto del tablero (donde nace el cable) y el pie de la palanca
+            public Vector2 CimaDeLaPalanca;           // donde late la señal de la palanca (sobre la oscuridad)
+            public RectTransform Señal;
+            public Image SeñalAro;
+            public TMP_Text SeñalTexto;
             public Cuarto Cuarto;
             public readonly List<ItemDeSala> Items = new List<ItemDeSala>();
             public ItemDeSala Palanquita;
@@ -66,10 +70,14 @@ namespace Nexus.Unity.Pantallas {
         private HashSet<string> _encendidos = new HashSet<string>(StringComparer.Ordinal);
         private readonly HashSet<string> _fallaDura = new HashSet<string>(StringComparer.Ordinal);
 
+        private RectTransform _pistaDelEnchufe;
+        private string _clavePista;
+
         private const string TextoOscuro = "Está muy oscuro para tocarlo: ilumínalo primero con la linterna.";
 
         private void LimpiarCuartos() {
             if (_progreso != null) Destroy(_progreso.gameObject);
+            if (_pistaDelEnchufe != null) { Destroy(_pistaDelEnchufe.gameObject); _pistaDelEnchufe = null; _clavePista = null; }
             _progreso = null; _sala = null; _linterna = null; _salaCont = null; _chispasCapa = null; _flash = null; _flashImg = null; _emergencia = null;
             _ocupado = false; _luciernaga = false;
         }
@@ -333,10 +341,20 @@ namespace Nexus.Unity.Pantallas {
             UiKit.Rellenar(etiquetas);
             item.Etiquetas = etiquetas.gameObject.AddComponent<CanvasGroup>();
             item.Etiquetas.alpha = 0;
-            var nombre = Etiqueta(etiquetas, def == null ? toma : def.Nombre, 27, Tema.ink, ancho, alto * 0.42f, alto * 0.38f, true);
-            nombre.enableAutoSizing = true; nombre.fontSizeMin = 16; nombre.fontSizeMax = 27;
+            var nombre = Etiqueta(etiquetas, def == null ? toma : def.Nombre, 34, Tema.ink, ancho, alto * 0.42f, alto * 0.36f, true);
+            nombre.enableAutoSizing = true; nombre.fontSizeMin = 20; nombre.fontSizeMax = 34;
+            nombre.fontStyle = FontStyles.Bold;
             var produccion = def == null || def.Entorno == "produccion";
-            var tag = Etiqueta(etiquetas, produccion ? "PRODUCCIÓN" : "PRUEBAS", 19, produccion ? Tema.warning : Tema.violet, ancho, 28, alto * 0.74f, true);
+            var colorEntorno = produccion ? Tema.warning : Tema.violet;
+            // El entorno, en una placa de su color: es lo que distingue una toma de la otra.
+            var placa = Ui.Nodo(etiquetas, "Placa del entorno");
+            Lamina.Colocar(placa, ancho * 0.18f, alto * 0.74f - 4, ancho * 0.64f, 38);
+            var fondoPlaca = placa.gameObject.AddComponent<Image>();
+            Ui.Fondo(fondoPlaca, NexusTheme.Alfa(colorEntorno, 0.22f), 8);
+            fondoPlaca.raycastTarget = false;
+            Ui.Borde(placa, colorEntorno, 8, 2);
+            var tag = Etiqueta(etiquetas, produccion ? "PRODUCCIÓN" : "PRUEBAS", 24, colorEntorno, ancho, 30, alto * 0.74f, true);
+            tag.fontStyle = FontStyles.Bold;
             tag.characterSpacing = 4;
             return item;
         }
@@ -377,31 +395,49 @@ namespace Nexus.Unity.Pantallas {
             return item;
         }
 
-        /// <summary>El tablero del fondo: «DESPLEGAR», la palanca que enciende el modulo y el puerto de donde sale el cable.</summary>
+        /// <summary>Lo grande que se ve el tablero de la palanca respecto a su dibujo (2026-11-14: antes casi no se veia).</summary>
+        private const float EscalaDelTablero = 1.65f;
+
+        /// <summary>
+        /// El tablero del fondo: «DESPLEGAR», la palanca que enciende el modulo y el puerto de donde sale el cable. Se
+        /// dibuja a su tamaño de siempre (380 × 132) dentro de un contenedor escalado: todo crece a la vez, y el boton
+        /// (el tablero entero) es mucho mas facil de acertar.
+        /// </summary>
         private ItemDeSala Palanca(Sala s, float w, float h, Cuarto c) {
-            float bw = 380, bh = 132;
+            const float dw = 380, dh = 132;
+            var k = EscalaDelTablero;
+            float bw = dw * k, bh = dh * k;
+            // Por encima de la pista del enchufe (fija abajo, unos 190 de alto): que no se tapen.
+            var y = Mathf.Max(h * 0.40f, Mathf.Min(h * 0.66f, h - bh - 200));
+            var x0 = w / 2 - bw / 2;
             var rt = Ui.Nodo(s.Props, "Tablero de despliegue");
-            Lamina.Colocar(rt, w / 2 - bw / 2, h * 0.725f, bw, bh);
+            Lamina.Colocar(rt, x0, y, bw, bh);
             var fondo = rt.gameObject.AddComponent<Image>();
-            Ui.Fondo(fondo, new Color(0.11f, 0.17f, 0.24f), 14);
+            Ui.Fondo(fondo, new Color(0.11f, 0.17f, 0.24f), 14 * k);
             fondo.raycastTarget = true;
-            var borde = Ui.Borde(rt, Tema.warning, 14, 3);
-            var item = new ItemDeSala { Tipo = "palanca", Rt = rt, Borde = borde, Centro = new Vector2(w / 2, h * 0.725f + bh / 2) };
+            var borde = Ui.Borde(rt, Tema.warning, 14 * k, 4);
+            var item = new ItemDeSala { Tipo = "palanca", Rt = rt, Borde = borde, Centro = new Vector2(w / 2, y + bh / 2) };
             var boton = rt.gameObject.AddComponent<Button>();
             boton.targetGraphic = fondo;
             boton.transition = Selectable.Transition.None;
             boton.onClick.AddListener(() => TirarPalanca(s));
             // Donde nace el cable (el puerto del borde de arriba) y el pie de la palanca, en coordenadas de la lamina.
-            s.Puerto = new Vector2(w / 2, h * 0.725f);
-            s.BaseDeLaPalanca = new Vector2(w / 2 - bw / 2 + bw - 35, h * 0.725f + bh - 22);
+            s.Puerto = new Vector2(w / 2, y);
+            s.BaseDeLaPalanca = new Vector2(x0 + (dw - 35) * k, y + (dh - 22) * k);
+            s.CimaDeLaPalanca = new Vector2(x0 + (dw - 35) * k, y + (dh - 100) * k);
 
-            var detalle = UiKit.Rellenar(Ui.Nodo(rt, "Detalle del tablero"));
+            // Todo lo de dentro, a la escala del dibujo original.
+            var dentro = Ui.Nodo(rt, "Dentro");
+            Lamina.Colocar(dentro, 0, 0, dw, dh);
+            dentro.localScale = new Vector3(k, k, 1);
+
+            var detalle = UiKit.Rellenar(Ui.Nodo(dentro, "Detalle del tablero"));
             detalle.gameObject.AddComponent<CanvasRenderer>();
             var dt = detalle.gameObject.AddComponent<DibujoUI>();
             dt.raycastTarget = false;
-            DibujarElTablero(dt, bw, bh);
+            DibujarElTablero(dt, dw, dh);
 
-            var etiquetas = Ui.Nodo(rt, "Etiquetas");
+            var etiquetas = Ui.Nodo(dentro, "Etiquetas");
             UiKit.Rellenar(etiquetas);
             item.Etiquetas = etiquetas.gameObject.AddComponent<CanvasGroup>();
             item.Etiquetas.alpha = 0;
@@ -412,23 +448,23 @@ namespace Nexus.Unity.Pantallas {
             Lamina.Colocar(titulo.rectTransform, 22, 20, 230, 36);
             Lamina.Colocar(modulo.rectTransform, 22, 62, 190, 52);
 
-            // La lampara (se enciende en verde o en rojo) y la palanca, que baja.
-            var lampara = Ui.Nodo(rt, "Lampara");
-            Lamina.Colocar(lampara, bw - 46, 14, 22, 22);
+            // La lampara (se enciende en verde o en rojo) y la palanca, que baja: mas gruesa y con un mango grande.
+            var lampara = Ui.Nodo(dentro, "Lampara");
+            Lamina.Colocar(lampara, dw - 46, 14, 22, 22);
             s.LamparaDeLaPalanca = lampara.gameObject.AddComponent<Image>();
             s.LamparaDeLaPalanca.sprite = Ui.SpriteCircular();
             s.LamparaDeLaPalanca.color = NexusTheme.Alfa(Tema.lineStrong, 0.8f);
             s.LamparaDeLaPalanca.raycastTarget = false;
-            var base_ = Ui.Nodo(rt, "Base de la palanca");
-            Lamina.Colocar(base_, bw - 64, bh - 34, 58, 20);
+            var base_ = Ui.Nodo(dentro, "Base de la palanca");
+            Lamina.Colocar(base_, dw - 66, dh - 36, 62, 24);
             var baseImg = base_.gameObject.AddComponent<Image>();
             Ui.Fondo(baseImg, new Color(0.06f, 0.1f, 0.15f), 8);
             baseImg.raycastTarget = false;
-            s.Palanca = Ui.Nodo(rt, "Palanca");
+            s.Palanca = Ui.Nodo(dentro, "Palanca");
             s.Palanca.anchorMin = s.Palanca.anchorMax = new Vector2(0, 1);
             s.Palanca.pivot = new Vector2(0.5f, 0f);
-            s.Palanca.sizeDelta = new Vector2(12, 76);
-            s.Palanca.anchoredPosition = new Vector2(bw - 35, -(bh - 22));
+            s.Palanca.sizeDelta = new Vector2(16, 80);
+            s.Palanca.anchoredPosition = new Vector2(dw - 35, -(dh - 22));
             s.Palanca.localEulerAngles = new Vector3(0, 0, 38f);
             var barra = s.Palanca.gameObject.AddComponent<Image>();
             barra.color = Tema.ink;
@@ -436,13 +472,114 @@ namespace Nexus.Unity.Pantallas {
             s.Mango = Ui.Nodo(s.Palanca, "Mango");
             s.Mango.anchorMin = s.Mango.anchorMax = new Vector2(0.5f, 1f);
             s.Mango.pivot = new Vector2(0.5f, 0.5f);
-            s.Mango.sizeDelta = new Vector2(30, 30);
+            s.Mango.sizeDelta = new Vector2(40, 40);
             s.Mango.anchoredPosition = Vector2.zero;
             var mango = s.Mango.gameObject.AddComponent<Image>();
             mango.sprite = Ui.SpriteCircular();
             mango.color = Tema.warning;
             mango.raycastTarget = false;
             return item;
+        }
+
+        /// <summary>
+        /// La pista del enchufe (2026-11-14), fija abajo en el centro y por encima de la oscuridad: QUE se conecta en este
+        /// cuarto, en grande, y las dos tomas a medida que se iluminan (nombre y entorno con su color), marcando la elegida.
+        /// Antes esto solo se leia en el globo de arriba, pequeño, y en las tomas, que a oscuras no se ven.
+        /// </summary>
+        private void ActualizarPistaDelEnchufe() {
+            var s = _sala;
+            if (s == null || _hud == null) return;
+            var c = s.Cuarto;
+            var opciones = s.Items.Where(i => i.Tipo == "opcion").OrderBy(i => i.Lado).ToList();
+            var clave = c.Modulo + "|" + s.Elegida + "|" + s.Resuelta + "|" + string.Join(",", opciones.Select(o => o.Visto ? "1" : "0"));
+            if (clave == _clavePista) return;
+            _clavePista = clave;
+            if (_pistaDelEnchufe != null) Destroy(_pistaDelEnchufe.gameObject);
+
+            var p = Globo(_hud, "Pista del enchufe", false, Tema.cyan, Tema.Espacio(4));
+            p.anchorMin = p.anchorMax = p.pivot = new Vector2(0.5f, 0f);
+            p.anchoredPosition = new Vector2(0, 22);
+            p.sizeDelta = new Vector2(980, 10);
+            Crecer(p, false);
+            _pistaDelEnchufe = p;
+
+            var rotulo = Ui.Texto(p, c.Dependencia ? "ESTE MÓDULO NECESITA" : c.Cable == null ? "ESTE CUARTO" : "QUÉ CONECTAS", EstiloTexto.Leyenda, Tema.cyan, TextAlignmentOptions.Center);
+            rotulo.characterSpacing = 4;
+            var principal = c.Dependencia ? "«" + NombreDe(c.Necesita) + "» ya desplegado"
+                          : c.Cable == null ? "No hay que enchufar nada: baja la palanca"
+                          : "«" + c.Cable.Nombre + "»";
+            var grande = Ui.Texto(p, principal, EstiloTexto.Titulo, Tema.ink, TextAlignmentOptions.Center);
+            grande.fontSize = 34;
+
+            if (!c.Dependencia && c.Cable != null && opciones.Count == 2) {
+                var fila = Ui.Fila(p, "Tomas", Tema.Espacio(3), 0, TextAnchor.MiddleCenter);
+                UiKit.Tamano(fila, flexAncho: 1);
+                foreach (var o in opciones) {
+                    var def = _def.Toma(o.Toma);
+                    var elegida = s.Elegida == o.Lado;
+                    var produccion = def == null || def.Entorno == "produccion";
+                    var color = !o.Visto ? Tema.inkMuted : produccion ? Tema.warning : Tema.violet;
+                    var toma = Ui.PanelColumna(fila, "Toma", Tema.Espacio(3), 2, NexusTheme.Alfa(Tema.bg950, 0.85f));
+                    UiKit.Tamano(toma, flexAncho: 1);
+                    Ui.Borde(toma, elegida ? Tema.cyan : NexusTheme.Alfa(color, 0.7f), NexusTheme.RadioMd, elegida ? 3 : 1.5f);
+                    Ui.Texto(toma, (o.Lado == 0 ? "◄ IZQUIERDA" : "DERECHA ►") + (elegida ? " · ENCHUFADO" : ""), EstiloTexto.Leyenda, elegida ? Tema.cyan : Tema.inkMuted, TextAlignmentOptions.Center);
+                    var nombre = Ui.Texto(toma, o.Visto ? (def == null ? o.Toma : def.Nombre) : "Ilumínala con la linterna", EstiloTexto.Subtitulo, o.Visto ? Tema.ink : Tema.inkMuted, TextAlignmentOptions.Center);
+                    nombre.fontSize = o.Visto ? 22 : 18;
+                    if (o.Visto) {
+                        var entorno = Ui.Texto(toma, produccion ? "PRODUCCIÓN" : "PRUEBAS", EstiloTexto.Etiqueta, color, TextAlignmentOptions.Center);
+                        entorno.characterSpacing = 4;
+                        entorno.fontSize = 18;
+                    }
+                }
+            }
+            p.gameObject.AddComponent<EntradaDePieza>();
+        }
+
+        /// <summary>
+        /// La señal de la palanca, por ENCIMA de la oscuridad: un aro que late sobre el tablero y un rotulo. Mientras falte
+        /// enchufar, dice «DESPLEGAR · aquí»; con todo listo, «▼ BAJA LA PALANCA» y late mas fuerte. Asi se sabe donde esta
+        /// y que hay que pulsarla aunque el haz no la ilumine.
+        /// </summary>
+        private void ActualizarSeñalDeLaPalanca() {
+            var s = _sala;
+            if (s == null || s.Palanquita == null || _chispasCapa == null) return;
+            if (s.Señal == null) {
+                s.Señal = Ui.Nodo(_chispasCapa, "Señal de la palanca");
+                s.Señal.anchorMin = s.Señal.anchorMax = s.Señal.pivot = new Vector2(0.5f, 0.5f);
+                s.Señal.sizeDelta = new Vector2(150, 150);
+                s.SeñalAro = s.Señal.gameObject.AddComponent<Image>();
+                s.SeñalAro.sprite = PlanoIlustrado.Brillo();
+                s.SeñalAro.raycastTarget = false;
+                var rotulo = Ui.Nodo(s.Señal, "Rotulo");
+                rotulo.anchorMin = rotulo.anchorMax = new Vector2(0.5f, 1f);
+                rotulo.pivot = new Vector2(0.5f, 0f);
+                rotulo.sizeDelta = new Vector2(360, 54);
+                rotulo.anchoredPosition = new Vector2(0, 6);
+                var fondo = rotulo.gameObject.AddComponent<Image>();
+                Ui.Fondo(fondo, NexusTheme.Alfa(Tema.bg950, 0.9f), NexusTheme.RadioMd);
+                fondo.raycastTarget = false;
+                Ui.Borde(rotulo, Tema.warning, NexusTheme.RadioMd, 2);
+                s.SeñalTexto = Ui.Texto(rotulo, "", EstiloTexto.Subtitulo, Tema.warning, TextAlignmentOptions.Center);
+                var at = s.SeñalTexto.GetComponent<AltoDeTexto>();
+                if (at != null) Destroy(at);
+                s.SeñalTexto.fontSize = 24;
+                s.SeñalTexto.fontStyle = FontStyles.Bold;
+                s.SeñalTexto.characterSpacing = 3;
+                s.SeñalTexto.textWrappingMode = TextWrappingModes.NoWrap;
+                s.SeñalTexto.raycastTarget = false;
+                UiKit.Rellenar(s.SeñalTexto.rectTransform);
+            }
+            var c = s.Cuarto;
+            var visible = !s.Resuelta && !_ocupado && !_transicionando;
+            if (s.Señal.gameObject.activeSelf != visible) s.Señal.gameObject.SetActive(visible);
+            if (!visible) return;
+            var lista = c.Dependencia || c.Cable == null || s.Elegida >= 0;
+            s.SeñalTexto.text = lista ? "▼  BAJA LA PALANCA" : "DESPLEGAR · AQUÍ";
+            s.Señal.anchoredPosition = AChispas(s, s.CimaDeLaPalanca);
+            var t = Time.unscaledTime * (lista ? 5f : 2.5f);
+            var pulso = 0.5f + 0.5f * Mathf.Sin(t);
+            s.SeñalAro.color = NexusTheme.Alfa(Tema.warning, (lista ? 0.55f : 0.25f) + (lista ? 0.35f : 0.15f) * pulso);
+            s.Señal.localScale = Vector3.one * (1f + (lista ? 0.12f : 0.05f) * pulso);
         }
 
         private TMP_Text Etiqueta(RectTransform padre, string texto, float tam, Color color, float ancho, float alto, float y, bool centradoEnElPanel) {
@@ -462,6 +599,8 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>Cuanta luz le llega a cada cosa: revela sus etiquetas, habilita los clics y avisa si el jugador se pierde.</summary>
         private void ActualizarLuzDeLosCuartos() {
             if (_sala == null || _linterna == null) return;
+            ActualizarSeñalDeLaPalanca();
+            ActualizarPistaDelEnchufe();
             var maxI = 0f;
             foreach (var it in _sala.Items) {
                 var local = new Vector2(it.Centro.x - _cw / 2f, _ch / 2f - it.Centro.y);
