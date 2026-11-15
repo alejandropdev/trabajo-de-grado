@@ -9,11 +9,11 @@ namespace Nexus.Core.Narrativa {
     public static class EscenasDePizarra {
         public static readonly string[] Todas = {
             // Escenas.Arquitectura.cs
-            "q-plano", "q-piezas", "q-donde-corre", "q-elegir", "q-mal-elegida", "q-cambiar-cuesta", "q-mono-dentro",
+            "q-plano", "q-piezas", "q-mono-dentro",
             "q-mono-viaje", "q-mono-despliegue", "q-mono-sin-modulos", "q-micro-dentro", "q-micro-viaje",
             "q-micro-despliegue", "q-micro-equipo", "q-parche-dentro", "q-parche-riesgo", "q-parche-cuando",
             // Escenas.Calidad.cs
-            "q-calidad-que", "q-calidad-falta", "q-adecuacion-que", "q-adecuacion-falta", "q-usabilidad-que",
+            "q-calidad-que", "q-adecuacion-que", "q-adecuacion-falta", "q-usabilidad-que",
             "q-usabilidad-falta", "q-fiabilidad-que", "q-fiabilidad-falta", "q-seguridad-que", "q-seguridad-falta",
             "q-mantenibilidad-que", "q-mantenibilidad-falta", "q-rendimiento-que", "q-rendimiento-falta",
             // Escenas.Cascada.cs
@@ -29,14 +29,11 @@ namespace Nexus.Core.Narrativa {
             "doc-sad-porque", "doc-sad-cuando-no", "doc-ptp-que", "doc-ptp-secciones", "doc-ptp-porque",
             "doc-ptp-cuando-no", "doc-pmp-que", "doc-pmp-secciones", "doc-pmp-porque", "doc-pmp-cuando-no",
             // Escenas.Equipo.cs
-            "g-ticket", "g-ticket-vida", "g-cliente", "g-desarrollador", "g-tester",
-            "g-historia", "g-columnas", "g-pr", "g-burndown", "g-cfd",
-            "g-curva-s", "g-velocidad", "g-planning", "g-componentes", "g-traza", "g-log",
-            "g-defecto", "g-presupuesto", "g-incidencia",
+            "g-ticket", "g-ticket-vida", "g-historia", "g-columnas", "g-pr", "g-burndown", "g-cfd",
+            "g-curva-s", "g-velocidad", "g-planning", "g-componentes", "g-incidencia",
             // Escenas.Juego.cs
             "j-barras", "j-horas-extra", "j-lanzamiento", "j-cliente-pide", "j-tablero", "j-decision", "j-incidencia",
-            "j-oficina", "j-reto-pruebas", "j-irse-a-casa", "j-charla", "j-reunion", "j-pronostico", "j-apuntes",
-            "j-fichas", "j-jurado", "j-reto-detectar", "j-reto-ordenar", "j-ticket", "j-eleccion", "j-planificacion",
+            "j-oficina", "j-reto-pruebas", "j-irse-a-casa", "j-charla", "j-reunion", "j-pronostico", "j-fichas", "j-jurado", "j-reto-detectar", "j-reto-ordenar", "j-ticket", "j-eleccion", "j-planificacion",
             "j-retro", "j-diagrama", "j-alerta", "j-graficas", "j-equipo", "j-lecciones",
             // Escenas.Kanban.cs
             "kb-que", "kb-origen", "kb-diferencia", "kb-cambio", "kb-servicio", "kb-practicas", "kb-tablero", "kb-tarjeta",
@@ -48,9 +45,7 @@ namespace Nexus.Core.Narrativa {
             "m-cobertura-que", "m-cobertura-alto", "m-cobertura-bajo", "m-cobertura-ideal", "m-cansancio-que",
             "m-cansancio-alto", "m-cansancio-bajo", "m-cansancio-ideal", "m-moral-que", "m-moral-alto", "m-moral-bajo",
             "m-moral-ideal", "m-satisfaccion-que", "m-satisfaccion-alto", "m-satisfaccion-bajo", "m-satisfaccion-ideal",
-            "m-riesgo-que", "m-riesgo-alto", "m-riesgo-bajo", "m-riesgo-ideal", "m-documentacion-que",
-            "m-documentacion-alto", "m-documentacion-bajo", "m-documentacion-ideal",
-            // Escenas.Oficio.cs
+            "m-riesgo-que", "m-riesgo-alto", "m-riesgo-bajo", "m-riesgo-ideal", // Escenas.Oficio.cs
             "of-quien-lo-usa", "of-visitante", "of-visitante-donde", "of-anfitrion", "of-anfitrion-donde", "of-cita",
             "of-cita-donde", "of-registro", "of-registro-donde", "of-credencial", "of-credencial-donde", "of-aforo",
             "of-aforo-donde", "of-mvp", "of-mvp-donde", "of-garita", "of-garita-donde", "of-barrera", "of-barrera-donde",

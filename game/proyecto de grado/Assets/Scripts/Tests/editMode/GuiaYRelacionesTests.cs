@@ -83,7 +83,7 @@ namespace Nexus.Tests {
                 foreach (var a in nivel.Fase1.Arquitecturas) Assert.IsTrue(hay(a.Id), "falta en el glosario: " + a.Id);
             }
             foreach (var m in c.Metodologias.Keys) Assert.IsTrue(hay(m), "falta en el glosario: " + m);
-            foreach (var t in new[] { "sprint", "wip", "deuda-tecnica", "cobertura", "riesgo", "satisfaccion", "srs", "ptp", "git", "devops", "estimacion" })
+            foreach (var t in new[] { "sprint", "wip", "deuda-tecnica", "cobertura", "riesgo", "satisfaccion", "srs", "ptp" })
                 Assert.IsTrue(hay(t), "falta en el glosario: " + t);
         }
 
@@ -169,7 +169,7 @@ namespace Nexus.Tests {
 
         [Test]
         public void Cada_medida_del_proyecto_explica_que_pasa_si_es_alta_o_baja_y_que_conviene() {
-            foreach (var id in new[] { "avance", "alcance", "deuda-tecnica", "cobertura", "cansancio", "moral", "satisfaccion", "riesgo", "documentacion" }) {
+            foreach (var id in new[] { "avance", "alcance", "deuda-tecnica", "cobertura", "cansancio", "moral", "satisfaccion", "riesgo" }) {
                 var titulos = Glosario.PaginasDe(Glosario.Buscar(Catalogo().Glosario, id)).Select(p => p.Titulo).ToList();
                 foreach (var parte in new[] { "si es alto", "si es bajo", "recomendable", "Por qué importa" })
                     Assert.IsTrue(titulos.Any(t => t.Contains(parte)), $"{id}: falta la página de «{parte}»");
@@ -216,9 +216,8 @@ namespace Nexus.Tests {
         // 2026-11-15: salen las entradas que ninguna pantalla abria (scrum-master, roles, reunion-diaria, diagramas, dependencia…).
         private static readonly string[] LoQueAntesSeDabaPorSabido = {
             "mvp",
-            "ticket", "cliente", "desarrollador", "tester", "historia-de-usuario", "columnas-del-tablero", "revision-de-codigo", "burndown", "flujo-acumulado", "curva-s", "velocidad",
-            "planificacion-de-sprint",
-            "traza", "log", "defecto", "presupuesto", "incidencia"
+            "ticket", "historia-de-usuario", "columnas-del-tablero", "revision-de-codigo", "burndown", "flujo-acumulado", "curva-s", "velocidad",
+            "planificacion-de-sprint"
         };
 
         // ================================================================ arquitecturas con sus propias razones

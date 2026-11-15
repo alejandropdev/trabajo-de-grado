@@ -210,25 +210,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Texto(300, 210, "no se baja directamente:", 17, Tizador.Tiza, true); p.Texto(300, 238, "se baja descansando, pagando deuda y probando", 17, Tizador.Mostaza, true);
             };
 
-            // ------------------------------------------------------------ documentacion
-            d["m-documentacion-que"] = p => {
-                p.Hoja(110, 60, 110, 150, Tizador.Cian, "SRS"); p.Hoja(245, 60, 110, 150, Tizador.Mostaza, "SAD"); p.Hoja(380, 60, 110, 150, Tizador.Tiza, "PTP");
-                p.Texto(300, 250, "lo que queda escrito del proyecto: qué hace, cómo es y cómo se prueba", 16, Tizador.Tiza, true);
-            };
-            d["m-documentacion-alto"] = p => {
-                p.Figura(120, 110, Tizador.Cian, "alguien nuevo"); p.Hoja(200, 70, 100, 130, Tizador.Tiza); p.Flecha(320, 130, 400, 130, Tizador.Cian);
-                p.Si(450, 126, null, 22); p.Texto(470, 190, "lo entiende solo", 17, Tizador.Cian, true); p.Texto(300, 260, "nadie tiene que adivinar ni preguntar dos veces", 16, Tizador.Tiza, true);
-            };
-            d["m-documentacion-bajo"] = p => {
-                p.Figura(150, 110, Tizador.Tiza, "tú"); p.Texto(150, 60, "?", 44, Tizador.Mostaza, true);
-                p.Figura(460, 110, Tizador.Gris, "se fue"); p.Bocadillo(360, 20, 200, 46, "solo lo sabía él", Tizador.Gris, 16); p.Flecha(500, 130, 570, 130, Tizador.Gris);
-                p.Texto(300, 250, "lo que no está escrito se pierde, y cada uno lo supone a su manera", 16, Tizador.Roja, true);
-            };
-            d["m-documentacion-ideal"] = p => {
-                p.Balanza(300, 80, 300, 0, Tizador.Tiza); p.Hoja(130, 8, 40, 50, Tizador.Cian); p.Esfera(450, 42, 18, Tizador.Mostaza);
-                p.Texto(150, 120, "escribir lo que importa", 16, Tizador.Cian, true); p.Texto(450, 120, "sin quitarle tiempo a construir", 16, Tizador.Mostaza, true);
-                p.Texto(300, 250, "lo justo: decisiones, reglas y lo que alguien nuevo necesita", 16, Tizador.Tiza, true);
-            };
         }
     }
 }

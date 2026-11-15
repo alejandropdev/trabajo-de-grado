@@ -68,10 +68,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Caja(100, 40, 400, 220, null, Tizador.Mostaza); p.Texto(300, 80, "Pronóstico del lanzamiento", 22, Tizador.Mostaza, true);
                 p.Linea(120, 96, 480, 96, Tizador.Gris, 2); p.Texto(300, 160, "saldría REGULAR", 30, Tizador.Tiza, true); p.Medidor(150, 200, 300, 0.55f, Tizador.Mostaza);
             };
-            d["j-apuntes"] = p => {
-                p.Hoja(190, 30, 220, 240, Tizador.Tiza, "Apuntes"); p.Linea(190, 30, 190, 270, Tizador.Mostaza, 8);
-                p.Si(450, 120, null, 16); p.Si(450, 180, null, 16);
-            };
             d["j-fichas"] = p => {
                 var nombres = new[] { "funcional", "usabilidad", "fiabilidad" }; var fichas = new[] { 2, 1, 1 };
                 for (var i = 0; i < 3; i++) {

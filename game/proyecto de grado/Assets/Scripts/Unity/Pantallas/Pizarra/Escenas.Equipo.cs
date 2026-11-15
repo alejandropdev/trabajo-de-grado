@@ -24,25 +24,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Curva(372, 96, 300, 30, 226, 96, Tizador.Roja); p.Texto(300, 36, "«no era eso»: se reabre", 15, Tizador.Roja, true);
                 p.Texto(80, 200, "alguien lo pide", 14, Tizador.Gris, true); p.Texto(226, 200, "alguien lo hace", 14, Tizador.Gris, true); p.Texto(372, 200, "se comprueba", 14, Tizador.Gris, true); p.Texto(518, 200, "queda el registro", 14, Tizador.Gris, true);
             };
-            d["g-cliente"] = p => {
-                p.Figura(300, 80, Tizador.Mostaza); p.Texto(300, 150, "el cliente", 20, Tizador.Mostaza, true);
-                p.Texto(110, 70, "?", 50, Tizador.Roja, true); p.Texto(110, 120, "tiene un problema", 15, Tizador.Roja, true); p.Flecha(180, 80, 260, 80, Tizador.Roja);
-                p.Moneda(490, 66, 26, Tizador.Mostaza); p.Texto(490, 120, "paga por resolverlo", 15, Tizador.Mostaza, true); p.Flecha(340, 80, 450, 70, Tizador.Mostaza);
-                p.Si(300, 220, null, 18); p.Texto(300, 266, "y decide si lo entregado le sirve", 16, Tizador.Cian, true);
-            };
-            d["g-desarrollador"] = p => {
-                p.Figura(110, 130, Tizador.Cian, "desarrollador"); p.Navegador(210, 40, 330, 210, Tizador.Tiza);
-                var ancho = new[] { 120f, 200, 160, 220, 90, 180 };
-                for (var i = 0; i < 6; i++) p.Linea(232 + (i % 3 == 0 ? 0 : 24), 90 + i * 26, 232 + (i % 3 == 0 ? 0 : 24) + ancho[i], 90 + i * 26, i == 3 ? Tizador.Mostaza : Tizador.Cian, 4);
-                p.Texto(380, 280, "escribe el código que hace funcionar el sistema", 15, Tizador.Tiza, true);
-            };
-            d["g-tester"] = p => {
-                p.Figura(90, 130, Tizador.Mostaza, "tester"); p.Navegador(190, 40, 220, 190, Tizador.Tiza); p.Caja(210, 90, 180, 34, null, Tizador.Cian); p.Caja(210, 136, 180, 34, null, Tizador.Roja);
-                p.Lupa(330, 150, 24, Tizador.Mostaza); p.Bicho(330, 150, Tizador.Roja);
-                var caso = new[] { "con cita", "sin cita", "nombre vacío" };
-                for (var i = 0; i < 3; i++) { p.Texto(440, 90 + i * 44, caso[i], 16, Tizador.Tiza); if (i == 1) p.No(570, 84 + i * 44, null, 8); else p.Si(570, 84 + i * 44, null, 9); }
-                p.Texto(300, 270, "busca los fallos antes de que los encuentre el cliente", 15, Tizador.Tiza, true);
-            };
 
             // ------------------------------------------------------------ el tablero y sus graficas
             d["g-historia"] = p => {
@@ -104,31 +85,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Caja(40, 40, 150, 70, "Recepción", Tizador.Cian, false, 16); p.Caja(240, 40, 150, 70, "Registro", Tizador.Cian, false, 16); p.Caja(240, 180, 150, 70, "Aviso", Tizador.Cian, false, 16); p.Cilindro(450, 40, 110, 80, Tizador.Tiza);
                 p.Flecha(194, 75, 236, 75, Tizador.Mostaza); p.Flecha(394, 75, 446, 75, Tizador.Mostaza); p.Flecha(315, 114, 315, 176, Tizador.Mostaza);
                 p.Texto(215, 60, "usa", 13, Tizador.Mostaza, true); p.Texto(110, 200, "cajas: las piezas", 16, Tizador.Cian, true); p.Texto(110, 226, "flechas: quién usa a quién", 14, Tizador.Mostaza, true);
-            };
-            d["g-traza"] = p => {
-                var paso = new[] { "garita", "lectura", "permiso", "barrera" };
-                for (var i = 0; i < 4; i++) {
-                    p.Caja(20 + i * 146, 40, 120, 54, paso[i], Tizador.Tiza, false, 16); p.Texto(80 + i * 146, 126, "08:41:0" + (2 + i), 15, Tizador.Mostaza, true);
-                    if (i < 3) { p.Punto(148 + i * 146, 67, 4, Tizador.Cian); p.Punto(158 + i * 146, 67, 4, Tizador.Cian); }
-                }
-                p.Curva(80, 150, 300, 230, 520, 150, Tizador.Cian); p.Texto(300, 250, "el rastro de UN pedido, paso a paso, con su hora", 16, Tizador.Cian, true);
-            };
-            d["g-log"] = p => {
-                p.Caja(60, 20, 480, 220, null, Tizador.Tiza);
-                var linea = new[] { "08:41:02  INFO   carro detectado", "08:41:03  INFO   lectura ABC123", "08:41:04  ERROR  permiso sin respuesta", "08:41:09  INFO   reintento", "08:41:10  INFO   barrera abierta" };
-                for (var i = 0; i < 5; i++) p.Texto(80, 60 + i * 40, linea[i], 17, i == 2 ? Tizador.Roja : Tizador.Tiza);
-                p.Texto(300, 272, "el diario del sistema: apunta todo lo que hace", 16, Tizador.Mostaza, true);
-            };
-            d["g-defecto"] = p => {
-                p.Caja(40, 60, 220, 110, null, Tizador.Cian); p.Texto(150, 96, "lo esperado", 16, Tizador.Cian, true); p.Texto(150, 144, "aforo: 40", 26, Tizador.Cian, true);
-                p.Caja(340, 60, 220, 110, null, Tizador.Roja); p.Texto(450, 96, "lo que pasó", 16, Tizador.Roja, true); p.Texto(450, 144, "aforo: 4", 26, Tizador.Roja, true);
-                p.Texto(300, 124, "≠", 44, Tizador.Mostaza, true); p.Bicho(300, 210, Tizador.Roja); p.Texto(300, 264, "esa diferencia es el defecto", 17, Tizador.Tiza, true);
-            };
-            d["g-presupuesto"] = p => {
-                p.Circulo(110, 130, 70, Tizador.Mostaza); p.Texto(110, 146, "$", 70, Tizador.Mostaza, true);
-                var parte = new[] { "gente", "tiempo", "herramientas" }; var w = new[] { 220f, 140, 70 };
-                for (var i = 0; i < 3; i++) { p.Flecha(190, 130, 250, 76 + i * 60, Tizador.Gris); p.Bloque(260, 62 + i * 60, w[i], 28, i == 0 ? Tizador.Cian : Tizador.Mostaza); p.Texto(270 + w[i], 84 + i * 60, parte[i], 15, Tizador.Tiza); }
-                p.Texto(300, 268, "lo que se puede gastar, y en qué", 17, Tizador.Tiza, true);
             };
             d["g-incidencia"] = p => {
                 p.Servidor(80, 70, 120, 150, Tizador.Tiza); p.Trazo(Tizador.Roja, 120, 70, 150, 120, 124, 140, 160, 220); p.Sirena(140, 52, Tizador.Roja);

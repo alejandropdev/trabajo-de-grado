@@ -31,34 +31,6 @@ namespace Nexus.Unity.Pantallas {
                 p.Cilindro(450, 90, 100, 100, Tizador.Tiza); p.Texto(500, 222, "lo que recuerda", 16, Tizador.Tiza, true);
                 p.Texto(300, 40, "cada pieza hace una cosa, y se hablan por las flechas", 17, Tizador.Gris, true);
             };
-            d["q-donde-corre"] = p => {
-                p.Servidor(60, 70, 110, 130, Tizador.Cian); p.Texto(115, 232, "todo en una máquina", 16, Tizador.Cian, true); p.Texto(115, 256, "simple de cuidar", 14, Tizador.Gris, true);
-                p.Linea(300, 30, 300, 280, Tizador.Gris, 2, true);
-                p.Servidor(350, 50, 60, 76, Tizador.Mostaza); p.Servidor(440, 50, 60, 76, Tizador.Mostaza); p.Servidor(395, 150, 60, 76, Tizador.Mostaza);
-                p.Linea(410, 90, 440, 90, Tizador.Tiza, 2); p.Linea(385, 128, 410, 150, Tizador.Tiza, 2); p.Linea(465, 128, 440, 150, Tizador.Tiza, 2);
-                p.Texto(450, 256, "repartido en varias", 16, Tizador.Mostaza, true); p.Texto(450, 280, "aguanta más, cuesta más cuidarlo", 14, Tizador.Gris, true);
-            };
-            d["q-elegir"] = p => {
-                p.Figura(60, 40, Tizador.Cian); p.Figura(100, 40, Tizador.Cian); p.Texto(80, 116, "el equipo", 16, Tizador.Cian, true);
-                p.RelojDeArena(66, 150, 44, Tizador.Mostaza); p.Texto(80, 222, "el plazo", 16, Tizador.Mostaza, true);
-                p.Hoja(230, 196, 56, 70, Tizador.Tiza); p.Texto(258, 290, "el encargo", 16, Tizador.Tiza, true);
-                p.Flecha(130, 76, 400, 136, Tizador.Gris, 2); p.Flecha(130, 172, 400, 156, Tizador.Gris, 2); p.Flecha(292, 226, 400, 176, Tizador.Gris, 2);
-                p.Caja(410, 110, 160, 90, "la arquitectura", Tizador.Mostaza, false, 18);
-                p.Texto(490, 230, "sale de esas tres cosas,", 15, Tizador.Tiza, true); p.Texto(490, 252, "no de la moda", 15, Tizador.Roja, true);
-            };
-            d["q-mal-elegida"] = p => {
-                for (var i = 0; i < 5; i++) { p.Caja(40 + (i % 3) * 90, 40 + (i / 3) * 80, 70, 54, null, Tizador.Roja); p.Engranaje(75 + (i % 3) * 90, 67 + (i / 3) * 80, 14, Tizador.Roja); }
-                p.Sirena(250, 140, Tizador.Roja);
-                p.Carita(450, 110, 30, -1, Tizador.Roja);
-                p.Texto(450, 200, "tres personas para", 16, Tizador.Tiza, true); p.Texto(450, 224, "cinco cosas que vigilar", 16, Tizador.Roja, true);
-                p.Texto(300, 276, "no era mala: era demasiado para este equipo", 16, Tizador.Mostaza, true);
-            };
-            d["q-cambiar-cuesta"] = p => {
-                p.Edificio(60, 50, 120, 170, Tizador.Cian); p.Texto(120, 250, "todo lo construido", 15, Tizador.Cian, true); p.Texto(120, 272, "se apoya en ella", 15, Tizador.Cian, true);
-                p.Flecha(210, 140, 330, 140, Tizador.Roja); p.Texto(270, 122, "cambiarla", 16, Tizador.Roja, true);
-                p.Edificio(360, 50, 120, 170, Tizador.Gris); p.No(420, 130, null, 34); p.LlaveInglesa(510, 120, Tizador.Roja);
-                p.Texto(440, 262, "es rehacer los cimientos:", 15, Tizador.Tiza, true); p.Texto(440, 284, "por eso se piensa al principio", 15, Tizador.Mostaza, true);
-            };
 
             // ---------------------------------------------------------------- monolito modular
             d["q-mono-dentro"] = p => {

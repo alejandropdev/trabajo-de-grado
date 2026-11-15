@@ -20,13 +20,6 @@ namespace Nexus.Unity.Pantallas {
                 xy[12] = xy[0]; xy[13] = xy[1];
                 p.Hexagono(300, 150, 110, Tizador.Gris); p.Trazo(Tizador.Cian, xy);
             };
-            d["q-calidad-falta"] = p => {
-                for (var i = 0; i < 4; i++) p.Punto(90 + i * 56, 80, 22, Tizador.Mostaza);
-                p.Texto(174, 136, "tus fichas", 17, Tizador.Mostaza, true); p.Flecha(310, 80, 360, 80, Tizador.Tiza);
-                for (var i = 0; i < 6; i++) p.Circulo(400 + (i % 3) * 62, 56 + (i / 3) * 62, 22, Tizador.Gris, true);
-                p.Texto(462, 176, "seis cosas que cuidar", 17, Tizador.Gris, true);
-                p.Texto(300, 240, "no alcanza para todo: lo que dejes sin ficha es lo que falla", 18, Tizador.Roja, true);
-            };
 
             d["q-adecuacion-que"] = p => {
                 p.Caja(50, 40, 200, 200, null, Tizador.Mostaza); p.Texto(150, 30, "lo que se pidió", 17, Tizador.Mostaza, true);
