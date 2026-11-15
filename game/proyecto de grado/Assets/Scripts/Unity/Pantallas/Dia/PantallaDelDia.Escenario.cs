@@ -15,7 +15,8 @@ namespace Nexus.Unity.Pantallas {
     /// <summary>
     /// La Fase 2 rediseñada (2026-11-06): poco texto y pocos botones, y lo que se mira, a pantalla completa.
     ///
-    ///   HUD fijo        arriba: «Mapa» y «Backlog» a la izquierda, el reloj en el centro, «Pausa» y «Menú» a la derecha;
+    ///   HUD fijo        arriba: «Mapa» y «Backlog» a la izquierda, el dia del proyecto en grande y el reloj en el
+    ///                   centro, «Menú» a la derecha (pausar es abrir el menú: no hay un boton «Pausa» aparte);
     ///                   abajo del todo: los puntos del carrusel (Indicadores, Burndown, Tablero, Equipo…); justo encima,
     ///                   «M» (mensajes: avisos, el cliente, la bitacora) a la izquierda y «Producto» a la derecha
     ///   el escenario    en el escritorio, un carrusel de diapositivas (indicadores, la grafica de la metodologia, el
@@ -30,7 +31,8 @@ namespace Nexus.Unity.Pantallas {
         private ScrollRect _scrollMomento;
         private RectTransform _fijoMomento;
         private CarruselDeDiapositivas _carrusel;
-        private TMP_Text _textoM, _subtituloHud, _desgloseM;
+        private TMP_Text _textoM, _subtituloHud, _desgloseM, _textoDia, _textoDiaDe;
+        private bool _historialAbierto;
         private RectTransform _globoM;
         private float _momento01, _bandeja01;
         private bool _bandejaAbierta;
@@ -94,6 +96,7 @@ namespace Nexus.Unity.Pantallas {
             // El reloj y su velocidad (×1/×2/×4): una sola pieza. Ya no hay «adelantar» (2026-11-07): el dia pasa solo.
             var centro = Ui.Columna(hud, "Reloj", 2, 0, TextAnchor.MiddleCenter);
             var fila = Ui.Fila(centro, "Tiempo", Tema.Espacio(2), alineacion: TextAnchor.MiddleCenter);
+            ConstruirDiaGrande(fila);
             GuiaView.Registrar("dia.reloj", RelojView.CrearCompacto(Ui, fila, Runner));
             var controles = Ui.Fila(fila, "Controles", 6, alineacion: TextAnchor.MiddleCenter);
             controles.gameObject.AddComponent<ListaDeElementos>();
@@ -103,15 +106,34 @@ namespace Nexus.Unity.Pantallas {
             }, VarianteBoton.Fantasma);
             UiKit.Tamano(velocidad, ancho: 84);
             _textoVelocidad = velocidad.GetComponentInChildren<TMP_Text>();
+            GuiaView.Registrar("dia.velocidad", velocidad);
             _subtituloHud = Ui.Texto(centro, "", EstiloTexto.Leyenda, Tema.inkMuted, TextAlignmentOptions.Center);
             Ui.Resorte(hud);
 
+            // Solo «Menú»: abrirlo ya para el reloj (2026-11-14: el boton «Pausa» sobraba).
             var derecha = Ui.Fila(hud, "Derecha", Tema.Espacio(2));
-            _pausa = Ui.Boton(derecha, "Pausa", () => Runner.Pausado = !Runner.Pausado);
-            UiKit.Tamano(_pausa, ancho: 130);
-            GuiaView.Registrar("dia.velocidad", _pausa);
             var menu = Ui.Boton(derecha, "Menú", () => App.Router.Apilar<PantallaDePausa>());
+            UiKit.Tamano(menu, ancho: 130);
             GuiaView.Registrar("dia.diario", menu);   // el diario vive en «Menú» (la pausa)
+        }
+
+        /// <summary>
+        /// El dia del proyecto, tan grande como la hora: «DÍA 3» con «de 10» debajo, y una raya que lo separa del reloj.
+        /// Asi se ve de un vistazo cuanto queda de proyecto, no solo de jornada.
+        /// </summary>
+        private void ConstruirDiaGrande(RectTransform fila) {
+            var bloque = Ui.Columna(fila, "Dia", 0, 0, TextAnchor.MiddleCenter);
+            _textoDia = Ui.Texto(bloque, "", EstiloTexto.Titulo, Tema.cyan, TextAlignmentOptions.Center);
+            QuitarAltoMinimo(_textoDia);
+            _textoDia.font = Tema.FuenteDisplay;
+            _textoDia.fontSize = 40;
+            _textoDia.characterSpacing = 4;
+            _textoDiaDe = Ui.Texto(bloque, "", EstiloTexto.Etiqueta, Tema.inkMuted, TextAlignmentOptions.Center);
+            QuitarAltoMinimo(_textoDiaDe);
+            _textoDiaDe.characterSpacing = 2;
+            var raya = Ui.Nodo(fila, "Raya");
+            raya.gameObject.AddComponent<Image>().color = NexusTheme.Alfa(Tema.cyan, 0.35f);
+            UiKit.Tamano(raya, ancho: 2, alto: 54);
         }
 
         /// <summary>Backlog: en Scrum, el product backlog; en las demas, el tablero (lo «por hacer» es su backlog).</summary>
@@ -437,11 +459,12 @@ namespace Nexus.Unity.Pantallas {
                         novedades > 0 ? $"{novedades} novedad{(novedades == 1 ? "" : "es")}" : null
                     }.Where(x => x != null)) + " · clic para abrir";
 
-            // El HUD: dia, unidad y donde estas, en una linea.
+            // El HUD: el dia en grande; debajo, la unidad (sprint, etapa…) y donde estas.
             var brief = S.BriefDeHoy;
-            _subtituloHud.text = (S.R.DiaActual == 0 ? "Antes del día 1" : $"Día {S.R.DiaActual} de {S.Perfil.DiasTotales}" +
-                                  (brief != null ? " · " + brief.EtiquetaUnidad : "")) + (zona != null ? " · " + zona.Nombre : "");
-            _pausa.GetComponentInChildren<TMP_Text>().text = Runner.Pausado ? "Seguir" : "Pausa";
+            _textoDia.text = S.R.DiaActual == 0 ? "DÍA 0" : "DÍA " + S.R.DiaActual;
+            _textoDiaDe.text = S.R.DiaActual == 0 ? "antes de empezar" : "DE " + S.Perfil.DiasTotales + (S.R.DiaActual >= S.Perfil.DiasTotales ? " · EL ÚLTIMO" : "");
+            _textoDia.color = S.R.DiaActual >= S.Perfil.DiasTotales ? Tema.warning : Tema.cyan;
+            _subtituloHud.text = string.Join(" · ", new[] { brief != null ? brief.EtiquetaUnidad : null, zona != null ? zona.Nombre : null }.Where(x => !string.IsNullOrEmpty(x)));
             if (_textoVelocidad != null) _textoVelocidad.text = RotuloDeVelocidad();
         }
 
