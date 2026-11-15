@@ -42,7 +42,6 @@ namespace Nexus.Unity.Pantallas {
 
         // interfaz
         private Hoja _ahora;
-        private Button _pausa;
         private readonly List<KeyValuePair<Alerta, TMP_Text>> _cuentasAtras = new List<KeyValuePair<Alerta, TMP_Text>>();
         private string _claveAhora;
         private Paso _pasoAnterior;

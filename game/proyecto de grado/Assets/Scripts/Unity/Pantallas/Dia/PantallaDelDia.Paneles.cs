@@ -224,7 +224,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private string MotivoParaNoMoverse() {
-            return Runner.Pausado ? "El juego está en pausa: pulsa «Seguir», arriba, para poder moverte."
+            return Runner.Pausado ? "El juego está en pausa: cierra el menú para poder moverte."
                  : Runner.EnEscena ? "Estás ocupado aquí: termina lo que tienes abierto antes de irte."
                  : "Solo te puedes mover mientras corre la jornada.";
         }
@@ -254,7 +254,7 @@ namespace Nexus.Unity.Pantallas {
                 if (aqui) Ui.Resaltar(boton, true);
             }
             if (!puedeMoverse && Runner.Estado != EstadoDelDia.DesarrolloTerminado)
-                Ui.Texto(zonas, Runner.Pausado ? "El juego está en pausa: pulsa «Seguir», arriba, para poder moverte."
+                Ui.Texto(zonas, Runner.Pausado ? "El juego está en pausa: cierra el menú para poder moverte."
                               : Runner.EnEscena ? "Estás ocupado aquí: termina lo que tienes abierto antes de irte."
                               : "Solo te puedes mover mientras corre la jornada.", EstiloTexto.Pequeno, Tema.warning);
 
