@@ -116,6 +116,7 @@ namespace Nexus.Mundo3D {
             RenderSettings.fogStartDistance = 10f;
             RenderSettings.fogEndDistance = 55f;
             PonerTecho(escena);
+            TemplarMateriales(escena);
             var n = 0;
             foreach (var raiz in escena.GetRootGameObjects())
                 foreach (var luz in raiz.GetComponentsInChildren<Light>(true)) {
@@ -165,6 +166,36 @@ namespace Nexus.Mundo3D {
             vineta.intensity.Override(0.3f);
             vineta.smoothness.Override(0.45f);
             volumen.sharedProfile = perfil;
+        }
+
+        /// <summary>
+        /// Materiales de estilo (2026-11-15): el marmol casi blanco del nivel quemaba la imagen en la penumbra del bunker.
+        /// Se pinta con una COPIA de cada material (el original no se toca) entintada hacia el hormigon verdeazulado y con
+        /// menos brillo especular. Una copia por material, compartida por todos los que lo usan.
+        /// </summary>
+        private static void TemplarMateriales(Scene escena) {
+            var copias = new Dictionary<Material, Material>();
+            var tinte = new Color(0.42f, 0.52f, 0.54f, 1f);
+            foreach (var raiz in escena.GetRootGameObjects())
+                foreach (var r in raiz.GetComponentsInChildren<Renderer>(true)) {
+                    var mats = r.sharedMaterials;
+                    var cambiado = false;
+                    for (var i = 0; i < mats.Length; i++) {
+                        var m = mats[i];
+                        if (m == null || !m.name.StartsWith("Marmol", StringComparison.OrdinalIgnoreCase)) continue;
+                        Material copia;
+                        if (!copias.TryGetValue(m, out copia)) {
+                            copia = new Material(m) { name = m.name + " (bunker)" };
+                            if (copia.HasProperty("_BaseColor")) copia.SetColor("_BaseColor", copia.GetColor("_BaseColor") * tinte);
+                            if (copia.HasProperty("_Smoothness")) copia.SetFloat("_Smoothness", Mathf.Min(copia.GetFloat("_Smoothness"), 0.25f));
+                            copias[m] = copia;
+                        }
+                        mats[i] = copia;
+                        cambiado = true;
+                    }
+                    if (cambiado) r.sharedMaterials = mats;
+                }
+            Debug.Log("[Recorrido] materiales templados: " + copias.Count);
         }
 
         /// <summary>
