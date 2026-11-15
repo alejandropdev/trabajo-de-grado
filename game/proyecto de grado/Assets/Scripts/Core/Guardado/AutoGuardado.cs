@@ -16,6 +16,12 @@ namespace Nexus.Core.Guardado {
             public const string TrasLanzamiento = "tras el lanzamiento";
             public const string CierreDeNivel = "cierre del nivel";
             public const string PausaYSalida = "pausa y salida";
+            /// <summary>La planificacion a medias: cada paso o decision de la Fase 1 queda en disco, no solo al cerrarla.</summary>
+            public const string Fase1EnCurso = "fase 1 en curso";
+            /// <summary>La entrevista y las escenas de apertura ya se vieron: no se repiten al volver.</summary>
+            public const string IntroVista = "intro vista";
+            /// <summary>La ventana del juego pierde el foco: por si despues se cierra a la fuerza.</summary>
+            public const string SinFoco = "ventana sin foco";
         }
 
         private readonly SaveStore _store;

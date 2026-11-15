@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nexus.Core.Fase1;
+using Nexus.Core.Guardado;
 using Nexus.Core.Metodologia;
 using Nexus.Core.Modelo;
 using Nexus.Core.Narrativa;
@@ -115,6 +116,42 @@ namespace Nexus.Unity.Pantallas {
                 FalladasAlguna = _falladas.ToList(),
                 Backlog = _backlog.ToList()
             };
+            // Si cambio algo de verdad, a disco en un momento (no en cada clic: varios cambios seguidos, un guardado).
+            if (ClaveDelBorrador() != _borradorEnDisco && _cambioSinGuardarDesde < 0) _cambioSinGuardarDesde = Time.unscaledTime;
+        }
+
+        /// <summary>Lo que ya esta en disco, para no reescribir la partida si nada cambio.</summary>
+        private string _borradorEnDisco;
+        private float _cambioSinGuardarDesde = -1f;
+        private const float SegundosAntesDeGuardar = 1f;
+
+        private string ClaveDelBorrador() {
+            var b = S.R.Fase1Borrador;
+            if (b == null) return "";
+            return string.Join("|", b.Paso, b.SubPaso, b.Metodologia, b.RazonMetodologia, b.DuracionDeUnidad, b.Arquitectura, b.RazonArquitectura,
+                string.Join(",", b.Fichas.OrderBy(kv => kv.Key).Select(kv => kv.Key + "=" + kv.Value)),
+                string.Join(",", b.Comprobacion.OrderBy(kv => kv.Key).Select(kv => kv.Key + "=" + kv.Value)),
+                string.Join(",", b.FalladasAlguna), string.Join(",", b.Backlog),
+                S.R.RecoleccionHecha);
+        }
+
+        /// <summary>
+        /// La planificacion a medias se escribe en disco: salir del juego por lo que sea (cerrarlo, que se cuelgue) no
+        /// obliga a empezar la Fase 1 de cero. Al volver, se sigue en el paso y con lo elegido hasta ahi.
+        /// </summary>
+        private void GuardarEnDisco() {
+            _cambioSinGuardarDesde = -1f;
+            if (S == null || S.Fase1Cerrada) return;
+            var clave = ClaveDelBorrador();
+            if (clave == _borradorEnDisco) return;
+            _borradorEnDisco = clave;
+            App.Guardar(AutoGuardado.Motivos.Fase1EnCurso);
+        }
+
+        public override void AntesDeGuardar() {
+            GuardarBorrador();
+            _borradorEnDisco = ClaveDelBorrador();
+            _cambioSinGuardarDesde = -1f;
         }
 
         private void CargarBorrador() {
@@ -161,6 +198,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         private void Update() {
+            if (_cambioSinGuardarDesde >= 0 && Time.unscaledTime - _cambioSinGuardarDesde >= SegundosAntesDeGuardar) GuardarEnDisco();
             if (_avisarAlEmpezar) {
                 _avisarAlEmpezar = false;
                 Repintar();

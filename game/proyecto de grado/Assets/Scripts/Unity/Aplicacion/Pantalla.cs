@@ -37,6 +37,12 @@ namespace Nexus.Unity.Aplicacion {
         /// </summary>
         public virtual bool AlPulsarEscape() { return false; }
 
+        /// <summary>
+        /// Justo antes de un guardado que no pidio la pantalla (la ventana pierde el foco, se cierra la aplicacion):
+        /// vuelca en la sesion lo que tenga a medias para que no se pierda.
+        /// </summary>
+        public virtual void AntesDeGuardar() { }
+
         /// <summary>Crea la interfaz. Se llama una sola vez.</summary>
         protected abstract void Construir();
 
