@@ -6,7 +6,7 @@ namespace Nexus.Core.Proyecto {
     /// El expediente del proyecto de un nivel: QUE se construye, para QUIEN, en que SECTOR y con que palabras.
     /// Espejo del bloque "proyecto" de niveles/nivel-XX.json. Es lo que hace que un nivel se distinga de otro por su
     /// contenido y no solo por los dias: lo enseña la Fase 1 (paso «El proyecto»), cada minijuego dice a que modulo
-    /// pertenece, la Fase 2 muestra el avance por modulo y los Apuntes lo resumen.
+    /// pertenece, la Fase 2 muestra el avance por modulo.
     /// Solo datos: las reglas que lo usan estan en PreguntasDelProyecto y AvanceDeModulos.
     /// </summary>
     public sealed class FichaDelProyecto {
