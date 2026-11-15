@@ -56,6 +56,13 @@ namespace Nexus.Unity.Aplicacion {
             paginas.Add(Par("propuesta_A_senaletica", PropuestaA));
             paginas.Add(Par("propuesta_B_plano", PropuestaB));
             paginas.Add(Par("propuesta_C_serigrafia", PropuestaC));
+            // Tanda piloto de las pizarras en el lenguaje nuevo, a tamano de pizarron (NEXUS_GALERIA=piloto).
+            var piloto = new[] { "m-avance-que", "m-avance-alto", "m-avance-bajo", "m-avance-ideal", "m-cansancio-que", "m-cansancio-alto",
+                                 "m-cansancio-bajo", "m-cansancio-ideal", "m-moral-que", "m-riesgo-que" };
+            for (var i = 0; i < piloto.Length; i += 4) {
+                var trozo = piloto.Skip(i).Take(4).ToList();
+                paginas.Add(Par("piloto_metricas_" + (i / 4 + 1), r => PizarrasGrandes(r, trozo)));
+            }
             var escenas = EscenasDePizarra.Todas.ToList();
             for (var i = 0; i < escenas.Count; i += 9) {
                 var trozo = escenas.Skip(i).Take(9).ToList();
@@ -107,6 +114,19 @@ namespace Nexus.Unity.Aplicacion {
                 lamina.Dibujo.Tiza = true;
                 DibujosDeEscena.Dibujar(new Tizador(lamina, _ui.FuenteTiza), ids[i]);
                 Rotulo(capa, x, y + 302, 600, ids[i]);
+            }
+        }
+
+        /// <summary>Hasta cuatro escenas a 1,45: lo que mide una escena a pagina completa en el pizarron.</summary>
+        private void PizarrasGrandes(RectTransform capa, List<string> ids) {
+            const float k = 1.45f, w = 600 * k, h = 300 * k;
+            for (var i = 0; i < ids.Count; i++) {
+                float x = 60 + (i % 2) * (w + 60), y = 40 + (i / 2) * (h + 70);
+                var fondo = Bloque(capa, x, y, w, h, Tizador.Pizarra);
+                var lamina = Lamina(fondo, 0, 0, w, h);
+                lamina.Dibujo.Tiza = true;
+                DibujosDeEscena.Dibujar(new Tizador(lamina, _ui.FuenteTiza, 0, 0, k), ids[i]);
+                Rotulo(capa, x, y + h + 6, w, ids[i]);
             }
         }
 
