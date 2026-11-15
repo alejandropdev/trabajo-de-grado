@@ -18,8 +18,8 @@ namespace Nexus.Core.Minijuegos.Corregir
 
     /// <summary>
     /// El tablero del diagrama con cartas: que carta hay en cada punto. Las cartas son UNICAS: una carta en un punto
-    /// no se puede jugar en otro hasta quitarla. «Está bien así» no se gasta. No se guarda en save.json: un reto no
-    /// es reanudable a mitad.
+    /// no se puede jugar en otro hasta quitarla. «Está bien así» tambien: se usa una sola vez, como las demas (cada
+    /// reto tiene como mucho un punto que esta bien). No se guarda en save.json: un reto no es reanudable a mitad.
     /// </summary>
     public sealed class CorregirState
     {
@@ -43,10 +43,10 @@ namespace Nexus.Core.Minijuegos.Corregir
             return punto != null && Asignaciones.TryGetValue(punto, out c) ? c : null;
         }
 
-        /// <summary>El punto en el que esta la carta (null si esta en la mano, y siempre para «Está bien así»).</summary>
+        /// <summary>El punto en el que esta la carta (null si esta en la mano).</summary>
         public string PuntoDe(string carta)
         {
-            if (carta == null || carta == PuntosDelDiagrama.EstaBien) return null;
+            if (carta == null) return null;
             foreach (var kv in Asignaciones) if (kv.Value == carta) return kv.Key;
             return null;
         }
@@ -66,7 +66,7 @@ namespace Nexus.Core.Minijuegos.Corregir
             var donde = PuntoDe(carta);
             if (donde != null && donde != PuntoElegido) return Jugada.EnUso;
             var anterior = CartaEn(PuntoElegido);
-            if (anterior != null && anterior != carta && anterior != PuntosDelDiagrama.EstaBien) devuelta = anterior;
+            if (anterior != null && anterior != carta) devuelta = anterior;
             Asignaciones[PuntoElegido] = carta;
             Momentos[PuntoElegido] = segundo;
             return Jugada.Puesta;
