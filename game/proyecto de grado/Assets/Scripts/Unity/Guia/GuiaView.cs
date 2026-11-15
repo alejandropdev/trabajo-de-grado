@@ -26,7 +26,7 @@ namespace Nexus.Unity.Guia {
     ///     quedaba pendiente del contexto anterior: la guia sigue al jugador, no al reves.
     ///   · Si algo hace imposible la accion (el aviso caduco, elegiste quedarte), la pantalla llama a Cancelar.
     ///   · Un paso se marca visto al CERRARLO. «¿Qué hago ahora?» relee lo de la pantalla actual, visto o no, y
-    ///     si no hay nada propio, la ayuda generica de esa pantalla. «Apuntes del proyecto» resume todo el nivel.
+    ///     si no hay nada propio, la ayuda generica de esa pantalla.
     /// </summary>
     public sealed class GuiaView : MonoBehaviour {
         private static GuiaView _instancia;
@@ -111,24 +111,21 @@ namespace Nexus.Unity.Guia {
                 _instancia.Cerrar(true);
         }
 
-        /// <summary>Los botones «¿Qué hago ahora?» y «Apuntes del proyecto». Solo en niveles que tienen guia.</summary>
+        /// <summary>El boton «?»: «¿Qué hago ahora?» directamente, sin menu de por medio. Solo en niveles que tienen guia.</summary>
         public static void BotonDeAyuda(AppRoot app, Transform padre) {
             var g = Obtener(app);
             if (g == null || g._guia == null || !g._guia.Activa) return;
-            // Un solo «?» con «¿Qué hago ahora?» y «Apuntes» dentro: eran dos botones fijos en cada cabecera.
-            PantallaDeMenu.Boton(app, padre, "?", "Ayuda", () => OpcionesDeAyuda(app), VarianteBoton.Secundario);
+            app.Ui.Boton(padre, "?", () => g.Repetir(), VarianteBoton.Secundario);
         }
 
         /// <summary>
-        /// Las mismas dos entradas de BotonDeAyuda, para meterlas en un menu corto («?» o «Más») en vez de ocupar dos
-        /// botones de la cabecera. Vacio si la guia no esta activa.
+        /// La ayuda de la guia como opciones de un menu corto (la pausa, «Más»). Vacio si la guia no esta activa.
         /// </summary>
         public static List<OpcionDeMenu> OpcionesDeAyuda(AppRoot app) {
             var lista = new List<OpcionDeMenu>();
             var g = Obtener(app);
             if (g == null || g._guia == null || !g._guia.Activa) return lista;
             lista.Add(new OpcionDeMenu("¿Qué hago ahora?", () => g.Repetir()));
-            lista.Add(new OpcionDeMenu("Apuntes del proyecto", () => ApuntesDelProyecto.Abrir(app)));
             return lista;
         }
 

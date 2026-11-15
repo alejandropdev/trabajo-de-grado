@@ -150,10 +150,9 @@ namespace Nexus.Unity.Pantallas {
         private void ConstruirNodos(RectTransform red) {
             foreach (var o in GuiaView.OpcionesDeAyuda(App)) {
                 var opcion = o;
-                var apuntes = opcion.Texto != null && opcion.Texto.StartsWith("Apuntes", StringComparison.Ordinal);
                 _defs.Add(new Def {
-                    Tipo = apuntes ? PictogramasDePausa.Tipo.Apuntes : PictogramasDePausa.Tipo.Ayuda,
-                    Rotulo = apuntes ? "Apuntes" : "¿Qué hago?",
+                    Tipo = PictogramasDePausa.Tipo.Ayuda,
+                    Rotulo = "¿Qué hago?",
                     // La ayuda de la guia (si esta activa): se cierra la pausa (con su salida) y luego se hace lo suyo.
                     Accion = () => Cerrar(opcion.AlPulsar)
                 });
