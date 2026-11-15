@@ -581,7 +581,7 @@
       "opciones": [
         {
           "id": "abrir-el-log",
-          "texto": "Abrir el archivo de log e indagar",
+          "texto": "Abrir el archivo de log e indagar a fondo.",
           "flag": "FLG_ZERO_NOTADO_N1",
           "valor": 1
         },
