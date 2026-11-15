@@ -99,6 +99,7 @@ namespace Nexus.Unity.Pantallas {
             var n = App.Partidas.Listar(App.PerfilActivo.idPerfil).Count + 1;
             _nombre = Ui.CampoDeTexto(nueva, "Nombre de la partida", "Partida " + n, 540);
             _nombre.characterLimit = 40;
+            _enfocarPendiente = true;
 
             Ui.Espaciador(nueva, 4);
             _botonAula = Ui.BotonDeOpcion(nueva, "Modo aula: no",
@@ -113,6 +114,17 @@ namespace Nexus.Unity.Pantallas {
 
             _aviso = Ui.Texto(nueva, "", EstiloTexto.Pequeno, Tema.warning);
             Ui.Boton(Ui.Fila(nueva), "Empezar", Empezar, VarianteBoton.Primario);
+        }
+
+        private bool _enfocarPendiente;
+
+        /// <summary>Al llegar, el nombre de la partida nueva ya tiene el foco: el cursor parpadea al final del texto.</summary>
+        private void Update() {
+            if (!_enfocarPendiente || _nombre == null) return;
+            _enfocarPendiente = false;
+            _nombre.Select();
+            _nombre.ActivateInputField();
+            _nombre.MoveTextEnd(false);
         }
 
         private void AlternarAula() {
