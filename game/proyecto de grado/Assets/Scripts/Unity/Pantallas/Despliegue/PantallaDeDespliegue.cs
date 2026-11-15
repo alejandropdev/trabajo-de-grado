@@ -76,6 +76,20 @@ namespace Nexus.Unity.Pantallas {
 
         public override bool PuedeVolver { get { return false; } }
 
+        /// <summary>Escape abre el menu de pausa, como en la Fase 2 y en los retos (2026-11-14). El reloj se para mientras.</summary>
+        public override bool AlPulsarEscape() {
+            if (!PantallaDePausa.Abierta) AbrirPausa();
+            return true;
+        }
+
+        private void AbrirPausa() {
+            if (_paso == Paso.Resultado) return;
+            App.Router.Apilar<PantallaDePausa>(p => {
+                // Salir a medias no entrega nada: el despliegue sigue pendiente y se vuelve a empezar al retomar la partida.
+                p.Aviso = "Si sales ahora, este despliegue empezará de nuevo cuando vuelvas.";
+            });
+        }
+
         private enum Paso { Intro, Tuberia, Cuartos, Resultado }
 
         private DespliegueDef _def;
@@ -127,8 +141,9 @@ namespace Nexus.Unity.Pantallas {
             _dialogo = Ui.Texto(dialogo, "", EstiloTexto.Dialogo, Tema.ink);
             var alto = _dialogo.GetComponent<AltoDeTexto>();
             if (alto != null) Destroy(alto);   // caja fija con letra que se ajusta: que no crezca el globo
-            _dialogo.enableAutoSizing = true; _dialogo.fontSizeMin = 14; _dialogo.fontSizeMax = 21;
-            UiKit.Tamano(_dialogo, alto: 78);
+            // Lo que dice el globo es lo que guia el paso (que cable, que toma): letra grande, que se lea sin buscarla.
+            _dialogo.enableAutoSizing = true; _dialogo.fontSizeMin = 18; _dialogo.fontSizeMax = 26;
+            UiKit.Tamano(_dialogo, alto: 96);
 
             var fila = Ui.Fila(_hud, "Acciones", Tema.espacio * 0.75f, 0, TextAnchor.MiddleRight);
             Anclar(fila, new Vector2(1, 1), new Vector2(-16, -14));
@@ -138,6 +153,7 @@ namespace Nexus.Unity.Pantallas {
             _chipIntentos.gameObject.SetActive(false);
             _accion = Ui.Fila(fila, "Accion del paso", Tema.espacio * 0.75f, 0, TextAnchor.MiddleRight);
             GuiaView.BotonDeAyuda(App, fila);
+            Ui.Boton(fila, "Menú", AbrirPausa, VarianteBoton.Fantasma);
             _reloj = Ui.Temporizador(fila, Reloj(_total), Tono.Cyan);
         }
 
