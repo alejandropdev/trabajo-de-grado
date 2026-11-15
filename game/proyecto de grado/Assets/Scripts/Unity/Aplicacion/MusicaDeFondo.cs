@@ -12,6 +12,8 @@ namespace Nexus.Unity.Aplicacion {
     /// Cada tema hace su bucle sin corte: dos fuentes con la misma pista, y la siguiente vuelta entra con un fundido
     /// antes de que acabe la actual, empezando justo donde empieza a sonar (sin el silencio del principio).
     /// Todo en 2D y sin pararse con la pausa del recorrido 3D.
+    /// Al salir de la ventana del juego la musica se congela donde iba y al volver sigue desde ese punto: nunca vuelve
+    /// a empezar la cancion por haber cambiado de ventana.
     /// </summary>
     public sealed class MusicaDeFondo : MonoBehaviour {
         public const string Carpeta = "Audio/Musica/";
@@ -26,6 +28,8 @@ namespace Nexus.Unity.Aplicacion {
             public AudioSource[] Fuentes;
             public int Actual;
             public float Empalme;
+            /// <summary>Por donde iba la fuente que suena (para seguir desde ahi si algo la para).</summary>
+            public float Posicion;
             public float Nivel, Destino, Velocidad = 1f / SegundosDeFundido;
             public bool Empezada, Pausada;
         }
@@ -34,6 +38,9 @@ namespace Nexus.Unity.Aplicacion {
         private float _volumenDeOpciones = 0.7f;
         private string _pantalla;
         private bool _apremio;
+        /// <summary>La ventana del juego no tiene el foco (o la aplicacion esta en pausa): todo congelado.</summary>
+        private bool _congelada;
+        private readonly System.Collections.Generic.List<AudioSource> _congeladas = new System.Collections.Generic.List<AudioSource>();
 
         public static MusicaDeFondo Crear(GameObject anfitrion, float volumenDeOpciones) {
             var m = anfitrion.AddComponent<MusicaDeFondo>();
@@ -96,8 +103,34 @@ namespace Nexus.Unity.Aplicacion {
             }
         }
 
+        private void OnApplicationFocus(bool conFoco) { if (conFoco) Descongelar(); else Congelar(); }
+
+        private void OnApplicationPause(bool enPausa) { if (enPausa) Congelar(); else Descongelar(); }
+
+        /// <summary>Pausa lo que este sonando, recordando que fuentes eran, para retomarlas tal cual al volver.</summary>
+        private void Congelar() {
+            if (_congelada || _pistas == null) return;
+            _congelada = true;
+            _congeladas.Clear();
+            foreach (var p in _pistas) {
+                if (p.Fuentes == null) continue;
+                foreach (var f in p.Fuentes) {
+                    if (!f.isPlaying) continue;
+                    _congeladas.Add(f);
+                    f.Pause();
+                }
+            }
+        }
+
+        private void Descongelar() {
+            if (!_congelada) return;
+            _congelada = false;
+            foreach (var f in _congeladas) if (f != null) f.UnPause();
+            _congeladas.Clear();
+        }
+
         private void Update() {
-            if (_pistas == null) return;
+            if (_pistas == null || _congelada) return;
             var dt = Time.unscaledDeltaTime;
             foreach (var p in _pistas) Avanzar(p, dt);
         }
@@ -139,9 +172,13 @@ namespace Nexus.Unity.Aplicacion {
                     p.Empalme = 0;
                 }
             } else if (!sonando.isPlaying) {
-                sonando.time = p.Inicio;   // por si algo la paro (un cambio de dispositivo de audio)
+                // Algo la paro (un cambio de dispositivo de audio, la ventana sin foco): sigue por donde iba, y solo
+                // vuelve al principio si de verdad habia llegado al final de la vuelta.
+                var resto = p.Clip.length - p.Posicion;
+                sonando.time = resto > SegundosDeEmpalme ? Mathf.Max(p.Inicio, p.Posicion) : p.Inicio;
                 sonando.Play();
             }
+            if (p.Fuentes[p.Actual].isPlaying) p.Posicion = p.Fuentes[p.Actual].time;
 
             var volumen = p.Nivel * _volumenDeOpciones;
             // Curva de igual potencia: en el empalme no hay bache de volumen.
