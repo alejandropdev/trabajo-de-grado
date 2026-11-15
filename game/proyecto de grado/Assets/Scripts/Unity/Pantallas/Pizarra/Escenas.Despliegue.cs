@@ -8,13 +8,6 @@ using L = Nexus.Unity.Tema.LuzUI;
 namespace Nexus.Unity.Pantallas {
     /// <summary>La Fase 3 (d-…): que es desplegar, los entornos, los secretos y la vuelta atras.</summary>
     public static partial class DibujosDeEscena {
-        /// <summary>Un tramo de tuberia con su nombre: dos lineas y dos bridas.</summary>
-        private static void Tramo(Tizador p, float x, float y, float w, string t, Color? c = null) {
-            p.Linea(x, y - 16, x + w, y - 16, c); p.Linea(x, y + 16, x + w, y + 16, c);
-            p.Linea(x, y - 24, x, y + 24, c, 5); p.Linea(x + w, y - 24, x + w, y + 24, c, 5);
-            if (t != null) p.Texto(x + w / 2, y + 6, t, 14, c ?? Tizador.Tiza, true);
-        }
-
         private static void Despliegue(Dictionary<string, Action<Tizador>> d) {
             d["d-despliegue"] = p => {
                 var v = p.Vitrina();

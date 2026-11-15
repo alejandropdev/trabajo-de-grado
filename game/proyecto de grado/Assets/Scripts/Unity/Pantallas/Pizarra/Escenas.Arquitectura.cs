@@ -8,11 +8,6 @@ using Nexus.Unity.Tema;
 namespace Nexus.Unity.Pantallas {
     /// <summary>La arquitectura (q-…): que es, como se elige, y como es por dentro un monolito, unos microservicios o un parche.</summary>
     public static partial class DibujosDeEscena {
-        /// <summary>Un modulo pequeño con su nombre.</summary>
-        private static void Modulito(Tizador p, float x, float y, string t, Color? c = null) {
-            p.Caja(x, y, 92, 46, t, c ?? Tizador.Cian, false, 15);
-        }
-
         private static void Arquitectura(Dictionary<string, Action<Tizador>> d) {
             // ---------------------------------------------------------------- que es
             d["q-plano"] = p => {
