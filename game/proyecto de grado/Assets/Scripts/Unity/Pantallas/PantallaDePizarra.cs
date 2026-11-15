@@ -88,6 +88,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         public static void Dibujar(Tizador t, string icono, Color c) {
+            if (DibujosDeEscena.Icono(t, icono, c)) return;   // el lenguaje nuevo (docs/08-arte); la tiza, de respaldo
             switch (icono) {
                 case "persona": t.Persona(80, 25, c); break;
                 case "equipo": t.Persona(42, 35, c); t.Persona(80, 22, c); t.Persona(118, 35, c); break;
@@ -138,6 +139,7 @@ namespace Nexus.Unity.Pantallas {
         /// columna (donde el dibujo se agranda o se encoge) quedarian pequeños y descolocados.
         /// </summary>
         public static void DibujarAEscala(Tizador t, string icono, Color c) {
+            if (DibujosDeEscena.Icono(t, icono, c)) return;
             switch (icono) {
                 case "persona": t.Figura(80, 42, c); break;
                 case "equipo": t.Figura(40, 52, c); t.Figura(80, 36, c); t.Figura(120, 52, c); break;
