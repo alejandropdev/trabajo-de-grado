@@ -31,7 +31,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             _l = lamina; _fuente = fuente; _ox = ox; _oy = oy; _k = k;
         }
 
-        public Tizador En(float x, float y, float k = 1) { return new Tizador(_l, _fuente, _ox + x * _k, _oy + y * _k, _k * k); }
+        public Tizador En(float x, float y, float k = 1) { return new Tizador(_l, _fuente, _ox + x * _k, _oy + y * _k, _k * k) { _capa = _capa }; }
 
         private float X(float x) { return _ox + x * _k; }
         private float Y(float y) { return _oy + y * _k; }

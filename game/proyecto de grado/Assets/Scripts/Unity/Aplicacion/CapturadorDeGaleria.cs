@@ -57,7 +57,7 @@ namespace Nexus.Unity.Aplicacion {
             paginas.Add(Par("propuesta_B_plano", PropuestaB));
             paginas.Add(Par("propuesta_C_serigrafia", PropuestaC));
             // Tanda piloto de las pizarras en el lenguaje nuevo, a tamano de pizarron (NEXUS_GALERIA=piloto).
-            var piloto = EscenasDePizarra.Todas.Where(id => id.StartsWith("m-") || id.StartsWith("j-")).ToArray();
+            var piloto = EscenasDePizarra.Todas.Where(id => Prefijos().Any(id.StartsWith)).ToArray();
             for (var i = 0; i < piloto.Length; i += 4) {
                 var trozo = piloto.Skip(i).Take(4).ToList();
                 paginas.Add(Par("piloto_metricas_" + (i / 4 + 1), r => PizarrasGrandes(r, trozo)));
@@ -120,6 +120,12 @@ namespace Nexus.Unity.Aplicacion {
                 DibujosDeEscena.Dibujar(new Tizador(lamina, _ui.FuenteTiza), ids[i]);
                 Rotulo(capa, x, y + 302, 600, ids[i]);
             }
+        }
+
+        /// <summary>Que escenas entran en las paginas «piloto_…»: NEXUS_PREFIJOS (p. ej. «g-,d-»); por defecto, metricas y juego.</summary>
+        private static string[] Prefijos() {
+            var e = Environment.GetEnvironmentVariable("NEXUS_PREFIJOS");
+            return string.IsNullOrEmpty(e) ? new[] { "m-", "j-" } : e.Split(',');
         }
 
         /// <summary>Hasta cuatro escenas a 1,45: lo que mide una escena a pagina completa en el pizarron.</summary>
