@@ -383,7 +383,7 @@ namespace Nexus.Unity.Pantallas {
                 }
             }
             var colorEstado = aprobado ? Tema.success : Tema.warning;
-            _despues.En(0.3f, 0.25f, p => _estado.color = Color.Lerp(Tema.cyan, colorEstado, p));
+            _despues.En(0.3f, 0.25f, p => { if (_estado != null) _estado.color = Color.Lerp(Tema.cyan, colorEstado, p); });
             _textoEstadoIzq.text = aprobado ? "main   fusionado: el cambio entra" : "feature/" + Slug(Pr.Titulo) + "   cambios pedidos";
             _textoEstadoIzq.color = Tema.bg950;
             _textoEstadoDer.color = Tema.bg950;
@@ -396,8 +396,10 @@ namespace Nexus.Unity.Pantallas {
             rs.anchorMin = rs.anchorMax = rs.pivot = new Vector2(1, 1);
             rs.anchoredPosition = new Vector2(-20, -12);
             rs.sizeDelta = new Vector2(240, 46);
-            var gSeguir = seguir.gameObject.AddComponent<CanvasGroup>();
-            _despues.En(0.9f, 0.2f, p => gSeguir.alpha = p);
+            // El boton puede traer ya su CanvasGroup (los botones neon lo usan): AddComponent devolveria null.
+            var gSeguir = seguir.GetComponent<CanvasGroup>();
+            if (gSeguir == null) gSeguir = seguir.gameObject.AddComponent<CanvasGroup>();
+            _despues.En(0.9f, 0.2f, p => { if (gSeguir != null) gSeguir.alpha = p; });
         }
 
         /// <summary>El resultado de la revision, como un comentario que llega al pull request: marca, titulo, por que y que cambio.</summary>
