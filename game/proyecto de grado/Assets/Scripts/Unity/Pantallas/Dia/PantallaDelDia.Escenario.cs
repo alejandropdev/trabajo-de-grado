@@ -284,7 +284,10 @@ namespace Nexus.Unity.Pantallas {
             _bandeja.gameObject.AddComponent<ListaDeElementos>();
 
             var cabecera = Ui.Fila(_bandeja, "Cabecera", Tema.Espacio(2));
-            UiKit.Tamano(Ui.Texto(cabecera, "TU BUZÓN", EstiloTexto.Leyenda, Tema.cyan), flexAncho: 1);
+            var titulo = Ui.Texto(cabecera, "MENSAJES", EstiloTexto.Titulo, Tema.cyan);
+            titulo.font = Tema.FuenteDisplay;
+            titulo.characterSpacing = 4;
+            UiKit.Tamano(titulo, flexAncho: 1);
             Ui.Boton(cabecera, "Cerrar (Esc)", AlternarBandeja, VarianteBoton.Salida);
             RectTransform contenido;
             var scroll = Ui.Desplazable(_bandeja, out contenido);
@@ -318,74 +321,136 @@ namespace Nexus.Unity.Pantallas {
         }
 
         /// <summary>
-        /// El buzon (2026-11-06): lo nuevo llega en SOBRES que se abren con un clic (giran y enseñan lo que traen), y el
-        /// numero de la «M» baja con cada sobre abierto. Asi se ve que era ese numero y como se quita. Los avisos que
-        /// suenan van arriba, abiertos, con «Atender». Debajo, lo que ha pasado.
-        /// Solo se repinta al abrir la bandeja o si cambian los avisos: un sobre abierto se queda abierto mientras se mira.
+        /// El buzon (rediseñado 2026-11-14): tarjetas cortas y con cara, no sobres llenos de texto.
+        ///   · los avisos que suenan, arriba, en rojo y con «Atender»;
+        ///   · lo del cliente: su cara, el titulo en una linea, lo que te dice en dos, y «Ver en la pizarra» bien grande;
+        ///   · lo que paso sin ti: una linea por novedad (clic = vista) y «Marcar todo como visto»;
+        ///   · lo que ha pasado (la bitacora), plegado: se abre si se quiere.
+        /// Al abrir la bandeja las tarjetas entran escalonadas. El numero de la «M» baja con cada cosa vista.
         /// </summary>
         private void PintarBandeja() {
-            var clave = string.Join(",", AlertasSonando().Select(a => a.Id));
+            var avisos = AlertasSonando();
+            var papeles = S.Perfil.Proyecto != null ? S.PapelesDelCliente().Where(x => !S.R.PapelesLeidos.Contains(x.Id)).ToList()
+                                                    : new List<Nexus.Core.Proyecto.PapelDelCliente>();
+            var novedades = S.R.Novedades.ToList();
+            var clave = string.Join(",", avisos.Select(a => a.Id)) + "|" + string.Join(",", papeles.Select(x => x.Id)) + "|" +
+                        novedades.Count + "|" + _historialAbierto;
             if (clave == _claveBandeja) return;
+            var animar = _claveBandeja == null;
             _claveBandeja = clave;
             UiKit.Vaciar(_cuerpoBandeja);
+            var orden = 0;
 
-            foreach (var a in AlertasSonando()) {
+            foreach (var a in avisos) {
                 var alerta = a;
-                var t = Ui.Tarjeta(_cuerpoBandeja, "AVISO · " + a.Canal.ToUpperInvariant(), Tono.Aviso);
-                Ui.Texto(t, a.Texto, EstiloTexto.Pequeno, Tema.ink);
-                Ui.Boton(Ui.Fila(t), "Atender", () => { AlternarBandeja(); Atender(alerta); }, VarianteBoton.Primario);
+                var t = TarjetaDeBuzon(Tema.danger, animar, orden++);
+                var fila = Ui.Fila(t, "Fila", Tema.Espacio(3), 0, TextAnchor.MiddleLeft);
+                UiKit.Tamano(fila, flexAncho: 1);
+                var textos = Ui.Columna(fila, "Textos", 2);
+                UiKit.Tamano(textos, flexAncho: 1);
+                Ui.Texto(textos, "AVISO · " + a.Canal.ToUpperInvariant(), EstiloTexto.Leyenda, Tema.danger);
+                Recortar(Ui.Texto(textos, a.Texto, EstiloTexto.Cuerpo, Tema.ink), 2);
+                var atender = Ui.Boton(fila, "Atender", () => { AlternarBandeja(); Atender(alerta); }, VarianteBoton.Primario);
+                UiKit.Tamano(atender, ancho: 150, alto: 52);
             }
 
-            var sobres = 0;
-            if (S.Perfil.Proyecto != null)
-                foreach (var p in S.PapelesDelCliente().Where(x => !S.R.PapelesLeidos.Contains(x.Id))) {
-                    var papel = p;
-                    Sobre(_cuerpoBandeja, "CLIENTE", Tema.cyan, $"Día {p.Dia} · {p.De}", p.Titulo, p.QueTeDice,
-                          () => { if (!S.R.PapelesLeidos.Contains(papel.Id)) S.R.PapelesLeidos.Add(papel.Id); });
-                    sobres++;
+            foreach (var p in papeles.OrderByDescending(x => x.Dia)) {
+                var papel = p;
+                Action abrir = () => {
+                    if (!S.R.PapelesLeidos.Contains(papel.Id)) S.R.PapelesLeidos.Add(papel.Id);
+                    AlternarBandeja();
+                    AbrirCarpetaDelCliente();
+                };
+                var t = TarjetaDeBuzon(Tema.cyan, animar, orden++);
+                var fila = Ui.Fila(t, "Fila", Tema.Espacio(3), 0, TextAnchor.UpperLeft);
+                UiKit.Tamano(fila, flexAncho: 1);
+                if (!string.IsNullOrEmpty(p.De)) RostroDePersonaje.Crear(Ui, fila, MaterialesNexus.IdDePersonaje(p.De), p.De, 72, Tema.cyan);
+                var textos = Ui.Columna(fila, "Textos", 4);
+                UiKit.Tamano(textos, flexAncho: 1);
+                var cima = Ui.Fila(textos, "Cima", Tema.Espacio(2), 0, TextAnchor.MiddleLeft);
+                Ui.Chip(cima, "NUEVO", NexusTheme.Alfa(Tema.cyan, 0.2f), Tema.cyan);
+                Ui.Texto(cima, "Día " + p.Dia + " · " + p.De, EstiloTexto.Leyenda, Tema.inkMuted);
+                Recortar(Ui.Texto(textos, p.Titulo, EstiloTexto.Encabezado, Tema.ink), 1);
+                if (!string.IsNullOrEmpty(p.QueTeDice)) Recortar(Ui.Texto(textos, p.QueTeDice, EstiloTexto.Pequeno, Tema.inkMuted), 2);
+                var ver = Ui.Boton(t, "Ver en la pizarra  ►", abrir, VarianteBoton.Primario);
+                UiKit.Tamano(ver, flexAncho: 1, alto: 56);
+                var viva = t.gameObject.AddComponent<PiezaViva>();
+                viva.Escala = 1.02f;
+                viva.AlPulsar = abrir;
+            }
+
+            if (novedades.Count > 0) {
+                var cabecera = Ui.Fila(_cuerpoBandeja, "Novedades", Tema.Espacio(2), 0, TextAnchor.MiddleLeft);
+                UiKit.Tamano(Ui.Texto(cabecera, "PASÓ SIN TI · " + novedades.Count, EstiloTexto.Leyenda, Tema.inkMuted), flexAncho: 1);
+                Ui.Boton(cabecera, "Marcar todo como visto", () => {
+                    foreach (var l in S.R.Novedades.ToList()) S.R.VerNovedad(l);
+                }, VarianteBoton.Fantasma);
+                foreach (var linea in novedades.Take(5)) {
+                    var l = linea;
+                    var t = TarjetaDeBuzon(Tema.inkMuted, animar, orden++, true);
+                    var fila = Ui.Fila(t, "Fila", Tema.Espacio(2), 0, TextAnchor.MiddleLeft);
+                    UiKit.Tamano(fila, flexAncho: 1);
+                    var punto = Ui.Nodo(fila, "Punto");
+                    var imagen = punto.gameObject.AddComponent<Image>();
+                    imagen.sprite = Ui.SpriteCircular();
+                    imagen.color = Tema.warning;
+                    UiKit.Tamano(punto, ancho: 10, alto: 10);
+                    UiKit.Tamano(Recortar(Ui.Texto(fila, l, EstiloTexto.Pequeno, Tema.ink), 2), flexAncho: 1);
+                    var viva = t.gameObject.AddComponent<PiezaViva>();
+                    viva.Escala = 1.02f;
+                    viva.AlPulsar = () => S.R.VerNovedad(l);
                 }
-            var novedades = S.R.BitacoraSinVer;
-            // Solo lo que paso sin ti (RuntimeState.Novedades); cada sobre abierto da por vista la suya.
-            foreach (var linea in S.R.Novedades.Take(6).ToList()) {
-                var l = linea;
-                Sobre(_cuerpoBandeja, "NOVEDAD", Tema.inkMuted, "Pasó sin ti", null, l, () => S.R.VerNovedad(l));
-                sobres++;
+                if (novedades.Count > 5) Ui.Texto(_cuerpoBandeja, "…y " + (novedades.Count - 5) + " más.", EstiloTexto.Leyenda, Tema.inkMuted);
             }
-            if (novedades > 6) Ui.Texto(_cuerpoBandeja, $"…y {novedades - 6} novedades más en la bitácora.", EstiloTexto.Leyenda, Tema.inkMuted);
-            if (sobres == 0 && AlertasSonando().Count == 0)
-                Ui.Texto(_cuerpoBandeja, "Todo leído. Aquí llegarán los avisos, el cliente y lo que vaya pasando.", EstiloTexto.Cuerpo, Tema.inkMuted);
 
-            Ui.Separador(_cuerpoBandeja);
-            Ui.Texto(_cuerpoBandeja, "LO QUE HA PASADO", EstiloTexto.Leyenda, Tema.inkMuted);
-            foreach (var linea in S.R.Bitacora.Take(12)) Ui.Texto(_cuerpoBandeja, linea, EstiloTexto.Pequeno, Tema.inkMuted);
+            if (avisos.Count == 0 && papeles.Count == 0 && novedades.Count == 0) {
+                var vacio = Ui.Columna(_cuerpoBandeja, "Vacio", Tema.Espacio(2), Tema.Espacio(6), TextAnchor.MiddleCenter);
+                var check = Ui.Nodo(vacio, "Check");
+                var fondo = check.gameObject.AddComponent<Image>();
+                fondo.sprite = Ui.SpriteCircular();
+                fondo.color = NexusTheme.Alfa(Tema.success, 0.18f);
+                UiKit.Tamano(check, ancho: 84, alto: 84);
+                var marca = Ui.Texto(check, "✓", EstiloTexto.Titulo, Tema.success, TextAlignmentOptions.Center);
+                QuitarAltoMinimo(marca);
+                UiKit.Rellenar(marca.rectTransform);
+                Ui.Texto(vacio, "Todo al día", EstiloTexto.Subtitulo, Tema.ink, TextAlignmentOptions.Center);
+                Ui.Texto(vacio, "Cuando llegue algo, la «M» se enciende.", EstiloTexto.Pequeno, Tema.inkMuted, TextAlignmentOptions.Center);
+                if (animar) vacio.gameObject.AddComponent<EntradaDePieza>();
+            }
+
+            // La bitacora entera, plegada: el que quiera releerla la abre.
+            if (S.R.Bitacora.Count > 0) {
+                Ui.Separador(_cuerpoBandeja);
+                Ui.Boton(_cuerpoBandeja, (_historialAbierto ? "▼  " : "►  ") + "Lo que ha pasado (" + Math.Min(12, S.R.Bitacora.Count) + ")",
+                         () => _historialAbierto = !_historialAbierto, VarianteBoton.Fantasma);
+                if (_historialAbierto)
+                    foreach (var linea in S.R.Bitacora.Take(12)) Recortar(Ui.Texto(_cuerpoBandeja, "· " + linea, EstiloTexto.Pequeno, Tema.inkMuted), 2);
+            }
         }
 
-        /// <summary>Un sobre cerrado (de que seccion es y un titulo); al pulsarlo gira, enseña lo que trae y se da por leido.</summary>
-        private void Sobre(RectTransform padre, string seccion, Color color, string de, string titulo, string contenido, Action alAbrir) {
-            var t = Ui.PanelColumna(padre, "Sobre", Tema.Espacio(4), Tema.Espacio(1), Tema.surfaceRaised);
-            Ui.Borde(t, color, NexusTheme.RadioMd, 2);
-            var frente = Ui.Columna(t, "Cerrado", 2);
-            Ui.Texto(frente, seccion + " · " + de, EstiloTexto.Leyenda, color);
-            if (!string.IsNullOrEmpty(titulo)) Ui.Texto(frente, titulo, EstiloTexto.Encabezado, Tema.ink);
-            Ui.Texto(frente, "Clic para abrir", EstiloTexto.Leyenda, Tema.inkFaint);
-            var dentro = Ui.Columna(t, "Abierto", 2);
-            Ui.Texto(dentro, seccion + " · " + de, EstiloTexto.Leyenda, color);
-            if (!string.IsNullOrEmpty(titulo)) Ui.Texto(dentro, titulo, EstiloTexto.Encabezado, Tema.ink);
-            if (!string.IsNullOrEmpty(contenido)) Ui.Texto(dentro, contenido, EstiloTexto.Pequeno, Tema.ink);
-            if (seccion == "CLIENTE") Ui.Boton(Ui.Fila(dentro), "Ver en la pizarra", () => { AlternarBandeja(); AbrirCarpetaDelCliente(); }, VarianteBoton.Fantasma);
-            dentro.gameObject.SetActive(false);
-            var giro = t.gameObject.AddComponent<GiroDeCarta>();
-            giro.Frente = frente.gameObject;
-            giro.Reverso = dentro.gameObject;
-            var abierto = false;
-            var viva = t.gameObject.AddComponent<PiezaViva>();
-            viva.Escala = 1.03f;
-            viva.AlPulsar = () => {
-                if (abierto) return;
-                abierto = true;
-                giro.Girar();
-                alAbrir?.Invoke();
-            };
+        /// <summary>Una tarjeta del buzon: cristal oscuro, una franja de color a la izquierda y entrada escalonada.</summary>
+        private RectTransform TarjetaDeBuzon(Color acento, bool animar, int orden, bool compacta = false) {
+            var t = Ui.PanelColumna(_cuerpoBandeja, "Mensaje", compacta ? Tema.Espacio(2) : Tema.Espacio(4), Tema.Espacio(2), Tema.surfaceRaised);
+            Ui.Borde(t, NexusTheme.Alfa(acento, compacta ? 0.35f : 0.8f), NexusTheme.RadioMd, compacta ? 1 : 2);
+            var franja = Ui.Nodo(t, "Franja");
+            franja.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            franja.anchorMin = new Vector2(0, 0);
+            franja.anchorMax = new Vector2(0, 1);
+            franja.pivot = new Vector2(0, 0.5f);
+            franja.sizeDelta = new Vector2(compacta ? 3 : 5, -12);
+            franja.anchoredPosition = new Vector2(4, 0);
+            var color = franja.gameObject.AddComponent<Image>();
+            color.color = acento;
+            color.raycastTarget = false;
+            if (animar) t.gameObject.AddComponent<EntradaDePieza>().Retraso = Math.Min(8, orden) * 0.05f;
+            return t;
+        }
+
+        /// <summary>Como mucho 'lineas' renglones, con puntos suspensivos: el buzon se lee de un vistazo.</summary>
+        private static TMP_Text Recortar(TMP_Text t, int lineas) {
+            t.maxVisibleLines = lineas;
+            t.overflowMode = TextOverflowModes.Ellipsis;
+            return t;
         }
 
         private void PintarMensajesDelCliente(RectTransform hoja, List<Nexus.Core.Proyecto.PapelDelCliente> papeles) {
