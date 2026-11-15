@@ -57,8 +57,7 @@ namespace Nexus.Unity.Aplicacion {
             paginas.Add(Par("propuesta_B_plano", PropuestaB));
             paginas.Add(Par("propuesta_C_serigrafia", PropuestaC));
             // Tanda piloto de las pizarras en el lenguaje nuevo, a tamano de pizarron (NEXUS_GALERIA=piloto).
-            var piloto = new[] { "m-avance-que", "m-avance-alto", "m-avance-bajo", "m-avance-ideal", "m-cansancio-que", "m-cansancio-alto",
-                                 "m-cansancio-bajo", "m-cansancio-ideal", "m-moral-que", "m-riesgo-que" };
+            var piloto = EscenasDePizarra.Todas.Where(id => id.StartsWith("m-")).ToArray();
             for (var i = 0; i < piloto.Length; i += 4) {
                 var trozo = piloto.Skip(i).Take(4).ToList();
                 paginas.Add(Par("piloto_metricas_" + (i / 4 + 1), r => PizarrasGrandes(r, trozo)));
