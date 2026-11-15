@@ -205,13 +205,6 @@
         "c6"
       ],
       "razonNoEsDefecto": "En un monolito modular es normal que varios módulos compartan la base de datos. Lo que no deben hacer es leer las tablas de otro módulo sin pasar por él."
-    },
-    {
-      "id": "S2",
-      "commits": [
-        "correo"
-      ],
-      "razonNoEsDefecto": "Usar el servicio de correo de la empresa no es un defecto: es no reinventar la rueda."
     }
   ],
   "paletaEtiquetas": [

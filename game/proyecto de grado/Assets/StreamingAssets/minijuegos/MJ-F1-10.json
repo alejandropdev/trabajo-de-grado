@@ -95,11 +95,45 @@
         "tipo": "pide",
         "desde": "reservas",
         "hasta": "ascensor",
-        "texto": "orden de subir"
+        "texto": "escribe la orden en el formato interno del fabricante"
+      },
+      {
+        "id": "c6",
+        "tipo": "lee",
+        "desde": "turnos",
+        "hasta": "bd",
+        "texto": "lee directamente las tablas internas de reservas"
       }
     ]
   },
-  "zonas": [],
+  "zonas": [
+    {
+      "id": "Z1",
+      "tipo": "commit",
+      "commits": [
+        "c5"
+      ],
+      "defecto": "acoplamiento_indebido",
+      "explicacion": "Reservas habla el idioma interno del aparato del fabricante. El día que el fabricante cambie su formato, hay que reescribir reservas. Una pieza nuestra que traduzca deja ese cambio en un solo sitio.",
+      "pista": "Mira cómo le llega la orden al ascensor. ¿Reservas habla su propio idioma o el del fabricante?",
+      "soluciones": [
+        "adaptador"
+      ]
+    },
+    {
+      "id": "Z2",
+      "tipo": "commit",
+      "commits": [
+        "c6"
+      ],
+      "defecto": "acoplamiento_indebido",
+      "explicacion": "Turnos lee las tablas internas de reservas sin pasar por él. El día que reservas cambie una tabla, turnos se rompe sin que nadie sepa por qué.",
+      "pista": "Hay dos flechas de turnos a la base de datos. Una lee sus reglas; ¿qué lee la otra, y de quién es?",
+      "soluciones": [
+        "fachada"
+      ]
+    }
+  ],
   "toleranciaDeSenuelos": 0,
   "senuelos": [
     {
@@ -108,20 +142,6 @@
         "c3"
       ],
       "razonNoEsDefecto": "Las reglas de prioridad viven en la base de datos a propósito: así Facilities las cambia sin que nadie toque el código."
-    },
-    {
-      "id": "S2",
-      "commits": [
-        "ascensor"
-      ],
-      "razonNoEsDefecto": "Un aparato de otro fabricante parece un riesgo, pero está bien tratado: solo una pieza le habla, y por una sola flecha."
-    },
-    {
-      "id": "S3",
-      "commits": [
-        "c2"
-      ],
-      "razonNoEsDefecto": "Que reservas le pregunte a turnos no es acoplamiento indebido: es pedirle a otra pieza lo que le toca decidir a ella."
     }
   ],
   "paletaEtiquetas": [
@@ -160,7 +180,7 @@
       "rubrica": {
         "veredicto": "correcta",
         "oa": "OA-DOC-01",
-        "razon": "Lo revisaste entero y estaba bien, y lo aprobaste. Saber cuándo un diseño no necesita cambios es parte de revisar."
+        "razon": "Viste la orden en el idioma del fabricante y la lectura por la puerta de atrás, y dejaste las reglas donde Facilities las cambia sin tocar código."
       }
     },
     "parcial": {
@@ -172,7 +192,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-DOC-01",
-        "razon": "Marcaste una pieza que estaba bien. Óscar va a rehacer algo que ya funcionaba."
+        "razon": "Encontraste parte de lo que había, o marcaste las reglas de prioridad, que estaban bien. Óscar va a programar el resto tal cual."
       }
     },
     "falsoPositivo": {
@@ -200,9 +220,8 @@
     }
   },
   "cierre": {
-    "texto": "Óscar asiente: «Entonces lo dejo así». Y lo deja así."
+    "texto": "Óscar pone una pieza que traduce delante del ascensor y hace que turnos le pregunte a reservas por su puerta."
   },
-  "sinDefectos": true,
   "cartas": [
     {
       "id": "estrategia",
