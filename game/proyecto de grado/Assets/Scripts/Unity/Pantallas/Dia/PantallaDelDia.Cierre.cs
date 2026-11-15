@@ -20,9 +20,18 @@ namespace Nexus.Unity.Pantallas {
         private VentanaDelAtardecer _ventanaDelCierre;
         private int _diaDelCierre = -1;
 
+        private bool _directoAlDespliegue;
+
         private void Cierre() {
             var j = S.Perfil.Jornada;
             var raiz = _fijoMomento;
+            // El ultimo dia no hay nada que decidir: quedarse ya no sirve (el juego acaba al cierre). Se va directo al
+            // despliegue, sin la carta de «Irme a casa / Quedarme».
+            if (S.EsUltimoDia) {
+                AvisoDelUltimoDia(raiz);
+                IrDirectoAlDespliegue();
+                return;
+            }
             var primeraVez = _diaDelCierre != S.R.DiaActual;
             _diaDelCierre = S.R.DiaActual;
 
@@ -72,6 +81,31 @@ namespace Nexus.Unity.Pantallas {
             });
         }
 
+        private void AvisoDelUltimoDia(RectTransform raiz) {
+            var aviso = Ui.Columna(raiz, "Ultimo dia", Tema.espacio, Tema.margen, TextAnchor.MiddleCenter);
+            UiKit.Tamano(aviso, flexAncho: 1, flexAlto: 1);
+            var t = Ui.Texto(aviso, "Se acabó el último día", EstiloTexto.Titulo, Tema.ink, TMPro.TextAlignmentOptions.Center);
+            t.font = Tema.FuenteDisplay;
+            Ui.Texto(aviso, "Vamos al despliegue…", EstiloTexto.Subtitulo, Tema.cyan, TMPro.TextAlignmentOptions.Center);
+            aviso.gameObject.AddComponent<EntradaDePieza>();
+        }
+
+        /// <summary>El ultimo dia, a la hora del cierre: se cierra el dia (y se guarda) y, un instante despues, al despliegue.</summary>
+        private void IrDirectoAlDespliegue() {
+            if (_directoAlDespliegue) return;
+            _directoAlDespliegue = true;
+            Runner.Irse();
+            Anotar("Último día: al despliegue.");
+            GuiaView.Hecho(App, "irse");
+            StartCoroutine(AlDespliegueEnUnMomento());
+        }
+
+        private System.Collections.IEnumerator AlDespliegueEnUnMomento() {
+            // Se deja pintar un momento el aviso y se sale fuera del repintado (cambiar de pantalla a mitad lo romperia).
+            yield return new WaitForSecondsRealtime(0.9f);
+            if (this != null && App.Sesion != null) FlujoDelNivel.Lanzar(App);
+        }
+
         // ==================================================================== se acabaron los dias
 
         private int _vecesFinDelDesarrollo;
@@ -83,6 +117,8 @@ namespace Nexus.Unity.Pantallas {
         /// cuyo texto («Ir al despliegue (Fase 3) ►») no cabia.
         /// </summary>
         private void FinDelDesarrollo() {
+            // Llegado solo desde el cierre del ultimo dia: el aviso sigue mientras se cambia al despliegue.
+            if (_directoAlDespliegue) { AvisoDelUltimoDia(_fijoMomento); return; }
             var falta = S.DesplieguePendiente;
             var w = S.W;
             var raiz = _fijoMomento;

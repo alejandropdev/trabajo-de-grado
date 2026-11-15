@@ -1412,6 +1412,12 @@ namespace Nexus.Core.Sesion {
             R.DiasSeguidosTrabajando++;
         }
 
+        /// <summary>
+        /// El ultimo dia de desarrollo: la interfaz no ofrece horas extra al cierre (el juego acaba ahi) y va directa al
+        /// despliegue. El motor no lo prohibe: las simulaciones de partida completa siguen pudiendo quedarse.
+        /// </summary>
+        public bool EsUltimoDia { get { return R.DiaActual >= Perfil.DiasTotales; } }
+
         /// <summary>Cierra el dia: lo simula (con horas extra si el jugador se quedo) y lo da por terminado.</summary>
         public void TerminarDia() {
             ExigirFase2();
