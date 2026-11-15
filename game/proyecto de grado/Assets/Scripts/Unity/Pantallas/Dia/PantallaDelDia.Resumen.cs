@@ -230,10 +230,19 @@ namespace Nexus.Unity.Pantallas {
             var caja = Caja(padre, titulo, subieron.Count > 0 ? Tema.success : Tema.cyan, 1, retraso);
             UiKit.Tamano(caja, flexAlto: 1);
 
-            var maxFilas = hayDemo ? 2 : 3;
+            // Lo de dentro va en una lista que ocupa lo que quede y recorta lo que no quepa: con muchas partes o citas
+            // largas, la caja no se desborda ni empuja el boton fuera (2026-11-14). El boton va fijo debajo.
+            var lista = Ui.Columna(caja, "Lista", 8, 0, TextAnchor.UpperLeft);
+            UiKit.Tamano(lista, alto: 0, flexAncho: 1, flexAlto: 1);
+            lista.gameObject.AddComponent<RectMask2D>();
+
+            // Una voz (o dos, si fue la demo): lo que dicen quienes van a usarlo.
+            var queDicen = hayDemo ? voces.Take(2).ToList()
+                : voces.Where(v => subieron.Any(m => m.Modulo.Id == v.ModuloId)).Take(1).ToList();
+            var maxFilas = hayDemo ? 1 : queDicen.Count > 0 ? 2 : 3;
             if (subieron.Count > 0) {
                 foreach (var m in subieron.Take(maxFilas)) {
-                    var fila = Ui.Fila(caja, "Etapa", 10, 0, TextAnchor.MiddleLeft);
+                    var fila = Ui.Fila(lista, "Etapa", 10, 0, TextAnchor.MiddleLeft);
                     Ui.Punto(fila, Tema.success, 10);
                     var nombre = Ui.Texto(fila, m.Modulo.Nombre, EstiloTexto.Cuerpo, Tema.ink);
                     nombre.maxVisibleLines = 1;
@@ -242,16 +251,16 @@ namespace Nexus.Unity.Pantallas {
                     Ui.Chip(fila, Nexus.Core.Proyecto.EtapasDelProducto.Nombre(m.Etapa), Tema.successSoft, Tema.success);
                     fila.gameObject.AddComponent<EntradaDeResumen>().Retraso = retraso + 0.2f;
                 }
-                if (subieron.Count > maxFilas) Ui.Texto(caja, $"y {subieron.Count - maxFilas} más", EstiloTexto.Pequeno, Tema.inkMuted);
+                if (subieron.Count > maxFilas) Ui.Texto(lista, $"y {subieron.Count - maxFilas} más", EstiloTexto.Pequeno, Tema.inkMuted);
             } else if (f != null && f.Modulos.Count > 0 && !hayDemo) {
                 var deAntes = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, antes, w.Alcance);
                 var deAhora = Nexus.Core.Proyecto.AvanceDeModulos.Calcular(f, w.Avance, w.Alcance);
                 var cambios = Enumerable.Range(0, deAhora.Count).Where(i => deAhora[i].Value - deAntes[i].Value >= 0.5)
                     .OrderByDescending(i => deAhora[i].Value - deAntes[i].Value).Take(maxFilas).ToList();
                 if (cambios.Count == 0)
-                    Ui.Texto(caja, "Hoy no avanzó ninguna parte del sistema.", EstiloTexto.Cuerpo, Tema.inkMuted);
+                    Ui.Texto(lista, "Hoy no avanzó ninguna parte del sistema.", EstiloTexto.Cuerpo, Tema.inkMuted);
                 foreach (var i in cambios) {
-                    var fila = Ui.Fila(caja, "Parte", 10, 0, TextAnchor.MiddleLeft);
+                    var fila = Ui.Fila(lista, "Parte", 10, 0, TextAnchor.MiddleLeft);
                     var nombre = Ui.Texto(fila, deAhora[i].Key.Nombre, EstiloTexto.Pequeno, Tema.ink);
                     nombre.maxVisibleLines = 1;
                     nombre.overflowMode = TextOverflowModes.Ellipsis;
@@ -268,18 +277,18 @@ namespace Nexus.Unity.Pantallas {
                 }
             }
 
-            // Una voz (o dos, si fue la demo): lo que dicen quienes van a usarlo.
-            var queDicen = hayDemo ? voces.Take(2).ToList()
-                : voces.Where(v => subieron.Any(m => m.Modulo.Id == v.ModuloId)).Take(1).ToList();
             foreach (var v in queDicen) {
-                var cita = Ui.Texto(caja, $"{v.Quien}: «{v.Frase}»", EstiloTexto.Dialogo, Tema.cyan);
+                var cita = Ui.Texto(lista, $"{v.Quien}: «{v.Frase}»", EstiloTexto.Dialogo, Tema.cyan);
                 cita.maxVisibleLines = 2;
                 cita.overflowMode = TextOverflowModes.Ellipsis;
                 cita.gameObject.AddComponent<EntradaDeResumen>().Retraso = retraso + 0.5f;
             }
             if (subieron.Count > 0 || hayDemo) {
-                UiKit.Tamano(Ui.Nodo(caja, "Hueco"), flexAlto: 1);
-                Ui.Boton(Ui.Fila(caja), "Ver el producto", () => PantallaDelProducto.Abrir(App), VarianteBoton.Fantasma);
+                // Grande y a lo ancho, con el texto entero: es la invitacion a mirar lo que se acaba de construir.
+                var ver = Ui.Boton(caja, "Ver el producto  ►", () => PantallaDelProducto.Abrir(App), VarianteBoton.Secundario);
+                UiKit.Tamano(ver, alto: 58, flexAncho: 1);
+                var texto = ver.GetComponentInChildren<TMP_Text>();
+                if (texto != null) { texto.enableAutoSizing = true; texto.fontSizeMin = 14; texto.fontSizeMax = 22; texto.textWrappingMode = TextWrappingModes.NoWrap; }
             }
         }
 
