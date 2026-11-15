@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Nexus.Unity.Pantallas.Minijuegos;
 using UnityEngine;
+using Nexus.Unity.Tema;
+using L = Nexus.Unity.Tema.LuzUI;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>La Fase 3 (d-…): que es desplegar, los entornos, los secretos y la vuelta atras.</summary>
@@ -59,20 +61,45 @@ namespace Nexus.Unity.Pantallas {
 
             // ------------------------------------------------------------ como se ve en el juego
             d["j-tuberia"] = p => {
-                p.Caja(10, 100, 70, 80, "código", Tizador.Gris, false, 14); p.Caja(520, 100, 70, 80, "cliente", Tizador.Mostaza, false, 14);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 140, Nucleo, 0.5f, 113);
+                PanelUI(v, 14, 104, 72, 80); v.Rotulo(50, 144, "código", 14, TintaSuave, 0, true);
+                v.Halo(550, 144, 60, A(Aviso, 0.3f));
+                PanelUI(v, 514, 104, 72, 80, null); v.Forma(L.Redondeado(512, 102, 76, 84, 13), A(Aviso, 0.9f)); v.Forma(L.Redondeado(514, 104, 72, 80, 12), SuperficieAlta, Superficie);
+                v.Rotulo(550, 144, "cliente", 14, Aviso, 0, true);
                 var n = new[] { "compilar", "probar", "ensayar", "producir" };
-                for (var i = 0; i < 4; i++) Tramo(p, 90 + i * 106, 140, 96, n[i], i == 2 ? Tizador.Mostaza : Tizador.Cian);
-                p.Texto(300, 250, "arrastra cada tramo a su hueco", 20, Tizador.Tiza, true);
+                for (var i = 0; i < 4; i++) {
+                    var x = 96 + i * 104; var c = i == 2 ? Aviso : Nucleo;
+                    v.Forma(L.Redondeado(x, 126, 96, 36, 8), Color.Lerp(Superficie, c, 0.18f), Superficie);
+                    v.Neon(Pts(x + 6, 127, x + 90, 127), 0.9f, c);
+                    v.Forma(L.Redondeado(x - 4, 120, 8, 48, 3), Cromo, CromoOscuro);
+                    v.Rotulo(x + 48, 145, n[i], 14, c, 0, true);
+                }
+                v.Forma(L.Redondeado(508, 120, 8, 48, 3), Cromo, CromoOscuro);
+                v.Rotulo(300, 252, "arrastra cada tramo a su hueco", 19, Tinta);
             };
             d["j-enchufes"] = p => {
-                p.Caja(30, 60, 190, 180, null, Tizador.Tiza); p.Texto(125, 90, "módulo", 18, Tizador.Tiza, true);
-                p.Caja(50, 120, 150, 40, "datos", Tizador.Mostaza, false, 16); p.Caja(50, 176, 150, 40, "clave", Tizador.Mostaza, false, 16);
-                p.Caja(380, 50, 190, 50, "producción", Tizador.Cian, false, 16); p.Caja(380, 126, 190, 50, "pruebas", Tizador.Gris, true, 16); p.Caja(380, 202, 190, 50, "caja de secretos", Tizador.Cian, false, 16);
-                p.Curva(204, 140, 290, 80, 376, 76, Tizador.Cian); p.Curva(204, 196, 290, 240, 376, 228, Tizador.Cian);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 140, Nucleo, 0.5f, 115);
+                PanelUI(v, 30, 56, 196, 188, "módulo", Tinta);
+                v.Forma(L.Redondeado(48, 116, 160, 40, 8), Color.Lerp(Superficie, Aviso, 0.18f), Superficie); v.Rotulo(128, 136, "datos", 15, Aviso, 0, true);
+                v.Forma(L.Redondeado(48, 174, 160, 40, 8), Color.Lerp(Superficie, Aviso, 0.18f), Superficie); v.Rotulo(128, 194, "clave", 15, Aviso, 0, true);
+                v.Neon(new RutaDeCurva(210, 136).C(290, 136, 300, 76, 374, 76).Puntos(), 1.2f, Nucleo);
+                v.Neon(new RutaDeCurva(210, 194).C(290, 194, 300, 228, 374, 228).Puntos(), 1.2f, Nucleo);
+                foreach (var y in new[] { 136f, 194f }) v.Forma(L.Elipse(210, y, 5, 5, 12), Cromo, CromoOscuro);
+                PanelUI(v, 380, 50, 190, 52); v.Rotulo(475, 76, "producción", 15, Nucleo, 0, true);
+                v.Forma(L.Redondeado(380, 126, 190, 52, 12), A(Superficie, 0.5f)); v.Rotulo(475, 152, "pruebas", 15, A(TintaSuave, 0.6f), 0, true);
+                PanelUI(v, 380, 202, 190, 52); v.Rotulo(475, 228, "caja de secretos", 15, Nucleo, 0, true);
+                foreach (var y in new[] { 76f, 228f }) { v.Halo(378, y, 14, A(Nucleo, 0.6f)); v.Forma(L.Elipse(378, y, 5, 5, 12), NucleoClaro, Nucleo); }
             };
             d["j-cuenta-atras"] = p => {
-                p.Caja(170, 70, 260, 120, null, Tizador.Roja); p.Texto(300, 156, "4:59", 70, Tizador.Roja, true);
-                p.Texto(300, 240, "una sola cuenta atrás para todo", 20, Tizador.Tiza, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 130, Coral, 0.6f, 117);
+                v.Latido(v.Halo(300, 130, 220, 90, A(Coral, 0.3f)), 0.5f, 1, 1f);
+                v.Forma(L.Redondeado(162, 62, 276, 136, 18), Cromo, CromoOscuro);
+                v.Forma(L.Redondeado(172, 72, 256, 116, 12), H(0x1A0806), H(0x0A0302));
+                v.Rotulo(300, 130, "4:59", 72, Coral, 0, false, true);
+                v.Rotulo(300, 244, "una sola cuenta atrás para todo", 19, Tinta);
             };
         }
     }

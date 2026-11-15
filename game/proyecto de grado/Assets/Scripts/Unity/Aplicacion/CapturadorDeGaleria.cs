@@ -57,7 +57,7 @@ namespace Nexus.Unity.Aplicacion {
             paginas.Add(Par("propuesta_B_plano", PropuestaB));
             paginas.Add(Par("propuesta_C_serigrafia", PropuestaC));
             // Tanda piloto de las pizarras en el lenguaje nuevo, a tamano de pizarron (NEXUS_GALERIA=piloto).
-            var piloto = EscenasDePizarra.Todas.Where(id => id.StartsWith("m-")).ToArray();
+            var piloto = EscenasDePizarra.Todas.Where(id => id.StartsWith("m-") || id.StartsWith("j-")).ToArray();
             for (var i = 0; i < piloto.Length; i += 4) {
                 var trozo = piloto.Skip(i).Take(4).ToList();
                 paginas.Add(Par("piloto_metricas_" + (i / 4 + 1), r => PizarrasGrandes(r, trozo)));
@@ -68,7 +68,7 @@ namespace Nexus.Unity.Aplicacion {
                 paginas.Add(Par("pizarra_" + (i / 9 + 1).ToString("00"), r => Pizarras(r, trozo)));
             }
             // El pizarron de verdad, con paginas del glosario (NEXUS_GALERIA=pizarron).
-            foreach (var (termino, pagina) in new[] { ("avance", 0), ("cansancio", 1), ("avance", 4) }) {
+            foreach (var (termino, pagina) in new[] { ("avance", 0), ("cansancio", 1), ("avance", 4), ("avance", 5), ("cansancio", 4) }) {
                 var t = termino; var n = pagina;
                 paginas.Add(Par("pizarron_" + t + "_" + (n + 1), r => Pizarron(r, t, n)));
             }
