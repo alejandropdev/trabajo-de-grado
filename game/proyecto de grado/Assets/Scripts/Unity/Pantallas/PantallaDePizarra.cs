@@ -17,18 +17,7 @@ namespace Nexus.Unity.Pantallas {
     public static class MarcoDePizarra {
         public const float W = 1612, H = 932;
 
-        // El panel del bunker (2026-11-15, direccion de arte): el fondo es la misma nave de las escenas nuevas, para que
-        // una escena a pagina completa se funda con el y no parezca un recorte pegado en una pizarra.
-        private static readonly Color PanelArriba = new Color32(0x0B, 0x2E, 0x38, 0xFF), PanelMedio = new Color32(0x07, 0x1E, 0x26, 0xFF),
-                                      PanelAbajo = new Color32(0x03, 0x0E, 0x14, 0xFF);
-
-        /// <summary>El color del fondo del panel a la altura y (0 arriba … H abajo). Lo usa el fundido de las escenas.</summary>
-        public static Color PanelEnY(float y) {
-            var t = Mathf.Clamp01(y / H);
-            return t < 0.55f ? Color.Lerp(PanelArriba, PanelMedio, t / 0.55f) : Color.Lerp(PanelMedio, PanelAbajo, (t - 0.55f) / 0.45f);
-        }
-
-        /// <param name="panel">true: el panel del bunker (conceptos y cursos, que muestran las escenas nuevas). false: la
+        /// <param name="panel">true: el panel de conceptos, del material de PanelDelPizarron (chapa, manual o pizarra). false: la
         /// pizarra de madera de siempre (recetas, el producto), hasta que se rediseñe su contenido de tiza.</param>
         public static RectTransform Construir(UiKit ui, RectTransform raiz, string nota, out Lamina lamina, bool panel = false) {
             var velo = raiz.gameObject.AddComponent<Image>();
@@ -39,18 +28,18 @@ namespace Nexus.Unity.Pantallas {
             marco.sizeDelta = new Vector2(W + 28, H + 28);
             var madera = marco.gameObject.AddComponent<Image>();
             madera.sprite = ui.SpriteRedondeado(); madera.type = Image.Type.Sliced;
-            madera.color = panel ? new Color32(0x16, 0x34, 0x3D, 0xFF) : new Color32(0x3A, 0x2E, 0x22, 0xFF);
+            madera.color = panel ? PanelDelPizarron.Marco : (Color)new Color32(0x3A, 0x2E, 0x22, 0xFF);
 
             var tabla = ui.Nodo(marco, "Pizarra");
             UiKit.Rellenar(tabla, 14);
-            if (panel) FondoDelPanel(ui, tabla);
+            if (panel) PanelDelPizarron.Fondo(ui, tabla);
             else tabla.gameObject.AddComponent<Image>().color = Tizador.Pizarra;
 
             lamina = new Lamina(ui, tabla, W, H);
             UiKit.Rellenar(lamina.Raiz);
             lamina.Dibujo.Tiza = true;
 
-            if (panel) { Placa(ui, marco, nota); return marco; }
+            if (panel) { PanelDelPizarron.Placa(ui, marco, nota); return marco; }
 
             var notaRt = ui.Nodo(marco, "Nota");
             notaRt.anchorMin = notaRt.anchorMax = new Vector2(1, 1);
@@ -63,73 +52,6 @@ namespace Nexus.Unity.Pantallas {
             tn.font = ui.FuenteTiza;
             UiKit.Rellenar((RectTransform)tn.transform);
             return marco;
-        }
-
-        /// <summary>
-        /// La nave en penumbra: solo un degradado vertical (nada que cambie a lo ancho, para que el fundido de la escena
-        /// caiga exactamente sobre el color que tiene detras) y un claro de luz sobre la cabecera, por encima de la escena.
-        /// </summary>
-        private static void FondoDelPanel(UiKit ui, RectTransform tabla) {
-            var fondo = tabla.gameObject.AddComponent<RawImage>();
-            fondo.texture = LuzUI.TexturaVertical(LuzUI.Parada(0, PanelArriba), LuzUI.Parada(0.55f, PanelMedio), LuzUI.Parada(1, PanelAbajo));
-            fondo.raycastTarget = false;
-            tabla.gameObject.AddComponent<RectMask2D>();
-            LuzUI.Brillo(ui, tabla, W * 0.28f, 40, 760, 210, new Color32(0x1B, 0x6F, 0x7C, 0x40));
-        }
-
-        /// <summary>La placa de la esquina: un rotulo recto de maqueta, no una nota pegada.</summary>
-        private static void Placa(UiKit ui, RectTransform marco, string nota) {
-            var rt = ui.Nodo(marco, "Nota");
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1, 1);
-            rt.anchoredPosition = new Vector2(-50, -42);
-            rt.sizeDelta = new Vector2(220, 40);
-            var img = rt.gameObject.AddComponent<Image>();
-            img.sprite = ui.SpriteRedondeado(); img.type = Image.Type.Sliced;
-            img.color = new Color32(0x0E, 0x33, 0x40, 0xFF);
-            img.raycastTarget = false;
-            var t = ui.Texto(rt, nota, EstiloTexto.Cuerpo, ui.Tema.cyan, TextAlignmentOptions.Center);
-            t.font = ui.Tema.FuenteInterfazNegrita;
-            t.fontSize = 19;
-            t.characterSpacing = 8;
-            t.raycastTarget = false;
-            UiKit.Rellenar((RectTransform)t.transform);
-        }
-
-        private static readonly Dictionary<string, Texture2D> _fundidos = new Dictionary<string, Texture2D>();
-
-        /// <summary>
-        /// Funde los bordes del rectangulo (x, y, w, h) de la lamina con el fondo del panel: cuatro velos del color que
-        /// tiene el panel a cada altura, opacos en el borde y transparentes hacia dentro. Asi la escena no es un recorte.
-        /// </summary>
-        public static void Fundir(UiKit ui, Transform padre, float x, float y, float w, float h, float lado, float arriba, float abajo) {
-            LuzUI.Imagen(ui, padre, Velo(y, h, true, false), x - 1, y, lado, h, Color.white, false, "Fundido");
-            LuzUI.Imagen(ui, padre, Velo(y, h, true, true), x + w - lado + 1, y, lado, h, Color.white, false, "Fundido");
-            LuzUI.Imagen(ui, padre, Velo(y - 1, arriba, false, false), x, y - 1, w, arriba, Color.white, false, "Fundido");
-            LuzUI.Imagen(ui, padre, Velo(y + h - abajo + 1, abajo, false, true), x, y + h - abajo + 1, w, abajo, Color.white, false, "Fundido");
-        }
-
-        /// <summary>Textura del velo: el color del panel en cada fila; el alfa cae a lo ancho (lateral) o a lo alto.</summary>
-        private static Texture2D Velo(float y, float alto, bool lateral, bool alReves) {
-            var clave = $"{Mathf.RoundToInt(y)}:{Mathf.RoundToInt(alto)}:{lateral}:{alReves}";
-            Texture2D t;
-            if (_fundidos.TryGetValue(clave, out t) && t != null) return t;
-            const int n = 48, filas = 64;
-            int ancho = lateral ? n : 2, alto2 = lateral ? filas : n;
-            t = new Texture2D(ancho, alto2, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "Fundido del panel" };
-            var px = new Color[ancho * alto2];
-            for (var fy = 0; fy < alto2; fy++) {
-                // La textura va de abajo (fila 0) a arriba; la lamina, de arriba a abajo.
-                var v = 1 - fy / (float)(alto2 - 1);
-                for (var fx = 0; fx < ancho; fx++) {
-                    var c = PanelEnY(y + v * alto);
-                    var d = lateral ? fx / (float)(ancho - 1) : v;
-                    if (alReves) d = 1 - d;
-                    c.a = 1 - Mathf.SmoothStep(0, 1, d);
-                    px[fy * ancho + fx] = c;
-                }
-            }
-            t.SetPixels(px); t.Apply(false, true);
-            return _fundidos[clave] = t;
         }
 
         /// <summary>Un boton pegado a una esquina del marco.</summary>
@@ -306,7 +228,7 @@ namespace Nexus.Unity.Pantallas {
             contador.anchorMin = contador.anchorMax = contador.pivot = new Vector2(0.5f, 0);
             contador.anchoredPosition = new Vector2(-90, 52);
             contador.sizeDelta = new Vector2(360, 44);
-            _contador = Ui.Texto(contador, "", EstiloTexto.Cuerpo, Tizador.Gris, TextAlignmentOptions.Center);
+            _contador = Ui.Texto(contador, "", EstiloTexto.Cuerpo, PanelDelPizarron.Contador, TextAlignmentOptions.Center);
             _contador.font = Ui.Tema.FuenteInterfaz;
             UiKit.Rellenar((RectTransform)_contador.transform);
             Ir(0);
@@ -331,16 +253,18 @@ namespace Nexus.Unity.Pantallas {
         private Tizador _negrita;
 
         /// <summary>
-        /// Una escena a pagina completa: todo lo grande que deje el texto de encima (sin tope), y con los bordes fundidos
-        /// en el fondo del panel para que sea una ventana de luz del mismo cuarto y no un recorte pegado.
+        /// Una escena a pagina completa: todo lo grande que deje el texto de encima (sin tope), montada en el panel como
+        /// lo pide su material (pantalla con bisel, lamina impresa o foto con cinta).
         /// </summary>
         private void PintarEscena(Tizador t, string id, float y) {
             const float W = MarcoDePizarra.W;
-            var y0 = y + 26;
-            var k = Mathf.Min((W - 80) / DibujosDeEscena.Ancho, (Fondo - y0) / DibujosDeEscena.Alto);
+            var m = PanelDelPizarron.Margen;
+            var y0 = y + 26 + m;
+            var k = Mathf.Min((W - 120 - 2 * m) / DibujosDeEscena.Ancho, (Fondo - m - y0) / DibujosDeEscena.Alto);
             float w = DibujosDeEscena.Ancho * k, h = DibujosDeEscena.Alto * k, x0 = (W - w) / 2;
+            PanelDelPizarron.Detras(Ui, _lamina.Raiz, x0, y0, w, h);
             DibujosDeEscena.Dibujar(t.En(x0, y0, k), id);
-            MarcoDePizarra.Fundir(Ui, _lamina.Raiz, x0, y0, w, h, w * 0.07f, 56, 18);
+            PanelDelPizarron.Encima(Ui, _lamina.Raiz, x0, y0, w, h);
         }
 
         /// <summary>De 2 a 4 columnas, cada una en su caja: el dibujo arriba, y debajo su titulo y su texto.</summary>
@@ -360,9 +284,9 @@ namespace Nexus.Unity.Pantallas {
                 var col = columnas[i];
                 var x = 60 + i * (ancho + hueco);
                 var color = DibujosDePizarra.ColorDe(col.Color);
-                // Tarjeta de cristal oscuro, DETRAS del dibujo (el DibujoUI de la lamina es el primer hijo).
-                var cara = t.Forma(LuzUI.Redondeado(x, y0, ancho, alto, 18), new Color32(0x15, 0x31, 0x3C, 0xE6), new Color32(0x09, 0x1D, 0x24, 0xE6));
-                var borde = t.Forma(LuzUI.Redondeado(x - 1.5f, y0 - 1.5f, ancho + 3, alto + 3, 19), new Color32(0x2E, 0x64, 0x70, 0xB0));
+                // La tarjeta del material del panel, DETRAS del dibujo (el DibujoUI de la lamina es el primer hijo).
+                Graphic cara, borde;
+                PanelDelPizarron.Tarjeta(Ui, _lamina.Raiz, x, y0, ancho, alto, out cara, out borde);
                 cara.transform.SetAsFirstSibling();
                 borde.transform.SetAsFirstSibling();
 
@@ -381,7 +305,7 @@ namespace Nexus.Unity.Pantallas {
                 }
                 foreach (var linea in Partir(col.Texto ?? "", porRenglon)) {
                     ty += 32;
-                    t.Texto(x + ancho / 2, ty, linea, 23, Tizador.Tiza, true);
+                    t.Texto(x + ancho / 2, ty, linea, 23, PanelDelPizarron.TextoDeTarjeta, true);
                 }
             }
         }
@@ -389,23 +313,23 @@ namespace Nexus.Unity.Pantallas {
         private void Pintar(Tizador t, PaginaDePizarra p) {
             const float W = MarcoDePizarra.W;
             // Cabecera a la izquierda, como un rotulo: el tema en versalitas, el titulo y una raya corta de neon.
-            if (!string.IsNullOrEmpty(Tema)) _negrita.Texto(60, 46, Tema.ToUpperInvariant(), 17, NexusTheme.Alfa(Ui.Tema.cyan, 0.8f)).characterSpacing = 8;
-            _negrita.Texto(60, 96, p.Titulo ?? "", 46, p.EnElJuego ? Tizador.Mostaza : Tizador.Tiza);
-            t.Forma(LuzUI.Redondeado(60, 112, 72, 4, 2), p.EnElJuego ? Tizador.Mostaza : Ui.Tema.cyan);
+            if (!string.IsNullOrEmpty(Tema)) _negrita.Texto(60, 50, Tema.ToUpperInvariant(), 17, PanelDelPizarron.Tema).characterSpacing = 8;
+            _negrita.Texto(60, 100, p.Titulo ?? "", 46, p.EnElJuego ? PanelDelPizarron.EnNexus : PanelDelPizarron.Titulo);
+            t.Forma(LuzUI.Redondeado(60, 116, 72, 4, 2), p.EnElJuego ? PanelDelPizarron.EnNexus : PanelDelPizarron.Acento);
 
             var vinetas = p.Vinetas ?? new List<VinetaDePizarra>();
             var columnas = p.Columnas ?? new List<ColumnaDePizarra>();
             var conDibujos = vinetas.Count > 0 || columnas.Count > 0 || !string.IsNullOrEmpty(p.Dibujo);
             float y = 132;
             if (p.EnElJuego) {
-                _negrita.Texto(60, y + 22, "EN NEXUS", 18, Tizador.Mostaza).characterSpacing = 8;
+                _negrita.Texto(60, y + 22, "EN NEXUS", 18, PanelDelPizarron.EnNexus).characterSpacing = 8;
                 y += 26;
             }
             if (!string.IsNullOrEmpty(p.Texto)) {
                 var lineas = Partir(p.Texto, conDibujos ? 108 : 90);
                 foreach (var linea in lineas) {
                     y += conDibujos ? 38 : 44;
-                    t.Texto(60, y, linea, conDibujos ? 28 : 32, Tizador.Tiza, false, W - 120);
+                    t.Texto(60, y, linea, conDibujos ? 28 : 32, PanelDelPizarron.Texto, false, W - 120);
                 }
             }
             Action<Tizador, float> dibujo;

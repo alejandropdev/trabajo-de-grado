@@ -69,7 +69,7 @@ namespace Nexus.Unity.Aplicacion {
                 paginas.Add(Par("pizarra_" + (i / 9 + 1).ToString("00"), r => Pizarras(r, trozo)));
             }
             // El pizarron de verdad, con paginas del glosario (NEXUS_GALERIA=pizarron).
-            foreach (var (termino, pagina) in new[] { ("avance", 0), ("avance", 2), ("avance", 4), ("avance", 5), ("cansancio", 1), ("cansancio", 3) }) {
+            foreach (var (termino, pagina) in new[] { ("avance", 0), ("cansancio", 1), ("avance", 4) }) {
                 var t = termino; var n = pagina;
                 paginas.Add(Par("pizarron_" + t + "_" + (n + 1), r => Pizarron(r, t, n)));
             }
