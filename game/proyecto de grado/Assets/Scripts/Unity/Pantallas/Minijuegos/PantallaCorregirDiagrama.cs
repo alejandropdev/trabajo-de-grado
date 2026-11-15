@@ -452,7 +452,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var pasos = new List<PasoDeTutorial> {
                 new PasoDeTutorial { Texto = "Estos círculos con número son los puntos que hay que revisar. Unos son errores de verdad y otros parecen raros, pero están bien.", Objetivo = marcador },
                 new PasoDeTutorial { Texto = "Pincha un punto y juégale la carta que lo arregla. Cada carta sirve una sola vez: si la usas aquí, ya no está para otro punto.", Objetivo = () => _abanico.Raiz },
-                new PasoDeTutorial { Texto = "«Está bien así» es para los puntos que no hay que tocar. Esa carta no se gasta. Cambiar lo que funciona también cuenta en contra.",
+                new PasoDeTutorial { Texto = "«Está bien así» es para el punto que no hay que tocar. Como las demás, se usa una sola vez. Cambiar lo que funciona también cuenta en contra.",
                                      Objetivo = () => { var c = _abanico.Carta(PuntosDelDiagrama.EstaBien); return c != null ? (RectTransform)c.transform : null; } },
                 new PasoDeTutorial { Texto = "Arrastra el diagrama para moverte y usa la rueda del ratón (o estos botones) para acercarte.", Objetivo = () => _zoom },
                 new PasoDeTutorial { Texto = "Cuando todos los puntos tengan carta, pulsa Verificar. Se revisan uno a uno y el reto termina.", Objetivo = () => _panelVerificar }
@@ -529,7 +529,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         /// <summary>
         /// La carta vuela del abanico al punto por una curva, girando y encogiendose; al llegar cae la chapa con su sello
-        /// y un golpe de luz, y la carta vuelve a su sitio en la mano (hundida y con «EN #N» si se gasto).
+        /// y un golpe de luz, y la carta vuelve a su sitio en la mano (hundida y con «EN #N»: se gasto).
         /// </summary>
         private void Volar(string carta, string punto) {
             MarcadorDePunto marcador;
@@ -555,7 +555,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
 
         private void Aterrizar(string carta, string punto, MarcadorDePunto marcador) {
             var esEstaBien = carta == PuntosDelDiagrama.EstaBien;
-            _abanico.Aterrizar(carta, esEstaBien ? 0 : NumeroDe(punto));
+            _abanico.Aterrizar(carta, NumeroDe(punto));
             if (marcador != null) {
                 var c = PuntosDelDiagrama.Carta(Def, carta);
                 marcador.PonerCarta(PuntosDelDiagrama.NombreDeCarta(Def, carta), c != null ? c.Icono : null, esEstaBien, _anim, _rafaga);
@@ -579,7 +579,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (carta == null) return;
             MarcadorDePunto m;
             if (_marcadores.TryGetValue(punto, out m)) m.QuitarCarta(_anim);
-            if (carta != PuntosDelDiagrama.EstaBien) _abanico.Devolver(carta, _anim);
+            _abanico.Devolver(carta, _anim);
             Decir($"«{PuntosDelDiagrama.NombreDeCarta(Def, carta)}» vuelve a la mano.");
             Repintar();
         }
