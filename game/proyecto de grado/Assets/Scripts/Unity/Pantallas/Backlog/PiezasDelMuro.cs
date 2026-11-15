@@ -423,9 +423,10 @@ namespace Nexus.Unity.Pantallas {
         /// <summary>El color de cada suministro: la pizza naranja, el cafe tostado, la Guepardex lima.</summary>
         public static Color ColorDeSuministro(NexusTheme tema, string id) {
             var i = (id ?? "").ToLowerInvariant();
-            if (i.Contains("pizza")) return new Color32(0xF5, 0x9E, 0x0B, 0xFF);
+            // 2026-11-15: fuera los tonos de Tailwind (amber-500, lime-400); colores de la paleta del mundo (STYLE.md).
+            if (i.Contains("pizza")) return new Color32(0xF2, 0xA2, 0x4E, 0xFF);
             if (i.Contains("coffee") || i.Contains("cafe")) return new Color32(0xC0, 0x84, 0x57, 0xFF);
-            if (i.Contains("energy") || i.Contains("guepard")) return new Color32(0xA3, 0xE6, 0x35, 0xFF);
+            if (i.Contains("energy") || i.Contains("guepard")) return new Color32(0xB9, 0xD8, 0x57, 0xFF);
             return tema.cyan;
         }
 
