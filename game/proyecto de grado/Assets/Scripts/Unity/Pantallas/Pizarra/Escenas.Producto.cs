@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Nexus.Unity.Pantallas.Minijuegos;
 using UnityEngine;
+using L = Nexus.Unity.Tema.LuzUI;
+using Nexus.Unity.Tema;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>El producto y lo que falta por hacer: el MVP y sus parientes (mvp-…) y el backlog (bl-…).</summary>
@@ -14,126 +16,232 @@ namespace Nexus.Unity.Pantallas {
         private static void Producto(Dictionary<string, Action<Tizador>> d) {
             // ------------------------------------------------------------ MVP
             d["mvp-que"] = p => {
-                p.Navegador(60, 50, 220, 180, Tizador.Cian);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 130, Nucleo, 0.5f, 501);
+                var y0 = Ventana(v, 60, 50, 220, 180);
                 var partes = new[] { "registrar", "avisar", "quién sigue" };
-                for (var i = 0; i < 3; i++) p.Caja(84, 92 + i * 44, 172, 34, partes[i], Tizador.Cian, false, 16);
-                p.Flecha(300, 140, 370, 140, Tizador.Tiza); p.Figura(430, 110, Tizador.Mostaza, "lo usa de verdad"); p.Si(500, 120, null, 16);
-                p.Texto(300, 270, "pequeño, pero completo: ya resuelve el problema", 17, Tizador.Tiza, true);
+                for (var i = 0; i < 3; i++) Pieza(v, 80, y0 + 16 + i * 44, 180, 34, partes[i], Nucleo);
+                FlechaNeon(v, 296, 140, 366, 140, Tinta);
+                Credencial(v, 430, 80, Aviso, "lo usa de verdad");
+                NeonCheck(v, 500, 92, 16);
+                v.Rotulo(300, 272, "pequeño, pero completo: ya resuelve el problema", 18, Tinta);
             };
             d["mvp-si"] = p => {
-                Patineta(p, 50, 110, Tizador.Cian); p.Flecha(140, 110, 200, 110, Tizador.Gris); Bici(p, 220, 80, Tizador.Cian); p.Flecha(330, 110, 390, 110, Tizador.Gris); p.Coche(410, 86, Tizador.Cian);
-                p.Carita(85, 190, 22, 0, Tizador.Mostaza); p.Carita(265, 190, 22, 1, Tizador.Mostaza); p.Carita(460, 190, 22, 1, Tizador.Mostaza);
-                p.Texto(300, 260, "cada entrega ya sirve para moverse", 20, Tizador.Cian, true);
+                var v = p.Vitrina();
+                FondoExterior(v, 0.2f, 300, 236, 503);
+                Via(v, -20, 620, 160, 8, 8, 236, Nucleo);
+                Plataforma(v, 40, 160, 90);
+                Capsula(v, 222, 160, 76, Nucleo, false);
+                Capsula(v, 400, 160, 140, Nucleo, true);
+                FlechaNeon(v, 148, 104, 204, 104, A(Tinta, 0.7f)); FlechaNeon(v, 320, 104, 376, 104, A(Tinta, 0.7f));
+                foreach (var x in new[] { 85f, 260f, 470f }) NeonCheck(v, x, 56, 18);
+                v.Rotulo(300, 272, "cada entrega ya sirve para moverse", 20, Nucleo);
             };
             d["mvp-no"] = p => {
-                p.Circulo(85, 110, 20, Tizador.Gris); p.Flecha(140, 110, 200, 110, Tizador.Gris); p.Linea(220, 120, 310, 120, Tizador.Gris, 5); p.Circulo(238, 130, 9, Tizador.Gris); p.Circulo(292, 130, 9, Tizador.Gris);
-                p.Flecha(330, 110, 390, 110, Tizador.Gris); p.Coche(410, 86, Tizador.Tiza);
-                p.Carita(85, 190, 22, -1, Tizador.Roja); p.Carita(265, 190, 22, -1, Tizador.Roja); p.Carita(460, 190, 22, 1, Tizador.Mostaza);
-                p.Texto(300, 260, "nada sirve hasta el final", 20, Tizador.Roja, true);
+                var v = p.Vitrina();
+                FondoExterior(v, 0.35f, 300, 236, 505);
+                Via(v, -20, 620, 160, 8, 8, 236, Nucleo);
+                Anillo(v, 85, 136, 18, 6, Cromo); v.Forma(L.Elipse(85, 136, 4, 4, 10), CromoOscuro);
+                v.Forma(L.Redondeado(222, 140, 90, 6, 3), Cromo, CromoOscuro);
+                Anillo(v, 230, 146, 8, 4, Cromo); Anillo(v, 304, 146, 8, 4, Cromo);
+                Capsula(v, 400, 160, 140, Nucleo, false);
+                FlechaNeon(v, 148, 104, 204, 104, A(Tinta, 0.7f)); FlechaNeon(v, 320, 104, 376, 104, A(Tinta, 0.7f));
+                NeonX(v, 85, 56, 18); NeonX(v, 265, 56, 18); NeonCheck(v, 470, 56, 18);
+                v.Rotulo(300, 272, "nada sirve hasta el final", 20, Coral);
             };
             d["mvp-escalera"] = p => {
+                var v = p.Vitrina();
+                FondoInterior(v, 380, 120, Aviso, 0.5f, 507);
                 var pasos = new[] { "boceto", "mockup", "prototipo", "prototipo", "MVP", "beta", "producto" };
                 var sub = new[] { "", "", "sin función", "con función", "", "", "completo" };
                 for (var i = 0; i < 7; i++) {
-                    var x = 20 + i * 80; var y = 250 - i * 30;
-                    p.Trazo(i == 4 ? Tizador.Mostaza : Tizador.Tiza, x, y, x + 80, y, x + 80, y - 30);
-                    p.Texto(x + 40, y - 12, pasos[i], 15, i == 4 ? Tizador.Mostaza : Tizador.Tiza, true);
-                    if (sub[i].Length > 0) p.Texto(x + 40, y + 20, sub[i], 12, Tizador.Gris, true);
+                    float x = 20 + i * 80, y = 250 - i * 30;
+                    var c = i == 4 ? Aviso : CostillaMedia;
+                    if (i == 4) v.Halo(x + 40, y + 10, 70, 30, A(Aviso, 0.35f));
+                    v.Forma(L.Redondeado(x, y, 78, 300 - y, 4), Color.Lerp(c, Color.white, 0.12f), Color.Lerp(c, Silueta, 0.5f));
+                    v.Forma(Caja(x + 2, y, 74, 2), A(Color.white, 0.3f));
+                    v.Rotulo(x + 40, y - 12, pasos[i], 15, i == 4 ? Aviso : Tinta);
+                    if (sub[i].Length > 0) v.Rotulo(x + 40, y + 16, sub[i], 12, TintaSuave);
                 }
-                p.Flecha(40, 120, 300, 30, Tizador.Cian); p.Texto(130, 50, "cada vez más real", 17, Tizador.Cian, true);
+                FlechaNeon(v, 40, 120, 296, 34, Nucleo);
+                v.Rotulo(130, 50, "cada vez más real", 17, Nucleo, 0, true);
             };
             d["mvp-boceto"] = p => {
-                p.Caja(170, 20, 260, 240, null, Tizador.Tiza, true);
-                p.Caja(194, 44, 212, 36, null, Tizador.Gris, true); p.Caja(194, 96, 100, 90, null, Tizador.Gris, true); p.Caja(306, 96, 100, 40, null, Tizador.Gris, true); p.Caja(306, 146, 100, 40, null, Tizador.Gris, true);
-                p.Linea(194, 206, 380, 206, Tizador.Gris, 2); p.Linea(194, 226, 330, 226, Tizador.Gris, 2);
-                p.Linea(470, 60, 540, 20, Tizador.Mostaza, 6); p.Trazo(Tizador.Mostaza, 470, 60, 462, 74, 478, 68); p.Texto(510, 110, "a lápiz,", 17, Tizador.Mostaza, true); p.Texto(510, 134, "en minutos", 17, Tizador.Mostaza, true);
-                p.Texto(90, 140, "la idea", 17, Tizador.Tiza, true); p.Texto(90, 164, "en rayas", 17, Tizador.Tiza, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 130, Aviso, 0.5f, 509);
+                Papel(v, 170, 20, 260, 240, null, null, -2);
+                foreach (var r in new[] { Caja(194, 44, 212, 36), Caja(194, 96, 100, 90), Caja(306, 96, 100, 40), Caja(306, 146, 100, 40) }) Contorno(v, r, 1.6f, A(H(0x1E2A2A), 0.6f));
+                v.Forma(Caja(194, 206, 186, 2), A(H(0x1E2A2A), 0.5f)); v.Forma(Caja(194, 226, 136, 2), A(H(0x1E2A2A), 0.5f));
+                v.Forma(Tizador.Rotar(L.Redondeado(470, 52, 90, 10, 3), 470, 57, -30), Aviso, H(0xB0922E));
+                v.Forma(Tizador.Rotar(Pts(458, 57, 470, 52, 470, 62), 470, 57, -30), H(0x3A2A1E));
+                v.Rotulo(510, 110, "a lápiz,", 17, Aviso, 0, true); v.Rotulo(510, 134, "en minutos", 17, Aviso, 0, true);
+                v.Rotulo(90, 140, "la idea", 17, Tinta, 0, true); v.Rotulo(90, 164, "en rayas", 17, Tinta, 0, true);
             };
             d["mvp-mockup"] = p => {
-                p.Navegador(150, 20, 300, 240, Tizador.Cian); p.Bloque(170, 60, 260, 36, Tizador.Cian); p.Bloque(170, 108, 120, 90, Tizador.Mostaza); p.Caja(304, 108, 126, 40, null, Tizador.Tiza); p.Caja(304, 158, 126, 40, null, Tizador.Tiza);
-                p.Bloque(170, 212, 110, 30, Tizador.Roja); p.Mano(490, 180); p.No(520, 150, null, 14);
-                p.Texto(520, 250, "se ve, no se toca", 16, Tizador.Roja, true); p.Texto(75, 130, "una imagen", 16, Tizador.Tiza, true); p.Texto(75, 154, "con el aspecto", 16, Tizador.Tiza, true); p.Texto(75, 178, "final", 16, Tizador.Tiza, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 130, Coral, 0.4f, 511);
+                Ventana(v, 150, 20, 300, 240);
+                v.Forma(L.Redondeado(170, 60, 260, 36, 6), Nucleo, A(Nucleo, 0.6f));
+                v.Forma(L.Redondeado(170, 108, 120, 90, 6), Aviso, A(Aviso, 0.6f));
+                Pieza(v, 304, 108, 126, 40, null, Tinta); Pieza(v, 304, 158, 126, 40, null, Tinta);
+                v.Forma(L.Redondeado(170, 212, 110, 30, 15), Coral);
+                v.Forma(Pts(490, 168, 490, 200, 498, 192, 506, 208, 512, 205, 504, 190, 516, 190), Tinta, TintaSuave);
+                NeonX(v, 530, 150, 18);
+                v.Rotulo(520, 250, "se ve, no se toca", 16, Coral, 0, true);
+                v.Rotulo(75, 130, "una imagen", 16, Tinta, 0, true); v.Rotulo(75, 154, "con el aspecto", 16, Tinta, 0, true); v.Rotulo(75, 178, "final", 16, Tinta, 0, true);
             };
             d["mvp-proto-nf"] = p => {
-                p.Navegador(30, 40, 150, 130, Tizador.Cian); p.Navegador(225, 40, 150, 130, Tizador.Cian); p.Navegador(420, 40, 150, 130, Tizador.Cian);
-                p.Caja(110, 130, 56, 26, null, Tizador.Mostaza); p.Curva(166, 143, 200, 100, 222, 110, Tizador.Mostaza); p.Caja(305, 130, 56, 26, null, Tizador.Mostaza); p.Curva(361, 143, 395, 100, 417, 110, Tizador.Mostaza);
-                p.Cilindro(250, 200, 90, 60, Tizador.Gris); p.No(295, 232, null, 22);
-                p.Texto(110, 230, "se puede hacer clic,", 16, Tizador.Mostaza, true); p.Texto(110, 254, "pasa de pantalla", 16, Tizador.Mostaza, true); p.Texto(480, 236, "pero no guarda nada", 16, Tizador.Roja, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Aviso, 0.5f, 513);
+                for (var i = 0; i < 3; i++) { Ventana(v, 30 + i * 195, 40, 150, 130); Renglones(v, 46 + i * 195, 78, 110, 2, 14); }
+                BotonUI(v, 104, 128, 64, 28, "ir", Aviso); BotonUI(v, 299, 128, 64, 28, "ir", Aviso);
+                v.Neon(Tizador.Bezier(new Vector2(168, 142), new Vector2(200, 100), new Vector2(222, 112), 16), 1, Aviso);
+                v.Neon(Tizador.Bezier(new Vector2(363, 142), new Vector2(395, 100), new Vector2(417, 112), 16), 1, Aviso);
+                Icono(v.En(256, 178, 0.6f), "base-de-datos", Tizador.Gris);
+                NeonX(v, 340, 220, 20);
+                v.Rotulo(110, 230, "se puede hacer clic,", 16, Aviso, 0, true); v.Rotulo(110, 254, "pasa de pantalla", 16, Aviso, 0, true);
+                v.Rotulo(480, 236, "pero no guarda nada", 16, Coral, 0, true);
             };
             d["mvp-proto-f"] = p => {
-                p.Navegador(40, 50, 160, 140, Tizador.Cian); p.Flecha(205, 120, 265, 120, Tizador.Cian); p.Servidor(275, 60, 80, 120, Tizador.Cian); p.Flecha(360, 120, 420, 120, Tizador.Cian); p.Cilindro(430, 80, 90, 80, Tizador.Cian);
-                p.Caja(60, 100, 120, 34, "una función", Tizador.Mostaza, false, 14); p.Caja(60, 146, 120, 30, null, Tizador.Gris, true);
-                p.Texto(300, 230, "una sola cosa funciona de punta a punta", 17, Tizador.Cian, true); p.Texto(300, 260, "sirve para probar una idea; después se suele desechar", 16, Tizador.Gris, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Nucleo, 0.6f, 515);
+                Ventana(v, 40, 50, 160, 140);
+                BotonUI(v, 56, 96, 128, 34, "una función", Aviso, true);
+                v.Forma(L.Redondeado(56, 142, 128, 30, 15), A(TintaSuave, 0.12f));
+                FlechaNeon(v, 206, 120, 262, 120, Nucleo);
+                Icono(v.En(238, 56, 0.95f), "servidor", Tizador.Tiza);
+                FlechaNeon(v, 360, 120, 416, 120, Nucleo);
+                Icono(v.En(404, 56, 0.85f), "base-de-datos", Tizador.Cian);
+                v.Rotulo(300, 230, "una sola cosa funciona de punta a punta", 18, Nucleo);
+                v.Rotulo(300, 258, "sirve para probar una idea; después se suele desechar", 16, TintaSuave);
             };
             d["mvp-minimo"] = p => {
-                p.Navegador(200, 30, 200, 160, Tizador.Mostaza);
-                for (var i = 0; i < 3; i++) { p.Caja(220, 70 + i * 38, 130, 28, null, Tizador.Cian); p.Si(374, 84 + i * 38, null, 9); }
-                p.Figura(100, 90, Tizador.Tiza); p.Figura(60, 150, Tizador.Tiza); p.Figura(140, 150, Tizador.Tiza); p.Flecha(160, 110, 195, 110, Tizador.Tiza);
-                p.Texto(500, 90, "clientes reales", 17, Tizador.Tiza, true); p.Texto(500, 114, "lo usan", 17, Tizador.Tiza, true); p.Bocadillo(440, 150, 130, 40, "«falta esto»", Tizador.Mostaza, 15);
-                p.Texto(300, 264, "lo esencial, bien hecho, y a aprender de quien lo usa", 16, Tizador.Mostaza, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Aviso, 0.5f, 517);
+                var y0 = Ventana(v, 200, 30, 200, 160, null, Aviso);
+                for (var i = 0; i < 3; i++) { Pieza(v, 218, y0 + 14 + i * 38, 130, 28, null, Nucleo); NeonCheck(v, 374, y0 + 28 + i * 38, 11); }
+                Credencial(v, 100, 74, Tinta); Credencial(v, 56, 120, Tinta); Credencial(v, 144, 120, Tinta);
+                FlechaNeon(v, 168, 110, 194, 110, Tinta);
+                v.Rotulo(500, 70, "clientes reales", 17, Tinta, 0, true); v.Rotulo(500, 94, "lo usan", 17, Tinta, 0, true);
+                Bocadillo(v, 434, 130, 136, 40, "«falta esto»", Aviso, 450, 190, 15);
+                v.Rotulo(300, 264, "lo esencial, bien hecho, y a aprender de quien lo usa", 17, Aviso);
             };
             d["mvp-beta"] = p => {
-                p.Navegador(180, 30, 240, 180, Tizador.Cian);
-                for (var f = 0; f < 3; f++) for (var k = 0; k < 2; k++) p.Caja(200 + k * 104, 70 + f * 42, 94, 32, null, f == 2 && k == 1 ? Tizador.Gris : Tizador.Cian, f == 2 && k == 1);
-                p.Bicho(120, 80, Tizador.Roja); p.Lupa(110, 150, 22, Tizador.Mostaza); p.Texto(100, 220, "se cazan errores", 16, Tizador.Mostaza, true);
-                p.Figura(480, 80, Tizador.Tiza); p.Figura(530, 130, Tizador.Tiza); p.Texto(500, 210, "con un grupo", 16, Tizador.Tiza, true); p.Texto(500, 232, "pequeño", 16, Tizador.Tiza, true);
-                p.Texto(300, 270, "casi todo está, y se pule antes de abrirlo a todos", 16, Tizador.Cian, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Nucleo, 0.5f, 519);
+                var y0 = Ventana(v, 180, 30, 240, 180);
+                for (var f = 0; f < 3; f++) for (var k = 0; k < 2; k++) {
+                    if (f == 2 && k == 1) v.Forma(L.Redondeado(196 + k * 106, y0 + 14 + f * 44, 96, 34, 8), A(TintaSuave, 0.12f));
+                    else Pieza(v, 196 + k * 106, y0 + 14 + f * 44, 96, 34, null, Nucleo);
+                }
+                Chispa(v, 100, 78, 9, 0.2f); Lupa(v, 110, 146, 26, Aviso);
+                v.Rotulo(100, 220, "se cazan errores", 16, Aviso, 0, true);
+                Credencial(v, 480, 66, Tinta); Credencial(v, 530, 96, Tinta);
+                v.Rotulo(500, 200, "con un grupo", 16, Tinta, 0, true); v.Rotulo(500, 222, "pequeño", 16, Tinta, 0, true);
+                v.Rotulo(300, 270, "casi todo está, y se pule antes de abrirlo a todos", 17, Nucleo);
             };
             d["mvp-completo"] = p => {
-                p.Navegador(60, 40, 240, 180, Tizador.Cian);
-                for (var f = 0; f < 3; f++) for (var k = 0; k < 2; k++) p.Caja(80 + k * 104, 80 + f * 42, 94, 32, null, Tizador.Cian);
-                p.Estrella(370, 70, 22, Tizador.Mostaza); p.Texto(470, 78, "todo lo planeado", 17, Tizador.Mostaza, true);
-                p.LlaveInglesa(350, 110, Tizador.Tiza); p.Texto(480, 144, "con mantenimiento", 17, Tizador.Tiza, true);
-                p.Figura(370, 190, Tizador.Cian); p.Texto(470, 216, "y con soporte", 17, Tizador.Cian, true);
-                p.Texto(300, 272, "abierto a todos los usuarios", 16, Tizador.Tiza, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Menta, 0.5f, 521);
+                var y0 = Ventana(v, 60, 40, 240, 180);
+                for (var f = 0; f < 3; f++) for (var k = 0; k < 2; k++) Pieza(v, 76 + k * 106, y0 + 16 + f * 44, 96, 34, null, Nucleo);
+                v.Halo(370, 70, 30, A(Sol, 0.45f)); v.FormaDeLuz(Estrella(370, 70, 18), A(Sol, 0.95f)); v.Forma(Estrella(370, 70, 7), BombillaCentro);
+                v.Rotulo(400, 72, "todo lo planeado", 17, Aviso, -1, true);
+                Llave(v, 344, 132, 44, -20); v.Rotulo(400, 132, "con mantenimiento", 17, Tinta, -1, true);
+                Credencial(v, 370, 170, Nucleo); v.Rotulo(400, 200, "y con soporte", 17, Nucleo, -1, true);
+                v.Rotulo(180, 272, "abierto a todos los usuarios", 17, Tinta);
             };
 
             // ------------------------------------------------------------ backlog
             d["bl-que"] = p => {
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Aviso, 0.5f, 523);
                 var filas = new[] { "registrar la entrada", "avisar al anfitrión", "quién sigue dentro", "exportar a Excel", "cambiar colores" };
-                for (var i = 0; i < 5; i++) { p.Texto(150, 56 + i * 50, (i + 1).ToString(), 24, Tizador.Mostaza, true); p.Tarjeta(180, 30 + i * 50, 250, 40, i < 3 ? Tizador.Cian : Tizador.Gris, filas[i]); }
-                p.Flecha(480, 250, 480, 40, Tizador.Mostaza); p.Texto(540, 60, "lo más", 16, Tizador.Mostaza, true); p.Texto(540, 82, "valioso", 16, Tizador.Mostaza, true); p.Texto(540, 240, "puede esperar", 15, Tizador.Gris, true);
-                p.Texto(70, 150, "todo lo", 17, Tizador.Tiza, true); p.Texto(70, 174, "que falta", 17, Tizador.Tiza, true);
+                for (var i = 0; i < 5; i++) {
+                    v.Rotulo(150, 50 + i * 50, (i + 1).ToString(), 22, i < 3 ? Aviso : TintaSuave, 0, false, true);
+                    Pieza(v, 180, 30 + i * 50, 250, 40, filas[i], i < 3 ? Nucleo : TintaSuave);
+                }
+                FlechaNeon(v, 480, 250, 480, 40, Aviso);
+                v.Rotulo(540, 60, "lo más", 16, Aviso, 0, true); v.Rotulo(540, 82, "valioso", 16, Aviso, 0, true);
+                v.Rotulo(540, 240, "puede esperar", 15, TintaSuave);
+                v.Rotulo(70, 150, "todo lo", 17, Tinta, 0, true); v.Rotulo(70, 174, "que falta", 17, Tinta, 0, true);
             };
             d["bl-detalle"] = p => {
-                p.Caja(60, 20, 230, 86, null, Tizador.Cian); p.Texto(175, 44, "registrar la entrada", 15, Tizador.Cian, true); p.Linea(76, 58, 274, 58, Tizador.Cian, 2); p.Linea(76, 74, 250, 74, Tizador.Cian, 2); p.Linea(76, 90, 220, 90, Tizador.Cian, 2);
-                p.Caja(60, 116, 230, 60, null, Tizador.Tiza); p.Linea(76, 138, 274, 138, Tizador.Tiza, 2); p.Linea(76, 156, 220, 156, Tizador.Tiza, 2);
-                p.Caja(60, 186, 230, 36, null, Tizador.Gris, true); p.Caja(60, 232, 230, 26, null, Tizador.Gris, true); p.Caja(60, 266, 230, 18, null, Tizador.Gris, true);
-                p.Texto(440, 60, "arriba: claro y detallado,", 16, Tizador.Cian, true); p.Texto(440, 84, "listo para empezar", 16, Tizador.Cian, true);
-                p.Texto(440, 230, "abajo: una idea suelta,", 16, Tizador.Gris, true); p.Texto(440, 254, "ya se detallará", 16, Tizador.Gris, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Nucleo, 0.5f, 525);
+                PanelUI(v, 60, 18, 230, 90, "registrar la entrada"); Renglones(v, 78, 64, 194, 3, 12);
+                PanelUI(v, 60, 118, 230, 60); Renglones(v, 78, 138, 194, 2, 14);
+                v.Forma(L.Redondeado(60, 188, 230, 36, 8), A(TintaSuave, 0.14f));
+                v.Forma(L.Redondeado(60, 232, 230, 26, 8), A(TintaSuave, 0.1f));
+                v.Forma(L.Redondeado(60, 266, 230, 18, 8), A(TintaSuave, 0.07f));
+                v.Rotulo(440, 60, "arriba: claro y detallado,", 16, Nucleo, 0, true); v.Rotulo(440, 84, "listo para empezar", 16, Nucleo, 0, true);
+                v.Rotulo(440, 230, "abajo: una idea suelta,", 16, TintaSuave, 0, true); v.Rotulo(440, 254, "ya se detallará", 16, TintaSuave, 0, true);
             };
             d["bl-dueno"] = p => {
-                for (var i = 0; i < 3; i++) { p.Figura(60, 50 + i * 86, Tizador.Tiza); p.Curva(90, 66 + i * 86, 170, 100 + i * 20, 240, 130, Tizador.Gris); }
-                p.Figura(280, 110, Tizador.Mostaza, "ordena la lista"); p.Flecha(320, 130, 390, 130, Tizador.Mostaza);
-                for (var i = 0; i < 4; i++) p.Tarjeta(410, 40 + i * 54, 150, 42, i == 0 ? Tizador.Mostaza : Tizador.Tiza);
-                p.Texto(130, 286, "cliente y usuarios piden", 15, Tizador.Tiza, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 280, 120, Aviso, 0.5f, 527);
+                for (var i = 0; i < 3; i++) {
+                    Credencial(v, 50 + i * 56, 64 + (i % 2) * 70, Tinta);
+                    v.Neon(Tizador.Bezier(new Vector2(74 + i * 56, 96 + (i % 2) * 70), new Vector2(200, 170), new Vector2(246, 134), 16), 0.8f, A(TintaSuave, 0.8f));
+                }
+                Credencial(v, 280, 96, Aviso, "ordena la lista");
+                FlechaNeon(v, 316, 130, 392, 130, Aviso);
+                for (var i = 0; i < 4; i++) TarjetaUI(v, 410, 40 + i * 54, 150, 42, i == 0 ? Aviso : Borde);
+                v.Rotulo(130, 256, "cliente y usuarios piden", 15, Tinta, 0);
             };
             d["bl-vivo"] = p => {
-                p.Tarjeta(30, 110, 110, 46, Tizador.Mostaza, "idea nueva"); p.Flecha(150, 133, 220, 133, Tizador.Mostaza);
-                for (var i = 0; i < 4; i++) p.Tarjeta(235, 50 + i * 52, 140, 40, Tizador.Tiza);
-                p.Flecha(390, 70, 450, 70, Tizador.Cian); p.Tarjeta(465, 48, 110, 46, Tizador.Cian, "hecha"); p.Si(520, 120, null, 12);
-                p.Flecha(390, 226, 436, 226, Tizador.Roja); p.Tarjeta(446, 204, 140, 46, Tizador.Roja, "ya no hace falta"); p.Texto(305, 284, "nunca está terminado", 17, Tizador.Tiza, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 120, Nucleo, 0.5f, 529);
+                Pieza(v, 26, 108, 116, 48, "idea nueva", Aviso);
+                FlechaNeon(v, 150, 132, 222, 132, Aviso);
+                for (var i = 0; i < 4; i++) TarjetaUI(v, 235, 50 + i * 52, 140, 40, Borde);
+                FlechaNeon(v, 388, 70, 450, 70, Nucleo);
+                Pieza(v, 462, 46, 116, 48, "hecha", Menta); NeonCheck(v, 520, 120, 14);
+                FlechaNeon(v, 388, 226, 434, 226, Coral);
+                Pieza(v, 444, 202, 144, 48, "ya no hace falta", Coral, 14);
+                v.Rotulo(305, 284, "nunca está terminado", 18, Tinta);
             };
             d["bl-producto"] = p => {
-                p.Caja(170, 20, 260, 260, null, Tizador.Tiza); p.Texto(300, 46, "todo el producto", 18, Tizador.Mostaza, true);
-                for (var i = 0; i < 6; i++) p.Tarjeta(190, 60 + i * 36, 220, 28, i < 2 ? Tizador.Cian : Tizador.Gris);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 130, Aviso, 0.5f, 531);
+                PanelUI(v, 170, 18, 260, 264, "todo el producto", Aviso);
+                for (var i = 0; i < 6; i++) TarjetaUI(v, 188, 66 + i * 34, 224, 28, i < 2 ? Nucleo : Borde);
             };
             d["bl-sprint"] = p => {
-                p.Caja(170, 60, 260, 170, null, Tizador.Cian); p.Texto(300, 90, "solo este sprint", 18, Tizador.Cian, true);
-                p.Tarjeta(190, 110, 220, 40, Tizador.Cian); p.Tarjeta(190, 164, 220, 40, Tizador.Cian); p.RelojDeArena(500, 140, 90, Tizador.Mostaza);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 130, Nucleo, 0.5f, 533);
+                PanelUI(v, 150, 60, 270, 170, "solo este sprint");
+                TarjetaUI(v, 170, 112, 230, 40, Nucleo); TarjetaUI(v, 170, 166, 230, 40, Nucleo);
+                RelojDeArena(v, 500, 96, 100, Aviso, 0.55f);
             };
             d["bl-sin-orden"] = p => {
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 140, Coral, 0.4f, 535);
                 var xy = new[] { 60f, 40, 250, 70, 130, 150, 330, 180, 90, 220, 400, 50, 440, 130 };
-                for (var i = 0; i < 7; i++) p.Tarjeta(xy[i * 2], xy[i * 2 + 1], 110, 46, Tizador.Gris);
-                p.Texto(300, 140, "?", 80, Tizador.Roja, true);
+                for (var i = 0; i < 7; i++) TarjetaUI(v, xy[i * 2], xy[i * 2 + 1], 110, 46, Borde);
+                v.Halo(300, 140, 60, A(Coral, 0.3f));
+                v.Rotulo(300, 140, "?", 80, Coral, 0, false, true);
             };
             d["bl-todo-urgente"] = p => {
-                for (var i = 0; i < 4; i++) { p.Tarjeta(170, 30 + i * 62, 220, 50, Tizador.Roja, "URGENTE"); p.Texto(140, 64 + i * 62, "1", 26, Tizador.Roja, true); }
-                p.Sirena(470, 150, Tizador.Roja);
+                var v = p.Vitrina();
+                FondoInterior(v, 470, 150, Coral, 0.6f, 537);
+                for (var i = 0; i < 4; i++) {
+                    v.Rotulo(140, 55 + i * 62, "1", 24, Coral, 0, false, true);
+                    Pieza(v, 170, 30 + i * 62, 220, 50, "URGENTE", Coral, 16);
+                }
+                Baliza(v, 480, 170);
             };
             d["bl-infinito"] = p => {
-                for (var i = 0; i < 9; i++) p.Tarjeta(210, 10 + i * 31, 180, 24, i < 2 ? Tizador.Tiza : Tizador.Gris);
-                p.Telarana(390, 190, 80, Tizador.Gris); p.Texto(110, 240, "ideas de", 17, Tizador.Gris, true); p.Texto(110, 264, "hace un año", 17, Tizador.Gris, true);
+                var v = p.Vitrina();
+                FondoInterior(v, 300, 100, TintaSuave, 0.4f, 539);
+                for (var i = 0; i < 9; i++) {
+                    var t = i / 8f;
+                    v.Forma(L.Redondeado(210, 10 + i * 31, 180, 24, 6), A(Color.Lerp(H(0x1D3F4A), Superficie, t), 1 - t * 0.5f));
+                    v.Forma(L.Redondeado(210, 10 + i * 31, 4, 24, 2), A(i < 2 ? Nucleo : TintaSuave, 1 - t * 0.7f));
+                    v.Forma(L.Redondeado(224, 18 + i * 31, 110 - i * 4, 3.5f, 1.7f), A(Tinta, 0.6f - t * 0.45f));
+                }
+                Maraña(v, 360, 140, 140, 110, A(TintaSuave, 0.35f), 13);
+                v.Rotulo(110, 240, "ideas de", 17, TintaSuave, 0, true); v.Rotulo(110, 264, "hace un año", 17, TintaSuave, 0, true);
             };
         }
     }
