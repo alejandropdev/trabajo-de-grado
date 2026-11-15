@@ -489,7 +489,23 @@ namespace Nexus.Unity.Aplicacion {
         private void OnApplicationQuit() {
             if (Telemetria != null) Telemetria.Terminar(Time.realtimeSinceStartupAsDouble);
             // Cerrar la ventana a mitad de dia no puede perder el dia: INV-7 dice que recargar da lo mismo.
-            if (Sesion != null && !Sesion.NivelTerminado) Guardar("cerrar la aplicacion");
+            GuardarLoQueHayAMedias("cerrar la aplicacion");
+        }
+
+        // Salir de la ventana (Alt+Tab, minimizar) tambien guarda: si despues el juego se cierra a la fuerza, lo que
+        // se estaba haciendo (la Fase 1 a medias, por ejemplo) sigue ahi al volver.
+        private void OnApplicationFocus(bool conFoco) { if (!conFoco) GuardarLoQueHayAMedias(AutoGuardado.Motivos.SinFoco); }
+
+        private void OnApplicationPause(bool enPausa) { if (enPausa) GuardarLoQueHayAMedias(AutoGuardado.Motivos.SinFoco); }
+
+        private void GuardarLoQueHayAMedias(string motivo) {
+            if (Sesion == null || Sesion.NivelTerminado || _autoGuardado == null) return;
+            try {
+                if (Router != null) foreach (var p in Router.Pila) if (p != null) p.AntesDeGuardar();
+                Guardar(motivo);
+            } catch (Exception e) {
+                Debug.LogWarning("No se pudo guardar (" + motivo + "): " + e.Message);
+            }
         }
 
         private void Update() {

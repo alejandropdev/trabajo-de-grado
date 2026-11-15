@@ -28,6 +28,8 @@ namespace Nexus.Unity.Aplicacion {
 
         public Pantalla Actual { get { return _pila.Count == 0 ? null : _pila[_pila.Count - 1]; } }
         public int Profundidad { get { return _pila.Count; } }
+        /// <summary>Las pantallas abiertas, de abajo a arriba.</summary>
+        public IReadOnlyList<Pantalla> Pila { get { return _pila; } }
 
         /// <summary>Cierra todo y abre T. 'configurar' se llama antes de construirla (para pasarle datos).</summary>
         public T IrA<T>(Action<T> configurar = null) where T : Pantalla {
