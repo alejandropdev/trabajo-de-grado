@@ -89,7 +89,7 @@ namespace Nexus.Unity.Pantallas {
             if (t == null) return;
             var enCurso = t.Tarjetas.Where(c => !c.EsBug && c.Empezada && !c.Terminada).OrderBy(c => c.Orden).ToList();
             var clave = string.Join("|", enCurso.Select(c => c.Id + ":" + (c.Trabajo / Math.Max(0.01, c.Puntos)).ToString("0.00") + ":" + c.Asignado)) +
-                        "#" + t.Tarjetas.Count(c => c.Terminada) + "#" + t.Tarjetas.Count + "#" + (S.PrPendiente != null) + "#" + S.R.LimiteWip;
+                        "#" + t.Tarjetas.Count(c => c.Terminada) + "#" + t.Tarjetas.Count + "#" + PuedoRevisar + "#" + S.R.LimiteWip;
             if (clave == _claveDelTablero) return;
             _claveDelTablero = clave;
             UiKit.Vaciar(_tableroDelDia);
@@ -111,7 +111,7 @@ namespace Nexus.Unity.Pantallas {
                 var quien = t.Miembro(c.Asignado);
                 UiKit.Tamano(Ui.Texto(fila, quien == null ? "—" : quien.Nombre, EstiloTexto.Pequeno, Tema.inkMuted, TextAlignmentOptions.Right), ancho: 90);
             }
-            if (S.PrPendiente != null) {
+            if (PuedoRevisar) {
                 var n = Ui.Notificacion(_tableroDelDia, "Hay un cambio de código esperando tu revisión.", Tono.Aviso);
                 Ui.Boton(n, "Revisar", AbrirRevision, VarianteBoton.Fantasma);
             }
@@ -184,9 +184,15 @@ namespace Nexus.Unity.Pantallas {
         /// Revisar un cambio de codigo (2026-11-07): como en un IDE, con el diff animado y las dos decisiones como cartas
         /// (Revision/PantallaDeRevisionDeCodigo.cs). La escena para el reloj; decidir cobra sus minutos como siempre.
         /// </summary>
+        /// <summary>
+        /// Hay un cambio de codigo que se puede revisar ahora. Lo usan los botones «Revisar código» y las claves de repintado:
+        /// en cuanto se revisa (o deja de poderse), el boton desaparece de todas partes.
+        /// </summary>
+        private bool PuedoRevisar { get { return S.PrPendiente != null && S.PorQueNoSePuedeRevisar() == null; } }
+
         private void AbrirRevision() {
             var pr = S.PrPendiente;
-            if (pr == null) return;
+            if (pr == null || !PuedoRevisar) return;
             CerrarPanel();
             _escenaApilada = true;
             Runner.EnEscena = true;

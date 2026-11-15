@@ -37,12 +37,14 @@ namespace Nexus.Unity.Pantallas {
                     return $"{w.Avance:0}|{w.Alcance:0}|{w.DeudaTecnica:0}|{w.MoralEquipo:0}|{w.Cobertura:0}|{w.Cansancio:0}|{w.SatisfaccionCliente:0}|" +
                            $"{S.R.DiaActual}|{S.PorQueNoSePuedeProbar() == null}|{_avisoDeKpiHasta > Time.unscaledTime}";
                 case DiapositivasDelDia.Tablero:
-                    return S.Tablero == null ? "" : string.Join(",", S.Tablero.Tarjetas.Select(t => t.Id + t.Columna + t.Asignado + Math.Round(t.Restante, 1))) + "|" + S.R.LimiteWip;
+                    // Con el cambio de codigo pendiente: al revisarlo, el boton «Revisar código» tiene que irse.
+                    return S.Tablero == null ? "" : string.Join(",", S.Tablero.Tarjetas.Select(t => t.Id + t.Columna + t.Asignado + Math.Round(t.Restante, 1))) + "|" + S.R.LimiteWip +
+                                                     "|" + PuedoRevisar;
                 case DiapositivasDelDia.Equipo:
                     return string.Join(",", S.FichasDelEquipo().Select(f => f.Miembro.Id + Math.Round(f.Cansancio) + f.Ahora.Count + f.Miembro.HabloHoy)) + S.R.DiaActual;
                 case DiapositivasDelDia.Escritorio:
                     return $"{S.TareasDeOficina.Count(t => S.PorQueNoSePuedeHacer(t.Id) == null)}|{S.CeremoniasDeHoy().Count(c => !c.Hecha)}|" +
-                           $"{S.R.Suministros.Values.Sum()}|{S.R.PruebasHechasHoy}|{S.PrPendiente != null}|{Runner.PuedeMoverse}";
+                           $"{S.R.Suministros.Values.Sum()}|{S.R.PruebasHechasHoy}|{PuedoRevisar}|{Runner.PuedeMoverse}";
                 case DiapositivasDelDia.Cliente:
                     return $"{S.PapelesDelCliente().Count}|{S.PapelesSinLeer()}|{w.SatisfaccionCliente:0}";
                 case DiapositivasDelDia.Documentos:
@@ -408,7 +410,7 @@ namespace Nexus.Unity.Pantallas {
                 Ui.Texto(cabecera, $"Sprint {t.SprintActual + 1}", EstiloTexto.Encabezado, Tema.ink);
             }
             Ui.Resorte(cabecera);
-            if (S.PrPendiente != null) Ui.Boton(cabecera, "Revisar código", AbrirRevision, VarianteBoton.Primario);
+            if (PuedoRevisar) Ui.Boton(cabecera, "Revisar código", AbrirRevision, VarianteBoton.Primario);
             Ui.Boton(cabecera, "Detalle", () => AbrirTablero(0), VarianteBoton.Fantasma);
 
             var columnas = Ui.Fila(col, "Columnas", Tema.espacio, alineacion: TextAnchor.UpperLeft);
