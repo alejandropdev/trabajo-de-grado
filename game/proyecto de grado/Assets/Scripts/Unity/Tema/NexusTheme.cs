@@ -24,40 +24,40 @@ namespace Nexus.Unity.Tema {
         // ================================================================ design system
 
         [Header("Fondos y superficies")]
-        public Color bg950 = Hex(0x0A0D12);
-        public Color bg900 = Hex(0x10141B);
-        public Color surface = Hex(0x161D27);
-        public Color surfaceRaised = Hex(0x1C2531);
-        public Color surfaceSunken = Hex(0x0D1117);
-        public Color line = Hex(0x2A3542);
-        public Color lineStrong = Hex(0x3D4B5C);
+        public Color bg950 = Hex(0x051218);
+        public Color bg900 = Hex(0x0A1C24);
+        public Color surface = Hex(0x0F2630);
+        public Color surfaceRaised = Hex(0x15313C);
+        public Color surfaceSunken = Hex(0x071419);
+        public Color line = Hex(0x1F4652);
+        public Color lineStrong = Hex(0x2E6470);
 
         [Header("Texto")]
-        public Color ink = Hex(0xEEF3F7);
-        public Color inkMuted = Hex(0x94A1B2);
+        public Color ink = Hex(0xE8F4F2);
+        public Color inkMuted = Hex(0x8DB2B6);
         [Tooltip("Deshabilitado o terciario. Nunca para texto accionable ni sobre surfaceSunken.")]
-        public Color inkFaint = Hex(0x576375);
+        public Color inkFaint = Hex(0x4E7279);
 
         [Header("Acento de marca")]
-        public Color cyan = Hex(0x22D3EE);
-        public Color cyanSoft = Hex(0x0E2A33);
-        public Color onCyan = Hex(0x04161B);
+        public Color cyan = Hex(0x5FD8F5);
+        public Color cyanSoft = Hex(0x0E3340);
+        public Color onCyan = Hex(0x03141A);
 
         [Header("Acento narrativo — nunca estado de sistema")]
-        public Color violet = Hex(0xC084FC);
-        public Color violetSoft = Hex(0x241236);
-        public Color onViolet = Hex(0x1A0A2E);
+        public Color violet = Hex(0xE39AB8);
+        public Color violetSoft = Hex(0x2E1626);
+        public Color onViolet = Hex(0x200A18);
 
         [Header("Estados")]
-        public Color success = Hex(0x34D399);
-        public Color successSoft = Hex(0x0C2A1F);
-        public Color onSuccess = Hex(0x06231A);
-        public Color warning = Hex(0xFBBF24);
-        public Color warningSoft = Hex(0x2E2309);
-        public Color onWarning = Hex(0x2B1D02);
-        public Color danger = Hex(0xF87171);
-        public Color dangerSoft = Hex(0x341012);
-        public Color onDanger = Hex(0x2B0B0B);
+        public Color success = Hex(0x7ED9AE);
+        public Color successSoft = Hex(0x0D2C24);
+        public Color onSuccess = Hex(0x06201A);
+        public Color warning = Hex(0xE3C24F);
+        public Color warningSoft = Hex(0x2B240A);
+        public Color onWarning = Hex(0x241C02);
+        public Color danger = Hex(0xEF7A5E);
+        public Color dangerSoft = Hex(0x36140E);
+        public Color onDanger = Hex(0x2A0B06);
 
         [Header("Papel — documentos del mundo, no cambian con el tema")]
         public Color paperBg = Hex(0xECE0C6);
