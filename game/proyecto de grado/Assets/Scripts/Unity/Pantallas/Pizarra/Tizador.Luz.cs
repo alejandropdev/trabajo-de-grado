@@ -31,6 +31,16 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             return new Tizador(_l, _fuente, rt, _k);
         }
 
+        /// <summary>
+        /// Una tarjeta de chapa (la del panel del pizarron) DETRAS de todo lo que ya hay en la lamina: para columnas y rejillas
+        /// que se pintan despues del fondo y encima de la tarjeta. Coordenadas del prototipo, como los demas metodos.
+        /// </summary>
+        public void TarjetaDeChapa(float x, float y, float w, float h) {
+            Graphic cara, borde;
+            PanelDelPizarron.Tarjeta(Ui, Capa, X(x), Y(y), w * _k, h * _k, out cara, out borde);
+            cara.transform.SetAsFirstSibling(); borde.transform.SetAsFirstSibling();
+        }
+
         // ---------------------------------------------------------------- formas
 
         /// <summary>
