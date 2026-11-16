@@ -42,9 +42,9 @@ namespace Nexus.Unity.Pantallas {
             for (var x = 30f; x < W; x += 92) { Remache(ui, t, x, 18); Remache(ui, t, x, H - 18); }
             for (var y = 92f; y < H - 40; y += 92) { Remache(ui, t, 18, y); Remache(ui, t, W - 18, y); }
             // Rotulacion estarcida, pintada a mano hace tiempo.
-            var r = ui.Texto(t, "SECTOR 7  ·  FORMACIÓN  ·  NX-07", EstiloTexto.Cuerpo, H6(0xE3C24F, 0.16f), TextAlignmentOptions.BottomRight);
+            var r = ui.Texto(t, "SECTOR 7  ·  FORMACIÓN  ·  NX-07", EstiloTexto.Cuerpo, H6(0xE3C24F, 0.16f), TextAlignmentOptions.Bottom);
             r.font = ui.Tema.FuenteDisplay; r.fontSize = 22; r.characterSpacing = 14; r.raycastTarget = false;
-            Lamina.Colocar(r.rectTransform, W - 1240, 34, 860, 40);
+            Lamina.Colocar(r.rectTransform, (W - 860) / 2, H - 70, 860, 40);   // al pie: arriba lo pisaban los titulos
         }
 
         private static void Remache(UiKit ui, RectTransform t, float cx, float cy) {

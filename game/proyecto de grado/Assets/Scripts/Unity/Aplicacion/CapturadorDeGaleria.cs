@@ -75,6 +75,7 @@ namespace Nexus.Unity.Aplicacion {
             foreach (var (nombre, que) in new[] { ("cliente", 0), ("voces", 1), ("papel_a", 2), ("papel_b", 3), ("papel_c", 4), ("papel_d", 5), ("plano_0", 10), ("plano_1", 11), ("plano_2", 12), ("plano_3", 13) }) {
                 var q = que; paginas.Add(Par("pizarron_" + nombre, r => PizarronDelCliente(r, q)));
             }
+            foreach (var tipo in new[] { "detectar", "corregir", "puente", "repartir" }) { var tp = tipo; paginas.Add(Par("pizarron_receta_" + tp, r => RecetaDe(r, tp))); }
             foreach (var curso in new[] { "scrum", "kanban", "cascada" }) { var c = curso; paginas.Add(Par("pizarron_curso_" + c, r => IndiceDeCurso(r, c))); }
             paginas.Add(Par("atardecer", Atardecer));
             paginas.Add(Par("despliegue", Despliegue));

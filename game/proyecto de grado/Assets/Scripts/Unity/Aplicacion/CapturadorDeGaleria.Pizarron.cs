@@ -1,8 +1,12 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Nexus.Core;
 using Nexus.Core.Guardado;
+using Nexus.Core.Minijuegos;
+using Nexus.Core.Datos;
 using Nexus.Core.Modelo;
 using Nexus.Core.Narrativa;
 using Nexus.Core.Sesion;
@@ -77,6 +81,29 @@ namespace Nexus.Unity.Aplicacion {
                 pp.Paginas = new List<PaginaDePizarra> { pagina };
                 pp.Dibujos = dibujos;
             });
+            _despues = () => app.Router.Volver();
+        }
+
+        private static string TipoDeReceta(MinijuegoDef d) {
+            var v = Verbos.Normalizar(d.Verbo);
+            if (v == Verbos.Ordenar) return Nexus.Core.Minijuegos.Puente.PuenteDelBacklog.Aplica(d) ? "puente" : "ordenar";
+            if (v == Verbos.Repartir) return "repartir";
+            return Nexus.Core.Minijuegos.Corregir.PuntosDelDiagrama.Aplica(d) ? "corregir" : "detectar";
+        }
+
+        /// <summary>La receta de un reto de cada tipo (detectar, corregir, ordenar, puente, repartir), con su definicion real.</summary>
+        private void RecetaDe(RectTransform capa, string tipo) {
+            var fondo = capa.GetComponent<Image>();
+            if (fondo != null) fondo.color = new Color(0, 0, 0, 0);
+            var app = AppRoot.Instancia;
+            var carpeta = Path.Combine(Application.streamingAssetsPath, "minijuegos");
+            MinijuegoDef def = null;
+            foreach (var f in Directory.GetFiles(carpeta, "MJ-*.json")) {
+                var d = CatalogoMinijuegos.Parsear(File.ReadAllText(f));
+                if (d != null && TipoDeReceta(d) == tipo) { def = d; break; }
+            }
+            if (def == null) throw new InvalidOperationException("no hay reto de tipo " + tipo);
+            app.Router.Apilar<PantallaDeReceta>(p => { p.Def = def; p.Inicio = false; });
             _despues = () => app.Router.Volver();
         }
 
