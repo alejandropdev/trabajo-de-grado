@@ -69,18 +69,22 @@ namespace Nexus.Unity.Tema {
         [Header("Sobre papel — los valores del tema claro «Aula» del design system")]
         [Tooltip("Lo que se dibuja sobre papel (los tableros de los minijuegos, los documentos) usa los tonos del tema " +
                  "claro: sobre crema, el cyan y los estados del tema oscuro no se leen.")]
-        public Color papelCyan = Hex(0x0E7490);
-        public Color papelExito = Hex(0x15803D);
-        public Color papelAviso = Hex(0xB45309);
-        public Color papelPeligro = Hex(0xB91C1C);
-        public Color papelCaja = Hex(0xDCE5EC);
-        public Color papelTrazo = Hex(0x4A5A6A);
+        // 2026-11-16 (direccion de arte): ya no son los Tailwind 700 del tema claro. Cada uno es el MISMO matiz que su par
+        // del tema oscuro (cian #5FD8F5, menta #7ED9AE, mostaza #E3C24F, coral #EF7A5E) oscurecido hasta 4,6:1 sobre el
+        // crema del papel (paperBg) y sobre papelCaja; los antiguos de exito y aviso llegaban solo a 3,8:1.
+        public Color papelCyan = Hex(0x106C82);
+        public Color papelExito = Hex(0x1F704A);
+        public Color papelAviso = Hex(0x78600C);
+        public Color papelPeligro = Hex(0xAD3B1F);
+        public Color papelCaja = Hex(0xD3E3E1);
+        public Color papelTrazo = Hex(0x3F5A5E);
 
         [Header("Etiquetas de papel (las de revisión y auditoría)")]
-        public Color etiquetaAzul = Hex(0xA9C7DC);
-        public Color etiquetaAmbar = Hex(0xE9C46A);
-        public Color etiquetaRoja = Hex(0xE39A8F);
-        public Color etiquetaVerde = Hex(0xA8D5B0);
+        // Los mismos cuatro matices en pastel (el papel autoadhesivo): el texto encima es paperInk.
+        public Color etiquetaAzul = Hex(0x9ED8E6);
+        public Color etiquetaAmbar = Hex(0xEBD27E);
+        public Color etiquetaRoja = Hex(0xF0A592);
+        public Color etiquetaVerde = Hex(0xA9DEC4);
 
         [Header("Fuentes (vacias = las de Resources/Fuentes)")]
         public TMP_FontAsset fuenteDisplay;
