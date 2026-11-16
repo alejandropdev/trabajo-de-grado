@@ -49,9 +49,11 @@ namespace Nexus.Unity.Pantallas {
 
             // ---- el plano: una cuadricula muy tenue dentro de un marco
             var plano = VentanaDelAtardecer.Capa(ui, _lienzo, "Plano");
-            plano.Rect(4, 4, Ancho - 8, Alto - 8, tema.line, 2, NexusTheme.Alfa(tema.surfaceSunken, 0.6f), false, 12);
-            for (var x = 42f; x < Ancho - 10; x += 38) plano.Linea(x, 8, x, Alto - 8, NexusTheme.Alfa(tema.cyan, 0.04f), 1);
-            for (var y = 42f; y < Alto - 10; y += 38) plano.Linea(8, y, Ancho - 8, y, NexusTheme.Alfa(tema.cyan, 0.04f), 1);
+            // (2026-11-15) Una chapa en vez de una cuadricula: marco grueso, remaches en las esquinas y una franja de peligro abajo.
+            plano.Rect(4, 4, Ancho - 8, Alto - 8, tema.lineStrong, 4, NexusTheme.Alfa(tema.surfaceSunken, 0.85f), false, 10);
+            for (var fx = 18f; fx < Ancho - 40; fx += 36)
+                plano.Poligono(new List<Vector2> { new Vector2(fx, Alto - 14), new Vector2(fx + 16, Alto - 14), new Vector2(fx + 10, Alto - 8), new Vector2(fx - 6, Alto - 8) }, NexusTheme.Alfa(tema.warning, 0.5f));
+            foreach (var rx in new[] { 16f, Ancho - 16 }) foreach (var ry in new[] { 16f, Alto - 22 }) plano.Circulo(rx, ry, 3, tema.lineStrong, 0, tema.line);
 
             // ---- la pila de lo construido
             var pila = VentanaDelAtardecer.Capa(ui, _lienzo, "Pila");
@@ -63,8 +65,11 @@ namespace Nexus.Unity.Pantallas {
                 var y = suelo - (f + 1) * (caja - 4);
                 for (var c = 0; c < filas[f]; c++) {
                     var x = x0 + c * (caja + separacion);
-                    pila.Rect(x, y, caja, caja - 6, NexusTheme.Alfa(tema.cyan, 0.55f), 2, tema.surfaceRaised, false, 3);
-                    pila.Linea(x + caja / 2, y + 1, x + caja / 2, y + caja - 7, NexusTheme.Alfa(tema.cyan, 0.3f), 2);
+                    // Cajas de carton con su cinta (la cinta es cian: lo que informa).
+                    var carton = new Color(0.66f, 0.47f, 0.24f); var canto = new Color(0.3f, 0.19f, 0.08f);
+                    pila.Rect(x, y, caja, caja - 6, canto, 3, carton, false, 2);
+                    pila.Poligono(new List<Vector2> { new Vector2(x + caja * 0.62f, y + 2), new Vector2(x + caja - 2, y + 2), new Vector2(x + caja - 2, y + caja - 8), new Vector2(x + caja * 0.62f, y + caja - 8) }, new Color(0.5f, 0.34f, 0.16f));
+                    pila.Linea(x + caja / 2, y + 1, x + caja / 2, y + caja - 7, tema.cyan, 4);
                 }
             }
             pila.Linea(22, suelo, 178, suelo, tema.lineStrong, 3);
@@ -73,16 +78,18 @@ namespace Nexus.Unity.Pantallas {
 
             // ---- la tuberia: la linea de fondo, lo recorrido (cian) y las etapas
             var tubo = VentanaDelAtardecer.Capa(ui, _lienzo, "Tubo");
-            tubo.Linea(DesdeX, LineaY, DestinoX - 40, LineaY, tema.lineStrong, 3, true);
-            _avance = VentanaDelAtardecer.Colocado(ui, _lienzo, "Recorrido", DesdeX, LineaY - 2, 0, 4);
+            // El tubo es un tubo de verdad: cuerpo grueso de acero con su hueco, no una linea de puntos.
+            tubo.Rect(DesdeX, LineaY - 9, DestinoX - 40 - DesdeX, 18, tema.lineStrong, 4, tema.surfaceSunken, false, 7);
+            _avance = VentanaDelAtardecer.Colocado(ui, _lienzo, "Recorrido", DesdeX, LineaY - 4, 0, 8);
             VentanaDelAtardecer.Imagen(_avance, null, NexusTheme.Alfa(tema.cyan, 0.8f));
 
             var n = etapas.Length;
             for (var i = 0; i < n - 1; i++) {
-                var x = Mathf.Lerp(DesdeX + 20, DestinoX - 70, n <= 2 ? 0.5f : i / (float)(n - 2));
+                var x = Mathf.Lerp(DesdeX + 20, DestinoX - 104, n <= 2 ? 0.5f : i / (float)(n - 2));
                 _xs.Add(x);
                 var anillo = VentanaDelAtardecer.Capa(ui, _lienzo, "Etapa");
-                anillo.Circulo(x, LineaY, 13, tema.lineStrong, 3, tema.surfaceSunken);
+                anillo.Rect(x - 6, LineaY - 20, 12, 40, tema.lineStrong, 3, tema.surfaceRaised, false, 3);   // la brida
+                anillo.Circulo(x, LineaY, 13, tema.lineStrong, 4, tema.surfaceSunken);
                 var luz = VentanaDelAtardecer.Colocado(ui, _lienzo, "Luz", x - 7, LineaY - 7, 14, 14);
                 _etapas.Add(VentanaDelAtardecer.Imagen(luz, ui.SpriteCircular(), NexusTheme.Alfa(tema.inkFaint, 0.5f)));
                 Texto(ui, x - 60, LineaY + 22, 120, 20, etapas[i], 14, tema.inkMuted, TextAlignmentOptions.Center);
@@ -95,10 +102,10 @@ namespace Nexus.Unity.Pantallas {
             var destino = VentanaDelAtardecer.Capa(ui, _lienzo, "Destino");
             if (!alCliente) {
                 // El rack de produccion: cinco bandejas con tres luces cada una.
-                destino.Rect(DestinoX - 36, 36, 72, 150, tema.lineStrong, 3, tema.surfaceSunken, false, 6);
+                destino.Rect(DestinoX - 36, 36, 72, 150, tema.lineStrong, 4, tema.surfaceSunken, false, 5);
                 for (var b = 0; b < 5; b++) {
                     var y = 46 + b * 27;
-                    destino.Rect(DestinoX - 28, y, 56, 20, tema.line, 2, tema.surfaceRaised, false, 3);
+                    destino.Rect(DestinoX - 28, y, 56, 20, tema.lineStrong, 3, tema.surfaceRaised, false, 2);
                     for (var k = 0; k < 3; k++) {
                         var led = VentanaDelAtardecer.Colocado(ui, _lienzo, "Led", DestinoX - 20 + k * 9, y + 7, 6, 6);
                         _luces.Add(VentanaDelAtardecer.Imagen(led, ui.SpriteCircular(), tema.cyan));
@@ -106,9 +113,9 @@ namespace Nexus.Unity.Pantallas {
                 }
             } else {
                 // La pantalla del cliente: un monitor con cinco barras que crecen cuando llega lo entregado.
-                destino.Rect(DestinoX - 62, 48, 124, 86, tema.lineStrong, 3, tema.surfaceSunken, false, 8);
-                destino.Linea(DestinoX, 134, DestinoX, 158, tema.lineStrong, 5);
-                destino.Linea(DestinoX - 26, 160, DestinoX + 26, 160, tema.lineStrong, 5);
+                destino.Rect(DestinoX - 62, 48, 124, 86, tema.lineStrong, 5, tema.surfaceSunken, false, 6);
+                destino.Linea(DestinoX, 134, DestinoX, 158, tema.lineStrong, 7);
+                destino.Linea(DestinoX - 26, 160, DestinoX + 26, 160, tema.lineStrong, 7);
                 for (var k = 0; k < 5; k++) {
                     var barra = VentanaDelAtardecer.Colocado(ui, _lienzo, "Barra", 0, 0, 12, 40);
                     barra.pivot = new Vector2(0.5f, 0);
@@ -152,7 +159,7 @@ namespace Nexus.Unity.Pantallas {
             var x = Mathf.Lerp(DesdeX, DestinoX - 40, r);
             _paquete.anchoredPosition = new Vector2(x, -LineaY);
             _paquete.gameObject.SetActive(r < 1);
-            _avance.sizeDelta = new Vector2(x - DesdeX, 4);
+            _avance.sizeDelta = new Vector2(x - DesdeX, 8);
             _brilloDelPaquete.color = NexusTheme.Alfa(_tema.cyan, 0.45f + 0.35f * _listo);
 
             // Cada etapa se enciende cuando el paquete la pasa.

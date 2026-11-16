@@ -13,11 +13,16 @@ namespace Nexus.Unity.Pantallas.Minijuegos.Corregir {
 
         public static void Dibujar(DibujoUI d, string icono, float x, float y, float s, Color c, Color acento) {
             System.Func<float, float, Vector2> P = (fx, fy) => new Vector2(x + fx * s, y + fy * s);
-            var g = Mathf.Max(2f, s * 0.045f);   // grosor de trazo
+            // (2026-11-15, direccion de arte) Pictograma de cartel: trazo grueso, cuerpos con zocalo de sombra (dos tonos) y
+            // los puntos de acento macizos, no anillos. La firma y las claves no cambian.
+            var g = Mathf.Max(2.6f, s * 0.07f);   // grosor de trazo
             System.Action<float, float, float, float> L = (ax, ay, bx, by) => d.Linea(x + ax * s, y + ay * s, x + bx * s, y + by * s, c, g);
-            System.Action<float, float, float, float, Color, bool> R = (rx, ry, rw, rh, col, lleno) =>
-                d.Rect(x + rx * s, y + ry * s, rw * s, rh * s, col, g, lleno ? (Color?)NexusTheme.Alfa(col, 0.18f) : null, false, s * 0.05f);
-            System.Action<float, float, float, Color> C = (cx, cy, r, col) => d.Circulo(x + cx * s, y + cy * s, r * s, col, g);
+            System.Action<float, float, float, float, Color, bool> R = (rx, ry, rw, rh, col, lleno) => {
+                d.Rect(x + rx * s, y + ry * s, rw * s, rh * s, col, g, lleno ? (Color?)NexusTheme.Alfa(col, 0.3f) : null, false, s * 0.05f);
+                if (lleno) d.Poligono(new List<Vector2> { P(rx + 0.03f, ry + rh * 0.68f), P(rx + rw - 0.03f, ry + rh * 0.68f), P(rx + rw - 0.03f, ry + rh - 0.03f), P(rx + 0.03f, ry + rh - 0.03f) }, new Color(0, 0, 0, 0.22f));
+            };
+            System.Action<float, float, float, Color> C = (cx, cy, r, col) =>
+                d.Circulo(x + cx * s, y + cy * s, r * s, col, g, r <= 0.1f ? (Color?)col : null);
 
             switch (icono) {
                 case "acuerdo":   // dos bocadillos que se tocan y un check

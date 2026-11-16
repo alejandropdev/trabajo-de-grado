@@ -413,7 +413,7 @@ namespace Nexus.Unity.Tema {
             if (Clasico) return BotonDeOpcion(padre, texto, detalle, alPulsar);
             var rt = Nodo(padre, "Etiqueta " + texto);
             var fondo = rt.gameObject.AddComponent<Image>();
-            if (Material(fondo, MaterialesNexus.Etiqueta, 6)) return EtiquetaDePapel(rt, fondo, texto, tono, alPulsar, detalle);
+            // 2026-11-15: sin la tira de papel teñido (se veia lavada y apagada): siempre la etiqueta del kit neon.
             Fondo(fondo, Tema.surfaceRaised, NexusTheme.RadioSm);
             var boton = rt.gameObject.AddComponent<Button>();
             boton.targetGraphic = fondo;
@@ -436,35 +436,6 @@ namespace Nexus.Unity.Tema {
             v.Normal = Estado(Tema.surfaceRaised, Tema.line, Tema.inkMuted);
             v.Encima = Estado(Tema.surfaceRaised, Tema.lineStrong, Tema.ink);
             v.ElegidoEstado = Estado(Tema.SuaveDe(tono), Tema.ColorDe(tono), Tema.ink, resplandor);
-            v.Aplicar();
-            if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
-            return boton;
-        }
-
-        /// <summary>
-        /// La etiqueta de revision de las referencias: una tira de papel teñida con el color de su diagnostico (rojo =
-        /// grave, ambar = riesgo, azul = observacion), texto de tinta. Marcada: borde de tinta del mismo tono y un ✓.
-        /// </summary>
-        private Button EtiquetaDePapel(RectTransform rt, Image fondo, string texto, Tono tono, Action alPulsar, string detalle) {
-            var boton = rt.gameObject.AddComponent<Button>();
-            boton.targetGraphic = fondo;
-            boton.transition = Selectable.Transition.None;
-            var fila = rt.gameObject.AddComponent<HorizontalLayoutGroup>();
-            Configurar(fila, Tema.Espacio(2), 0, TextAnchor.MiddleLeft);
-            fila.padding = new RectOffset((int)Tema.Espacio(3), (int)Tema.Espacio(3), (int)Tema.Espacio(2), (int)Tema.Espacio(2));
-            var col = Columna(rt, "Texto", 2);
-            Tamano(col, flexAncho: 1);
-            var t = Texto(col, texto, EstiloTexto.Etiqueta, Tema.paperInk);
-            t.textWrappingMode = TextWrappingModes.Normal;
-            if (!string.IsNullOrEmpty(detalle)) Texto(col, detalle, EstiloTexto.Leyenda, Tema.paperMuted);
-            var papel = Tema.EtiquetaDe(tono);
-            var v = rt.gameObject.AddComponent<VisualDeBoton>();
-            v.Fondo = fondo;
-            v.Borde = Borde(rt, Color.clear, NexusTheme.RadioSm, 2);
-            v.Etiqueta = t;
-            v.Normal = Estado(papel, Color.clear, Tema.paperInk);
-            v.Encima = Estado(Color.Lerp(papel, Color.white, 0.25f), Color.clear, Tema.paperInk);
-            v.ElegidoEstado = Estado(Color.Lerp(papel, Color.black, 0.12f), Tema.PapelDe(tono), Tema.paperInk);
             v.Aplicar();
             if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
             return boton;

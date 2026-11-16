@@ -147,7 +147,7 @@ namespace Nexus.Unity.Pantallas {
             _lamina = new Lamina(ui, capa, Ancho, Alto);
             _lamina.Raiz.anchorMin = _lamina.Raiz.anchorMax = _lamina.Raiz.pivot = new Vector2(0.5f, 0.5f);
             _lamina.Raiz.sizeDelta = new Vector2(Ancho, Alto);
-            _lamina.Dibujo.Tiza = true;
+            _lamina.Dibujo.Tiza = false;
 
             var banda = ui.Nodo(raiz, "Banda");
             banda.anchorMin = Vector2.zero; banda.anchorMax = new Vector2(1, 0.30f);

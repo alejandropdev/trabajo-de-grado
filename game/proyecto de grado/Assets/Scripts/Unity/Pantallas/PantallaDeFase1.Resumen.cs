@@ -83,7 +83,7 @@ namespace Nexus.Unity.Pantallas {
                 var dibujo = Ui.Nodo(c, "Dibujo");
                 dibujo.anchorMin = new Vector2(0, 0.42f); dibujo.anchorMax = Vector2.one; dibujo.offsetMin = dibujo.offsetMax = Vector2.zero;
                 var lamina = PiezasDeProyecto.NuevaLamina(Ui, dibujo, 600, 300);
-                lamina.Dibujo.Tiza = true;
+                lamina.Dibujo.Tiza = false;
                 DibujosDeMetodologia.Icono(new Tizador(lamina, Ui.FuenteTiza), met);
                 TextoEnCaja.Crear(Ui, c, met.Nombre, EstiloTexto.Encabezado, Tema.ink, TextAlignmentOptions.Center, Tema.Px(18),
                                   new Vector2(0, 0.24f), new Vector2(1, 0.42f), 2).fontStyle = FontStyles.Bold;
@@ -112,7 +112,7 @@ namespace Nexus.Unity.Pantallas {
                 var dibujo = Ui.Nodo(c, "Dibujo");
                 dibujo.anchorMin = new Vector2(0, 0.24f); dibujo.anchorMax = Vector2.one; dibujo.offsetMin = dibujo.offsetMax = Vector2.zero;
                 var lamina = PiezasDeProyecto.NuevaLamina(Ui, dibujo, 600, 300);
-                lamina.Dibujo.Tiza = true;
+                lamina.Dibujo.Tiza = false;
                 DibujosDeArquitecturaAnimados.Icono(new Tizador(lamina, Ui.FuenteTiza), arq, Perfil.Proyecto);
                 TextoEnCaja.Crear(Ui, c, arq.Nombre, EstiloTexto.Encabezado, Tema.ink, TextAlignmentOptions.Center, Tema.Px(18),
                                   new Vector2(0, 0.0f), new Vector2(1, 0.24f), 2).fontStyle = FontStyles.Bold;

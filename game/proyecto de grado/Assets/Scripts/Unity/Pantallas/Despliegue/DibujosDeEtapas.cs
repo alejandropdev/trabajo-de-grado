@@ -12,12 +12,17 @@ namespace Nexus.Unity.Pantallas {
     public static class DibujosDeEtapas {
         public static bool Dibujar(DibujoUI d, string id, float x, float y, float s, Color c, Color a) {
             if (string.IsNullOrEmpty(id)) return false;
-            var g = Mathf.Max(2f, s * 0.045f);
+            // (2026-11-15, direccion de arte) Mismo lenguaje que las cartas de solucion: trazo grueso, zocalo de sombra en
+            // los cuerpos y puntos de acento macizos.
+            var g = Mathf.Max(2.6f, s * 0.07f);
             System.Func<float, float, Vector2> P = (fx, fy) => new Vector2(x + fx * s, y + fy * s);
             System.Action<float, float, float, float, Color> L = (ax, ay, bx, by, col) => d.Linea(x + ax * s, y + ay * s, x + bx * s, y + by * s, col, g);
-            System.Action<float, float, float, float, Color> R = (rx, ry, rw, rh, col) =>
-                d.Rect(x + rx * s, y + ry * s, rw * s, rh * s, col, g, NexusTheme.Alfa(col, 0.16f), false, s * 0.05f);
-            System.Action<float, float, float, Color> C = (cx, cy, r, col) => d.Circulo(x + cx * s, y + cy * s, r * s, col, g);
+            System.Action<float, float, float, float, Color> R = (rx, ry, rw, rh, col) => {
+                d.Rect(x + rx * s, y + ry * s, rw * s, rh * s, col, g, NexusTheme.Alfa(col, 0.3f), false, s * 0.05f);
+                d.Poligono(new List<Vector2> { P(rx + 0.03f, ry + rh * 0.68f), P(rx + rw - 0.03f, ry + rh * 0.68f), P(rx + rw - 0.03f, ry + rh - 0.03f), P(rx + 0.03f, ry + rh - 0.03f) }, new Color(0, 0, 0, 0.22f));
+            };
+            System.Action<float, float, float, Color> C = (cx, cy, r, col) =>
+                d.Circulo(x + cx * s, y + cy * s, r * s, col, g, r <= 0.1f ? (Color?)col : null);
 
             switch (id) {
                 case "compilar": {   // un engranaje

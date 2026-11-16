@@ -93,7 +93,7 @@ namespace Nexus.Mundo3D {
         /// El color de la luz principal de la escena de recoleccion (#160059: R 22, G 0, B 89). Se escribe en sRGB, tal como
         /// sale del selector de color; Unity lo convierte solo en el espacio lineal.
         /// </summary>
-        public static readonly Color ColorDeLaLuz = new Color(22f / 255f, 0f, 89f / 255f, 1f);
+        public static readonly Color ColorDeLaLuz = new Color32(0x5F, 0xB8, 0xC8, 0xFF);   // luz principal fria y tenue (antes, morada #160059)
 
         /// <summary>
         /// Luz de oficina por la tarde: ambiente en tres tonos (techo claro, paredes calidas, suelo oscuro), una niebla
@@ -102,21 +102,38 @@ namespace Nexus.Mundo3D {
         /// escena que se le pasa. Nada de esto cambia lo que se puede ver o recoger.
         /// </summary>
         public static void Ambientar(Scene escena) {
+            // 2026-11-15, direccion de arte (docs/08-arte): el recorrido es el INTERIOR del bunker, en bioluminiscencia.
+            // Ambiente y niebla verdeazulados (antes: niebla parda y filtro calido sobre luz morada, dos temperaturas que
+            // se anulaban), un techo que cierra el bunker (antes se veian las estrellas dentro de la oficina) y los paneles
+            // de luz en el cian del neon.
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.78f, 0.80f, 0.84f);
-            RenderSettings.ambientEquatorColor = new Color(0.62f, 0.55f, 0.47f);
-            RenderSettings.ambientGroundColor = new Color(0.22f, 0.20f, 0.19f);
+            RenderSettings.ambientSkyColor = new Color32(0x24, 0x4C, 0x54, 0xFF);
+            RenderSettings.ambientEquatorColor = new Color32(0x16, 0x34, 0x3A, 0xFF);
+            RenderSettings.ambientGroundColor = new Color32(0x08, 0x14, 0x18, 0xFF);
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = new Color(0.55f, 0.53f, 0.50f);
-            RenderSettings.fogStartDistance = 18f;
-            RenderSettings.fogEndDistance = 70f;
+            RenderSettings.fogColor = new Color32(0x16, 0x46, 0x50, 0xFF);
+            RenderSettings.fogStartDistance = 10f;
+            RenderSettings.fogEndDistance = 55f;
+            PonerTecho(escena);
+            TemplarMateriales(escena);
+            var n = 0;
+            foreach (var raiz in escena.GetRootGameObjects())
+                foreach (var luz in raiz.GetComponentsInChildren<Light>(true)) {
+                    if (luz.type != LightType.Point && luz.type != LightType.Spot) continue;
+                    // Los paneles del equipo eran azul electrico (0.11, 0.40, 0.83): pasan al cian del neon; uno de cada tres,
+                    // al ambar de las bombillas, para que el interior tenga su contrapunto calido.
+                    if (luz.color.b > luz.color.r * 2f) {
+                        luz.color = n++ % 3 == 0 ? new Color32(0xF2, 0xB0, 0x5A, 0xFF) : new Color32(0x6F, 0xCF, 0xE6, 0xFF);
+                        luz.intensity *= 0.65f;
+                    }
+                }
 
             foreach (var raiz in escena.GetRootGameObjects())
                 foreach (var luz in raiz.GetComponentsInChildren<Light>(true)) {
                     if (luz.type != LightType.Directional) continue;
                     luz.color = ColorDeLaLuz;
-                    luz.intensity = Mathf.Max(luz.intensity, 1.1f);
+                    luz.intensity = 0.45f;
                     luz.shadows = LightShadows.Soft;
                     luz.shadowStrength = 0.75f;
                 }
@@ -137,18 +154,125 @@ namespace Nexus.Mundo3D {
             var tonos = perfil.Add<Tonemapping>(true);
             tonos.mode.Override(TonemappingMode.ACES);
             var brillo = perfil.Add<Bloom>(true);
-            brillo.threshold.Override(1.05f);
-            brillo.intensity.Override(0.35f);
+            brillo.threshold.Override(0.85f);
+            brillo.intensity.Override(0.6f);
             brillo.scatter.Override(0.6f);
             var color = perfil.Add<ColorAdjustments>(true);
-            color.postExposure.Override(0.25f);
+            color.postExposure.Override(0.1f);
             color.contrast.Override(8f);
             color.saturation.Override(6f);
-            color.colorFilter.Override(new Color(1f, 0.97f, 0.93f));
+            color.colorFilter.Override(new Color(0.94f, 1f, 1f));
             var vineta = perfil.Add<Vignette>(true);
-            vineta.intensity.Override(0.22f);
+            vineta.intensity.Override(0.3f);
             vineta.smoothness.Override(0.45f);
+            GradacionDelBunker(perfil);
             volumen.sharedProfile = perfil;
+        }
+
+        /// <summary>
+        /// Gradacion comun (2026-11-16, direccion de arte). El recorrido junta cuatro familias de materiales (atlas de paleta
+        /// «Gradient*», texturas fotograficas de pared y madera, colores planos de packs y cubos de prueba en magenta, cian
+        /// y rojo puros) y todos son URP/Lit con el color metido en texturas, asi que repintar material a material no los
+        /// iguala. Se iguala en el volumen: sombras verdeazuladas y luces ambar (el contrapunto del cian del neon), y una
+        /// curva matiz → saturacion que apaga rojos, naranjas, verdes y violetas y deja el cian y el ambar como lo vivo.
+        /// Los materiales originales no se tocan.
+        /// </summary>
+        private static void GradacionDelBunker(VolumeProfile perfil) {
+            var tonos = perfil.Add<ShadowsMidtonesHighlights>(true);
+            tonos.shadows.Override(new Vector4(0.80f, 0.98f, 1.02f, 0f));
+            tonos.midtones.Override(new Vector4(0.97f, 1.0f, 1.0f, 0f));
+            tonos.highlights.Override(new Vector4(1.06f, 1.0f, 0.88f, 0f));
+
+            // En el eje de la curva, 0,5 es «igual»; por debajo, menos color. Eje horizontal = matiz (0 rojo … 1 rojo).
+            var claves = new[] {
+                new Keyframe(0.00f, 0.40f), new Keyframe(0.05f, 0.30f), new Keyframe(0.10f, 0.32f), new Keyframe(0.16f, 0.46f),
+                new Keyframe(0.25f, 0.34f), new Keyframe(0.33f, 0.40f), new Keyframe(0.45f, 0.54f), new Keyframe(0.52f, 0.58f),
+                new Keyframe(0.62f, 0.42f), new Keyframe(0.74f, 0.44f), new Keyframe(0.85f, 0.34f), new Keyframe(1.00f, 0.40f) };
+            // Ojo: el rojo (0), el verde (0,33) y el violeta (0,74) se atenuan MENOS que el resto: son los colores con que
+            // CollectibleFeedback marca la categoria de cada recolectable (evidencia, consumible, nota/carta).
+            var curvas = perfil.Add<ColorCurves>(true);
+            curvas.hueVsSat.Override(new TextureCurve(new AnimationCurve(claves), 0.5f, true, new Vector2(0f, 1f)));
+        }
+
+        /// <summary>
+        /// Materiales de estilo (2026-11-15): el marmol casi blanco del nivel quemaba la imagen en la penumbra del bunker.
+        /// Se pinta con una COPIA de cada material (el original no se toca) entintada hacia el hormigon verdeazulado y con
+        /// menos brillo especular. Una copia por material, compartida por todos los que lo usan.
+        /// </summary>
+        private static void TemplarMateriales(Scene escena) {
+            var copias = new Dictionary<Material, Material>();
+            var tinte = new Color(0.42f, 0.52f, 0.54f, 1f);
+            foreach (var raiz in escena.GetRootGameObjects())
+                foreach (var r in raiz.GetComponentsInChildren<Renderer>(true)) {
+                    var mats = r.sharedMaterials;
+                    var cambiado = false;
+                    for (var i = 0; i < mats.Length; i++) {
+                        var m = mats[i];
+                        if (m == null) continue;
+                        var esMarmol = m.name.StartsWith("Marmol", StringComparison.OrdinalIgnoreCase);
+                        var esPanel = m.name.StartsWith("M_PanelLuz", StringComparison.OrdinalIgnoreCase);
+                        if (!esMarmol && !esPanel) continue;
+                        Material copia;
+                        if (!copias.TryGetValue(m, out copia)) {
+                            copia = new Material(m) { name = m.name + " (bunker)" };
+                            if (esMarmol) {
+                                if (copia.HasProperty("_BaseColor")) copia.SetColor("_BaseColor", copia.GetColor("_BaseColor") * tinte);
+                                if (copia.HasProperty("_Smoothness")) copia.SetFloat("_Smoothness", Mathf.Min(copia.GetFloat("_Smoothness"), 0.25f));
+                            } else {
+                                // Los paneles de luz EMITEN (HDR, por encima de 1) en el cian del neon: asi el bloom los hace brillar
+                                // y la luz se ve como una fuente, no como un rectangulo claro.
+                                copia.EnableKeyword("_EMISSION");
+                                copia.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+                                if (copia.HasProperty("_EmissionColor")) copia.SetColor("_EmissionColor", new Color(0.43f, 0.81f, 0.90f) * 1.6f);
+                            }
+                            copias[m] = copia;
+                        }
+                        mats[i] = copia;
+                        cambiado = true;
+                    }
+                    if (cambiado) r.sharedMaterials = mats;
+                }
+            Debug.Log("[Recorrido] materiales templados: " + copias.Count);
+        }
+
+        /// <summary>
+        /// El techo del bunker (2026-11-15): el nivel del equipo no tenia, y dentro de la oficina se veia el cielo con
+        /// estrellas. La altura sale de los muros (piezas altas y delgadas): la mediana de su borde superior. Una losa
+        /// oscura, iluminada por los paneles, que no colisiona ni cambia nada de lo que se puede ver o recoger a ras de suelo.
+        /// </summary>
+        private static void PonerTecho(Scene escena) {
+            var alturas = new List<float>();
+            var todo = new Bounds();
+            var hay = false;
+            foreach (var raiz in escena.GetRootGameObjects())
+                foreach (var r in raiz.GetComponentsInChildren<MeshRenderer>(false)) {
+                    var b = r.bounds;
+                    if (!hay) { todo = b; hay = true; } else todo.Encapsulate(b);
+                    var largo = Mathf.Max(b.size.x, b.size.z);
+                    var grueso = Mathf.Min(b.size.x, b.size.z);
+                    if (b.size.y > 2.2f && b.size.y < 9f && largo > 3f && grueso < 1.2f) alturas.Add(b.max.y);
+                }
+            if (!hay || alturas.Count < 5) { Debug.LogWarning("[Recorrido] sin muros para medir la altura del techo: no se pone"); return; }
+            alturas.Sort();
+            var altura = alturas[alturas.Count / 2];
+
+            var techo = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            techo.name = "Techo del bunker (Nexus)";
+            UnityEngine.Object.Destroy(techo.GetComponent<Collider>());
+            SceneManager.MoveGameObjectToScene(techo, escena);
+            techo.transform.position = new Vector3(todo.center.x, altura, todo.center.z);
+            techo.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);   // la cara visible mira hacia abajo
+            techo.transform.localScale = new Vector3(todo.size.x + 20f, todo.size.z + 20f, 1f);
+            var sombreador = Shader.Find("Universal Render Pipeline/Lit");
+            if (sombreador != null) {
+                var m = new Material(sombreador) { name = "Techo del bunker" };
+                m.SetColor("_BaseColor", new Color32(0x0A, 0x2A, 0x33, 0xFF));
+                m.SetFloat("_Smoothness", 0.05f);
+                techo.GetComponent<MeshRenderer>().sharedMaterial = m;
+            }
+            // Por las dos caras: la losa tapa la luz principal y el interior queda en la penumbra de sus propias lamparas.
+            techo.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.TwoSided;
+            Debug.Log("[Recorrido] techo a " + altura.ToString("0.00") + " m (" + alturas.Count + " muros medidos)");
         }
     }
 }

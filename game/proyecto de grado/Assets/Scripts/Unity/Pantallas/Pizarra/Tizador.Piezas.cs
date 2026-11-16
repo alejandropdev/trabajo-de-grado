@@ -12,11 +12,11 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         public void Trazo(Color? c, params float[] xy) {
             var pts = new List<Vector2>();
             for (var i = 0; i + 1 < xy.Length; i += 2) pts.Add(P(xy[i], xy[i + 1]));
-            D.Polilinea(pts, c ?? Tiza, 3 * _k);
+            D.Polilinea(pts, c ?? Tiza, 3 * _k * _peso);
         }
 
         public void Elipse(float x, float y, float rx, float ry, Color? c = null, bool disc = false) {
-            D.Elipse(X(x), Y(y), rx * _k, ry * _k, c ?? Tiza, 3 * _k, null, disc);
+            D.Elipse(X(x), Y(y), rx * _k, ry * _k, c ?? Tiza, 3 * _k * _peso, null, disc);
         }
 
         /// <summary>Un circulo macizo (una bola, una moneda, un punto de una grafica).</summary>

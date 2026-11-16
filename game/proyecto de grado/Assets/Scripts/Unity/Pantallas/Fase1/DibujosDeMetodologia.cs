@@ -261,7 +261,7 @@ namespace Nexus.Unity.Pantallas {
             for (var i = 0; i < n; i++) {
                 var c = Huella(i, n);
                 var texto = dias != null && i < dias.Count && dias[i] > 0 ? nombres[i] + " · " + dias[i] + " d" : nombres[i];
-                p.Texto(c.x, c.y + 22, texto, 18, Tizador.Mostaza, true, w - 6);
+                p.Texto(c.x, c.y + 22, texto, 16, Tizador.Mostaza, true, w - 2);
             }
         }
 

@@ -286,6 +286,8 @@ namespace Nexus.Unity.Tema {
         private readonly UiKit _ui;
         public RectTransform Raiz { get; private set; }
         public DibujoUI Dibujo { get; private set; }
+        /// <summary>El kit con el que se creo: lo usan las piezas de luz de las escenas (Tizador.Luz).</summary>
+        public UiKit Ui { get { return _ui; } }
 
         /// <summary>Donde ya hay una etiqueta escrita: las siguientes la esquivan (Reservar).</summary>
         private readonly System.Collections.Generic.List<Rect> _etiquetas = new System.Collections.Generic.List<Rect>();

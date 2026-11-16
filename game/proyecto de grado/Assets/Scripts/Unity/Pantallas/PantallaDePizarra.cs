@@ -17,24 +17,29 @@ namespace Nexus.Unity.Pantallas {
     public static class MarcoDePizarra {
         public const float W = 1612, H = 932;
 
-        public static RectTransform Construir(UiKit ui, RectTransform raiz, string nota, out Lamina lamina) {
+        /// <param name="panel">true: el panel de conceptos, del material de PanelDelPizarron (chapa, manual o pizarra). false: la
+        /// pizarra de madera de siempre (recetas, el producto), hasta que se rediseñe su contenido de tiza.</param>
+        public static RectTransform Construir(UiKit ui, RectTransform raiz, string nota, out Lamina lamina, bool panel = false) {
             var velo = raiz.gameObject.AddComponent<Image>();
-            velo.color = new Color(0, 0, 0, 0.66f);
+            velo.color = new Color(0, 0, 0, panel ? 0.74f : 0.66f);
 
             var marco = ui.Nodo(raiz, "Marco");
             marco.anchorMin = marco.anchorMax = marco.pivot = new Vector2(0.5f, 0.5f);
             marco.sizeDelta = new Vector2(W + 28, H + 28);
             var madera = marco.gameObject.AddComponent<Image>();
             madera.sprite = ui.SpriteRedondeado(); madera.type = Image.Type.Sliced;
-            madera.color = new Color32(0x3A, 0x2E, 0x22, 0xFF);
+            madera.color = panel ? PanelDelPizarron.Marco : (Color)new Color32(0x3A, 0x2E, 0x22, 0xFF);
 
             var tabla = ui.Nodo(marco, "Pizarra");
             UiKit.Rellenar(tabla, 14);
-            tabla.gameObject.AddComponent<Image>().color = Tizador.Pizarra;
+            if (panel) PanelDelPizarron.Fondo(ui, tabla);
+            else tabla.gameObject.AddComponent<Image>().color = Tizador.Pizarra;
 
             lamina = new Lamina(ui, tabla, W, H);
             UiKit.Rellenar(lamina.Raiz);
-            lamina.Dibujo.Tiza = true;
+            lamina.Dibujo.Tiza = false;
+
+            if (panel) { PanelDelPizarron.Placa(ui, marco, nota); return marco; }
 
             var notaRt = ui.Nodo(marco, "Nota");
             notaRt.anchorMin = notaRt.anchorMax = new Vector2(1, 1);
@@ -83,6 +88,7 @@ namespace Nexus.Unity.Pantallas {
         }
 
         public static void Dibujar(Tizador t, string icono, Color c) {
+            if (DibujosDeEscena.Icono(t, icono, c)) return;   // el lenguaje nuevo (docs/08-arte); la tiza, de respaldo
             switch (icono) {
                 case "persona": t.Persona(80, 25, c); break;
                 case "equipo": t.Persona(42, 35, c); t.Persona(80, 22, c); t.Persona(118, 35, c); break;
@@ -133,6 +139,7 @@ namespace Nexus.Unity.Pantallas {
         /// columna (donde el dibujo se agranda o se encoge) quedarian pequeños y descolocados.
         /// </summary>
         public static void DibujarAEscala(Tizador t, string icono, Color c) {
+            if (DibujosDeEscena.Icono(t, icono, c)) return;
             switch (icono) {
                 case "persona": t.Figura(80, 42, c); break;
                 case "equipo": t.Figura(40, 52, c); t.Figura(80, 36, c); t.Figura(120, 52, c); break;
@@ -212,7 +219,7 @@ namespace Nexus.Unity.Pantallas {
 
         protected override void Construir() {
             if (App.Runner != null) { _pausadoAntes = App.Runner.Pausado; App.Runner.Pausado = true; }
-            var marco = MarcoDePizarra.Construir(Ui, Raiz, Etiqueta, out _lamina);
+            var marco = MarcoDePizarra.Construir(Ui, Raiz, Etiqueta, out _lamina, true);
             _nota = marco.Find("Nota").GetComponentInChildren<TMP_Text>();
             _anterior = MarcoDePizarra.Boton(Ui, marco, "◄ Anterior", () => Ir(_pagina - 1), new Vector2(0, 0), new Vector2(52, 44), 220, VarianteBoton.Secundario);
             _siguiente = MarcoDePizarra.Boton(Ui, marco, "Siguiente ►", () => Ir(_pagina + 1), new Vector2(1, 0), new Vector2(-300, 44), 220);
@@ -223,8 +230,8 @@ namespace Nexus.Unity.Pantallas {
             contador.anchorMin = contador.anchorMax = contador.pivot = new Vector2(0.5f, 0);
             contador.anchoredPosition = new Vector2(-90, 52);
             contador.sizeDelta = new Vector2(360, 44);
-            _contador = Ui.Texto(contador, "", EstiloTexto.Cuerpo, Tizador.Gris, TextAlignmentOptions.Center);
-            _contador.font = Ui.FuenteTiza;
+            _contador = Ui.Texto(contador, "", EstiloTexto.Cuerpo, PanelDelPizarron.Contador, TextAlignmentOptions.Center);
+            _contador.font = Ui.Tema.FuenteInterfaz;
             UiKit.Rellenar((RectTransform)_contador.transform);
             Ir(0);
         }
@@ -237,21 +244,33 @@ namespace Nexus.Unity.Pantallas {
             _contador.text = (string.IsNullOrEmpty(Contador) ? "" : Contador + " · ") + $"Página {_pagina + 1} de {Paginas.Count}";
             _nota.text = string.IsNullOrEmpty(Paginas[_pagina].Etiqueta) ? Etiqueta : Paginas[_pagina].Etiqueta;
             MarcoDePizarra.Limpiar(_lamina);
-            Pintar(new Tizador(_lamina, Ui.FuenteTiza), Paginas[_pagina]);
+            // Rajdhani, no Gochi Hand: la letra de los rotulos de las escenas (docs/08-arte). Negrita para titulos.
+            _negrita = new Tizador(_lamina, Ui.Tema.FuenteInterfazNegrita);
+            Pintar(new Tizador(_lamina, Ui.Tema.FuenteInterfaz), Paginas[_pagina]);
         }
 
         /// <summary>Hasta donde se puede dibujar: debajo estan los botones.</summary>
         private const float Fondo = 812;
 
-        /// <summary>Una escena a pagina completa, tan grande como deje el texto de encima.</summary>
-        private static void PintarEscena(Tizador t, string id, float y) {
-            var y0 = y + 34;
-            var k = Mathf.Min(1.6f, (Fondo - y0) / DibujosDeEscena.Alto);
-            DibujosDeEscena.Dibujar(t.En((MarcoDePizarra.W - DibujosDeEscena.Ancho * k) / 2, y0, k), id);
+        private Tizador _negrita;
+
+        /// <summary>
+        /// Una escena a pagina completa: todo lo grande que deje el texto de encima (sin tope), montada en el panel como
+        /// lo pide su material (pantalla con bisel, lamina impresa o foto con cinta).
+        /// </summary>
+        private void PintarEscena(Tizador t, string id, float y) {
+            const float W = MarcoDePizarra.W;
+            var m = PanelDelPizarron.Margen;
+            var y0 = y + 26 + m;
+            var k = Mathf.Min((W - 120 - 2 * m) / DibujosDeEscena.Ancho, (Fondo - m - y0) / DibujosDeEscena.Alto);
+            float w = DibujosDeEscena.Ancho * k, h = DibujosDeEscena.Alto * k, x0 = (W - w) / 2;
+            PanelDelPizarron.Detras(Ui, _lamina.Raiz, x0, y0, w, h);
+            DibujosDeEscena.Dibujar(t.En(x0, y0, k), id);
+            PanelDelPizarron.Encima(Ui, _lamina.Raiz, x0, y0, w, h);
         }
 
         /// <summary>De 2 a 4 columnas, cada una en su caja: el dibujo arriba, y debajo su titulo y su texto.</summary>
-        private static void PintarColumnas(Tizador t, List<ColumnaDePizarra> columnas, float y) {
+        private void PintarColumnas(Tizador t, List<ColumnaDePizarra> columnas, float y) {
             const float hueco = 24;
             var n = Math.Min(4, columnas.Count);
             var ancho = (MarcoDePizarra.W - 120 - hueco * (n - 1)) / n;
@@ -267,7 +286,11 @@ namespace Nexus.Unity.Pantallas {
                 var col = columnas[i];
                 var x = 60 + i * (ancho + hueco);
                 var color = DibujosDePizarra.ColorDe(col.Color);
-                t.Caja(x, y0, ancho, alto, null, Tizador.Gris, true);
+                // La tarjeta del material del panel, DETRAS del dibujo (el DibujoUI de la lamina es el primer hijo).
+                Graphic cara, borde;
+                PanelDelPizarron.Tarjeta(Ui, _lamina.Raiz, x, y0, ancho, alto, out cara, out borde);
+                cara.transform.SetAsFirstSibling();
+                borde.transform.SetAsFirstSibling();
 
                 var escena = DibujosDeEscena.Existe(col.Dibujo);
                 var bw = escena ? DibujosDeEscena.Ancho : 160; var bh = escena ? DibujosDeEscena.Alto : 130;
@@ -279,35 +302,36 @@ namespace Nexus.Unity.Pantallas {
 
                 var ty = y0 + altoDibujo + 34;
                 if (!string.IsNullOrEmpty(col.Titulo)) {
-                    t.Texto(x + ancho / 2, ty, col.Titulo, 28, color == Tizador.Tiza ? Tizador.Mostaza : color, true);
+                    _negrita.Texto(x + ancho / 2, ty, col.Titulo, 29, color == Tizador.Tiza ? Tizador.Mostaza : color, true);
                     ty += 12;
                 }
                 foreach (var linea in Partir(col.Texto ?? "", porRenglon)) {
                     ty += 32;
-                    t.Texto(x + ancho / 2, ty, linea, 23, Tizador.Tiza, true);
+                    t.Texto(x + ancho / 2, ty, linea, 23, PanelDelPizarron.TextoDeTarjeta, true);
                 }
             }
         }
 
         private void Pintar(Tizador t, PaginaDePizarra p) {
             const float W = MarcoDePizarra.W;
-            if (!string.IsNullOrEmpty(Tema)) t.Texto(60, 44, Tema.ToUpperInvariant(), 22, Tizador.Gris);
-            t.Texto(W / 2, 96, p.Titulo ?? "", 44, p.EnElJuego ? Tizador.Mostaza : Tizador.Tiza, true);
-            t.Linea(360, 116, W - 360, 116, null, 2);
+            // Cabecera a la izquierda, como un rotulo: el tema en versalitas, el titulo y una raya corta de neon.
+            if (!string.IsNullOrEmpty(Tema)) _negrita.Texto(60, 50, Tema.ToUpperInvariant(), 17, PanelDelPizarron.Tema).characterSpacing = 8;
+            _negrita.Texto(60, 100, p.Titulo ?? "", 46, p.EnElJuego ? PanelDelPizarron.EnNexus : PanelDelPizarron.Titulo);
+            t.Forma(LuzUI.Redondeado(60, 116, 72, 4, 2), p.EnElJuego ? PanelDelPizarron.EnNexus : PanelDelPizarron.Acento);
 
             var vinetas = p.Vinetas ?? new List<VinetaDePizarra>();
             var columnas = p.Columnas ?? new List<ColumnaDePizarra>();
             var conDibujos = vinetas.Count > 0 || columnas.Count > 0 || !string.IsNullOrEmpty(p.Dibujo);
-            float y = 170;
+            float y = 132;
             if (p.EnElJuego) {
-                t.Texto(60, y, "EN NEXUS", 24, Tizador.Mostaza);
-                y += 16;
+                _negrita.Texto(60, y + 22, "EN NEXUS", 18, PanelDelPizarron.EnNexus).characterSpacing = 8;
+                y += 26;
             }
             if (!string.IsNullOrEmpty(p.Texto)) {
-                var lineas = Partir(p.Texto, conDibujos ? 92 : 78);
+                var lineas = Partir(p.Texto, conDibujos ? 108 : 90);
                 foreach (var linea in lineas) {
-                    y += conDibujos ? 40 : 46;
-                    t.Texto(60, y, linea, conDibujos ? 28 : 32, Tizador.Tiza, false, W - 120);
+                    y += conDibujos ? 38 : 44;
+                    t.Texto(60, y, linea, conDibujos ? 28 : 32, PanelDelPizarron.Texto, false, W - 120);
                 }
             }
             Action<Tizador, float> dibujo;

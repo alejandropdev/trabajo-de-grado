@@ -63,7 +63,7 @@ namespace Nexus.Unity.Pantallas {
             _lamina = new Lamina(ui, capa, DibujosDeEscena.Ancho, DibujosDeEscena.Alto);
             _lamina.Raiz.anchorMin = _lamina.Raiz.anchorMax = _lamina.Raiz.pivot = new Vector2(0.5f, 0.5f);
             _lamina.Raiz.sizeDelta = new Vector2(DibujosDeEscena.Ancho, DibujosDeEscena.Alto);
-            _lamina.Dibujo.Tiza = true;
+            _lamina.Dibujo.Tiza = false;
         }
 
         /// <summary>Borra la pizarra y dibuja la escena 'id' trazo a trazo. Sin escena, el numero de la pregunta.</summary>
