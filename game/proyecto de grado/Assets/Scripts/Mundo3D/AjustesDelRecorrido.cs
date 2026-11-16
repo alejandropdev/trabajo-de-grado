@@ -165,7 +165,33 @@ namespace Nexus.Mundo3D {
             var vineta = perfil.Add<Vignette>(true);
             vineta.intensity.Override(0.3f);
             vineta.smoothness.Override(0.45f);
+            GradacionDelBunker(perfil);
             volumen.sharedProfile = perfil;
+        }
+
+        /// <summary>
+        /// Gradacion comun (2026-11-16, direccion de arte). El recorrido junta cuatro familias de materiales (atlas de paleta
+        /// «Gradient*», texturas fotograficas de pared y madera, colores planos de packs y cubos de prueba en magenta, cian
+        /// y rojo puros) y todos son URP/Lit con el color metido en texturas, asi que repintar material a material no los
+        /// iguala. Se iguala en el volumen: sombras verdeazuladas y luces ambar (el contrapunto del cian del neon), y una
+        /// curva matiz → saturacion que apaga rojos, naranjas, verdes y violetas y deja el cian y el ambar como lo vivo.
+        /// Los materiales originales no se tocan.
+        /// </summary>
+        private static void GradacionDelBunker(VolumeProfile perfil) {
+            var tonos = perfil.Add<ShadowsMidtonesHighlights>(true);
+            tonos.shadows.Override(new Vector4(0.80f, 0.98f, 1.02f, 0f));
+            tonos.midtones.Override(new Vector4(0.97f, 1.0f, 1.0f, 0f));
+            tonos.highlights.Override(new Vector4(1.06f, 1.0f, 0.88f, 0f));
+
+            // En el eje de la curva, 0,5 es «igual»; por debajo, menos color. Eje horizontal = matiz (0 rojo … 1 rojo).
+            var claves = new[] {
+                new Keyframe(0.00f, 0.40f), new Keyframe(0.05f, 0.30f), new Keyframe(0.10f, 0.32f), new Keyframe(0.16f, 0.46f),
+                new Keyframe(0.25f, 0.34f), new Keyframe(0.33f, 0.40f), new Keyframe(0.45f, 0.54f), new Keyframe(0.52f, 0.58f),
+                new Keyframe(0.62f, 0.42f), new Keyframe(0.74f, 0.44f), new Keyframe(0.85f, 0.34f), new Keyframe(1.00f, 0.40f) };
+            // Ojo: el rojo (0), el verde (0,33) y el violeta (0,74) se atenuan MENOS que el resto: son los colores con que
+            // CollectibleFeedback marca la categoria de cada recolectable (evidencia, consumible, nota/carta).
+            var curvas = perfil.Add<ColorCurves>(true);
+            curvas.hueVsSat.Override(new TextureCurve(new AnimationCurve(claves), 0.5f, true, new Vector2(0f, 1f)));
         }
 
         /// <summary>
@@ -182,12 +208,23 @@ namespace Nexus.Mundo3D {
                     var cambiado = false;
                     for (var i = 0; i < mats.Length; i++) {
                         var m = mats[i];
-                        if (m == null || !m.name.StartsWith("Marmol", StringComparison.OrdinalIgnoreCase)) continue;
+                        if (m == null) continue;
+                        var esMarmol = m.name.StartsWith("Marmol", StringComparison.OrdinalIgnoreCase);
+                        var esPanel = m.name.StartsWith("M_PanelLuz", StringComparison.OrdinalIgnoreCase);
+                        if (!esMarmol && !esPanel) continue;
                         Material copia;
                         if (!copias.TryGetValue(m, out copia)) {
                             copia = new Material(m) { name = m.name + " (bunker)" };
-                            if (copia.HasProperty("_BaseColor")) copia.SetColor("_BaseColor", copia.GetColor("_BaseColor") * tinte);
-                            if (copia.HasProperty("_Smoothness")) copia.SetFloat("_Smoothness", Mathf.Min(copia.GetFloat("_Smoothness"), 0.25f));
+                            if (esMarmol) {
+                                if (copia.HasProperty("_BaseColor")) copia.SetColor("_BaseColor", copia.GetColor("_BaseColor") * tinte);
+                                if (copia.HasProperty("_Smoothness")) copia.SetFloat("_Smoothness", Mathf.Min(copia.GetFloat("_Smoothness"), 0.25f));
+                            } else {
+                                // Los paneles de luz EMITEN (HDR, por encima de 1) en el cian del neon: asi el bloom los hace brillar
+                                // y la luz se ve como una fuente, no como un rectangulo claro.
+                                copia.EnableKeyword("_EMISSION");
+                                copia.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+                                if (copia.HasProperty("_EmissionColor")) copia.SetColor("_EmissionColor", new Color(0.43f, 0.81f, 0.90f) * 1.6f);
+                            }
                             copias[m] = copia;
                         }
                         mats[i] = copia;
