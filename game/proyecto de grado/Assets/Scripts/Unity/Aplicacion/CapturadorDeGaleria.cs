@@ -121,7 +121,7 @@ namespace Nexus.Unity.Aplicacion {
                 float x = 30 + (i % 3) * 630, y = 20 + (i / 3) * 352;
                 var fondo = Bloque(capa, x, y, 600, 300, Tizador.Pizarra);
                 var lamina = Lamina(fondo, 0, 0, 600, 300);
-                lamina.Dibujo.Tiza = true;
+                lamina.Dibujo.Tiza = false;
                 DibujosDeEscena.Dibujar(new Tizador(lamina, _ui.FuenteTiza), ids[i]);
                 Rotulo(capa, x, y + 302, 600, ids[i]);
             }
@@ -140,7 +140,7 @@ namespace Nexus.Unity.Aplicacion {
                 float x = 60 + (i % 2) * (w + 60), y = 40 + (i / 2) * (h + 70);
                 var fondo = Bloque(capa, x, y, w, h, Tizador.Pizarra);
                 var lamina = Lamina(fondo, 0, 0, w, h);
-                lamina.Dibujo.Tiza = true;
+                lamina.Dibujo.Tiza = false;
                 DibujosDeEscena.Dibujar(new Tizador(lamina, _ui.FuenteTiza, 0, 0, k), ids[i]);
                 Rotulo(capa, x, y + h + 6, w, ids[i]);
             }
@@ -255,7 +255,7 @@ namespace Nexus.Unity.Aplicacion {
                 float x = 40 + (i % 8) * 232, y = 20 + (i / 8) * 262;
                 var fondo = Bloque(capa, x, y, 200, 200, Tizador.Pizarra);
                 var lamina = Lamina(fondo, 0, 0, 200, 200);
-                lamina.Dibujo.Tiza = true;
+                lamina.Dibujo.Tiza = false;
                 var esEmblema = todos[i].Key.StartsWith("emblema", StringComparison.Ordinal);
                 var k = esEmblema ? 200f / 240f : 200f / 120f;
                 todos[i].Value(new Tizador(lamina, _ui.FuenteTiza, 0, esEmblema ? 8 : 0, k), t.warning);

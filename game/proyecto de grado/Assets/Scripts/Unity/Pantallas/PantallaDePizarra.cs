@@ -37,7 +37,7 @@ namespace Nexus.Unity.Pantallas {
 
             lamina = new Lamina(ui, tabla, W, H);
             UiKit.Rellenar(lamina.Raiz);
-            lamina.Dibujo.Tiza = true;
+            lamina.Dibujo.Tiza = false;
 
             if (panel) { PanelDelPizarron.Placa(ui, marco, nota); return marco; }
 

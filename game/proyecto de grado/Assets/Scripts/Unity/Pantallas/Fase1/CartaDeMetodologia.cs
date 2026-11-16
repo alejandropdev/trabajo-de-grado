@@ -77,7 +77,7 @@ namespace Nexus.Unity.Pantallas {
             _lamina = new Lamina(ui, _hueco, AnchoLamina, AltoLamina);
             _lamina.Raiz.anchorMin = _lamina.Raiz.anchorMax = _lamina.Raiz.pivot = new Vector2(0.5f, 0.5f);
             _lamina.Raiz.sizeDelta = new Vector2(AnchoLamina, AltoLamina);
-            _lamina.Dibujo.Tiza = true;
+            _lamina.Dibujo.Tiza = false;
             if (icono != null) icono(new Tizador(_lamina, ui.FuenteTiza));
             var nombre = TextoEnCaja.Crear(ui, _anverso, nombreDeLaCarta, EstiloTexto.Encabezado, _t.ink, TextAlignmentOptions.Center,
                                            _t.Px(22), new Vector2(0, 0.04f), new Vector2(1, 0.28f), 8);

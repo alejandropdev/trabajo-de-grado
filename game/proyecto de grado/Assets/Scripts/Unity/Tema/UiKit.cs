@@ -597,8 +597,6 @@ namespace Nexus.Unity.Tema {
         }
 
         private Sprite _redondeado;
-        private TMP_FontAsset _tiza;
-        private bool _tizaIntentada;
 
         /// <summary>
         /// Un rectangulo de esquinas redondeadas, blanco y «9-slice»: estirado a cualquier tamaño conserva las
@@ -625,22 +623,12 @@ namespace Nexus.Unity.Tema {
         }
 
         /// <summary>
-        /// La letra de tiza de las recetas (Gochi Hand, licencia OFL, en Resources/Fuentes). Se crea en tiempo de
-        /// ejecucion desde el TTF, con la fuente normal de reserva para cualquier glifo que no tenga. Si no esta,
-        /// se usa la fuente del cuerpo: las recetas se leen igual, solo pierden el aire de pizarra.
+        /// La letra de los rotulos dibujados (antes Gochi Hand, de tiza). Desde 2026-11-15 es la del sistema, Rajdhani en
+        /// negrita: la direccion de arte quito la tiza (se leia como «hecha con IA»). El nombre se queda para no tocar a
+        /// los que la piden; el archivo Gochi sigue en Resources por si se quisiera volver.
         /// </summary>
         public TMP_FontAsset FuenteTiza {
-            get {
-                if (_tizaIntentada) return _tiza != null ? _tiza : Tema.FuenteCuerpo;
-                _tizaIntentada = true;
-                var ttf = Resources.Load<Font>("Fuentes/GochiHand-Regular");
-                if (ttf != null) {
-                    _tiza = TMP_FontAsset.CreateFontAsset(ttf);
-                    if (_tiza != null && Tema.FuenteCuerpo != null)
-                        _tiza.fallbackFontAssetTable = new System.Collections.Generic.List<TMP_FontAsset> { Tema.FuenteCuerpo };
-                }
-                return _tiza != null ? _tiza : Tema.FuenteCuerpo;
-            }
+            get { return Tema.FuenteInterfazNegrita != null ? Tema.FuenteInterfazNegrita : Tema.FuenteCuerpo; }
         }
 
         /// <summary>Un circulo blanco de 128 px, generado una vez. Lo necesitan el dial y los puntos de estado.</summary>
