@@ -26,12 +26,17 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private readonly Lamina _l;
         private readonly TMP_FontAsset _fuente;
         private readonly float _ox, _oy, _k;
+        /// <summary>Multiplicador del grosor de todos los trazos (1 = el de siempre). Lo fija Grueso.</summary>
+        private float _peso = 1f;
 
         public Tizador(Lamina lamina, TMP_FontAsset fuente, float ox = 0, float oy = 0, float k = 1) {
             _l = lamina; _fuente = fuente; _ox = ox; _oy = oy; _k = k;
         }
 
-        public Tizador En(float x, float y, float k = 1) { return new Tizador(_l, _fuente, _ox + x * _k, _oy + y * _k, _k * k) { _capa = _capa }; }
+        public Tizador En(float x, float y, float k = 1) { return new Tizador(_l, _fuente, _ox + x * _k, _oy + y * _k, _k * k) { _capa = _capa, _peso = _peso }; }
+
+        /// <summary>Una copia con el trazo mas grueso (p veces): para pictogramas que se leen de lejos.</summary>
+        public Tizador Grueso(float p) { return new Tizador(_l, _fuente, _ox, _oy, _k) { _capa = _capa, _peso = _peso * p }; }
 
         private float X(float x) { return _ox + x * _k; }
         private float Y(float y) { return _oy + y * _k; }
@@ -39,21 +44,21 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         private DibujoUI D { get { return _l.Dibujo; } }
 
         public void Linea(float x1, float y1, float x2, float y2, Color? c = null, float g = 3, bool disc = false) {
-            D.Linea(X(x1), Y(y1), X(x2), Y(y2), c ?? Tiza, g * _k, disc);
+            D.Linea(X(x1), Y(y1), X(x2), Y(y2), c ?? Tiza, g * _k * _peso, disc);
         }
         public void Flecha(float x1, float y1, float x2, float y2, Color? c = null, float g = 3) {
             Linea(x1, y1, x2, y2, c, g);
-            D.Punta(P(x1, y1), P(x2, y2), c ?? Tiza, g * _k, 13 * _k);
+            D.Punta(P(x1, y1), P(x2, y2), c ?? Tiza, g * _k * _peso, 13 * _k);
         }
         public void Curva(float x1, float y1, float cx, float cy, float x2, float y2, Color? c = null, bool punta = true) {
-            D.Curva(P(x1, y1), P(cx, cy), P(x2, y2), c ?? Tiza, 3 * _k, punta);
+            D.Curva(P(x1, y1), P(cx, cy), P(x2, y2), c ?? Tiza, 3 * _k * _peso, punta);
         }
         public void Caja(float x, float y, float w, float h, string t = null, Color? c = null, bool disc = false, float tam = 19) {
-            D.Rect(X(x), Y(y), w * _k, h * _k, c ?? Tiza, 3 * _k, new Color(1, 1, 1, 0.04f), disc, 8 * _k);
+            D.Rect(X(x), Y(y), w * _k, h * _k, c ?? Tiza, 3 * _k * _peso, new Color(1, 1, 1, 0.04f), disc, 8 * _k);
             if (t != null) Texto(x + w / 2, y + h / 2 + 7, t, tam, c ?? Tiza, true);
         }
-        public void Cilindro(float x, float y, float w, float h, Color? c = null) { D.Cilindro(X(x), Y(y), w * _k, h * _k, c ?? Tiza, 3 * _k); }
-        public void Circulo(float x, float y, float r, Color? c = null, bool disc = false, float g = 3) { D.Circulo(X(x), Y(y), r * _k, c ?? Tiza, g * _k, null, disc); }
+        public void Cilindro(float x, float y, float w, float h, Color? c = null) { D.Cilindro(X(x), Y(y), w * _k, h * _k, c ?? Tiza, 3 * _k * _peso); }
+        public void Circulo(float x, float y, float r, Color? c = null, bool disc = false, float g = 3) { D.Circulo(X(x), Y(y), r * _k, c ?? Tiza, g * _k * _peso, null, disc); }
         /// <summary>Un circulo macizo con su numero, por ENCIMA de las lineas del dibujo (tapa la flecha que pasa debajo).</summary>
         public void Insignia(float x, float y, float r, string numero, Color fondo, Color colorTexto) {
             _l.Insignia(X(x), Y(y), r * _k, numero, fondo, colorTexto, Pizarra);
@@ -63,7 +68,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             if (t != null) Texto(x + 20, y + 7, t, 16, c);
         }
         public void Persona(float x, float y, Color? c = null, string t = null) {
-            D.Persona(X(x), Y(y), c ?? Tiza, 3 * _k);
+            D.Persona(X(x), Y(y), c ?? Tiza, 3 * _k * _peso);
             if (t != null) Texto(x, y + 56, t, 16, c ?? Tiza, true);
         }
         public void Cruz(float x, float y, Color? c = null, float r = 14) { D.Cruz(X(x), Y(y), c ?? Roja, r * _k); }

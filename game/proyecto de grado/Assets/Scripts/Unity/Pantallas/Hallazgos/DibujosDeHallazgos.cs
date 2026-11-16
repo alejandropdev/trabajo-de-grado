@@ -13,11 +13,20 @@ namespace Nexus.Unity.Pantallas {
     /// Las claves vienen de Core (EmblemasDeColeccionables): un test exige que el catalogo tenga todas y sin repetir.
     /// </summary>
     public static class DibujosDeHallazgos {
+        /// <summary>(2026-11-15, direccion de arte) Los pictogramas se dibujan con trazo grueso: se leen de lejos y no parecen un esquema.</summary>
+        private const float PesoDelPictograma = 1.9f;
+
+        private static Dictionary<string, Action<Tizador, Color>> Engrosar(Dictionary<string, Action<Tizador, Color>> origen) {
+            var r = new Dictionary<string, Action<Tizador, Color>>();
+            foreach (var par in origen) { var f = par.Value; r[par.Key] = (t, c) => f(t.Grueso(PesoDelPictograma), c); }
+            return r;
+        }
+
         private static readonly Color Tiza = Tizador.Tiza, Cian = Tizador.Cian, Mostaza = Tizador.Mostaza, Roja = Tizador.Roja, Gris = Tizador.Gris;
 
         // ==================================================================== emblemas de las cartas (240×220)
 
-        public static readonly Dictionary<string, Action<Tizador, Color>> Emblemas = new Dictionary<string, Action<Tizador, Color>> {
+        public static readonly Dictionary<string, Action<Tizador, Color>> Emblemas = Engrosar(new Dictionary<string, Action<Tizador, Color>> {
             // Ley de Conway: dos equipos (izquierda) y dos modulos (derecha) con la MISMA frontera entre ellos.
             { "organigrama-espejo", (t, c) => {
                 t.Circulo(60, 40, 13, c); t.Linea(60, 53, 60, 70, c); t.Linea(30, 70, 90, 70, c);
@@ -154,11 +163,12 @@ namespace Nexus.Unity.Pantallas {
                 t.Trazo(Tiza, 140, 20, 226, 20, 226, 72, 168, 72, 152, 90, 156, 72, 140, 72, 140, 20);
                 t.Carita(183, 46, 15, 1, Mostaza);
             } },
-        };
+        });
 
         // ==================================================================== glifo de cada palo (60×60)
 
         public static void GlifoDePalo(Tizador t, string palo, Color c) {
+            t = t.Grueso(PesoDelPictograma);
             switch (palo) {
                 case PalosDeCarta.Leyes:   // una balanza
                     t.Linea(30, 10, 30, 52, c); t.Linea(18, 52, 42, 52, c);
@@ -186,7 +196,7 @@ namespace Nexus.Unity.Pantallas {
 
         // ==================================================================== iconos de las advertencias (120×120)
 
-        public static readonly Dictionary<string, Action<Tizador, Color>> IconosDeAdvertencia = new Dictionary<string, Action<Tizador, Color>> {
+        public static readonly Dictionary<string, Action<Tizador, Color>> IconosDeAdvertencia = Engrosar(new Dictionary<string, Action<Tizador, Color>> {
             { "commit", (t, c) => { t.Linea(10, 60, 110, 60, c, 4); t.Punto(30, 60, 8, c); t.Circulo(60, 60, 16, c, false, 5); t.Punto(90, 60, 8, c); } },
             { "documento", (t, c) => { t.Trazo(c, 30, 14, 76, 14, 92, 30, 92, 106, 30, 106, 30, 14); for (var i = 0; i < 4; i++) t.Linea(42, 44 + i * 16, 80, 44 + i * 16, c, 3); } },
             { "termometro", (t, c) => { t.Trazo(c, 52, 90, 52, 18, 68, 18, 68, 90); t.Circulo(60, 98, 14, c); t.Punto(60, 98, 9, c); t.Linea(60, 88, 60, 34, c, 6); } },
@@ -202,11 +212,12 @@ namespace Nexus.Unity.Pantallas {
             { "brujula", (t, c) => { t.Circulo(60, 60, 44, c, false, 4); t.Trazo(c, 60, 22, 70, 60, 60, 98, 50, 60, 60, 22); t.Punto(60, 60, 4, c); } },
             { "sirena", (t, c) => { t.Curva(34, 84, 60, 10, 86, 84, c, false); t.Linea(24, 86, 96, 86, c, 6); t.Linea(30, 100, 90, 100, c, 4);
                                     t.Linea(14, 40, 26, 50, c, 3); t.Linea(106, 40, 94, 50, c, 3); t.Linea(60, 6, 60, 18, c, 3); } },
-        };
+        });
 
         // ==================================================================== pictogramas del diario (120×90)
 
         public static void Pictograma(Tizador t, string serie, Color c) {
+            t = t.Grueso(PesoDelPictograma);
             switch (serie) {
                 case SeriesDeColeccionables.Usb:
                     t.Caja(22, 30, 62, 32, null, c); t.Caja(84, 36, 20, 20, null, Tiza); t.Punto(34, 46, 3, Mostaza);
