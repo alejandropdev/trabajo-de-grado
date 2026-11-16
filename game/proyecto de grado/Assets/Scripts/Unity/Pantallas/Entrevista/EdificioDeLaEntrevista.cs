@@ -51,12 +51,15 @@ namespace Nexus.Unity.Pantallas {
 
             // ---- el cuerpo, la azotea y la calle
             var cuerpo = VentanaDelAtardecer.Capa(ui, _lienzo, "Cuerpo");
-            cuerpo.Rect(X0, Techo - 10, X1 - X0, Calle - 6 - (Techo - 10), tema.lineStrong, 3, NexusTheme.Alfa(tema.surfaceRaised, 0.92f), false, 6);
-            cuerpo.Linea(X0 - 18, Calle - 4, X1 + 18, Calle - 4, tema.lineStrong, 3);
+            cuerpo.Rect(X0, Techo - 10, X1 - X0, Calle - 6 - (Techo - 10), tema.lineStrong, 4, NexusTheme.Alfa(tema.surfaceRaised, 0.96f), false, 4);
+            // Dos tonos: la cara de la sombra a la derecha, y el parapeto de la azotea con franja de peligro.
+            cuerpo.Poligono(new List<Vector2> { P(X1 - 34, Techo), P(X1 - 2, Techo), P(X1 - 2, Calle - 8), P(X1 - 34, Calle - 8) }, new Color(0, 0, 0, 0.22f));
+            for (var fx = X0 + 4; fx < X1 - 14; fx += 22) cuerpo.Poligono(new List<Vector2> { P(fx, Techo - 8), P(fx + 11, Techo - 8), P(fx + 7, Techo - 2), P(fx - 4, Techo - 2) }, NexusTheme.Alfa(tema.warning, 0.75f));
+            cuerpo.Linea(X0 - 18, Calle - 4, X1 + 18, Calle - 4, tema.lineStrong, 5);
             // Antena y bandera.
-            cuerpo.Linea(90, Techo - 10, 90, 30, tema.inkMuted, 3);
-            cuerpo.Linea(78, 52, 102, 52, tema.inkMuted, 2);
-            cuerpo.Linea(210, Techo - 10, 210, 42, tema.inkMuted, 2);
+            cuerpo.Linea(90, Techo - 10, 90, 30, tema.inkMuted, 4.5f);
+            cuerpo.Linea(78, 52, 102, 52, tema.inkMuted, 3.5f); cuerpo.Linea(84, 42, 96, 42, tema.inkMuted, 3);
+            cuerpo.Linea(210, Techo - 10, 210, 42, tema.inkMuted, 3.5f);
             cuerpo.Poligono(new List<Vector2> { P(211, 42), P(246, 50), P(211, 60) }, tema.cyan);
             Texto(ui, 150, 60, 140, 18, "META", 12, tema.cyan, TextAlignmentOptions.Center).characterSpacing = 4;
             _luzDeAntena = VentanaDelAtardecer.Imagen(VentanaDelAtardecer.Colocado(ui, _lienzo, "Luz de antena", 84, 22, 12, 12), ui.SpriteCircular(), tema.danger);
@@ -65,7 +68,7 @@ namespace Nexus.Unity.Pantallas {
             var xs = new[] { 46f, 86f, 188f, 228f };
             for (var p = 1; p <= _pisos; p++) {
                 var y = YDePiso(p);
-                cuerpo.Linea(X0, y + AltoDePiso, X1, y + AltoDePiso, tema.line, 2);
+                cuerpo.Linea(X0, y + AltoDePiso, X1, y + AltoDePiso, tema.lineStrong, 3);
                 var fila = new Image[4];
                 for (var k = 0; k < 4; k++)
                     fila[k] = VentanaDelAtardecer.Imagen(VentanaDelAtardecer.Colocado(ui, _lienzo, "Ventana", xs[k], y + 10, 26, 20), null, _apagada);
@@ -75,9 +78,10 @@ namespace Nexus.Unity.Pantallas {
             cuerpo.Linea(X0, Techo, X1, Techo, tema.lineStrong, 3);
 
             // ---- el vestibulo: puertas de cristal y el cartel
-            cuerpo.Rect(52, Suelo + 22, 56, 44, tema.inkFaint, 2, NexusTheme.Alfa(tema.cyan, 0.08f), false, 3);
-            cuerpo.Linea(80, Suelo + 22, 80, Suelo + 66, tema.inkFaint, 2);
-            cuerpo.Rect(190, Suelo + 22, 60, 44, tema.inkFaint, 2, NexusTheme.Alfa(tema.cyan, 0.08f), false, 3);
+            cuerpo.Rect(52, Suelo + 22, 56, 44, tema.inkMuted, 3, NexusTheme.Alfa(tema.cyan, 0.14f), false, 2);
+            cuerpo.Linea(80, Suelo + 22, 80, Suelo + 66, tema.inkMuted, 3);
+            cuerpo.Rect(190, Suelo + 22, 60, 44, tema.inkMuted, 3, NexusTheme.Alfa(tema.cyan, 0.14f), false, 2);
+            cuerpo.Rect(X0 + 4, Suelo, X1 - X0 - 8, 18, NexusTheme.Alfa(tema.warning, 0.9f), 2, NexusTheme.Alfa(tema.warning, 0.2f), false, 2);   // la placa del cartel
             Texto(ui, X0, Suelo + 2, X1 - X0, 18, "CRADLE LIFTS · CONCURSO", 11, tema.warning, TextAlignmentOptions.Center).characterSpacing = 2;
 
             // ---- el hueco del ascensor, los cables y el contrapeso
