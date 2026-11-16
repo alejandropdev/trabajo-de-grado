@@ -72,6 +72,7 @@ namespace Nexus.Unity.Aplicacion {
                 var t = termino; var n = pagina;
                 paginas.Add(Par("pizarron_" + t + "_" + (n + 1), r => Pizarron(r, t, n)));
             }
+            foreach (var curso in new[] { "scrum", "kanban", "cascada" }) { var c = curso; paginas.Add(Par("pizarron_curso_" + c, r => IndiceDeCurso(r, c))); }
             paginas.Add(Par("atardecer", Atardecer));
             paginas.Add(Par("despliegue", Despliegue));
             paginas.Add(Par("edificio", Edificio));

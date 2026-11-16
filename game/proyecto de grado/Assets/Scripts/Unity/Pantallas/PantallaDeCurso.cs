@@ -5,6 +5,7 @@ using Nexus.Unity.Aplicacion;
 using Nexus.Unity.Pantallas.Minijuegos;
 using Nexus.Unity.Tema;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Nexus.Unity.Pantallas {
     /// <summary>
@@ -25,16 +26,18 @@ namespace Nexus.Unity.Pantallas {
 
         protected override void Construir() {
             Lamina lamina;
-            var marco = MarcoDePizarra.Construir(Ui, Raiz, "CURSO", out lamina);
+            var marco = MarcoDePizarra.Construir(Ui, Raiz, "CURSO", out lamina, true);
             MarcoDePizarra.Boton(Ui, marco, "Ver todo seguido", () => AbrirPaginas(Termino.Curso, null), new Vector2(0, 0), new Vector2(52, 44), 280);
             MarcoDePizarra.Boton(Ui, marco, "Cerrar", () => App.Router.Volver(), new Vector2(1, 0), new Vector2(-52, 44), 220, VarianteBoton.Secundario);
 
             const float W = MarcoDePizarra.W;
-            var t = new Tizador(lamina, Ui.FuenteTiza);
-            if (!string.IsNullOrEmpty(Termino.Tema)) t.Texto(60, 44, Termino.Tema.ToUpperInvariant(), 22, Tizador.Gris);
-            t.Texto(W / 2, 96, Termino.Termino + ", a fondo", 44, Tizador.Tiza, true);
-            t.Linea(360, 116, W - 360, 116, null, 2);
-            t.Texto(W / 2, 160, $"{Termino.Curso.Count} páginas en capítulos. Empieza por el primero o entra al que necesites.", 26, Tizador.Gris, true);
+            // Rajdhani, como el resto del pizarron de chapa (docs/08-arte): negrita para titulos, normal para el cuerpo.
+            var t = new Tizador(lamina, Ui.Tema.FuenteInterfaz);
+            var negrita = new Tizador(lamina, Ui.Tema.FuenteInterfazNegrita);
+            if (!string.IsNullOrEmpty(Termino.Tema)) negrita.Texto(60, 50, Termino.Tema.ToUpperInvariant(), 17, PanelDelPizarron.Tema).characterSpacing = 8;
+            negrita.Texto(60, 100, Termino.Termino + ", a fondo", 46, PanelDelPizarron.Titulo);
+            t.Forma(LuzUI.Redondeado(60, 116, 72, 4, 2), PanelDelPizarron.Acento);
+            t.Texto(60, 160, $"{Termino.Curso.Count} páginas en capítulos. Empieza por el primero o entra al que necesites.", 26, PanelDelPizarron.Contador);
 
             // Los capitulos, en el orden en que aparecen sus paginas: dos columnas de tarjetas.
             var capitulos = new List<string>();
@@ -48,15 +51,19 @@ namespace Nexus.Unity.Pantallas {
                 var paginas = Termino.Curso.Where(p => (p.Capitulo ?? "") == capitulo).ToList();
                 var x = 60 + (i % 2) * (ancho + hueco);
                 var y = y0 + (i / 2) * (alto + hueco);
-                t.Caja(x, y, ancho, alto, null, Tizador.Cian);
-                t.Insignia(x + 46, y + alto / 2, 26, (i + 1).ToString(), Tizador.Cian, Tizador.Pizarra);
-                t.Texto(x + 92, y + alto / 2 - 14, capitulo, 30, Tizador.Tiza);
-                t.Texto(x + 92, y + alto / 2 + 22, Resumen(paginas, Mathf.FloorToInt((ancho - 110) / 11.5f)), 20, Tizador.Gris);
+                Graphic cara, borde;
+                PanelDelPizarron.Tarjeta(Ui, lamina.Raiz, x, y, ancho, alto, out cara, out borde);
+                cara.transform.SetAsFirstSibling(); borde.transform.SetAsFirstSibling();
+                t.Insignia(x + 46, y + alto / 2, 26, (i + 1).ToString(), PanelDelPizarron.Acento, H(0x1A1608));
+                negrita.Texto(x + 92, y + alto / 2 - 10, capitulo, 30, PanelDelPizarron.Titulo);
+                t.Texto(x + 92, y + alto / 2 + 24, Resumen(paginas, Mathf.FloorToInt((ancho - 110) / 10.2f)), 20, PanelDelPizarron.Contador);
                 lamina.Zona(x, y, ancho, alto, () => AbrirPaginas(paginas, capitulo), "Capitulo " + (i + 1));
             }
         }
 
         /// <summary>«4 páginas: El Sprint, Sprint Planning…», recortado a lo que cabe en la tarjeta.</summary>
+        private static Color H(int rgb) { return new Color(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, (rgb & 0xFF) / 255f, 1); }
+
         private static string Resumen(List<PaginaDePizarra> paginas, int max) {
             var texto = (paginas.Count == 1 ? "1 página: " : paginas.Count + " páginas: ") + string.Join(", ", paginas.Select(p => p.Titulo));
             return texto.Length <= max ? texto : texto.Substring(0, Mathf.Max(0, max - 1)).TrimEnd(' ', ',') + "…";

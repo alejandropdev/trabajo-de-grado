@@ -15,6 +15,17 @@ namespace Nexus.Unity.Aplicacion {
         /// <summary>Lo que hay que deshacer despues de capturar la pagina (cerrar la pantalla apilada).</summary>
         private Action _despues;
 
+        /// <summary>El indice «Aprender a fondo» de un curso (scrum, kanban, cascada).</summary>
+        private void IndiceDeCurso(RectTransform capa, string termino) {
+            var fondo = capa.GetComponent<Image>();
+            if (fondo != null) fondo.color = new Color(0, 0, 0, 0);
+            var app = AppRoot.Instancia;
+            var e = Glosario.Buscar(app.Catalogo.Glosario, termino);
+            if (e == null) throw new InvalidOperationException("no hay termino " + termino);
+            PantallaDeCurso.Abrir(app, e);
+            _despues = () => app.Router.Volver();
+        }
+
         private void Pizarron(RectTransform capa, string termino, int pagina) {
             var fondo = capa.GetComponent<Image>();
             if (fondo != null) fondo.color = new Color(0, 0, 0, 0);
