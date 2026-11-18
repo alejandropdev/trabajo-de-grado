@@ -100,8 +100,8 @@
         "dentro"
       ],
       "defecto": "requisito_incompleto",
-      "explicacion": "La lista solo mira las visitas que entraron hoy. Quien entró ayer por la tarde y sigue dentro no aparece: el vigilante cierra el edificio con alguien dentro.",
-      "pista": "Lee qué visitas mira esta pieza. ¿Y alguien que entró ayer y todavía no ha salido?",
+      "explicacion": "Solo lista las visitas de hoy: quien entró ayer y sigue dentro no aparece. El vigilante cerraría con alguien dentro.",
+      "pista": "¿Qué visitas mira esta pieza? ¿Y quien entró ayer y sigue dentro?",
       "soluciones": [
         "cubrir-caso"
       ]
@@ -163,7 +163,7 @@
       "rubrica": {
         "veredicto": "aceptable",
         "oa": "OA-DOC-01",
-        "razon": "Se te escapó el caso que faltaba, o marcaste algo que estaba bien. Iván va a programar la lista tal cual."
+        "razon": "Se te escapó el caso que faltaba, o marcaste algo que estaba bien. Iván programa la lista tal cual."
       }
     },
     "falsoPositivo": {
@@ -196,7 +196,7 @@
   "cartas": [
     {
       "id": "cubrir-caso",
-      "nombre": "Añadir el caso que falta",
+      "nombre": "Cubrir el caso",
       "descripcion": "Decir qué pasa en el caso olvidado.",
       "icono": "lista"
     },

@@ -159,9 +159,14 @@ namespace Nexus.Unity.Pantallas {
             _barras.Preparar(Sesion.W, StocksQueToca(_actual));
         }
 
-        /// <summary>Los stocks que alguna respuesta mueve (maximo cuatro), en el orden en que aparecen.</summary>
+        /// <summary>
+        /// Los stocks que alguna respuesta mueve (maximo cuatro), en el orden en que aparecen, y el dinero siempre: aunque
+        /// ninguna respuesta lo toque, el jugador decide viendo con cuanto presupuesto cuenta.
+        /// </summary>
         private static List<string> StocksQueToca(TarjetaDef tarjeta) {
-            return tarjeta.Opciones.SelectMany(o => o.Efectos.Keys).Distinct(StringComparer.Ordinal).Take(4).ToList();
+            var stocks = tarjeta.Opciones.SelectMany(o => o.Efectos.Keys).Distinct(StringComparer.Ordinal).Take(4).ToList();
+            if (!stocks.Contains("Dinero")) stocks.Add("Dinero");
+            return stocks;
         }
 
         // ------------------------------------------------------------ gesto y teclas

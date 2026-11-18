@@ -1486,6 +1486,7 @@ namespace Nexus.Core.Sesion {
             R.SerieDeuda.Add(Math.Round(W.DeudaTecnica, 2));
             R.SerieCobertura.Add(Math.Round(W.Cobertura, 2));
             R.SerieSatisfaccion.Add(Math.Round(W.SatisfaccionCliente, 2));
+            R.SerieDinero.Add(Math.Round(W.Dinero, 2));
         }
 
         // ==================================================================== FASE 3

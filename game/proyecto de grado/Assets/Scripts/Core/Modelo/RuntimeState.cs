@@ -222,6 +222,8 @@ namespace Nexus.Core.Modelo {
         public List<double> SerieDeuda = new List<double>();
         public List<double> SerieCobertura = new List<double>();
         public List<double> SerieSatisfaccion = new List<double>();
+        /// <summary>El dinero del proyecto al cerrar cada dia (la tarjeta «Dinero» del panel). Una partida vieja la trae vacia.</summary>
+        public List<double> SerieDinero = new List<double>();
 
         /// <summary>
         /// La bitacora de la jornada (lo mas nuevo primero, como mucho BitacoraMaxima lineas). Antes vivia en la pantalla y
@@ -386,6 +388,7 @@ namespace Nexus.Core.Modelo {
             if (SerieDeuda == null) SerieDeuda = new List<double>();
             if (SerieCobertura == null) SerieCobertura = new List<double>();
             if (SerieSatisfaccion == null) SerieSatisfaccion = new List<double>();
+            if (SerieDinero == null) SerieDinero = new List<double>();
             if (Bitacora == null) Bitacora = new List<string>();
             if (Novedades == null) Novedades = new List<string>();
             if (MinijuegoDeZonaJugado == null) MinijuegoDeZonaJugado = new Dictionary<string, int>(StringComparer.Ordinal);

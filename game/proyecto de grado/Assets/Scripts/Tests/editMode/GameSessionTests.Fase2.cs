@@ -61,6 +61,20 @@ namespace Nexus.Tests {
             Assert.AreEqual(s.R.SerieAvance.Count, s.R.SerieDeuda.Count);
             Assert.AreEqual(s.R.SerieAvance.Count, s.R.SerieCobertura.Count);
             Assert.AreEqual(s.R.SerieAvance.Count, s.R.SerieSatisfaccion.Count);
+            // La tarjeta «Dinero» del panel lleva su mini-grafica: una muestra por dia, igual que las demas.
+            Assert.AreEqual(s.R.SerieAvance.Count, s.R.SerieDinero.Count);
+            Assert.AreEqual(Math.Round(s.W.Dinero, 2), s.R.SerieDinero.Last(), 1e-9);
+        }
+
+        [Test]
+        public void Un_guardado_sin_la_serie_de_dinero_se_abre_con_la_serie_vacia() {
+            // Lo que trae una partida guardada antes de que existiera la tarjeta: el campo ausente o nulo.
+            var sinCampo = Newtonsoft.Json.JsonConvert.DeserializeObject<RuntimeState>("{}");
+            var nulo = Newtonsoft.Json.JsonConvert.DeserializeObject<RuntimeState>("{\"SerieDinero\":null}");
+            Assert.IsNotNull(sinCampo.SerieDinero);
+            Assert.AreEqual(0, sinCampo.SerieDinero.Count);
+            Assert.IsNotNull(nulo.SerieDinero);
+            Assert.AreEqual(0, nulo.SerieDinero.Count);
         }
 
         // ================================================================ los minijuegos de zona

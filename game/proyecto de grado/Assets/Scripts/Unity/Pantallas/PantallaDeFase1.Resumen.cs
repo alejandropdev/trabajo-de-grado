@@ -17,7 +17,7 @@ namespace Nexus.Unity.Pantallas {
     ///   · El proyecto     cuantas comprobaciones acertaste        · Equipo       las caras de quien va contigo
     ///   · Metodologia     su dibujo y el calendario en una tira   · Recorrido    minutos, suministros y hallazgos
     ///   · Calidad         un radar con las fichas repartidas      · Backlog      la pila de historias
-    ///   · Arquitectura    su dibujo
+    ///   · Arquitectura    su dibujo                               · Presupuesto  el dinero con el que arrancas
     /// Lo que falta late en ambar; lo hecho brilla en su color. Pulsar un instrumento lleva a ese paso, y al pasar el raton
     /// sale el «porque» que antes era texto. Arriba, un anillo cuenta cuantos estan listos; abajo, la palanca de lanzar,
     /// que hace una cuenta atras antes de empezar el dia 1. Todo en una pantalla, sin scroll.
@@ -178,6 +178,19 @@ namespace Nexus.Unity.Pantallas {
                                   new Vector2(0.15f, 0.40f), new Vector2(0.75f, 0.92f), 2).fontStyle = FontStyles.Bold;
                 TextoEnCaja.Crear(Ui, c, _backlog.Count == 1 ? "HISTORIA" : "HISTORIAS", EstiloTexto.Leyenda, Tema.inkMuted, TextAlignmentOptions.Center,
                                   Tema.Px(12), Vector2.zero, new Vector2(1, 0.30f), 2);
+            });
+
+            // Presupuesto: el dinero con el que arranca el nivel (lo que traigas del recorrido ya cuenta)
+            instrumentos.Add((fila, retraso) => {
+                RectTransform c;
+                var inicial = Perfil.PresupuestoInicial;
+                var ahora = S.W.Dinero;
+                Instrumento(fila, "Presupuesto", Paso.Encargo, true, Tema.success, "El presupuesto",
+                            Textos.ExplicarDinero(inicial, Textos.LimiteDeDinero(Perfil)), retraso, out c);
+                TextoEnCaja.Crear(Ui, c, Textos.Dinero(ahora), EstiloTexto.Titulo, Tema.success, TextAlignmentOptions.Center, Tema.Px(40),
+                                  new Vector2(0, 0.36f), Vector2.one, 4).fontStyle = FontStyles.Bold;
+                TextoEnCaja.Crear(Ui, c, Math.Abs(ahora - inicial) < 0.5 ? "DINERO DEL PROYECTO" : "DE " + Textos.Dinero(inicial) + " DEL ENCARGO",
+                                  EstiloTexto.Leyenda, Tema.inkMuted, TextAlignmentOptions.Center, Tema.Px(12), Vector2.zero, new Vector2(1, 0.32f), 2);
             });
 
             // reparto: las cuatro primeras arriba, el resto debajo

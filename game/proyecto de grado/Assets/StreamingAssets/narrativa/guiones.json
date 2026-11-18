@@ -35,15 +35,15 @@
         "default": [
           {
             "quien": "narrador",
-            "texto": "Una sala pequeña. Una mujer con una planilla; a su lado, un hombre de traje y corbata de un verde muy oscuro, el cual no se presenta."
+            "texto": "Una sala pequeña. Una mujer con una planilla; a su lado, un hombre de traje verde oscuro, sin presentarse."
           },
           {
             "quien": "Marisol Andrade",
-            "texto": "Soy Marisol Andrade. Le haré quince preguntas; si no sabe una, dígalo: no se descuenta nada. El señor solo escucha."
+            "texto": "Soy Marisol Andrade. Quince preguntas; si no sabe una, dígalo: no se descuenta nada. El señor solo escucha."
           },
           {
             "quien": "narrador",
-            "texto": "Cada vez que respondas, el hombre le susurrará algo a ella. Ella no lo repetirá. Pero tú sí lo oirás."
+            "texto": "Cada vez que respondas, el hombre le susurrará algo a ella. Ella no lo repetirá. Tú sí lo oirás."
           },
           {
             "quien": "Marisol Andrade",
@@ -118,7 +118,7 @@
         "default": [
           {
             "quien": "Marisol Andrade",
-            "texto": "Espera, antes de programar, todo proyecto toma tres decisiones: cómo trabajar (metodología), qué cuidar (calidad) y qué forma tiene (arquitectura)."
+            "texto": "Antes de programar, todo proyecto toma tres decisiones: cómo trabajar (metodología), qué cuidar (calidad) y qué forma tiene (arquitectura)."
           },
           {
             "quien": "Marisol Andrade",
@@ -201,7 +201,7 @@
           },
           {
             "quien": "Marisol Andrade",
-            "texto": "Habla con la gente: quien confía en ti, te echa una mano. Y revisa los espacios a detalle: algunas cosas valen la pena."
+            "texto": "Habla con la gente: quien confía en ti, te echa una mano. Y revisa los espacios: algunas cosas valen la pena."
           }
         ]
       }
@@ -259,7 +259,7 @@
         "default": [
           {
             "quien": "narrador",
-            "texto": "El auditorio de N1, lleno. Los doce concursantes con el mismo objetivo, en la misma fila."
+            "texto": "El auditorio de N1, lleno. Los doce concursantes, alineados."
           },
           {
             "quien": "Megafonía",
@@ -271,7 +271,7 @@
           },
           {
             "quien": "narrador",
-            "texto": "En un balcón, el hombre del traje te observa con atención; mientras en los dedos gira algo pequeño y antiguo."
+            "texto": "En un balcón, el hombre del traje te observa; algo pequeño y antiguo gira en sus dedos."
           },
           {
             "quien": "narrador",
@@ -281,7 +281,7 @@
         "lanzamiento-bien": [
           {
             "quien": "narrador",
-            "texto": "El auditorio de N1, lleno. Los doce concursantes con el mismo objetivo, en la misma fila."
+            "texto": "El auditorio de N1, lleno. Los doce concursantes, alineados."
           },
           {
             "quien": "narrador",
@@ -293,7 +293,7 @@
           },
           {
             "quien": "narrador",
-            "texto": "En un balcón, el hombre del traje te observa con atención; mientras en los dedos gira algo pequeño y antiguo."
+            "texto": "En un balcón, el hombre del traje te observa; algo pequeño y antiguo gira en sus dedos."
           },
           {
             "quien": "narrador",
@@ -303,7 +303,7 @@
         "lanzamiento-con-problemas": [
           {
             "quien": "narrador",
-            "texto": "El auditorio de N1, lleno. Los doce concursantes con el mismo objetivo, en la misma fila."
+            "texto": "El auditorio de N1, lleno. Los doce concursantes, alineados."
           },
           {
             "quien": "narrador",
@@ -315,7 +315,7 @@
           },
           {
             "quien": "narrador",
-            "texto": "En un balcón, el hombre del traje te observa con atención; mientras en los dedos gira algo pequeño y antiguo."
+            "texto": "En un balcón, el hombre del traje te observa; algo pequeño y antiguo gira en sus dedos."
           },
           {
             "quien": "narrador",
@@ -325,7 +325,7 @@
         "lanzamiento-mal": [
           {
             "quien": "narrador",
-            "texto": "El auditorio de N1, lleno. Los doce concursantes con el mismo objetivo, en la misma fila."
+            "texto": "El auditorio de N1, lleno. Los doce concursantes, alineados."
           },
           {
             "quien": "narrador",
@@ -337,7 +337,7 @@
           },
           {
             "quien": "narrador",
-            "texto": "En un balcón, el hombre del traje te observa con atención; mientras en los dedos gira algo pequeño y antiguo."
+            "texto": "En un balcón, el hombre del traje te observa; algo pequeño y antiguo gira en sus dedos."
           },
           {
             "quien": "narrador",
