@@ -81,6 +81,14 @@ namespace Nexus.Unity.Pantallas {
             TarjetaKpi(rejilla, "Cliente", $"{w.SatisfaccionCliente:0}", w.SatisfaccionCliente / 100,
                        w.SatisfaccionCliente <= 35 ? Tema.danger : Tema.success, S.R.SerieSatisfaccion,
                        w.SatisfaccionCliente <= 35 ? "Tan baja que pedirán explicaciones." : "Sube al escuchar y cumplir; baja con sorpresas.", "satisfaccion");
+            // El dinero: el presupuesto del nivel. La barra es lo que queda de lo que habia al empezar.
+            var presupuesto = S.Perfil.PresupuestoInicial;
+            var limiteDeDinero = Textos.LimiteDeDinero(S.Perfil);
+            var quedaDeDinero = presupuesto > 0 ? Math.Max(0, w.Dinero / presupuesto) : 0;
+            var dineroEnPeligro = quedaDeDinero <= 0.2 || (limiteDeDinero.HasValue && w.Dinero <= limiteDeDinero.Value);
+            TarjetaKpi(rejilla, "Dinero", Textos.Dinero(w.Dinero), Math.Min(1, quedaDeDinero),
+                       dineroEnPeligro ? Tema.danger : quedaDeDinero < 0.5 ? Tema.warning : Tema.success, S.R.SerieDinero,
+                       Textos.ExplicarDinero(presupuesto, limiteDeDinero), "presupuesto");
 
             // El pronostico: un dial con el nivel del lanzamiento si se entregara hoy.
             if (S.R.Fase == 2) {

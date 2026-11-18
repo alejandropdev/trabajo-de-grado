@@ -62,7 +62,7 @@ namespace Nexus.Unity.Pantallas {
                     fila.Barra = _ui.Barra(columna, (float)(actual / 100.0), _tema.cyan);
                     fila.Objetivo = (float)(actual / 100.0);
                 } else {
-                    fila.Cifra = _ui.Texto(columna, Formato(actual), EstiloTexto.Encabezado, _tema.ink);
+                    fila.Cifra = _ui.Texto(columna, Formato(stock, actual), EstiloTexto.Encabezado, _tema.ink);
                 }
                 _filas.Add(fila);
             }
@@ -81,7 +81,7 @@ namespace Nexus.Unity.Pantallas {
                     fila.Objetivo = Mathf.Clamp01((float)((fila.Actual + delta) / 100.0));
                     fila.Barra.Color = color;
                 } else if (fila.Cifra != null) {
-                    fila.Cifra.text = Mathf.Abs((float)delta) < 1e-6f ? Formato(fila.Actual) : Formato(fila.Actual + delta) + "  (" + Signo(delta) + ")";
+                    fila.Cifra.text = Mathf.Abs((float)delta) < 1e-6f ? Formato(fila.Stock, fila.Actual) : Formato(fila.Stock, fila.Actual + delta) + "  (" + Signo(fila.Stock, delta) + ")";
                     fila.Cifra.color = Mathf.Abs((float)delta) < 1e-6f ? _tema.ink : color;
                 }
             }
@@ -102,13 +102,13 @@ namespace Nexus.Unity.Pantallas {
                 w.TryGet(fila.Stock, out actual);
                 fila.Actual = actual;
                 if (fila.Barra != null) { fila.Objetivo = (float)(actual / 100.0); fila.Barra.Color = _tema.cyan; }
-                if (fila.Cifra != null) { fila.Cifra.text = Formato(actual); fila.Cifra.color = _tema.ink; }
+                if (fila.Cifra != null) { fila.Cifra.text = Formato(fila.Stock, actual); fila.Cifra.color = _tema.ink; }
             }
             _previsto = new Dictionary<string, double>();
         }
 
         private static string Nombre(string stock) { return Textos.NombreDeStock(stock); }
-        private static string Formato(double v) { return Math.Round(v, 1).ToString("0.#"); }
-        private static string Signo(double d) { return (d > 0 ? "+" : "") + Math.Round(d, 1).ToString("0.#"); }
+        private static string Formato(string stock, double v) { return stock == "Dinero" ? Textos.Dinero(v) : Math.Round(v, 1).ToString("0.#"); }
+        private static string Signo(string stock, double d) { return stock == "Dinero" ? Textos.DineroConSigno(d) : (d > 0 ? "+" : "") + Math.Round(d, 1).ToString("0.#"); }
     }
 }

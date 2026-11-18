@@ -154,7 +154,7 @@
         {
           "id": "apagar-y-arreglar",
           "texto": "Sacar el panel de la garita de producción seis horas y arreglar la causa de verdad.",
-          "efectosInmediatos": { "Dias": 1, "DeudaTecnica": -10, "SatisfaccionCliente": -4 },
+          "efectosInmediatos": { "Dias": 1, "DeudaTecnica": -10, "SatisfaccionCliente": -4, "Dinero": -500 },
           "rubrica": {
             "veredicto": "correcta",
             "oa": "OA-CAL-01",
@@ -210,7 +210,7 @@
           "id": "nombrar-y-negociar",
           "texto": "Nombrarlo como lo que es: un cambio de alcance. Documentarlo y negociar fecha o qué se recorta.",
           "ampliaAlcance": true,
-          "efectosInmediatos": { "Alcance": 4, "SatisfaccionCliente": -2, "Documentacion": 3 },
+          "efectosInmediatos": { "Alcance": 4, "SatisfaccionCliente": -2, "Documentacion": 3, "Dinero": 800 },
           "rubrica": {
             "veredicto": "correcta",
             "oa": "OA-DOC-01",
@@ -387,7 +387,7 @@
         {
           "id": "pipeline-local",
           "texto": "Montar un pipeline de respaldo en otra máquina, para no parar.",
-          "efectosInmediatos": { "Cansancio": 3 },
+          "efectosInmediatos": { "Cansancio": 3, "Dinero": -400 },
           "efectosDiferidos": [ { "enDias": 5, "efectos": { "DeudaTecnica": 5, "Documentacion": -4 } } ],
           "rubrica": {
             "veredicto": "aceptable",
@@ -461,7 +461,7 @@
         {
           "id": "almuerzo",
           "texto": "Óscar propone pedir almuerzo para todos. Una hora de equipo, sin agenda.",
-          "efectosInmediatos": { "MoralEquipo": 8, "Cansancio": -6 },
+          "efectosInmediatos": { "MoralEquipo": 8, "Cansancio": -6, "Dinero": -150 },
           "rubrica": {
             "veredicto": "correcta",
             "oa": "OA-SCRUM-01",

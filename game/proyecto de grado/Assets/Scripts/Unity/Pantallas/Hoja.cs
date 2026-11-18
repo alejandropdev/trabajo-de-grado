@@ -74,6 +74,27 @@ namespace Nexus.Unity.Pantallas {
 
     /// <summary>Lo que varias pantallas necesitan decir igual: veredictos, cambios de estado, etiquetas.</summary>
     public static class Textos {
+        /// <summary>El dinero del proyecto: sin decimales y con espacio entre los miles («18 000»), como en los documentos.</summary>
+        public static string Dinero(double valor) {
+            return Math.Round(valor).ToString("N0", System.Globalization.CultureInfo.InvariantCulture).Replace(',', ' ');
+        }
+
+        /// <summary>Un cambio de dinero con su signo: «+1 500», «-800».</summary>
+        public static string DineroConSigno(double delta) {
+            return (delta > 0 ? "+" : "") + Dinero(delta);
+        }
+
+        /// <summary>El umbral de dinero que hace fallar el nivel; null si ese nivel no tiene (el N0).</summary>
+        public static double? LimiteDeDinero(Nexus.Core.Modelo.LevelProfile perfil) {
+            return perfil != null && perfil.Umbrales != null && perfil.Umbrales.Fallo != null ? perfil.Umbrales.Fallo.Dinero : null;
+        }
+
+        /// <summary>Lo que dice la ficha del dinero, igual en la Fase 1, en el panel del dia y en las decisiones.</summary>
+        public static string ExplicarDinero(double inicial, double? limite) {
+            return "El dinero del proyecto: parte de " + Dinero(inicial) + ". Lo mueven tus decisiones y lo que traes del recorrido." +
+                   (limite.HasValue ? " Si llega a " + Dinero(limite.Value) + ", el nivel falla." : " En este nivel no hay umbral de fallo.");
+        }
+
         public static string Veredicto(string veredicto) {
             switch (veredicto) {
                 case "correcta": return "Correcta";

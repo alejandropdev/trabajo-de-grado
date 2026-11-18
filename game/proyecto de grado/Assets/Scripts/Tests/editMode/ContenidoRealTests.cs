@@ -233,6 +233,20 @@ namespace Nexus.Tests {
         }
 
         [Test]
+        public void Hay_decisiones_del_dia_que_mueven_el_dinero_y_ninguna_lo_deja_en_numeros_rojos() {
+            // El dinero se ve en el panel y en las decisiones (2026-11-17): tiene que haber decisiones que lo muevan, con
+            // costos y con ingresos, y el total de lo que podria perderse en una partida no puede quebrar el presupuesto.
+            var conDinero = Catalogo().Eventos.SelectMany(e => e.Opciones)
+                .Where(o => o.EfectosInmediatos.ContainsKey("Dinero")).ToList();
+            Assert.GreaterOrEqual(conDinero.Count, 3, "decisiones que mueven el dinero");
+            var cambios = conDinero.Select(o => Convert.ToDouble(o.EfectosInmediatos["Dinero"], System.Globalization.CultureInfo.InvariantCulture)).ToList();
+            Assert.IsTrue(cambios.Any(c => c < 0), "alguna decision cuesta");
+            Assert.IsTrue(cambios.Any(c => c > 0), "alguna decision ingresa");
+            var peorCaso = cambios.Where(c => c < 0).Sum();
+            Assert.Greater(Catalogo().Niveles["nivel-01"].PresupuestoInicial + peorCaso, 0, "ni pagando todo se acaba el presupuesto");
+        }
+
+        [Test]
         public void La_recoleccion_aplica_sus_efectos_una_sola_vez() {
             var s = SinCerrarLaFase1();
             var moral = s.W.MoralEquipo;

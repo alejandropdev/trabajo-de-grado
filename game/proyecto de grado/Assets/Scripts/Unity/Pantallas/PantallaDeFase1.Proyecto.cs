@@ -121,6 +121,8 @@ namespace Nexus.Unity.Pantallas {
                                             : "Las personas con las que cuentas.", Tooltip, ancho, alto);
             PiezasDeProyecto.Dato(Ui, datos, Perfil.AlcanceInicial.ToString("0"), "ALCANCE", Tema.success, "Alcance",
                                   "Puntos de trabajo prometidos al cliente. Si prometes más, hay más que entregar.", Tooltip, ancho, alto);
+            PiezasDeProyecto.Dato(Ui, datos, Textos.Dinero(Perfil.PresupuestoInicial), "PRESUPUESTO", Tema.success, "Presupuesto",
+                                  Textos.ExplicarDinero(Perfil.PresupuestoInicial, Textos.LimiteDeDinero(Perfil)), Tooltip, ancho, alto);
             PiezasDeProyecto.Dato(Ui, datos, PiezasDeProyecto.Titular(f.Sector.Nombre, 24), "SECTOR", Tema.violet, f.Sector.Nombre, f.Sector.ComoTrabaja, Tooltip, ancho * 2f, alto);
             var novedades = ExpedienteView.QueCambia(App, Perfil);
             if (novedades.Count > 0)
