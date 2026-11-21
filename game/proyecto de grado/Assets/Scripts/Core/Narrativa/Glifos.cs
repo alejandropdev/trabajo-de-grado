@@ -25,8 +25,12 @@ namespace Nexus.Core.Narrativa {
         public static string Cambio(char c) {
             switch (c) {
                 case '►': case '▸': case '▶': return "»";
+                case '◀': case '◂': return "«";                       // 2026-11-20: la flecha de «pagina anterior» salia como cuadrito
                 case '▾': case '▼': case '▲': case '↵': case '⏸': return "";
-                case '√': case '✓': return "";
+                case '√': case '✓': case '✔': return "";
+                case '✖': case '✕': case '✗': case '✘': return "×";
+                case '⚠': return "!";
+                case '▭': return "-";
                 case '＋': return "+";
                 case '✱': case '★': return "*";
                 case '○': return "o";

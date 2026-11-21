@@ -351,7 +351,7 @@ namespace Nexus.Unity.Tema {
             var alto = Clasico ? AltoBotonBase : Tema.altoBoton;
             var le = rt.gameObject.AddComponent<LayoutElement>();
             le.minHeight = le.preferredHeight = menu ? alto + 8 : fantasma ? alto * 0.8f : alto;
-            le.preferredWidth = Mathf.Max(fantasma ? 100 : 160, etiqueta.GetPreferredValues(texto).x + relleno * 2);
+            le.preferredWidth = Mathf.Max(fantasma ? 100 : 160, etiqueta.GetPreferredValues(Nexus.Core.Narrativa.Glifos.Seguro(texto)).x + relleno * 2);
 
             if (alPulsar != null) boton.onClick.AddListener(new UnityAction(alPulsar));
             return boton;
