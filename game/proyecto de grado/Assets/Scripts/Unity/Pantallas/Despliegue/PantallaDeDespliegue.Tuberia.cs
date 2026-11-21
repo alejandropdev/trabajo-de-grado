@@ -33,6 +33,7 @@ namespace Nexus.Unity.Pantallas {
         private bool _probando, _completa, _volando;
 
         private const float Hueco = 16f, AnchoDelNodo = 140f, AltoDelNodo = 170f, EscalaDeLaMano = 0.92f;
+        private const int CartasPorPagina = 6;
 
         private void LimpiarTuberia() {
             _tub = null; _est = null; _estBorde = null; _estDibujo = null; _estNombre = null; _estNumero = null; _estLuz = null;
@@ -71,6 +72,7 @@ namespace Nexus.Unity.Pantallas {
             _mano = AbanicoDeSoluciones.Crear(Ui, sitio, opciones);
             _mano.Escala = EscalaDeLaMano;
             _mano.PermiteArrastrar = true;
+            _mano.ActivarPaginas(CartasPorPagina);   // 6 a la vez: con 12 las de las puntas se salian del sitio
             _mano.AlPulsar = JugarPieza;
             _mano.AlSoltar = SoltarPieza;
             _mano.AlEnfocar = id => { if (!string.IsNullOrEmpty(id)) { var t = _def.Tramo(id); Decir(t.Nombre + ": " + t.QueHace); } };
@@ -527,10 +529,17 @@ namespace Nexus.Unity.Pantallas {
                 if (_completa) IrALosCuartos(); else Probar();
                 return;
             }
+            if (_mano != null) {
+                if (teclado.leftArrowKey.wasPressedThisFrame) { _mano.CambiarPagina(-1); return; }
+                if (teclado.rightArrowKey.wasPressedThisFrame) { _mano.CambiarPagina(1); return; }
+            }
             var digitos = new[] { teclado.digit1Key, teclado.digit2Key, teclado.digit3Key, teclado.digit4Key, teclado.digit5Key,
                                   teclado.digit6Key, teclado.digit7Key, teclado.digit8Key, teclado.digit9Key };
-            for (var i = 0; i < digitos.Length && i < _ordenDeLaMano.Count; i++)
-                if (digitos[i].wasPressedThisFrame) { JugarPieza(_ordenDeLaMano[i]); return; }
+            for (var i = 0; i < digitos.Length; i++) {
+                if (!digitos[i].wasPressedThisFrame) continue;
+                var id = _mano != null ? _mano.IdDeLaTecla(i) : null;   // la i-esima carta de la pagina que se ve
+                if (id != null) { JugarPieza(id); return; }
+            }
         }
 
         private void AbrirElTutorialDeLaTuberia() {
