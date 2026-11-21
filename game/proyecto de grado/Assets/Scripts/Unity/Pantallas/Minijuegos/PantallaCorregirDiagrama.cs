@@ -32,7 +32,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
     /// La logica vive en Core (PuntosDelDiagrama, CorregirState, CorregirEvaluador, RevisionDePunto); aqui solo se dibuja
     /// y se anima.
     /// </summary>
-    public sealed class PantallaCorregirDiagrama : PantallaDeMinijuego {
+    public sealed partial class PantallaCorregirDiagrama : PantallaDeMinijuego {
         private const int SegundosPorPista = 15;
         // Reparto del diagrama sobre el lienzo. Los margenes dejan libres los globos de arriba y el abanico de abajo
         // cuando el lienzo esta entero (zoom 1); al acercar, se puede mover para ver lo que tapan.
@@ -199,6 +199,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 if (animado) _resalte = resalte;
 
                 var textos = PintarDiagrama(lamina, w, h, alPinchar);
+                SepararAnclas(w, h);   // ningun #N pegado a otro (2026-11-20)
                 if (animado) {
                     var dibujo = lamina.Dibujo;
                     dibujo.Avance = 0;
@@ -236,6 +237,9 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         /// Devuelve los textos, para animar su entrada.
         /// </summary>
         private List<RectTransform> PintarDiagrama(Lamina l, float W, float H, Action<string> alPinchar) {
+            // El grafo de commits y la secuencia se dibujan aparte (PantallaCorregirDiagrama.Grafo.cs) pero se juegan igual.
+            if (Def.Lienzo == "grafo_commits") return PintarGrafoDeCommits(l, W, H, alPinchar);
+            if (Def.Lienzo == "secuencia") return PintarSecuencia(l, W, H, alPinchar);
             var creados = new List<RectTransform>();
             var els = Def.Artefacto.Elementos;
             if (els.Count == 0) return creados;
@@ -247,23 +251,31 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             var paso = filas > 1 ? (H - MargenSup - MargenInf - _bh) / (filas - 1) : 0f;
             var y0 = filas > 1 ? MargenSup : (H - _bh) / 2f;
             var pos = els.ToDictionary(e => e.Id, e => new Vector2(gx + e.Columna * (_bw + gx), y0 + e.Fila * paso));
-            var ocupados = els.Select(e => new Rect(pos[e.Id].x - 4, pos[e.Id].y - 4, _bw + 8, _bh + 8)).ToList();
+            // Cada cuadro, un rectangulo para el enrutador (2026-11-20): las flechas salen por un lado, van por los pasillos
+            // entre cajas y entran por otro, sin atravesar cajas y cruzandose lo menos posible.
+            var ocupados = els.Select(e => new[] { pos[e.Id].x - 4, pos[e.Id].y - 4, _bw + 8, _bh + 8 }).ToList();
+            var rutas = RutasDeDiagrama.Calcular(
+                els.Select(e => new CajaDeRuta { Id = e.Id, X = pos[e.Id].x, Y = pos[e.Id].y, Ancho = _bw, Alto = _bh }).ToList(),
+                Def.Artefacto.Conexiones.Select(c => new ConexionDeRuta { Id = c.Id, Desde = c.Desde ?? "", Hasta = c.Hasta ?? "" }).ToList());
             var piezasConPunto = new HashSet<string>(_puntos.Select(p => p.Pieza));
             var flecha = NexusTheme.Alfa(Tema.cyan, 0.6f);
 
             var etiquetas = new List<Action>();
             foreach (var c in Def.Artefacto.Conexiones) {
-                Vector2 pa, pb;
-                if (!pos.TryGetValue(c.Desde ?? "", out pa) || !pos.TryGetValue(c.Hasta ?? "", out pb)) continue;
-                var a = pa + new Vector2(_bw / 2, _bh / 2); var b = pb + new Vector2(_bw / 2, _bh / 2);
-                var p1 = Corte(a, b); var p2 = Corte(b, a);
-                l.Dibujo.Flecha(p1.x, p1.y, p2.x, p2.y, flecha, c.Tipo == "escribe" ? 4.5f : 3f, c.Tipo == "lee");
+                List<PuntoDeRuta> ruta;
+                if (!rutas.TryGetValue(c.Id, out ruta) || ruta.Count < 2) continue;
+                var puntos = ruta.Select(p => new Vector2(p.X, p.Y)).ToList();
+                var grosor = c.Tipo == "escribe" ? 4.5f : 3f;
+                l.Dibujo.Polilinea(puntos, flecha, grosor, c.Tipo == "lee");
+                l.Dibujo.Punta(puntos[puntos.Count - 2], puntos[puntos.Count - 1], flecha, grosor);
                 var conPunto = piezasConPunto.Contains(c.Id);
                 var ancho = l.AnchoDePastilla(c.Texto, 21);
                 var extra = conPunto ? 2 * MarcadorDePunto.Radio + 14 : 0;
-                var hueco = Hueco(p1, p2, ancho + extra, ocupados);
+                var otras = rutas.Where(kv => kv.Key != c.Id).Select(kv => (IList<PuntoDeRuta>)kv.Value);
+                var sitio = RutasDeDiagrama.PuestoDeEtiqueta(ruta, ancho + extra, 33f, ocupados, otras);
+                var hueco = new Vector2(sitio.X, sitio.Y);
                 var con = c;
-                _flechas[con.Id] = new[] { p1, p2 };
+                _flechas[con.Id] = puntos.ToArray();
                 etiquetas.Add(() => {
                     var centro = hueco.x - extra / 2;
                     creados.Add(l.Pastilla(centro, hueco.y, con.Texto, 21, NexusTheme.Alfa(Tema.bg950, 0.92f),
@@ -295,27 +307,6 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
                 if (alPinchar != null) l.Zona(p.x, p.y, _bw, _bh, () => alPinchar(id), "Caja " + id);
             }
             return creados;
-        }
-
-        private Vector2 Corte(Vector2 desde, Vector2 hacia) {
-            var d = hacia - desde;
-            var tx = Mathf.Abs(d.x) > 0.01f ? (_bw / 2 + 8) / Mathf.Abs(d.x) : 1e9f;
-            var ty = Mathf.Abs(d.y) > 0.01f ? (_bh / 2 + 8) / Mathf.Abs(d.y) : 1e9f;
-            return desde + d * Mathf.Min(tx, ty);
-        }
-
-        /// <summary>Donde poner la etiqueta de una flecha (y su marcador) sin pisar cajas ni otras etiquetas.</summary>
-        private static Vector2 Hueco(Vector2 a, Vector2 b, float ancho, List<Rect> ocupados) {
-            var normal = (b - a).sqrMagnitude > 0 ? new Vector2(-(b - a).y, (b - a).x).normalized : Vector2.up;
-            foreach (var lado in new[] { 0f, 30f, -30f, 56f, -56f, 80f, -80f })
-                foreach (var t in new[] { .5f, .38f, .62f, .28f, .72f, .2f, .8f }) {
-                    var p = Vector2.Lerp(a, b, t) + normal * lado;
-                    var r = new Rect(p.x - ancho / 2 - 8, p.y - 30, ancho + 16, 60);
-                    if (!ocupados.Any(o => o.Overlaps(r))) { ocupados.Add(r); return p; }
-                }
-            var m = (a + b) / 2;
-            ocupados.Add(new Rect(m.x - ancho / 2, m.y - 19, ancho, 38));
-            return m;
         }
 
         /// <summary>De coordenadas de la lamina (origen arriba a la izquierda, y hacia abajo) a las de la capa de globos.</summary>
@@ -472,6 +463,8 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
         }
 
         private string QueEs(string pieza) {
+            var commit = Def.Artefacto.Commits.FirstOrDefault(k => k.Id == pieza);
+            if (commit != null) return DescripcionDeCommit(commit);
             var el = Def.Artefacto.Elementos.FirstOrDefault(e => e.Id == pieza);
             if (el != null) return $"«{el.Texto}»: " + (string.IsNullOrEmpty(el.Detalle) ? "nadie ha escrito qué hace." : el.Detalle);
             var cx = Def.Artefacto.Conexiones.FirstOrDefault(c => c.Id == pieza);
@@ -737,12 +730,19 @@ namespace Nexus.Unity.Pantallas.Minijuegos {
             Rect caja;
             Vector2[] flecha;
             if (_cajas.TryGetValue(p.Pieza ?? "", out caja)) {
-                _resalte.Rect(caja.x - 12, caja.y - 12, caja.width + 24, caja.height + 24, NexusTheme.Alfa(Tema.cyan, 0.25f), 10,
-                              NexusTheme.Alfa(Tema.cyan, 0.08f), false, 16);
-                _resalte.Rect(caja.x - 6, caja.y - 6, caja.width + 12, caja.height + 12, Tema.cyan, 3, null, false, 12);
+                // Un tramo (varios commits seguidos): se enciende entero, no solo el primero.
+                var piezas = p.Zona != null && p.Zona.Commits.Count > 1 ? p.Zona.Commits : new List<string> { p.Pieza };
+                foreach (var pieza in piezas) {
+                    Rect c;
+                    if (!_cajas.TryGetValue(pieza ?? "", out c)) continue;
+                    _resalte.Rect(c.x - 12, c.y - 12, c.width + 24, c.height + 24, NexusTheme.Alfa(Tema.cyan, 0.25f), 10,
+                                  NexusTheme.Alfa(Tema.cyan, 0.08f), false, 16);
+                    _resalte.Rect(c.x - 6, c.y - 6, c.width + 12, c.height + 12, Tema.cyan, 3, null, false, 12);
+                }
             } else if (_flechas.TryGetValue(p.Pieza ?? "", out flecha)) {
-                _resalte.Linea(flecha[0].x, flecha[0].y, flecha[1].x, flecha[1].y, NexusTheme.Alfa(Tema.cyan, 0.25f), 16);
-                _resalte.Flecha(flecha[0].x, flecha[0].y, flecha[1].x, flecha[1].y, Tema.cyan, 5);
+                _resalte.Polilinea(flecha.ToList(), NexusTheme.Alfa(Tema.cyan, 0.25f), 16);
+                _resalte.Polilinea(flecha.ToList(), Tema.cyan, 5);
+                _resalte.Punta(flecha[flecha.Length - 2], flecha[flecha.Length - 1], Tema.cyan, 5);
             }
         }
 

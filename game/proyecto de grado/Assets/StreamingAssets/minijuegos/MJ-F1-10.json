@@ -48,7 +48,7 @@
         "texto": "Base de datos",
         "tipo": "baseDeDatos",
         "fila": 2,
-        "columna": 0,
+        "columna": 1,
         "detalle": "Guarda las reservas y la tabla de reglas de prioridad."
       },
       {
@@ -57,7 +57,7 @@
         "texto": "Controlador del ascensor",
         "tipo": "externo",
         "fila": 2,
-        "columna": 1,
+        "columna": 0,
         "detalle": "El aparato del fabricante. No se puede cambiar: solo recibe órdenes."
       }
     ],

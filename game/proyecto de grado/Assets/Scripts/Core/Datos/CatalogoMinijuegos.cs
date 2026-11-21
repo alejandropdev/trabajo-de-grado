@@ -104,7 +104,8 @@ namespace Nexus.Core.Datos
                 if (def.Zonas.Any(z => z.Commits.Intersect(s.Commits).Any()))
                     e.Add($"El senuelo '{s.Id}' se solapa con una zona real. Seria injusto.");
             }
-            if (def.Lienzo == "diagrama") ValidarCartas(def, e);
+            // El grafo y la secuencia, desde 2026-11-20, tambien se pueden jugar con cartas: si las traen, se validan igual.
+            if (def.Lienzo == "diagrama" || def.Cartas.Count > 0) ValidarCartas(def, e);
         }
 
         /// <summary>Maximo de cartas en la mano del diagrama: con mas, el abanico no cabe en 1920 de ancho.</summary>

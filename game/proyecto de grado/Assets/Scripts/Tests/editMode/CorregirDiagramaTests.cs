@@ -264,6 +264,61 @@ namespace Nexus.Tests {
                 }
         }
 
+        // La misma rejilla que PantallaCorregirDiagrama.PintarDiagrama (si cambia alli, cambia aqui).
+        private static List<CajaDeRuta> CajasDe(MinijuegoDef def, float W, float H) {
+            const float MargenX = 70, MargenSup = 210, MargenInf = 270, Hf = 70, Hc = 100, AnchoMax = 330, AltoMax = 118, AltoMin = 70;
+            var els = def.Artefacto.Elementos;
+            var cols = els.Max(e => e.Columna) + 1; var filas = els.Max(e => e.Fila) + 1;
+            var bw = Math.Max(150f, Math.Min(AnchoMax, (W - 2 * MargenX - (cols - 1) * Hc) / cols));
+            var bh = Math.Max(AltoMin, Math.Min(AltoMax, (H - MargenSup - MargenInf - (filas - 1) * Hf) / filas));
+            var gx = (W - cols * bw) / (cols + 1);
+            var paso = filas > 1 ? (H - MargenSup - MargenInf - bh) / (filas - 1) : 0f;
+            var y0 = filas > 1 ? MargenSup : (H - bh) / 2f;
+            return els.Select(e => new CajaDeRuta { Id = e.Id, X = gx + e.Columna * (bw + gx), Y = y0 + e.Fila * paso, Ancho = bw, Alto = bh }).ToList();
+        }
+
+        [Test]
+        public void Las_flechas_no_atraviesan_cajas_y_casi_no_se_cruzan() {
+            var demasiados = new List<string>();
+            foreach (var def in Diagramas())
+                foreach (var tam in new[] { new[] { 1500f, 900f }, new[] { 1200f, 760f } }) {
+                    var cajas = CajasDe(def, tam[0], tam[1]);
+                    var con = def.Artefacto.Conexiones.Select(c => new ConexionDeRuta { Id = c.Id, Desde = c.Desde, Hasta = c.Hasta }).ToList();
+                    var rutas = RutasDeDiagrama.Calcular(cajas, con);
+                    var etiqueta = def.Id + " " + tam[0];
+                    Assert.AreEqual(con.Count, rutas.Count, etiqueta);
+                    var cruces = 0;
+                    foreach (var c in con) {
+                        var ruta = rutas[c.Id];
+                        Assert.GreaterOrEqual(ruta.Count, 2, etiqueta + "/" + c.Id);
+                        Assert.AreEqual(0, RutasDeDiagrama.CajasAtravesadas(ruta, cajas.Where(b => b.Id != c.Desde && b.Id != c.Hasta)), etiqueta + "/" + c.Id + " atraviesa una caja");
+                        foreach (var otra in con.Where(o => string.CompareOrdinal(o.Id, c.Id) > 0)) cruces += RutasDeDiagrama.Cruces(ruta, rutas[otra.Id]);
+                    }
+                    // Los de 5 cajas se resuelven casi sin cruces; el de 9 cajas y 8 flechas (MJ-F1-07) admite alguno.
+                    if (cruces > (cajas.Count <= 5 ? 1 : 3)) demasiados.Add(etiqueta + " (" + cruces + ")");
+                }
+            CollectionAssert.IsEmpty(demasiados, "cruces entre flechas de mas");
+        }
+
+        [Test]
+        public void El_grafo_de_commits_y_la_secuencia_se_juegan_con_cartas_y_se_pueden_ganar() {
+            foreach (var id in new[] { "MJ-F2-02", "MJ-F2-07" }) {
+                var def = Cargar(id);
+                CollectionAssert.IsEmpty(CatalogoMinijuegos.Validar(def), id);
+                Assert.IsTrue(PuntosDelDiagrama.Aplica(def), id);
+                var ganadora = PuntosDelDiagrama.SolucionGanadora(def);
+                Assert.IsNotNull(ganadora, id);
+                var st = Tablero(def);
+                foreach (var kv in ganadora) Assert.AreEqual(Jugada.Puesta, Jugar(st, kv.Key, kv.Value), id + "/" + kv.Key);
+                Assert.AreEqual(ResultadosDeMinijuego.Todos, CorregirEvaluador.Evaluar(def, st).Resultado, id);
+                Assert.LessOrEqual(def.Senuelos.Count, 1, id + ": como mucho un punto que esta bien");
+                Assert.GreaterOrEqual(def.Presentacion.SegundosReloj, 150, id + ": tiempo de sobra");
+                // Cada punto tiene un nombre legible (el cierre y el modo guiado lo usan).
+                foreach (var p in PuntosDelDiagrama.De(def))
+                    Assert.IsFalse(PuntosDelDiagrama.NombreDePieza(def, p.Pieza).StartsWith("«" + p.Pieza), id + "/" + p.Pieza + " sin nombre");
+            }
+        }
+
         [Test]
         public void El_validador_rechaza_un_diagrama_imposible_o_sin_distractores() {
             var def = Cargar("MJ-F1-07");

@@ -48,7 +48,7 @@
         "texto": "Servidor de correo",
         "tipo": "externo",
         "fila": 2,
-        "columna": 2,
+        "columna": 0,
         "detalle": "El correo de Nexus."
       },
       {
@@ -57,7 +57,7 @@
         "texto": "Base de datos",
         "tipo": "baseDeDatos",
         "fila": 2,
-        "columna": 0,
+        "columna": 2,
         "detalle": "Reservas, accesos y averías."
       }
     ],
