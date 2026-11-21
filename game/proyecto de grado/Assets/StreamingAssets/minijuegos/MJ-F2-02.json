@@ -8,10 +8,10 @@
   "enElProyecto": "Es el historial de git del repositorio del sistema de los patios: ahí está guardado el trabajo de todo el equipo, módulo a módulo.",
   "presentacion": {
     "titulo": "La auditoría del grafo de commits",
-    "comoSeJuega": "Esto es el historial de git: cada punto es un commit (una versión guardada) y cada columna, una rama. Alguien reescribió la historia compartida. Pincha los commits afectados y di qué pasó: ¿se reescribió la historia? ¿cambió el autor de un trabajo? Cuidado: una rama abandonada o una fusión sin revisar no son lo mismo.",
+    "comoSeJuega": "Esto es el historial de git: cada punto es un commit (una versión guardada) y cada fila, una rama. Alguien rehízo parte de la historia compartida. Los círculos con número marcan lo que hay que revisar: elige uno y juégale la carta que lo arregla, o «Está bien así» si no hay nada que cambiar. Cada carta se usa una sola vez. Cuando todos tengan su carta, pulsa Verificar.",
     "quienEspera": "Javier",
     "textoPresion": "Javier necesita esto antes de las 10:00",
-    "segundosReloj": 90
+    "segundosReloj": 180
   },
   "artefacto": {
     "ramas": [
@@ -26,10 +26,6 @@
       {
         "id": "feature/reportes-v2",
         "color": "mostaza"
-      },
-      {
-        "id": "spike/cache",
-        "color": "gris"
       }
     ],
     "commits": [
@@ -146,17 +142,6 @@
         "huerfano": true
       },
       {
-        "id": "s01",
-        "rama": "spike/cache",
-        "fecha": "2026-04-17T13:10",
-        "autor": "OR",
-        "mensaje": "Prueba de cache en memoria (spike)",
-        "padres": [
-          "r01"
-        ],
-        "diff": "d_s01"
-      },
-      {
         "id": "mrg",
         "rama": "main",
         "fecha": "2026-04-18T09:02",
@@ -167,17 +152,6 @@
           "x06"
         ],
         "diff": "d_mrg"
-      },
-      {
-        "id": "m02",
-        "rama": "main",
-        "fecha": "2026-04-18T09:14",
-        "autor": "OR",
-        "mensaje": "Agrega reporte de uso",
-        "padres": [
-          "mrg"
-        ],
-        "diff": "d_m02"
       }
     ],
     "diffs": {
@@ -319,30 +293,12 @@
           }
         ]
       },
-      "d_s01": {
-        "titulo": "17 ABR 13:10  ·  OR",
-        "lineas": [
-          {
-            "tipo": "add",
-            "texto": "// spike: no mergear"
-          }
-        ]
-      },
       "d_mrg": {
         "titulo": "18 ABR 09:02  ·  DH",
         "lineas": [
           {
             "tipo": "add",
             "texto": "Merge branch 'feature/reportes-v2'"
-          }
-        ]
-      },
-      "d_m02": {
-        "titulo": "18 ABR 09:14  ·  OR",
-        "lineas": [
-          {
-            "tipo": "add",
-            "texto": "export function usageReport() { ... }"
           }
         ]
       }
@@ -360,7 +316,10 @@
       ],
       "defecto": "historia_reescrita",
       "explicacion": "Cuatro commits con fechas idénticas a los originales y padres distintos. La rama se reescribió y se volvió a publicar sobre una historia que ya era compartida: quien tenía la versión anterior perdió su base.",
-      "pista": "Compara las fechas de estos commits con los de la otra rama. ¿Son nuevos, o son copias reescritas de los de antes?"
+      "pista": "Compara las fechas de estos commits con los de la otra rama. ¿Son nuevos, o son copias reescritas de los de antes?",
+      "soluciones": [
+        "no-reescribir"
+      ]
     },
     {
       "id": "Z2",
@@ -370,7 +329,10 @@
       ],
       "defecto": "autoria_perdida",
       "explicacion": "El contenido de x04 es idéntico al de r04, firmado por JW. Tras la reescritura, ese trabajo aparece firmado por DH: la autoría se perdió.",
-      "pista": "Mira quién firma este commit y compáralo con el original del que es copia. ¿Es la misma persona?"
+      "pista": "Mira quién firma este commit y compáralo con el original del que es copia. ¿Es la misma persona?",
+      "soluciones": [
+        "conservar-autoria"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -381,13 +343,6 @@
         "mrg"
       ],
       "razonNoEsDefecto": "Es una fusión sin revisar. Es mala práctica, pero no reescribe la historia ni cambia la autoría de nadie."
-    },
-    {
-      "id": "S2",
-      "commits": [
-        "s01"
-      ],
-      "razonNoEsDefecto": "spike/cache es una rama de exploración abandonada a propósito. Una rama sin fusionar no es una rama huérfana."
     }
   ],
   "paletaEtiquetas": [
@@ -493,5 +448,39 @@
   },
   "cierre": {
     "texto": "El registro dice que este trabajo lo hizo otra persona. En una rama compartida, la historia no se reescribe: se añade."
-  }
+  },
+  "cartas": [
+    {
+      "id": "no-reescribir",
+      "nombre": "No reescribir la historia compartida",
+      "descripcion": "En una rama que otros ya usan solo se añaden commits: los que ya existen no se rehacen.",
+      "icono": "candado",
+      "tipo": "practica",
+      "porQueNo": "aquí nadie rehízo commits que ya estaban publicados."
+    },
+    {
+      "id": "conservar-autoria",
+      "nombre": "Conservar al autor",
+      "descripcion": "Si se copia o se rehace un trabajo, la firma de quien lo escribió se queda con él.",
+      "icono": "bitacora",
+      "tipo": "practica",
+      "porQueNo": "la firma de este commit no se ha cambiado: sigue siendo de quien lo escribió."
+    },
+    {
+      "id": "revision-pr",
+      "nombre": "Pedir revisión antes de fusionar",
+      "descripcion": "Otra persona mira los cambios antes de que entren en main.",
+      "icono": "ojo",
+      "tipo": "practica",
+      "porQueNo": "revisar antes de fusionar es buena idea, pero no arregla lo que se hizo con el historial."
+    },
+    {
+      "id": "borrar-rama",
+      "nombre": "Borrar la rama vieja",
+      "descripcion": "Quitar una rama que ya no se usa para que no estorbe.",
+      "icono": "bifurcacion",
+      "tipo": "practica",
+      "porQueNo": "borrar una rama no devuelve lo que ya se rehízo ni la firma que se perdió."
+    }
+  ]
 }

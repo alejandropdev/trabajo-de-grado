@@ -30,7 +30,9 @@ namespace Nexus.Core.Minijuegos.Corregir
         /// <summary>El reto se juega con cartas (lienzo diagrama con cartas): si no, es el Detectar de siempre.</summary>
         public static bool Aplica(MinijuegoDef def)
         {
-            return def != null && def.Lienzo == "diagrama" && def.Cartas != null && def.Cartas.Count > 0;
+            // 2026-11-20: el grafo de commits y el diagrama de secuencia se juegan igual que los diagramas.
+            return def != null && (def.Lienzo == "diagrama" || def.Lienzo == "grafo_commits" || def.Lienzo == "secuencia")
+                   && def.Cartas != null && def.Cartas.Count > 0;
         }
 
         public static List<PuntoDelDiagrama> De(MinijuegoDef def)
@@ -76,6 +78,8 @@ namespace Nexus.Core.Minijuegos.Corregir
             if (e != null) return "«" + e.Texto + "»";
             var c = def.Artefacto.Conexiones.FirstOrDefault(x => x.Id == pieza);
             if (c != null) return "la flecha «" + c.Texto + "»";
+            var k = def.Artefacto.Commits.FirstOrDefault(x => x.Id == pieza);
+            if (k != null) return "el commit " + k.Id + " («" + k.Mensaje + "»)";
             return "«" + pieza + "»";
         }
 

@@ -102,7 +102,7 @@ namespace Nexus.Unity.Pantallas {
                 franja.anchorMin = new Vector2(0, 0);
                 franja.anchorMax = new Vector2(1, 0);
                 franja.pivot = new Vector2(0.5f, 0);
-                franja.sizeDelta = new Vector2(-40, 150);
+                franja.sizeDelta = new Vector2(-40, 196);
                 franja.anchoredPosition = new Vector2(0, 4);
                 var fondo = franja.gameObject.AddComponent<Image>();
                 Ui.Fondo(fondo, Tema.surfaceRaised, NexusTheme.RadioLg);

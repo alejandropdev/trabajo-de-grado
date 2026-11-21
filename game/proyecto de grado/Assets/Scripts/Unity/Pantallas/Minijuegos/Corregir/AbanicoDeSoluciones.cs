@@ -89,10 +89,102 @@ namespace Nexus.Unity.Pantallas.Minijuegos.Corregir {
             if (_encima >= 0 && _encima < _cartas.Count) _cartas[_encima].transform.SetAsLastSibling();
         }
 
+        // ====================================================================== paginas (la tuberia trae 12 cartas)
+
+        /// <summary>Cuantas cartas se ven a la vez (0 = todas juntas, en un solo abanico).</summary>
+        public int CartasPorPagina { get; private set; }
+        public int Pagina { get; private set; }
+        public int Paginas { get; private set; } = 1;
+        private List<CartaDeSolucionView> _deLaPagina = new List<CartaDeSolucionView>();
+        private RectTransform _controles;
+        private Button _atras, _adelante;
+        private TMP_Text _rotuloPagina;
+
+        /// <summary>
+        /// Reparte la mano en paginas de 'porPagina' cartas: se ven rectas y enteras, y unas flechas (o ← →) pasan de pagina.
+        /// Las teclas 1-N valen para la pagina que se ve (IdDeLaTecla).
+        /// </summary>
+        public void ActivarPaginas(int porPagina) {
+            CartasPorPagina = Mathf.Max(0, porPagina);
+            if (CartasPorPagina > 0 && _controles == null) CrearControlesDePagina();
+        }
+
+        public void CambiarPagina(int delta) {
+            if (CartasPorPagina <= 0) return;
+            var nueva = Mathf.Clamp(Pagina + delta, 0, Paginas - 1);
+            if (nueva == Pagina) return;
+            Pagina = nueva;
+            _encima = -1;
+            AlEnfocar?.Invoke(null);
+        }
+
+        /// <summary>La carta de esa tecla (0 = la primera de la pagina que se ve), o null.</summary>
+        public string IdDeLaTecla(int k) {
+            if (CartasPorPagina <= 0) return k >= 0 && k < _cartas.Count ? _cartas[k].Opcion.Id : null;
+            return k >= 0 && k < _deLaPagina.Count ? _deLaPagina[k].Opcion.Id : null;
+        }
+
+        private void CrearControlesDePagina() {
+            _controles = _ui.Nodo(_rt, "Paginas");
+            _controles.anchorMin = _controles.anchorMax = new Vector2(0.5f, 0f);
+            _controles.pivot = new Vector2(0.5f, 0f);
+            _controles.anchoredPosition = new Vector2(0, 8);
+            _controles.sizeDelta = new Vector2(270, 46);
+            var fondo = _controles.gameObject.AddComponent<Image>();
+            _ui.Fondo(fondo, NexusTheme.Alfa(_tema.bg950, 0.94f), 23);
+            _ui.Borde(_controles, NexusTheme.Alfa(_tema.cyan, 0.7f), 23, 1.5f);
+
+            _atras = FlechaDePagina("Anterior", "◀", -1, 0f);
+            _adelante = FlechaDePagina("Siguiente", "▶", 1, 1f);
+            _rotuloPagina = _ui.Texto(_controles, "", EstiloTexto.Leyenda, _tema.ink, TextAlignmentOptions.Center);
+            var alto = _rotuloPagina.GetComponent<AltoDeTexto>();
+            if (alto != null) Destroy(alto);
+            _rotuloPagina.fontSize = 18;
+            _rotuloPagina.raycastTarget = false;
+            var r = _rotuloPagina.rectTransform;
+            r.anchorMin = new Vector2(0, 0); r.anchorMax = new Vector2(1, 1);
+            r.offsetMin = new Vector2(62, 0); r.offsetMax = new Vector2(-62, 0);
+        }
+
+        private Button FlechaDePagina(string nombre, string simbolo, int delta, float lado) {
+            var b = _ui.Boton(_controles, simbolo, () => CambiarPagina(delta), VarianteBoton.Secundario);
+            var rt = (RectTransform)b.transform;
+            rt.name = nombre;
+            rt.anchorMin = rt.anchorMax = new Vector2(lado, 0.5f);
+            rt.pivot = new Vector2(lado, 0.5f);
+            rt.anchoredPosition = new Vector2(lado < 0.5f ? 4 : -4, 0);
+            rt.sizeDelta = new Vector2(54, 38);
+            return b;
+        }
+
         private void Update() {
             var dt = Time.unscaledDeltaTime;
             _t += dt;
-            var visibles = _cartas.FindAll(c => !c.Quemada && !c.Volando && !c.Oculta);
+            List<CartaDeSolucionView> visibles;
+            if (CartasPorPagina > 0) {
+                var enMano = _cartas.FindAll(c => !c.Quemada && !c.Oculta);
+                Paginas = Mathf.Max(1, Mathf.CeilToInt(enMano.Count / (float)CartasPorPagina));
+                Pagina = Mathf.Clamp(Pagina, 0, Paginas - 1);
+                var desde = Pagina * CartasPorPagina;
+                _deLaPagina = enMano.GetRange(Mathf.Min(desde, enMano.Count), Mathf.Max(0, Mathf.Min(CartasPorPagina, enMano.Count - desde)));
+                foreach (var c in enMano) {
+                    if (c.Volando) continue;
+                    var ver = _deLaPagina.Contains(c);
+                    if (c.gameObject.activeSelf == ver) continue;
+                    c.gameObject.SetActive(ver);
+                    if (ver) c.Colocar(new Vector2(c.Posicion.x, -420), 0, 1, true);   // la pagina nueva sube desde abajo
+                }
+                for (var k = 0; k < _deLaPagina.Count; k++) _deLaPagina[k].PonerTecla((k + 1).ToString());
+                visibles = _deLaPagina.FindAll(c => !c.Volando);
+                if (_controles != null) {
+                    _controles.gameObject.SetActive(Paginas > 1);
+                    _rotuloPagina.text = (Pagina + 1) + " / " + Paginas;
+                    _atras.interactable = Pagina > 0;
+                    _adelante.interactable = Pagina < Paginas - 1;
+                }
+            } else {
+                visibles = _cartas.FindAll(c => !c.Quemada && !c.Volando && !c.Oculta);
+            }
             var normales = visibles.FindAll(c => !c.Opcion.EsEstaBien);
             var estaBien = visibles.Find(c => c.Opcion.EsEstaBien);
             // El ancho que cabe: si no, el solape crece.
@@ -217,7 +309,10 @@ namespace Nexus.Unity.Pantallas.Minijuegos.Corregir {
         private RectTransform _rt, _chapa;
         private CanvasGroup _grupo;
         private Image _fondo, _halo, _borde;
-        private TMP_Text _titulo, _textoChapa;
+        private TMP_Text _titulo, _textoChapa, _rotuloTecla;
+
+        /// <summary>El numero de la tecla de esta carta (cambia con la pagina de la mano).</summary>
+        public void PonerTecla(string t) { if (_rotuloTecla != null && _rotuloTecla.text != t) _rotuloTecla.text = t; }
         private Vector2 _pos;
         private float _ang, _escala = 1, _sacudida, _brillo, _salto;
 
@@ -252,6 +347,7 @@ namespace Nexus.Unity.Pantallas.Minijuegos.Corregir {
             fondoTecla.raycastTarget = false;
             ui.Borde(tecla, NexusTheme.Alfa(acento, 0.7f), 6, 1);
             var rotulo = Texto(ui, tecla, o.EsEstaBien ? "0" : (indice + 1).ToString(), 17, acento, TextAlignmentOptions.Center);
+            c._rotuloTecla = rotulo;
             UiKit.Rellenar(rotulo.rectTransform);
             if (!string.IsNullOrEmpty(o.Tipo) || o.EsEstaBien) {
                 var tipo = Texto(ui, rt, o.EsEstaBien ? "UNA VEZ" : o.Tipo == "patron" ? "PATRÓN" : "PRÁCTICA", 13,

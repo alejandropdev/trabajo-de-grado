@@ -87,12 +87,14 @@ namespace Nexus.Tests
                 (new[] { "mrg" }, "fusion_sin_revisar"));
             Assert.AreEqual(DetectarEvaluador.PARCIAL, DetectarEvaluador.Evaluar(def, conUno).Resultado);
 
-            // Acusar a los dos señuelos pasa de la tolerancia: manda sobre haber acertado todo.
+            // Acusar a dos señuelos pasa de la tolerancia: manda sobre haber acertado todo. (Con cartas el reto trae un
+            // solo señuelo, 2026-11-20; el segundo se añade aqui para probar el evaluador.)
+            def.Senuelos.Add(new Senuelo { Id = "S9", Commits = new List<string> { "r03" }, RazonNoEsDefecto = "x" });
             var conDos = ConMarcas(def,
                 (new[] { "x03", "x04", "x05", "x06" }, "historia_reescrita"),
                 (new[] { "x04" }, "autoria_perdida"),
                 (new[] { "mrg" }, "fusion_sin_revisar"),
-                (new[] { "s01" }, "rama_huerfana"));
+                (new[] { "r03" }, "rama_huerfana"));
             Assert.AreEqual(DetectarEvaluador.FALSO_POSITIVO, DetectarEvaluador.Evaluar(def, conDos).Resultado);
 
             // Sin tolerancia (lo de antes), con uno basta.

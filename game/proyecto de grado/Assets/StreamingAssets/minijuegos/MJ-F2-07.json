@@ -8,10 +8,10 @@
   "enElProyecto": "Es lo que pasa cuando un carro llega a la garita: la cámara lee la matrícula, el control de acceso consulta el permiso y abre (o no) la barrera.",
   "presentacion": {
     "titulo": "El diagrama de secuencia contra la realidad",
-    "comoSeJuega": "Un diagrama de secuencia dice en qué orden se hablan las piezas. A la izquierda, lo que se diseñó; a la derecha, lo que pasó de verdad esta mañana en la garita (el log). Pincha las filas del log que no coinciden con el diseño y di qué tipo de diferencia es: otro orden, algo repetido o algo que el diseño no tenía.",
+    "comoSeJuega": "Un diagrama de secuencia dice en qué orden se hablan las piezas. A la izquierda, lo que se diseñó; a la derecha, lo que pasó de verdad esta mañana en la garita (el log). Los círculos con número marcan las filas del log que hay que revisar: elige una y juégale la carta que arregla la diferencia, o «Está bien así». Cada carta se usa una sola vez. Cuando todas tengan su carta, pulsa Verificar.",
     "quienEspera": "Javier",
     "textoPresion": "Javier sacó esta traza del log de producción de las 07:58",
-    "segundosReloj": 120
+    "segundosReloj": 180
   },
   "artefacto": {
     "elementos": [
@@ -145,7 +145,10 @@
       ],
       "defecto": "orden_incorrecto",
       "explicacion": "La barrera se abre antes de que llegue la respuesta del permiso. Con un DENEGADO, el carro ya ha entrado. El diagrama lo tenía bien; el código no lo siguió.",
-      "pista": "En el diseño, ¿qué pasa primero: llega la respuesta del permiso o se abre la barrera? ¿Y en lo que pasó de verdad?"
+      "pista": "En el diseño, ¿qué pasa primero: llega la respuesta del permiso o se abre la barrera? ¿Y en lo que pasó de verdad?",
+      "soluciones": [
+        "esperar-respuesta"
+      ]
     },
     {
       "id": "Z2",
@@ -155,7 +158,10 @@
       ],
       "defecto": "mensaje_duplicado",
       "explicacion": "El acceso se guarda dos veces. Es el origen de las «lecturas duplicadas» que la garita lleva días reportando.",
-      "pista": "Busca dos filas iguales en el log, una detrás de otra. ¿Debería guardarse el acceso dos veces?"
+      "pista": "Busca dos filas iguales en el log, una detrás de otra. ¿Debería guardarse el acceso dos veces?",
+      "soluciones": [
+        "guardar-una-vez"
+      ]
     },
     {
       "id": "Z3",
@@ -165,7 +171,10 @@
       ],
       "defecto": "mensaje_no_documentado",
       "explicacion": "La garita reintenta cuando la red falla, y el diagrama no lo contempla. Si nadie diseñó el reintento, nadie diseñó que un reintento no duplique el acceso.",
-      "pista": "Hay una fila en lo que pasó de verdad que no aparece en el diseño. ¿Cuál es?"
+      "pista": "Hay una fila en lo que pasó de verdad que no aparece en el diseño. ¿Cuál es?",
+      "soluciones": [
+        "documentar-reintento"
+      ]
     }
   ],
   "toleranciaDeSenuelos": 1,
@@ -176,13 +185,6 @@
         "t2"
       ],
       "razonNoEsDefecto": "Dos mensajes en el mismo segundo no son un error: el sistema es rápido, y buscar el permiso justo al recibir la matrícula es lo que dice el diagrama."
-    },
-    {
-      "id": "S2",
-      "commits": [
-        "m3"
-      ],
-      "razonNoEsDefecto": "Que la base de datos responda al módulo es exactamente lo que un diagrama de secuencia tiene que mostrar: la respuesta también es un mensaje."
     }
   ],
   "paletaEtiquetas": [
@@ -287,5 +289,47 @@
   },
   "cierre": {
     "texto": "Un diagrama que nadie compara con la realidad se convierte en ficción."
-  }
+  },
+  "cartas": [
+    {
+      "id": "esperar-respuesta",
+      "nombre": "Esperar la respuesta antes de actuar",
+      "descripcion": "Una pieza no actúa hasta que le llega la respuesta que necesita.",
+      "icono": "acuerdo",
+      "tipo": "practica",
+      "porQueNo": "aquí no falta esperar ninguna respuesta: el orden es el del diseño."
+    },
+    {
+      "id": "guardar-una-vez",
+      "nombre": "Guardar una sola vez",
+      "descripcion": "Repetir una petición no puede dejar dos registros: cada acceso se guarda una vez.",
+      "icono": "uno",
+      "tipo": "patron",
+      "porQueNo": "este mensaje no se está guardando dos veces."
+    },
+    {
+      "id": "documentar-reintento",
+      "nombre": "Dibujar el reintento en el diagrama",
+      "descripcion": "Si el sistema reintenta cuando falla, el diagrama también lo cuenta.",
+      "icono": "plano",
+      "tipo": "practica",
+      "porQueNo": "este mensaje ya está en el diseño: no falta dibujar nada."
+    },
+    {
+      "id": "mas-servidores",
+      "nombre": "Poner más servidores",
+      "descripcion": "Repartir el trabajo entre más máquinas para que aguante más carga.",
+      "icono": "servidores",
+      "tipo": "patron",
+      "porQueNo": "el problema no es la carga, sino lo que dice el diseño frente a lo que pasó."
+    },
+    {
+      "id": "cache",
+      "nombre": "Caché",
+      "descripcion": "Guardar una copia de los datos para responder más rápido.",
+      "icono": "rayo",
+      "tipo": "patron",
+      "porQueNo": "va más rápido, pero la diferencia con el diseño sigue ahí."
+    }
+  ]
 }
