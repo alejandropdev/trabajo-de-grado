@@ -19,6 +19,9 @@ namespace Nexus.Core {
         public List<string> recetasVistas = new List<string>();
         // Los pasos de la guia del tutorial que este perfil ya vio: la guia no se repite en otra partida.
         public List<string> guiaVista = new List<string>();
+        // Los mini-videos del tutorial (p. ej. del recorrido 3D) que este perfil ya vio: no se repiten solos.
+        // Un perfil de antes no trae el campo: queda en una lista vacia al abrirlo.
+        public List<string> videosVistos = new List<string>();
         // Los minijuegos que este perfil ya terminó alguna vez.
         public List<string> minijuegosJugados = new List<string>();
         // Las mecánicas (verbos) que Marisol ya le guió de principio a fin: la primera vez de cada una se juega

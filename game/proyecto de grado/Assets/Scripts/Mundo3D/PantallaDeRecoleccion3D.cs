@@ -55,6 +55,7 @@ namespace Nexus.Mundo3D {
         private RectTransform _cartel;
         private TMP_Text _estado, _fps;
         private MenuDePausa3D _menu;
+        private MiniVideoTutorial3D _tutorial;
         private MapaDelRecorrido _mapa;
         private GameTimerUI _reloj;
         /// <summary>Con este tiempo o menos en el reloj, la musica del recorrido sube (MusicaDeFondo.Apremio).</summary>
@@ -129,6 +130,12 @@ namespace Nexus.Mundo3D {
             _menu.AlGuardarOpciones = () => App.CambiarPreferencias(App.Preferencias);
             _menu.AlCambiarVolumen = AplicarVolumen;
             _menu.Estado = EstadoDelRecorrido;
+            _menu.Diario = () => App.PerfilActivo != null ? App.PerfilActivo.coleccionablesGlobales : null;
+            _menu.AlVerTutorial = VerTutorialDesdeLaPausa;
+
+            // Los mini-videos del tutorial: abajo a la derecha, sin sonido, el mundo sigue vivo.
+            _tutorial = MiniVideoTutorial3D.Crear(Ui, Raiz);
+            _tutorial.AlTerminarUno = id => { if (id != null) App.AnotarVideoVisto(id); };
         }
 
         private void Start() {
@@ -195,6 +202,35 @@ namespace Nexus.Mundo3D {
             var minutos = _reloj != null ? Mathf.RoundToInt(_reloj.TotalTime / 60f) : 0;
             _estado.text = "Recoge <b>hojas de vida</b> (tu equipo) y <b>suministros</b>" +
                            (minutos > 0 ? $" antes de que acaben los <b>{minutos} minutos</b>." : ".");
+            StartCoroutine(IniciarElTutorial());
+        }
+
+        // ==================================================================== los mini-videos del tutorial
+
+        /// <summary>
+        /// Al entrar, los videos que este perfil aun no ha visto, en orden. Si ya los vio todos, no sale nada (se pueden
+        /// repetir desde Pausa → Tutoriales). Se espera un momento: que el mundo se asiente y se vea el cartel de teclas.
+        /// </summary>
+        private IEnumerator IniciarElTutorial() {
+            yield return new WaitForSecondsRealtime(1.5f);
+            if (_terminando || _tutorial == null) yield break;
+            // Si falta alguno por ver, pasan los cuatro de corrido (son ~1:17 en total): el tutorial se ve entero o no sale.
+            var faltaAlguno = false;
+            var todos = new List<int>();
+            for (var i = 0; i < MiniVideoTutorial3D.Ids.Length; i++) {
+                todos.Add(i);
+                if (!App.YaVioElVideo(MiniVideoTutorial3D.Ids[i])) faltaAlguno = true;
+            }
+            if (faltaAlguno) _tutorial.Reproducir(todos);
+        }
+
+        /// <summary>Desde la pausa: se cierra y suena el video pedido (-1 = los cuatro) en su rincon, con el mundo ya andando.</summary>
+        private void VerTutorialDesdeLaPausa(int indice) {
+            CerrarPausa();
+            var cola = new List<int>();
+            if (indice < 0) for (var i = 0; i < MiniVideoTutorial3D.Ids.Length; i++) cola.Add(i);
+            else cola.Add(indice);
+            _tutorial.Reproducir(cola);
         }
 
         /// <summary>Busca en el mundo recien cargado lo que hay que escuchar: el reloj, el inventario y el jugador.</summary>
@@ -292,6 +328,8 @@ namespace Nexus.Mundo3D {
             _medidor.Anotar(Time.unscaledDeltaTime);
             if (teclado.f3Key.wasPressedThisFrame) _fps.gameObject.SetActive(!_fps.gameObject.activeSelf);
             if (_fps.gameObject.activeSelf) _fps.text = $"{_medidor.FpsAhora:0} FPS · {_medidor.MsAhora:0.0} ms";
+            // El rincon de abajo a la derecha es del mini-video mientras se ve: los FPS se suben encima.
+            _fps.rectTransform.anchoredPosition = new Vector2(-Tema.margen, Tema.margen + (_tutorial != null && _tutorial.Visible ? _tutorial.AltoAproximado + Tema.margen : 0));
             AnimarLaGuia();
             if (!_escenaCargada) return;
             // El ultimo minuto del recorrido, la musica sube; con el reloj parado (pausa, inventario), no.
