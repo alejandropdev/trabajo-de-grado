@@ -63,10 +63,16 @@ namespace Nexus.Unity.Pantallas {
 
             // ---- el boton para salir
             var acciones = Ui.Fila(hoja.Raiz, "Empezar", Tema.Espacio(4), 0, TextAnchor.MiddleCenter);
+            // Centrados bajo el MAPA, no bajo toda la pantalla: a la derecha hay una columna (la leyenda) que no cuenta.
+            acciones.GetComponent<HorizontalLayoutGroup>().padding.right = Mathf.RoundToInt(Tema.Px(360) + Tema.Espacio(6));
             GuiaView.Registrar("fase1.simular", acciones);
             if (modulo != null) {
                 var b = Ui.Boton(acciones, "▶  Empezar recorrido", () => EmpezarRecoleccion(modulo), VarianteBoton.Primario);
                 UiKit.Tamano(b, ancho: Tema.Px(320));
+                // Todo lo que se puede recoger, con para que sirve (nunca donde está): se mira antes de entrar.
+                var objetos = Ui.Boton(acciones, "Ver objetos", () => PanelDeObjetos3D.Abrir(
+                    Ui, Raiz, App.PerfilActivo != null ? App.PerfilActivo.coleccionablesGlobales : null), VarianteBoton.Secundario);
+                UiKit.Tamano(objetos, ancho: Tema.Px(200));
             } else {
                 Ui.Texto(acciones, "¿Cuánto lo recorres?", EstiloTexto.Pequeno, Tema.inkMuted);
                 Ui.Boton(acciones, "Rápido", () => Simular(IntensidadesDeSimulacion.Rapida));

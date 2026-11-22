@@ -403,6 +403,19 @@ namespace Nexus.Unity.Aplicacion {
             GuardarPerfil();
         }
 
+        /// <summary>Si este perfil ya vio ese mini-video del tutorial (solo se pasan solos la primera vez).</summary>
+        public bool YaVioElVideo(string id) {
+            return PerfilActivo != null && PerfilActivo.videosVistos != null && PerfilActivo.videosVistos.Contains(id);
+        }
+
+        public void AnotarVideoVisto(string id) {
+            if (PerfilActivo == null || string.IsNullOrEmpty(id)) return;
+            if (PerfilActivo.videosVistos == null) PerfilActivo.videosVistos = new List<string>();
+            if (PerfilActivo.videosVistos.Contains(id)) return;
+            PerfilActivo.videosVistos.Add(id);
+            GuardarPerfil();
+        }
+
         /// <summary>La lista del perfil; un perfil de antes (null) la deduce de las escenas que ya jugo.</summary>
         private List<string> MecanicasGuiadas() {
             if (PerfilActivo == null) return null;

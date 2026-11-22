@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Nexus.Unity.Pantallas;
 using Nexus.Unity.Tema;
 using TMPro;
 using UnityEngine;
@@ -24,9 +26,13 @@ namespace Nexus.Mundo3D {
         public const string ClaveSensibilidad = "nexus.3d.sensibilidad";
         public const float SensibilidadMinima = 0.3f, SensibilidadMaxima = 2f;
 
-        private enum Vista { Principal, Controles, Opciones, Confirmar }
+        private enum Vista { Principal, Controles, Opciones, Confirmar, Objetos, Tutoriales }
 
         public Action AlContinuar, AlInventario, AlTerminar;
+        /// <summary>Ver de nuevo un mini-video del tutorial (indice de MiniVideoTutorial3D.Ids; -1 = todos). La pantalla cierra la pausa.</summary>
+        public Action<int> AlVerTutorial;
+        /// <summary>Los ids del Diario del jugador, para contar lo que ya encontro en la lista de objetos.</summary>
+        public Func<IEnumerable<string>> Diario;
         /// <summary>La sensibilidad del raton cambio (1 = la de serie). Es la misma de Opciones del juego.</summary>
         public Action<float> AlCambiarSensibilidad;
         /// <summary>La sensibilidad de ahora (de Opciones), para pintar el deslizador.</summary>
@@ -113,7 +119,11 @@ namespace Nexus.Mundo3D {
             UiKit.Vaciar(_ventana);
             _estado = null;
             Button primero;
+            // La lista de objetos es una cuadricula de tres columnas: la ventana se ensancha solo para ella.
+            _ventana.sizeDelta = new Vector2(_vista == Vista.Objetos ? 940 : 640, 0);
             switch (_vista) {
+                case Vista.Objetos: primero = PintarObjetos(); break;
+                case Vista.Tutoriales: primero = PintarTutoriales(); break;
                 case Vista.Controles: primero = PintarControles(); break;
                 case Vista.Opciones: primero = PintarOpciones(); break;
                 case Vista.Confirmar: primero = PintarConfirmar(); break;
@@ -133,6 +143,8 @@ namespace Nexus.Mundo3D {
             var continuar = Boton(col, "Continuar", () => AlContinuar?.Invoke(), VarianteBoton.Primario);
             Boton(col, "Inventario", () => AlInventario?.Invoke(), VarianteBoton.Secundario);
             Boton(col, "Controles", () => IrA(Vista.Controles), VarianteBoton.Secundario);
+            Boton(col, "Objetos", () => IrA(Vista.Objetos), VarianteBoton.Secundario);
+            Boton(col, "Tutoriales", () => IrA(Vista.Tutoriales), VarianteBoton.Secundario);
             Boton(col, "Opciones", () => IrA(Vista.Opciones), VarianteBoton.Secundario);
             _ui.Espaciador(col, _tema.Espacio(2));
             Boton(col, "Terminar el recorrido", () => IrA(Vista.Confirmar), VarianteBoton.Peligro);
@@ -151,6 +163,7 @@ namespace Nexus.Mundo3D {
             Tecla(lista, "E", "Abrir o cerrar el inventario (el reloj se para)");
             Tecla(lista, "M", "Ver el mapa y dónde estás (el reloj sigue)");
             Tecla(lista, "Tab", "Soltar o capturar el ratón");
+            Tecla(lista, "Enter", "Saltar el mini-video del tutorial");
             Tecla(lista, "Esc", "Pausa");
             Tecla(lista, "F3", "Ver el rendimiento (FPS)");
             _ui.Texto(_ventana, "Acércate a un objeto para recogerlo. Las hojas de vida forman tu equipo; la pizza, el café y la " +
@@ -166,6 +179,26 @@ namespace Nexus.Mundo3D {
             Luz(luces, "#F87171", "Coral que pulsa rápido: una evidencia (el fragmento de USB)");
             Luz(luces, "#E3C24F", "Dorado con halo lento: un certificado");
             return Boton(_ventana, "Volver", () => IrA(Vista.Principal), VarianteBoton.Fantasma);
+        }
+
+        private Button PintarObjetos() {
+            _ui.Texto(_ventana, "Lo que puedes recoger", EstiloTexto.Subtitulo, _tema.ink);
+            PanelDeObjetos3D.Pintar(_ui, _ventana, Diario != null ? Diario() : null);
+            return Boton(_ventana, "Volver", () => IrA(Vista.Principal), VarianteBoton.Fantasma);
+        }
+
+        /// <summary>Los mini-videos del tutorial: cada uno se puede ver de nuevo. Al elegir uno, la pausa se cierra y suena en su rincon.</summary>
+        private Button PintarTutoriales() {
+            _ui.Texto(_ventana, "Tutoriales", EstiloTexto.Subtitulo, _tema.ink);
+            _ui.Texto(_ventana, "Mini-videos sin sonido, en la esquina de abajo a la derecha. Enter salta el que esté pasando.",
+                      EstiloTexto.Pequeno, _tema.inkMuted);
+            var todos = Boton(_ventana, "▶  Ver los cuatro", () => AlVerTutorial?.Invoke(-1), VarianteBoton.Primario);
+            for (var i = 0; i < MiniVideoTutorial3D.Titulos.Length; i++) {
+                var indice = i;
+                Boton(_ventana, (i + 1) + " · " + MiniVideoTutorial3D.Titulos[i], () => AlVerTutorial?.Invoke(indice), VarianteBoton.Secundario);
+            }
+            Boton(_ventana, "Volver", () => IrA(Vista.Principal), VarianteBoton.Fantasma);
+            return todos;
         }
 
         private Button PintarOpciones() {
